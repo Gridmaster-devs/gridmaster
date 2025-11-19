@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://csgsppiq2pvq4"]
+
+[node name="SaveButton" type="Button"]
+offset_right = 81.0
+offset_bottom = 31.0
+text = "Save Unit"
