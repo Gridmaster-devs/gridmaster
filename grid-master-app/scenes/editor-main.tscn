@@ -1,8 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://nxldab0hpse0"]
+[gd_scene load_steps=3 format=3 uid="uid://nxldab0hpse0"]
 
-[ext_resource type="PackedScene" uid="uid://dobbracx71ad" path="res://scenes/map-editor.tscn" id="1_t5mqw"]
-[ext_resource type="PackedScene" uid="uid://d1mgyle0o8kx3" path="res://scenes/unit-editor.tscn" id="2_lvkd1"]
-[ext_resource type="PackedScene" uid="uid://bo7oe8477f30h" path="res://scenes/game_editor.tscn" id="3_7dy3i"]
+[ext_resource type="Script" uid="uid://78n4c50gry5c" path="res://scenes/h_box_container.gd" id="1_svbj7"]
 
 [sub_resource type="Theme" id="Theme_pxqd5"]
 
@@ -68,6 +66,7 @@ item_0/id = 0
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/ColorRect/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 6
+script = ExtResource("1_svbj7")
 
 [node name="Button" type="Button" parent="VBoxContainer/ColorRect/HBoxContainer/HBoxContainer"]
 layout_mode = 2
@@ -81,19 +80,3 @@ text = "Unit Editor"
 layout_mode = 2
 text = "Game Editor
 "
-
-[node name="Button" type="Control" parent="VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="MapEditor" parent="VBoxContainer/Button" instance=ExtResource("1_t5mqw")]
-visible = false
-layout_mode = 1
-
-[node name="UnitEditor" parent="VBoxContainer/Button" instance=ExtResource("2_lvkd1")]
-visible = false
-layout_mode = 1
-
-[node name="GameEditor" parent="VBoxContainer/Button" instance=ExtResource("3_7dy3i")]
-visible = false
-layout_mode = 1

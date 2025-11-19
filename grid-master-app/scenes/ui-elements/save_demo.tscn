@@ -1,0 +1,42 @@
+[gd_scene load_steps=4 format=3 uid="uid://by2rcslgtjd7v"]
+
+[ext_resource type="Script" uid="uid://cy74qa3doa3xw" path="res://scripts/event_handler.gd" id="1_p5t5k"]
+[ext_resource type="Script" uid="uid://cwoy43aaig3mp" path="res://scripts/unit_stats.gd" id="2_4m0l6"]
+[ext_resource type="PackedScene" uid="uid://csgsppiq2pvq4" path="res://scenes/ui-elements/save_button.tscn" id="2_12wcm"]
+
+[node name="SaveDemo" type="HFlowContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="EventHandler" type="Control" parent="." node_paths=PackedStringArray("unit_name", "unit_description")]
+layout_mode = 2
+script = ExtResource("1_p5t5k")
+unit_stats = ExtResource("2_4m0l6")
+unit_name = NodePath("../HSplitContainer/NameEdit")
+unit_description = NodePath("../HSplitContainer/DescriptionEdit")
+
+[node name="SaveButton" parent="." instance=ExtResource("2_12wcm")]
+layout_mode = 2
+
+[node name="LoadButton" type="Button" parent="."]
+layout_mode = 2
+text = "Load Unit"
+
+[node name="HSplitContainer" type="HSplitContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="NameEdit" type="LineEdit" parent="HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "name your unit"
+
+[node name="DescriptionEdit" type="TextEdit" parent="HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "describe your unit"
+
+[connection signal="pressed" from="SaveButton" to="EventHandler" method="_save_unit"]
