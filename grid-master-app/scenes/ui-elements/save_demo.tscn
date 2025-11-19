@@ -1,22 +1,47 @@
-[gd_scene load_steps=4 format=3 uid="uid://by2rcslgtjd7v"]
+[gd_scene load_steps=7 format=3 uid="uid://by2rcslgtjd7v"]
 
 [ext_resource type="Script" uid="uid://cy74qa3doa3xw" path="res://scripts/event_handler.gd" id="1_p5t5k"]
 [ext_resource type="Script" uid="uid://cwoy43aaig3mp" path="res://scripts/unit_stats.gd" id="2_4m0l6"]
 [ext_resource type="PackedScene" uid="uid://csgsppiq2pvq4" path="res://scenes/ui-elements/save_button.tscn" id="2_12wcm"]
+[ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://themes/editor-theme.tres" id="4_072sb"]
+[ext_resource type="Texture2D" uid="uid://c1w6x3k5dpnv2" path="res://sprites/ui_images/placeholder.jpg" id="5_yta5o"]
+[ext_resource type="Script" uid="uid://byhvs0ee5ohef" path="res://scripts/texture_rect_clicked.gd" id="6_yta5o"]
 
 [node name="SaveDemo" type="HFlowContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_right = -1120.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="EventHandler" type="Control" parent="." node_paths=PackedStringArray("unit_name", "unit_description")]
-layout_mode = 2
+[node name="EventHandler" type="Node" parent="." node_paths=PackedStringArray("load_dialog", "image_picker", "unit_name", "unit_description", "image_container")]
 script = ExtResource("1_p5t5k")
+load_dialog = NodePath("LoadUnitDialog")
+image_picker = NodePath("ImagePicker")
 unit_stats = ExtResource("2_4m0l6")
-unit_name = NodePath("../HSplitContainer/NameEdit")
-unit_description = NodePath("../HSplitContainer/DescriptionEdit")
+unit_name = NodePath("../NameEdit")
+unit_description = NodePath("../DescriptionEdit")
+image_container = NodePath("../PanelContainer/ImageBox/TextureRect")
+
+[node name="LoadUnitDialog" type="FileDialog" parent="EventHandler"]
+oversampling_override = 1.0
+title = "Open a File"
+initial_position = 1
+ok_button_text = "Load"
+file_mode = 0
+display_mode = 1
+access = 1
+root_subfolder = "units"
+filters = PackedStringArray("*.tres", "*.res")
+
+[node name="ImagePicker" type="FileDialog" parent="EventHandler"]
+oversampling_override = 1.0
+title = "Open a File"
+initial_position = 1
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.jpeg", "*.png")
 
 [node name="SaveButton" parent="." instance=ExtResource("2_12wcm")]
 layout_mode = 2
@@ -25,18 +50,40 @@ layout_mode = 2
 layout_mode = 2
 text = "Load Unit"
 
-[node name="HSplitContainer" type="HSplitContainer" parent="."]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="NameEdit" type="LineEdit" parent="HSplitContainer"]
+[node name="NameEdit" type="LineEdit" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "name your unit"
 
-[node name="DescriptionEdit" type="TextEdit" parent="HSplitContainer"]
+[node name="DescriptionEdit" type="TextEdit" parent="."]
+custom_minimum_size = Vector2(800, 100)
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "describe your unit"
 
+[node name="PanelContainer" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(400, 400)
+layout_mode = 2
+
+[node name="ImageBox" type="VBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainer/ImageBox"]
+layout_mode = 2
+text = "   Image"
+
+[node name="TextureRect" type="TextureRect" parent="PanelContainer/ImageBox"]
+custom_minimum_size = Vector2(350, 350)
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
+theme = ExtResource("4_072sb")
+texture = ExtResource("5_yta5o")
+expand_mode = 1
+script = ExtResource("6_yta5o")
+
+[connection signal="file_selected" from="EventHandler/LoadUnitDialog" to="EventHandler" method="_load_unit"]
+[connection signal="file_selected" from="EventHandler/ImagePicker" to="EventHandler" method="_set_image"]
 [connection signal="pressed" from="SaveButton" to="EventHandler" method="_save_unit"]
+[connection signal="pressed" from="LoadButton" to="EventHandler" method="_show_load_dialog"]
+[connection signal="left_clicked" from="PanelContainer/ImageBox/TextureRect" to="EventHandler" method="_pick_image"]
