@@ -1,7 +1,14 @@
-[gd_resource type="Theme" load_steps=3 format=3 uid="uid://yxekjv7f7m0g"]
+[gd_resource type="Theme" load_steps=4 format=3 uid="uid://yxekjv7f7m0g"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vkfub"]
 bg_color = Color(0, 0.26298377, 0.27078637, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v4w48"]
+bg_color = Color(0.08812428, 0.4416501, 0.44633758, 1)
 corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10
@@ -18,7 +25,7 @@ corner_radius_top_right = 10
 [resource]
 PanelContainer/styles/panel = SubResource("StyleBoxFlat_vkfub")
 SectionLabel/base_type = &"Label"
-SectionLabel/styles/normal = null
+SectionLabel/styles/normal = SubResource("StyleBoxFlat_v4w48")
 TopLabel/base_type = &"Label"
 TopLabel/styles/normal = SubResource("StyleBoxFlat_ch5s5")
 TopVBox/base_type = &"VBoxContainer"
