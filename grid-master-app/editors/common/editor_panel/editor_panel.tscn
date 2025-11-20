@@ -11,6 +11,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("1_38p7f")
 script = ExtResource("2_ifgyv")
+title = "EditorPanel"
 
 [node name="TopVBox" type="VBoxContainer" parent="."]
 layout_mode = 2
@@ -22,7 +23,7 @@ layout_mode = 2
 size_flags_vertical = 0
 theme = ExtResource("1_38p7f")
 theme_type_variation = &"TopLabel"
-text = "Top Label"
+text = "EditorPanel"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="TopVBox"]
 layout_mode = 2
