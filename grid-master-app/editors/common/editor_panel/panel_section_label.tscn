@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://dvcuce0aqcc4r"]
+
+[ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://themes/editor-theme.tres" id="1_s1f3f"]
+
+[node name="PanelSectionLabel" type="Label"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_s1f3f")
+theme_type_variation = &"SectionLabel"
+text = "Section Label"
+horizontal_alignment = 1
+vertical_alignment = 1
