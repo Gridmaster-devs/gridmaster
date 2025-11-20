@@ -13,7 +13,6 @@ func _save_unit() -> void:
 	unit.name = unit_name.text
 	unit.image = image_container.texture
 	ResourceSaver.save(unit, "user://units/{name}.tres".format({"name" : unit_name.text}))
-	print("Saved unit {name}".format({"name" : unit_name.text}))
 	
 func _show_load_dialog() -> void:
 	load_dialog.show()
@@ -30,3 +29,10 @@ func _pick_image() -> void:
 func _set_image(path: String) -> void:
 	var image = Image.load_from_file(path)
 	image_container.texture = ImageTexture.create_from_image(image)
+	
+func _init() -> void:
+	if not DirAccess.dir_exists_absolute("user://units"):
+		DirAccess.make_dir_absolute("user://units")
+
+func _ready() -> void:
+	load_dialog.root_subfolder = "units"
