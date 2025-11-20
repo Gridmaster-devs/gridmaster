@@ -20,7 +20,6 @@ func update_name():
 	if Engine.is_editor_hint():
 		var top_label : Label = get_node("TopVBox/TopLabel")
 		if title.is_empty():
-			print("Empty title")
 			title = self.name
 		print("Title is " + title)
 		top_label.text = title

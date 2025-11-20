@@ -1,17 +1,38 @@
-[gd_scene format=3 uid="uid://duy7bm2yir3f1"]
+[gd_scene load_steps=3 format=3 uid="uid://duy7bm2yir3f1"]
 
-[node name="PanelItem" type="HBoxContainer"]
-anchors_preset = 15
+[ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://themes/editor-theme.tres" id="1_axgwj"]
+[ext_resource type="Script" uid="uid://bbvhgqhj2mil" path="res://editors/common/editor_panel/panel_item_contents.gd" id="2_s4jd0"]
+
+[node name="PanelItem" type="VBoxContainer"]
+anchors_preset = 14
+anchor_top = 0.5
 anchor_right = 1.0
-anchor_bottom = 1.0
+anchor_bottom = 0.5
+offset_bottom = 23.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme = ExtResource("1_axgwj")
+script = ExtResource("2_s4jd0")
+text = "PanelItem"
+type = 2
+items = Array[String](["Boiiiiiii", "Slay"])
 
-[node name="Item Name" type="Label" parent="."]
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 2
-text = "Item name"
 
-[node name="LItem Value" type="LineEdit" parent="."]
+[node name="Label" type="Label" parent="HBoxContainer"]
 layout_mode = 2
-text = "Value"
-placeholder_text = "enter value"
+size_flags_horizontal = 3
+text = "PanelItem"
+
+[node name="OptionButton" type="OptionButton" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+selected = 0
+item_count = 2
+popup/item_0/text = "Boiiiiiii"
+popup/item_0/id = 0
+popup/item_1/text = "Slay"
+popup/item_1/id = 1
