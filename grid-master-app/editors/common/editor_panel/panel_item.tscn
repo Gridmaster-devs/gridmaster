@@ -9,11 +9,9 @@ grow_vertical = 2
 
 [node name="Item Name" type="Label" parent="."]
 layout_mode = 2
-size_flags_horizontal = 3
 text = "Item name"
 
 [node name="LItem Value" type="LineEdit" parent="."]
 layout_mode = 2
-size_flags_horizontal = 3
 text = "Value"
 placeholder_text = "enter value"
