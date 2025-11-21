@@ -1,8 +1,8 @@
 [gd_scene load_steps=5 format=3 uid="uid://nxldab0hpse0"]
 
-[ext_resource type="PackedScene" uid="uid://dobbracx71ad" path="res://scenes/map-editor-scenes/map-editor.tscn" id="1_t5mqw"]
-[ext_resource type="PackedScene" uid="uid://d1mgyle0o8kx3" path="res://scenes/unit-editor.tscn" id="2_lvkd1"]
-[ext_resource type="PackedScene" uid="uid://bo7oe8477f30h" path="res://scenes/game_editor.tscn" id="3_7dy3i"]
+[ext_resource type="PackedScene" uid="uid://dobbracx71ad" path="res://editors/map_editor/map-editor.tscn" id="1_t5mqw"]
+[ext_resource type="PackedScene" uid="uid://d1mgyle0o8kx3" path="res://editors/unit_editor/unit_editor.tscn" id="2_lvkd1"]
+[ext_resource type="PackedScene" uid="uid://bo7oe8477f30h" path="res://editors/game_editor/game_editor.tscn" id="3_7dy3i"]
 
 [sub_resource type="Theme" id="Theme_pxqd5"]
 

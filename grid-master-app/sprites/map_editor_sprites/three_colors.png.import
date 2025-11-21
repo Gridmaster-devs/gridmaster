@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bwgcqw3v3nert"
-path="res://.godot/imported/three-colors.png-818e691d5e0e423cda71bdfc81b8bde0.ctex"
+path="res://.godot/imported/three_colors.png-4ba5ba43f556eb17161f28b07d31608d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/map-editor-sprites/three-colors.png"
-dest_files=["res://.godot/imported/three-colors.png-818e691d5e0e423cda71bdfc81b8bde0.ctex"]
+source_file="res://sprites/map_editor_sprites/three_colors.png"
+dest_files=["res://.godot/imported/three_colors.png-4ba5ba43f556eb17161f28b07d31608d.ctex"]
 
 [params]
 
