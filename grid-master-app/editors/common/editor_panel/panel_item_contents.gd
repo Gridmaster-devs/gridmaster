@@ -7,7 +7,20 @@ extends VBoxContainer
 
 var items : Array[String] = []
 var label_path = "HBoxContainer/ItemName"
-var dropdown_path = ""
+var value_container_path = ""
+
+func get_value():
+	match type:
+		0:
+			var node : LineEdit = get_node(value_container_path) as LineEdit
+			return node.text
+		1:
+			var node : CheckBox = get_node(value_container_path) as CheckBox
+			return node.is_pressed()
+		2:
+			var node : OptionButton = get_node(value_container_path) as OptionButton
+			var index = node.selected
+			return items[index]
 
 func update_item():
 	if Engine.is_editor_hint():
@@ -35,13 +48,12 @@ func update_text():
 
 func update_dropdown():
 	if type == 2:
-		var dropdown = get_node(dropdown_path) as OptionButton
+		var dropdown = get_node(value_container_path) as OptionButton
 		for i in dropdown.item_count:
 			dropdown.remove_item(i)
 		for item in items:
 			dropdown.add_item(item)
-		
-
+	
 func make_field_item():
 	var root = get_tree().edited_scene_root
 	var container = HBoxContainer.new()
@@ -58,6 +70,7 @@ func make_field_item():
 	
 	container.set_anchors_preset(PRESET_HCENTER_WIDE, true)
 	label_path = label.get_path()
+	value_container_path = line_edit.get_path()
 	label.size_flags_horizontal = SIZE_EXPAND_FILL
 	line_edit.size_flags_horizontal = SIZE_EXPAND_FILL
 	
@@ -77,6 +90,7 @@ func make_checkbox_item():
 	
 	container.set_anchors_preset(PRESET_HCENTER_WIDE, true)
 	label_path = label.get_path()
+	value_container_path = checkbox.get_path()
 	label.size_flags_horizontal = SIZE_EXPAND_FILL
 	checkbox.size_flags_horizontal = SIZE_EXPAND_FILL
 	
@@ -96,7 +110,7 @@ func make_dropdown_item():
 	
 	container.set_anchors_preset(PRESET_HCENTER_WIDE, true)
 	label_path = label.get_path()
-	dropdown_path = dropdown.get_path()
+	value_container_path = dropdown.get_path()
 	label.size_flags_horizontal = SIZE_EXPAND_FILL
 	dropdown.size_flags_horizontal = SIZE_EXPAND_FILL
 

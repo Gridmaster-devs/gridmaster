@@ -8,7 +8,7 @@ extends Node
 @export var image_container : TextureRect
 
 func _save_unit() -> void:
-	var unit = UnitStats.new()
+	var unit = UnitResource.new()
 	unit.description = unit_description.text
 	unit.name = unit_name.text
 	unit.image = image_container.texture
@@ -18,7 +18,7 @@ func _show_load_dialog() -> void:
 	load_dialog.show()
 	
 func _load_unit(path : String) -> void:
-	var data = ResourceLoader.load(path) as UnitStats
+	var data = ResourceLoader.load(path) as UnitResource
 	unit_name.text = data.name
 	unit_description.text = data.description
 	image_container.texture = data.image
