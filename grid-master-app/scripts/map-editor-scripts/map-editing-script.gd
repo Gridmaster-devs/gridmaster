@@ -25,3 +25,6 @@ func _input(event):
 			
 			tile_map.set_cell(grid_pos, cur_source, cur_set_cord, 0)
 			
+
+func _draw() -> void:
+	pass

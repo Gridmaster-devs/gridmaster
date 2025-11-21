@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://nwroc3fkan84"]
+[gd_scene load_steps=11 format=4 uid="uid://nwroc3fkan84"]
 
 [ext_resource type="Script" uid="uid://c30cixnwoblrw" path="res://scripts/map-editor-scripts/map-editing-script.gd" id="1_7x244"]
 [ext_resource type="Texture2D" uid="uid://bwgcqw3v3nert" path="res://sprites/map_editor_sprites/three_colors.png" id="2_cekfr"]
@@ -20,10 +20,11 @@ texture_region_size = Vector2i(64, 64)
 tile_size = Vector2i(64, 64)
 sources/0 = SubResource("TileSetAtlasSource_57ywr")
 
-[node name="MapEditor2" type="Node2D"]
+[node name="MapEditor" type="Node2D"]
 script = ExtResource("1_7x244")
 
 [node name="TileMapLayer" type="TileMapLayer" parent="."]
+tile_map_data = PackedByteArray("AAAKAAMAAAAAAAAAAAAKAAQAAAAAAAAAAAAKAAUAAAAAAAAAAAAKAAYAAAAAAAAAAAAHAAcAAAABAAAAAAAIAAcAAAABAAAAAAAJAAcAAAABAAAAAAAKAAcAAAABAAAAAAALAAcAAAABAAAAAAAMAAcAAAABAAAAAAANAAcAAAABAAAAAAA=")
 tile_set = SubResource("TileSet_3s3gj")
 
 [node name="Camera2D" type="Camera2D" parent="."]
