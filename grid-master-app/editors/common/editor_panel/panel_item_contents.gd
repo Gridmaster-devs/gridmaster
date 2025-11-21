@@ -8,7 +8,15 @@ extends VBoxContainer
 
 var items : Array[String] = []
 var label_path = "HBoxContainer/ItemName"
+
+# THIS IS THE ISSUE, GETS RESET WHEN THE SCENE IS NOT LIVE
+# REPLACE THE USAGE OF THIS WITH ABSOLUTE PATHS FOR GETTERS AND SETTERS
+# ALSO NOTICE THAT THE TOOL SCRIPT FUNCTION THAT MAKES THE DROPDOWN USES THIS
+# TO SET VALUES IN EDITOR; THIS IS NOT USELESS, JUST NOT FIT FOR GET_VALUE AND SET_VALUE
+# (the get and set at the bottom relate to godot's internal logic and work fine
+# this problem has to do with the top most functions)
 var value_container_path = ""
+
 
 func get_value():
 	match type:
