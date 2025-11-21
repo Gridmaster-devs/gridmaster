@@ -50,6 +50,6 @@ func update_headers():
 				sub_sections.get_or_add(h, section)
 			i += 1
 		for over_max in range(i, content_box.get_child_count()):
-			var removed = content_box.get_child(over_max)
+			var removed = content_box.get_child(i)
 			sub_sections.erase(removed.name)
 			content_box.remove_child(removed)
