@@ -1,4 +1,5 @@
 @tool
+class_name PanelItem
 extends VBoxContainer
 
 @export var text : String
@@ -21,6 +22,18 @@ func get_value():
 			var node : OptionButton = get_node(value_container_path) as OptionButton
 			var index = node.selected
 			return items[index]
+			
+func set_value(val): 
+	match type:
+		0:
+			var node : LineEdit = get_node(value_container_path) as LineEdit
+			node.text = val
+		1:
+			var node : CheckBox = get_node(value_container_path) as CheckBox
+			node.set_pressed(val)
+		2:
+			var node : OptionButton = get_node(value_container_path) as OptionButton
+			node.selected = val
 
 func update_item():
 	if Engine.is_editor_hint():
@@ -45,6 +58,7 @@ func update_text():
 	if text.is_empty():
 		text = self.name
 	get_node(label_path).text = text
+	self.name = text
 
 func update_dropdown():
 	if type == 2:
@@ -69,10 +83,12 @@ func make_field_item():
 	line_edit.owner = root
 	
 	container.set_anchors_preset(PRESET_HCENTER_WIDE, true)
+	container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label_path = label.get_path()
 	value_container_path = line_edit.get_path()
 	label.size_flags_horizontal = SIZE_EXPAND_FILL
 	line_edit.size_flags_horizontal = SIZE_EXPAND_FILL
+	line_edit.editable = true
 	
 func make_checkbox_item(): 
 	var root = get_tree().edited_scene_root
@@ -89,10 +105,12 @@ func make_checkbox_item():
 	checkbox.owner = root
 	
 	container.set_anchors_preset(PRESET_HCENTER_WIDE, true)
+	container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label_path = label.get_path()
 	value_container_path = checkbox.get_path()
 	label.size_flags_horizontal = SIZE_EXPAND_FILL
 	checkbox.size_flags_horizontal = SIZE_EXPAND_FILL
+	checkbox.set_disabled(false)
 	
 func make_dropdown_item():
 	var root = get_tree().edited_scene_root
@@ -109,10 +127,12 @@ func make_dropdown_item():
 	dropdown.owner = root
 	
 	container.set_anchors_preset(PRESET_HCENTER_WIDE, true)
+	container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label_path = label.get_path()
 	value_container_path = dropdown.get_path()
 	label.size_flags_horizontal = SIZE_EXPAND_FILL
 	dropdown.size_flags_horizontal = SIZE_EXPAND_FILL
+	dropdown.set_disabled(false)
 
 func _get_property_list():
 	var properties = []
@@ -139,3 +159,6 @@ func _set(property, value):
 		items = value
 		return true
 	return false
+	
+func _ready():
+	self.mouse_filter = Control.MOUSE_FILTER_IGNORE

@@ -16,15 +16,3 @@ size_flags_vertical = 4
 theme = ExtResource("1_axgwj")
 script = ExtResource("2_s4jd0")
 text = "PanelItem"
-
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "PanelItem"
-
-[node name="LineEdit" type="LineEdit" parent="HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3

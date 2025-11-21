@@ -16,8 +16,9 @@ extends Resource
 	"Flying", 
 	"Floating", 
 	"Teleporting") var movement_type : int
-@export var capturable : bool
+@export var movement_speed : int
 @export_group("Interaction")
+@export var capturable : bool
 @export_group("")
 
 @export_category("Resources")
