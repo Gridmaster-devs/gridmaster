@@ -1,0 +1,42 @@
+[gd_scene load_steps=3 format=3 uid="uid://0vbsphcn5703"]
+
+[ext_resource type="Script" uid="uid://bwqcq5xsksi7y" path="res://scripts/common-scripts/ui-element-scripts/draggable.gd" id="1_68oa1"]
+[ext_resource type="Script" uid="uid://p45oo81db6vn" path="res://scripts/map-editor-scripts/add-new-tile.gd" id="2_71ti5"]
+
+[node name="CreateNewTile" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1576.0
+offset_bottom = -383.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_68oa1")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.16206557, 0.1620656, 0.16206557, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Create a new tile"
+
+[node name="ColorPicker" type="ColorPicker" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Save"
+script = ExtResource("2_71ti5")

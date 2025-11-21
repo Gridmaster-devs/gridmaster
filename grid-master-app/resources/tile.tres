@@ -1,0 +1,6 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://ddpe8aav5ihar"]
+
+[ext_resource type="Script" uid="uid://cx4eb5xvjjpey" path="res://scripts/map-editor-scripts/tile-stats.gd" id="1_tuphj"]
+
+[resource]
+script = ExtResource("1_tuphj")

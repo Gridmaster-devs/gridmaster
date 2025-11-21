@@ -1,0 +1,79 @@
+[gd_scene load_steps=11 format=3 uid="uid://dobbracx71ad"]
+
+[ext_resource type="Script" uid="uid://c30cixnwoblrw" path="res://scripts/map-editor-scripts/map-editing-script.gd" id="1_3s3gj"]
+[ext_resource type="Texture2D" uid="uid://bwgcqw3v3nert" path="res://sprites/map-editor-sprites/three-colors.png" id="2_3s3gj"]
+[ext_resource type="Script" uid="uid://6g2o1upyh5q4" path="res://scripts/map-editor-scripts/map-camera-script.gd" id="2_aoi5e"]
+[ext_resource type="Script" uid="uid://3hho2kfjitxu" path="res://scripts/map-editor-scripts/set-blue-tile.gd" id="4_57ywr"]
+[ext_resource type="Script" uid="uid://dblu3phsac554" path="res://scripts/map-editor-scripts/set-red-tile.gd" id="4_nyrlk"]
+[ext_resource type="Script" uid="uid://dssbrvqmbt1b0" path="res://scripts/map-editor-scripts/set-green-tile.gd" id="6_0nj4j"]
+[ext_resource type="Script" uid="uid://c7dvdg0w230je" path="res://scripts/map-editor-scripts/open-new-tile-popup.gd" id="7_0nj4j"]
+[ext_resource type="Script" uid="uid://c6lrx2cwunu0i" path="res://scripts/map-editor-scripts/set-own-tile.gd" id="7_dsi2q"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_57ywr"]
+texture = ExtResource("2_3s3gj")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_3s3gj"]
+tile_size = Vector2i(64, 64)
+sources/0 = SubResource("TileSetAtlasSource_57ywr")
+
+[node name="MapEditor" type="Node2D"]
+script = ExtResource("1_3s3gj")
+
+[node name="TileMapLayer" type="TileMapLayer" parent="."]
+tile_set = SubResource("TileSet_3s3gj")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+anchor_mode = 0
+script = ExtResource("2_aoi5e")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Panel" type="Panel" parent="CanvasLayer"]
+custom_minimum_size = Vector2(300, 0)
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -300.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Button" type="Button" parent="CanvasLayer/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Red
+"
+script = ExtResource("4_nyrlk")
+
+[node name="Button2" type="Button" parent="CanvasLayer/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Blue
+"
+script = ExtResource("4_57ywr")
+
+[node name="Button3" type="Button" parent="CanvasLayer/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Green
+"
+script = ExtResource("6_0nj4j")
+
+[node name="Button5" type="Button" parent="CanvasLayer/Panel/VBoxContainer"]
+layout_mode = 2
+text = "my own"
+script = ExtResource("7_dsi2q")
+
+[node name="Button4" type="Button" parent="CanvasLayer/Panel/VBoxContainer"]
+layout_mode = 2
+text = "new tile"
+script = ExtResource("7_0nj4j")
