@@ -16,8 +16,6 @@ size_flags_vertical = 4
 theme = ExtResource("1_axgwj")
 script = ExtResource("2_s4jd0")
 text = "PanelItem"
-type = 2
-items = Array[String](["Boiiiiiii", "Slay"])
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 2
@@ -27,12 +25,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "PanelItem"
 
-[node name="OptionButton" type="OptionButton" parent="HBoxContainer"]
+[node name="LineEdit" type="LineEdit" parent="HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-selected = 0
-item_count = 2
-popup/item_0/text = "Boiiiiiii"
-popup/item_0/id = 0
-popup/item_1/text = "Slay"
-popup/item_1/id = 1
