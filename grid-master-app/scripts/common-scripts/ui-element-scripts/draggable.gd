@@ -2,7 +2,12 @@ extends Control
 
 var dragging := false
 var drag_offset := Vector2.ZERO
- 
+var parent_ref = null
+
+func init(parent_path: String): 
+	parent_ref = get_node(parent_path)
+
+
 func _gui_input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
