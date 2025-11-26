@@ -7,7 +7,7 @@
 [ext_resource type="Script" uid="uid://dgeudson3p1wa" path="res://scripts/map-editor-scripts/tile_grid_gen.gd" id="5_7x244"]
 [ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/editor_panel.tscn" id="6_woml6"]
 [ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/panel_item.tscn" id="7_woml6"]
-[ext_resource type="Script" uid="uid://c7dvdg0w230je" path="res://scripts/map-editor-scripts/open_tile_color_picker.gd" id="8_t7crc"]
+[ext_resource type="Script" uid="uid://bg4hv7x0k1qvk" path="res://scripts/map-editor-scripts/open_new_tile_popup.gd" id="8_7x244"]
 
 [sub_resource type="TileSet" id="TileSet_3s3gj"]
 tile_size = Vector2i(64, 64)
@@ -231,7 +231,7 @@ custom_minimum_size = Vector2(84, 84)
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "+"
-script = ExtResource("8_t7crc")
+script = ExtResource("8_7x244")
 
 [node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tile library/GridContainer/VBoxContainer"]
 custom_minimum_size = Vector2(84, 64)

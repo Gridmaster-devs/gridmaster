@@ -1,5 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://ds0w463f0tq7w"]
+[gd_scene load_steps=6 format=3 uid="uid://ds0w463f0tq7w"]
 
+[ext_resource type="Script" uid="uid://b60lcnw54cidu" path="res://scripts/map-editor-scripts/new_tile_scripts/new_tile_root.gd" id="1_p8hom"]
 [ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/editor_panel.tscn" id="1_uhk68"]
 [ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/panel_item.tscn" id="2_ilbg8"]
 [ext_resource type="Script" uid="uid://c7dvdg0w230je" path="res://scripts/map-editor-scripts/open_tile_color_picker.gd" id="3_4yvtc"]
@@ -13,6 +14,7 @@ offset_right = 0.23995972
 offset_bottom = -0.52001953
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_p8hom")
 
 [node name="EditorPanel" parent="." instance=ExtResource("1_uhk68")]
 layout_mode = 1
