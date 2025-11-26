@@ -1,0 +1,47 @@
+[gd_scene load_steps=3 format=3 uid="uid://dwbescfigvm0m"]
+
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/editor_panel.tscn" id="1_nc4hq"]
+[ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/panel_item.tscn" id="2_ckwvq"]
+
+[node name="TestingScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="EditorPanel" parent="." instance=ExtResource("1_nc4hq")]
+layout_mode = 0
+anchors_preset = 0
+mouse_filter = 2
+section_headers = Array[String](["header 1"])
+
+[node name="header 1" type="VBoxContainer" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/header 1"]
+layout_mode = 2
+theme_type_variation = &"SectionLabel"
+text = "header 1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PanelItem" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/header 1" instance=ExtResource("2_ckwvq")]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/header 1/PanelItem"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/header 1/PanelItem/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "PanelItem"
+
+[node name="LineEdit" type="LineEdit" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/header 1/PanelItem/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[editable path="EditorPanel"]

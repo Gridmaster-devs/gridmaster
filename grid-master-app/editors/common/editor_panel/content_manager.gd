@@ -53,6 +53,7 @@ func update_headers():
 			var removed = content_box.get_child(i)
 			sub_sections.erase(removed.name)
 			content_box.remove_child(removed)
+			# TODO: This also removes non-label nodes, which means it can wipe your other work accidentally. Should fix.
 			
 func _ready():
 	self.mouse_filter = Control.MOUSE_FILTER_IGNORE
