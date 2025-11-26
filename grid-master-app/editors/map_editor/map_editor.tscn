@@ -1,24 +1,14 @@
-[gd_scene load_steps=13 format=3 uid="uid://nwroc3fkan84"]
+[gd_scene load_steps=10 format=3 uid="uid://nwroc3fkan84"]
 
 [ext_resource type="Script" uid="uid://c30cixnwoblrw" path="res://scripts/map-editor-scripts/map-editing-script.gd" id="1_7x244"]
-[ext_resource type="Texture2D" uid="uid://bwgcqw3v3nert" path="res://sprites/map_editor_sprites/three_colors.png" id="2_cekfr"]
 [ext_resource type="Script" uid="uid://pfgcd2tk24gn" path="res://scripts/map-editor-scripts/sub_viewport_script.gd" id="2_qqlts"]
 [ext_resource type="Script" uid="uid://6g2o1upyh5q4" path="res://scripts/map-editor-scripts/map-camera-script.gd" id="3_x2l8i"]
 [ext_resource type="Texture2D" uid="uid://doqe1u6vume5c" path="res://sprites/map_editor_sprites/grid_invis.png" id="4_woml6"]
 [ext_resource type="Script" uid="uid://dgeudson3p1wa" path="res://scripts/map-editor-scripts/tile_grid_gen.gd" id="5_7x244"]
-[ext_resource type="Script" uid="uid://c6lrx2cwunu0i" path="res://scripts/map-editor-scripts/set-own-tile.gd" id="7_1xdc5"]
 [ext_resource type="Script" uid="uid://c7dvdg0w230je" path="res://scripts/map-editor-scripts/open-new-tile-popup.gd" id="8_t7crc"]
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_woml6"]
-texture = ExtResource("2_cekfr")
-texture_region_size = Vector2i(64, 64)
-0:0/0 = 0
-1:0/0 = 0
-2:0/0 = 0
 
 [sub_resource type="TileSet" id="TileSet_3s3gj"]
 tile_size = Vector2i(64, 64)
-sources/0 = SubResource("TileSetAtlasSource_woml6")
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7x244"]
 texture = ExtResource("4_woml6")
@@ -98,12 +88,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Button5" type="Button" parent="VBoxContainer/HBoxContainer/Panel/VBoxContainer"]
-layout_mode = 2
-text = "my own"
-script = ExtResource("7_1xdc5")
-
 [node name="Button4" type="Button" parent="VBoxContainer/HBoxContainer/Panel/VBoxContainer"]
 layout_mode = 2
 text = "new tile"
 script = ExtResource("8_t7crc")
+
+[node name="Tile_library" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/Panel/VBoxContainer"]
+layout_mode = 2

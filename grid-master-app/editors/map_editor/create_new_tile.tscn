@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://0vbsphcn5703"]
+[gd_scene load_steps=3 format=3 uid="uid://da7gwnaom168w"]
 
 [ext_resource type="Script" uid="uid://bwqcq5xsksi7y" path="res://scripts/common-scripts/ui-element-scripts/draggable.gd" id="1_l4m5y"]
 [ext_resource type="Script" uid="uid://p45oo81db6vn" path="res://scripts/map-editor-scripts/add-new-tile.gd" id="2_ew0t7"]
