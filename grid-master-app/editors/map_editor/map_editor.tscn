@@ -1,13 +1,15 @@
-[gd_scene load_steps=9 format=4 uid="uid://nwroc3fkan84"]
+[gd_scene load_steps=13 format=3 uid="uid://nwroc3fkan84"]
 
 [ext_resource type="Script" uid="uid://c30cixnwoblrw" path="res://scripts/map-editor-scripts/map-editing-script.gd" id="1_7x244"]
 [ext_resource type="Texture2D" uid="uid://bwgcqw3v3nert" path="res://sprites/map_editor_sprites/three_colors.png" id="2_cekfr"]
 [ext_resource type="Script" uid="uid://pfgcd2tk24gn" path="res://scripts/map-editor-scripts/sub_viewport_script.gd" id="2_qqlts"]
 [ext_resource type="Script" uid="uid://6g2o1upyh5q4" path="res://scripts/map-editor-scripts/map-camera-script.gd" id="3_x2l8i"]
+[ext_resource type="Texture2D" uid="uid://doqe1u6vume5c" path="res://sprites/map_editor_sprites/grid_invis.png" id="4_woml6"]
+[ext_resource type="Script" uid="uid://dgeudson3p1wa" path="res://scripts/map-editor-scripts/tile_grid_gen.gd" id="5_7x244"]
 [ext_resource type="Script" uid="uid://c6lrx2cwunu0i" path="res://scripts/map-editor-scripts/set-own-tile.gd" id="7_1xdc5"]
 [ext_resource type="Script" uid="uid://c7dvdg0w230je" path="res://scripts/map-editor-scripts/open-new-tile-popup.gd" id="8_t7crc"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_57ywr"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_woml6"]
 texture = ExtResource("2_cekfr")
 texture_region_size = Vector2i(64, 64)
 0:0/0 = 0
@@ -16,7 +18,16 @@ texture_region_size = Vector2i(64, 64)
 
 [sub_resource type="TileSet" id="TileSet_3s3gj"]
 tile_size = Vector2i(64, 64)
-sources/0 = SubResource("TileSetAtlasSource_57ywr")
+sources/0 = SubResource("TileSetAtlasSource_woml6")
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7x244"]
+texture = ExtResource("4_woml6")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_cekfr"]
+tile_size = Vector2i(64, 64)
+sources/1 = SubResource("TileSetAtlasSource_7x244")
 
 [node name="MapEditor" type="Control"]
 layout_mode = 3
@@ -62,13 +73,18 @@ size = Vector2i(2, 2)
 render_target_update_mode = 4
 script = ExtResource("2_qqlts")
 
+[node name="TileMapLayer" type="TileMapLayer" parent="VBoxContainer/HBoxContainer/SubViewControl/SubViewportContainer/SubViewport"]
+tile_set = SubResource("TileSet_3s3gj")
+
+[node name="TileMapGrid" type="TileMapLayer" parent="VBoxContainer/HBoxContainer/SubViewControl/SubViewportContainer/SubViewport"]
+tile_set = SubResource("TileSet_cekfr")
+script = ExtResource("5_7x244")
+width = 200
+height = 200
+
 [node name="Camera2D" type="Camera2D" parent="VBoxContainer/HBoxContainer/SubViewControl/SubViewportContainer/SubViewport"]
 anchor_mode = 0
 script = ExtResource("3_x2l8i")
-
-[node name="TileMapLayer" type="TileMapLayer" parent="VBoxContainer/HBoxContainer/SubViewControl/SubViewportContainer/SubViewport"]
-tile_map_data = PackedByteArray("AAAKAAMAAAAAAAAAAAAKAAQAAAAAAAAAAAAKAAUAAAAAAAAAAAAKAAYAAAAAAAAAAAAHAAcAAAABAAAAAAAIAAcAAAABAAAAAAAJAAcAAAABAAAAAAAKAAcAAAABAAAAAAALAAcAAAABAAAAAAAMAAcAAAABAAAAAAANAAcAAAABAAAAAAA=")
-tile_set = SubResource("TileSet_3s3gj")
 
 [node name="Panel" type="Panel" parent="VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(300, 0)
