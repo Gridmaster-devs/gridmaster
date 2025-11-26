@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://nwroc3fkan84"]
+[gd_scene load_steps=12 format=3 uid="uid://nwroc3fkan84"]
 
 [ext_resource type="Script" uid="uid://c30cixnwoblrw" path="res://scripts/map-editor-scripts/map-editing-script.gd" id="1_7x244"]
 [ext_resource type="Script" uid="uid://pfgcd2tk24gn" path="res://scripts/map-editor-scripts/sub_viewport_script.gd" id="2_qqlts"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://dgeudson3p1wa" path="res://scripts/map-editor-scripts/tile_grid_gen.gd" id="5_7x244"]
 [ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/editor_panel.tscn" id="6_woml6"]
 [ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/panel_item.tscn" id="7_woml6"]
+[ext_resource type="Script" uid="uid://c7dvdg0w230je" path="res://scripts/map-editor-scripts/open-new-tile-popup.gd" id="8_t7crc"]
 
 [sub_resource type="TileSet" id="TileSet_3s3gj"]
 tile_size = Vector2i(64, 64)
@@ -225,11 +226,12 @@ columns = 4
 [node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tile library/GridContainer"]
 layout_mode = 2
 
-[node name="Button" type="Button" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tile library/GridContainer/VBoxContainer"]
+[node name="new_tile_button" type="Button" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tile library/GridContainer/VBoxContainer"]
 custom_minimum_size = Vector2(84, 84)
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "+"
+script = ExtResource("8_t7crc")
 
 [node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tile library/GridContainer/VBoxContainer"]
 custom_minimum_size = Vector2(84, 64)
