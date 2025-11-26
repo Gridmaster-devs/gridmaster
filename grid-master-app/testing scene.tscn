@@ -12,8 +12,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="EditorPanel" parent="." instance=ExtResource("1_nc4hq")]
-layout_mode = 0
-anchors_preset = 0
+layout_mode = 1
 mouse_filter = 2
 section_headers = Array[String](["header 1"])
 
@@ -27,20 +26,17 @@ text = "header 1"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PanelItem" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/header 1" instance=ExtResource("2_ckwvq")]
+[node name="swag" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/header 1" instance=ExtResource("2_ckwvq")]
 layout_mode = 2
-mouse_filter = 2
+text = "swag"
+type = 3
 
-[node name="HBoxContainer" type="HBoxContainer" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/header 1/PanelItem"]
-layout_mode = 2
-mouse_filter = 2
-
-[node name="Label" type="Label" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/header 1/PanelItem/HBoxContainer"]
+[node name="Label" type="Label" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/header 1/swag"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "PanelItem"
+text = "swag"
 
-[node name="LineEdit" type="LineEdit" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/header 1/PanelItem/HBoxContainer"]
+[node name="SpinBox" type="SpinBox" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/header 1/swag"]
 layout_mode = 2
 size_flags_horizontal = 3
 
