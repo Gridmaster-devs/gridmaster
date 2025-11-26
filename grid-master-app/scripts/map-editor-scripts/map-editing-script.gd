@@ -10,6 +10,12 @@ extends Control
 
 var dragging = false
 
+
+var tile_data := {
+	
+}
+
+
 func _ready():
 	pass
 
