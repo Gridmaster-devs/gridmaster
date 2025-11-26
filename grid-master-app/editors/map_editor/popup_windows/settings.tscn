@@ -1,38 +1,81 @@
-[gd_scene load_steps=3 format=3 uid="uid://d27v75vsmk7v8"]
+[gd_scene load_steps=4 format=3 uid="uid://d27v75vsmk7v8"]
 
+[ext_resource type="Script" uid="uid://bwqcq5xsksi7y" path="res://scripts/common-scripts/ui-element-scripts/draggable.gd" id="1_2fwbw"]
 [ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/editor_panel.tscn" id="1_8yskk"]
 [ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/panel_item.tscn" id="2_qfd4r"]
 
 [node name="Settings" type="Control"]
 layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_right = -1509.0
-offset_bottom = -783.0
-grow_horizontal = 2
-grow_vertical = 2
+anchors_preset = 0
+script = ExtResource("1_2fwbw")
 
 [node name="EditorPanel" parent="." instance=ExtResource("1_8yskk")]
-layout_mode = 1
+layout_mode = 0
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_right = 433.5
+offset_bottom = 205.0
+grow_horizontal = 1
+grow_vertical = 1
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+title = "Settings"
+section_headers = Array[String](["Map dimensions"])
+
+[node name="TopLabel" parent="EditorPanel/TopVBox" index="0"]
+text = "Settings"
+
+[node name="Map dimensions" type="VBoxContainer" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Map dimensions"]
+layout_mode = 2
+theme_type_variation = &"SectionLabel"
+text = "Map dimensions"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Width" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Map dimensions" instance=ExtResource("2_qfd4r")]
+layout_mode = 2
+mouse_filter = 2
+text = "Width"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Map dimensions/Width"]
+layout_mode = 2
 mouse_filter = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="EditorPanel"]
+[node name="Label" type="Label" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Map dimensions/Width/HBoxContainer"]
 layout_mode = 2
-size_flags_vertical = 4
+size_flags_horizontal = 3
+text = "Width"
 
-[node name="PanelItem" parent="EditorPanel/VBoxContainer" instance=ExtResource("2_qfd4r")]
+[node name="LineEdit" type="LineEdit" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Map dimensions/Width/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Height" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Map dimensions" instance=ExtResource("2_qfd4r")]
+layout_mode = 2
+mouse_filter = 2
+text = "Height"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Map dimensions/Height"]
 layout_mode = 2
 mouse_filter = 2
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="EditorPanel/VBoxContainer/PanelItem"]
+[node name="Label" type="Label" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Map dimensions/Height/HBoxContainer"]
 layout_mode = 2
-mouse_filter = 2
+size_flags_horizontal = 3
+text = "Height"
 
-[node name="PanelItem2" parent="EditorPanel/VBoxContainer" instance=ExtResource("2_qfd4r")]
+[node name="LineEdit" type="LineEdit" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Map dimensions/Height/HBoxContainer"]
 layout_mode = 2
-mouse_filter = 2
+size_flags_horizontal = 3
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="EditorPanel/VBoxContainer/PanelItem2"]
+[node name="SaveBtn" type="Button" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="1"]
 layout_mode = 2
-mouse_filter = 2
+size_flags_vertical = 10
+text = "Save"
+
+[editable path="EditorPanel"]
