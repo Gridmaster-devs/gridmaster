@@ -1,11 +1,12 @@
-[gd_scene load_steps=10 format=3 uid="uid://nwroc3fkan84"]
+[gd_scene load_steps=11 format=3 uid="uid://nwroc3fkan84"]
 
 [ext_resource type="Script" uid="uid://c30cixnwoblrw" path="res://scripts/map-editor-scripts/map-editing-script.gd" id="1_7x244"]
 [ext_resource type="Script" uid="uid://pfgcd2tk24gn" path="res://scripts/map-editor-scripts/sub_viewport_script.gd" id="2_qqlts"]
 [ext_resource type="Script" uid="uid://6g2o1upyh5q4" path="res://scripts/map-editor-scripts/map-camera-script.gd" id="3_x2l8i"]
 [ext_resource type="Texture2D" uid="uid://doqe1u6vume5c" path="res://sprites/map_editor_sprites/grid_invis.png" id="4_woml6"]
 [ext_resource type="Script" uid="uid://dgeudson3p1wa" path="res://scripts/map-editor-scripts/tile_grid_gen.gd" id="5_7x244"]
-[ext_resource type="Script" uid="uid://c7dvdg0w230je" path="res://scripts/map-editor-scripts/open-new-tile-popup.gd" id="8_t7crc"]
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/editor_panel.tscn" id="6_woml6"]
+[ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/panel_item.tscn" id="7_woml6"]
 
 [sub_resource type="TileSet" id="TileSet_3s3gj"]
 tile_size = Vector2i(64, 64)
@@ -76,22 +77,178 @@ height = 200
 anchor_mode = 0
 script = ExtResource("3_x2l8i")
 
-[node name="Panel" type="Panel" parent="VBoxContainer/HBoxContainer"]
-custom_minimum_size = Vector2(300, 0)
+[node name="EditorPanel" parent="VBoxContainer/HBoxContainer" instance=ExtResource("6_woml6")]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+mouse_filter = 2
+section_headers = Array[String](["Current tile", "Tile library", "Tactical library"])
+
+[node name="Current tile" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Button4" type="Button" parent="VBoxContainer/HBoxContainer/Panel/VBoxContainer"]
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile"]
 layout_mode = 2
-text = "new tile"
-script = ExtResource("8_t7crc")
+theme_type_variation = &"SectionLabel"
+text = "Current tile"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="Tile_library" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/Panel/VBoxContainer"]
+[node name="Name" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile" instance=ExtResource("7_woml6")]
 layout_mode = 2
+mouse_filter = 2
+text = "Name"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/Name"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/Name/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Name"
+
+[node name="LineEdit" type="LineEdit" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/Name/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Protection" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile" instance=ExtResource("7_woml6")]
+layout_mode = 2
+mouse_filter = 2
+text = "Protection"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/Protection"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/Protection/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Protection"
+
+[node name="LineEdit" type="LineEdit" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/Protection/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Movement" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile" instance=ExtResource("7_woml6")]
+layout_mode = 2
+mouse_filter = 2
+text = "Movement"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/Movement"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/Movement/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Movement"
+
+[node name="LineEdit" type="LineEdit" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/Movement/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Hiding" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile" instance=ExtResource("7_woml6")]
+layout_mode = 2
+mouse_filter = 2
+text = "Hiding"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/Hiding"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/Hiding/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Hiding"
+
+[node name="LineEdit" type="LineEdit" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/Hiding/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="image_hbox" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/image_hbox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Image"
+
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/image_hbox"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/image_hbox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Choose image"
+
+[node name="Button2" type="Button" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/image_hbox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Crop"
+
+[node name="dimage_hbox" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/dimage_hbox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Destroyed image"
+
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/dimage_hbox"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/dimage_hbox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Choose image"
+
+[node name="Button2" type="Button" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/dimage_hbox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Crop"
+
+[node name="Tile library" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="1"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tile library"]
+layout_mode = 2
+theme_type_variation = &"SectionLabel"
+text = "Tile library"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tile library"]
+layout_mode = 2
+theme_override_constants/h_separation = 14
+columns = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tile library/GridContainer"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tile library/GridContainer/VBoxContainer"]
+custom_minimum_size = Vector2(84, 84)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "+"
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tile library/GridContainer/VBoxContainer"]
+custom_minimum_size = Vector2(84, 64)
+layout_mode = 2
+text = "New"
+autowrap_mode = 3
+
+[node name="Tactical library" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="2"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tactical library"]
+layout_mode = 2
+theme_type_variation = &"SectionLabel"
+text = "Tactical library"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tactical library"]
+layout_mode = 2
+columns = 6
+
+[editable path="VBoxContainer/HBoxContainer/EditorPanel"]

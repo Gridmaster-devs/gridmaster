@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://da7gwnaom168w"]
+[gd_scene load_steps=4 format=3 uid="uid://da7gwnaom168w"]
 
 [ext_resource type="Script" uid="uid://bwqcq5xsksi7y" path="res://scripts/common-scripts/ui-element-scripts/draggable.gd" id="1_l4m5y"]
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/editor_panel.tscn" id="2_4ihk2"]
 [ext_resource type="Script" uid="uid://p45oo81db6vn" path="res://scripts/map-editor-scripts/add-new-tile.gd" id="2_ew0t7"]
 
 [node name="CreateNewTile" type="Control"]
@@ -23,20 +24,24 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.16206557, 0.1620656, 0.16206557, 1)
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="EditorPanel" parent="." instance=ExtResource("2_4ihk2")]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+anchors_preset = 0
+mouse_filter = 2
+title = "Choose tile color"
 
-[node name="Label" type="Label" parent="VBoxContainer"]
+[node name="TopLabel" parent="EditorPanel/TopVBox" index="0"]
+text = "Choose tile color"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "Create a new tile"
 
-[node name="ColorPicker" type="ColorPicker" parent="VBoxContainer"]
+[node name="ColorPicker" type="ColorPicker" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/VBoxContainer"]
 layout_mode = 2
 
-[node name="Button" type="Button" parent="VBoxContainer"]
+[node name="Button" type="Button" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/VBoxContainer"]
 layout_mode = 2
 text = "Save"
 script = ExtResource("2_ew0t7")
+
+[editable path="EditorPanel"]
