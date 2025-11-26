@@ -2,14 +2,18 @@
 class_name PanelItem
 extends HBoxContainer
 
-
-
 enum PanelType {FIELD, CHECKBOX, DROPDOWN, SPINBOX}
 
+# this is the name of the attribute that will be saved in the dictionary
+@export var attribute_name : String
+
+# the text that will be shown to the user, explains the attribute
 @export var text : String
+
 @export_enum("Field", "Checkbox", "Dropdown", "Spinbox") var type : int
 @export_tool_button("Update Item", "Callable") var update_action = update_item
 
+# Array for the dropdown menu option
 var items : Array[String] = []
 
 # THIS IS THE ISSUE, GETS RESET WHEN THE SCENE IS NOT LIVE
@@ -29,6 +33,14 @@ func get_label():
 func get_content():
 	# assert(has_type == true, "the panel item has not been given a type, and thus does not have any children")
 	return get_child(1)
+
+func save_to_unit_resource(resource_p : UnitResourceDict):
+	resource_p.set_attribute(attribute_name, get_value())
+	
+func load_from_unit_resource(resource_p : UnitResourceDict):
+	var value = resource_p.get_attribute(attribute_name)
+	if (value != null):
+		set_value(value) # this assumes that the type of the attribute is the same in the dictionary and in here
 
 func get_value():
 	match type:
@@ -182,6 +194,12 @@ func _get_property_list():
 		PanelType.SPINBOX:
 			pass
 	return properties
+	
+func _on_save_to_resource(resource : UnitResourceDict):
+	save_to_unit_resource(resource)
+	
+func _on_load_from_resource(resource : UnitResourceDict):
+	load_from_unit_resource(resource)
 	
 func _get(property):
 	if property == "items":

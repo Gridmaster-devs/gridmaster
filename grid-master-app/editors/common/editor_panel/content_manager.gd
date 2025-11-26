@@ -3,6 +3,9 @@ extends PanelContainer
 
 @export var title : String
 
+signal save_to_resource(resource : UnitResourceDict)
+signal load_from_resource(resource : UnitResourceDict)
+
 @export_category("Contents")
 @export_group("Sections")
 @export var section_headers : Array[String]
@@ -12,6 +15,7 @@ extends PanelContainer
 @export_tool_button("Update Panel", "Callable") var update_action : Callable = update_panel
 
 var sub_sections : Dictionary[String, Node] = {}
+
 
 func update_panel():
 	if Engine.is_editor_hint():
@@ -53,7 +57,7 @@ func update_headers():
 			var removed = content_box.get_child(i)
 			sub_sections.erase(removed.name)
 			content_box.remove_child(removed)
-			# TODO: This also removes non-label nodes, which means it can wipe your other work accidentally. Should fix.
+			# TODO: This resets EVERYTHING, it should preserve headers that are already there
 			
 func _ready():
 	self.mouse_filter = Control.MOUSE_FILTER_IGNORE

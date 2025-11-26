@@ -1,4 +1,4 @@
-class_name UnitResource2
+class_name UnitResourceDict
 extends Resource
 
 # holds string : Attribute pairs
