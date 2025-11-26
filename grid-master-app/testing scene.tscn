@@ -32,6 +32,7 @@ attribute_name = "swag"
 text = "Swag amount"
 type = 2
 parent_editor_panel = NodePath("../../../../..")
+items = Array[String]([])
 
 [node name="Label" type="Label" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/header 1/Swag amount"]
 layout_mode = 2

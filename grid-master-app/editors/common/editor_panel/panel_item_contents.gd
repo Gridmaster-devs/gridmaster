@@ -13,6 +13,7 @@ enum PanelType {FIELD, CHECKBOX, DROPDOWN, SPINBOX}
 @export_enum("Field", "Checkbox", "Dropdown", "Spinbox") var type : int
 @export_tool_button("Update Item", "Callable") var update_action = update_item
 
+# this is pretty jank, it should automatically find the parent on ready
 @export var parent_editor_panel : EditorPanel
 
 # Array for the dropdown menu option
