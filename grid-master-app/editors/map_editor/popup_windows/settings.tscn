@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://d27v75vsmk7v8"]
+[gd_scene load_steps=5 format=3 uid="uid://d27v75vsmk7v8"]
 
 [ext_resource type="Script" uid="uid://bwqcq5xsksi7y" path="res://scripts/common-scripts/ui-element-scripts/draggable.gd" id="1_2fwbw"]
 [ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/editor_panel.tscn" id="1_8yskk"]
 [ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/panel_item.tscn" id="2_qfd4r"]
+[ext_resource type="Script" uid="uid://bu0l5wb0xwreq" path="res://scripts/map-editor-scripts/save_settings_btn.gd" id="4_w216f"]
 
 [node name="Settings" type="Control"]
 layout_mode = 3
@@ -51,7 +52,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "Width"
 
-[node name="LineEdit" type="LineEdit" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Map dimensions/Width/HBoxContainer"]
+[node name="LineEditWidth" type="LineEdit" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Map dimensions/Width/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -69,7 +70,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "Height"
 
-[node name="LineEdit" type="LineEdit" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Map dimensions/Height/HBoxContainer"]
+[node name="LineEditHeight" type="LineEdit" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Map dimensions/Height/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -77,5 +78,6 @@ size_flags_horizontal = 3
 layout_mode = 2
 size_flags_vertical = 10
 text = "Save"
+script = ExtResource("4_w216f")
 
 [editable path="EditorPanel"]
