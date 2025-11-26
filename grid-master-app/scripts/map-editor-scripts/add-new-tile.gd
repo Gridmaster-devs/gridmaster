@@ -2,7 +2,7 @@ extends Node
 
 
 @onready var tile_map = get_node("/root/MapEditor/VBoxContainer/HBoxContainer/SubViewControl/SubViewportContainer/SubViewport/TileMapLayer")
-@onready var tile_lib = get_node("/root/MapEditor/VBoxContainer/HBoxContainer/Panel/VBoxContainer/Tile_library")
+@onready var tile_lib = get_node("/root/MapEditor/VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tile library/GridContainer")
 @onready var color_picker = $"../ColorPicker"
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
