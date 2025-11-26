@@ -53,3 +53,6 @@ func update_headers():
 			var removed = content_box.get_child(i)
 			sub_sections.erase(removed.name)
 			content_box.remove_child(removed)
+			
+func _ready():
+	self.mouse_filter = Control.MOUSE_FILTER_IGNORE

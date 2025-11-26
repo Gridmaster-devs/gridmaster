@@ -1,4 +1,5 @@
 @tool
+class_name PanelItem
 extends VBoxContainer
 
 @export var text : String
@@ -7,7 +8,40 @@ extends VBoxContainer
 
 var items : Array[String] = []
 var label_path = "HBoxContainer/ItemName"
-var dropdown_path = ""
+
+# THIS IS THE ISSUE, GETS RESET WHEN THE SCENE IS NOT LIVE
+# REPLACE THE USAGE OF THIS WITH ABSOLUTE PATHS FOR GETTERS AND SETTERS
+# ALSO NOTICE THAT THE TOOL SCRIPT FUNCTION THAT MAKES THE DROPDOWN USES THIS
+# TO SET VALUES IN EDITOR; THIS IS NOT USELESS, JUST NOT FIT FOR GET_VALUE AND SET_VALUE
+# (the get and set at the bottom relate to godot's internal logic and work fine
+# this problem has to do with the top most functions)
+var value_container_path = ""
+
+
+func get_value():
+	match type:
+		0:
+			var node : LineEdit = get_node(value_container_path) as LineEdit
+			return node.text
+		1:
+			var node : CheckBox = get_node(value_container_path) as CheckBox
+			return node.is_pressed()
+		2:
+			var node : OptionButton = get_node(value_container_path) as OptionButton
+			var index = node.selected
+			return items[index]
+			
+func set_value(val): 
+	match type:
+		0:
+			var node : LineEdit = get_node(value_container_path) as LineEdit
+			node.text = val
+		1:
+			var node : CheckBox = get_node(value_container_path) as CheckBox
+			node.set_pressed(val)
+		2:
+			var node : OptionButton = get_node(value_container_path) as OptionButton
+			node.selected = val
 
 func update_item():
 	if Engine.is_editor_hint():
@@ -32,16 +66,16 @@ func update_text():
 	if text.is_empty():
 		text = self.name
 	get_node(label_path).text = text
+	self.name = text
 
 func update_dropdown():
 	if type == 2:
-		var dropdown = get_node(dropdown_path) as OptionButton
+		var dropdown = get_node(value_container_path) as OptionButton
 		for i in dropdown.item_count:
 			dropdown.remove_item(i)
 		for item in items:
 			dropdown.add_item(item)
-		
-
+	
 func make_field_item():
 	var root = get_tree().edited_scene_root
 	var container = HBoxContainer.new()
@@ -57,9 +91,12 @@ func make_field_item():
 	line_edit.owner = root
 	
 	container.set_anchors_preset(PRESET_HCENTER_WIDE, true)
+	container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label_path = label.get_path()
+	value_container_path = line_edit.get_path()
 	label.size_flags_horizontal = SIZE_EXPAND_FILL
 	line_edit.size_flags_horizontal = SIZE_EXPAND_FILL
+	line_edit.editable = true
 	
 func make_checkbox_item(): 
 	var root = get_tree().edited_scene_root
@@ -76,9 +113,12 @@ func make_checkbox_item():
 	checkbox.owner = root
 	
 	container.set_anchors_preset(PRESET_HCENTER_WIDE, true)
+	container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label_path = label.get_path()
+	value_container_path = checkbox.get_path()
 	label.size_flags_horizontal = SIZE_EXPAND_FILL
 	checkbox.size_flags_horizontal = SIZE_EXPAND_FILL
+	checkbox.set_disabled(false)
 	
 func make_dropdown_item():
 	var root = get_tree().edited_scene_root
@@ -95,10 +135,12 @@ func make_dropdown_item():
 	dropdown.owner = root
 	
 	container.set_anchors_preset(PRESET_HCENTER_WIDE, true)
+	container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label_path = label.get_path()
-	dropdown_path = dropdown.get_path()
+	value_container_path = dropdown.get_path()
 	label.size_flags_horizontal = SIZE_EXPAND_FILL
 	dropdown.size_flags_horizontal = SIZE_EXPAND_FILL
+	dropdown.set_disabled(false)
 
 func _get_property_list():
 	var properties = []
@@ -125,3 +167,6 @@ func _set(property, value):
 		items = value
 		return true
 	return false
+	
+func _ready():
+	self.mouse_filter = Control.MOUSE_FILTER_IGNORE
