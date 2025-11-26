@@ -1,4 +1,5 @@
 @tool
+class_name EditorPanel
 extends PanelContainer
 
 @export var title : String

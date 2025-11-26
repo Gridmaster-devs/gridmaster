@@ -13,6 +13,8 @@ enum PanelType {FIELD, CHECKBOX, DROPDOWN, SPINBOX}
 @export_enum("Field", "Checkbox", "Dropdown", "Spinbox") var type : int
 @export_tool_button("Update Item", "Callable") var update_action = update_item
 
+@export var parent_editor_panel : EditorPanel
+
 # Array for the dropdown menu option
 var items : Array[String] = []
 
@@ -200,7 +202,7 @@ func _on_save_to_resource(resource : UnitResourceDict):
 	
 func _on_load_from_resource(resource : UnitResourceDict):
 	load_from_unit_resource(resource)
-	
+
 func _get(property):
 	if property == "items":
 		return items
@@ -212,4 +214,7 @@ func _set(property, value):
 	return false
 	
 func _ready():
+	if (parent_editor_panel != null):
+		parent_editor_panel.save_to_resource.connect(save_to_unit_resource)
+		parent_editor_panel.load_from_resource.connect(load_from_unit_resource)
 	self.mouse_filter = Control.MOUSE_FILTER_IGNORE
