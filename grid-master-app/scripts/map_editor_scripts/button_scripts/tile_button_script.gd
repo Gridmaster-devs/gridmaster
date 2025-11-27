@@ -1,6 +1,6 @@
 extends Button
 
-@onready var root_cntr = get_node("/root/MapEditor")
+var parent_ref = null
 
 var source = 0
 var set_cord_x = 0
@@ -11,5 +11,6 @@ func _ready() -> void:
 
 	
 func _on_button_pressed():
-	root_cntr.cur_set_cord = Vector2i(set_cord_x, set_cord_y)
-	root_cntr.cur_source = source
+	parent_ref.cur_set_cord = Vector2i(set_cord_x, set_cord_y)
+	parent_ref.cur_source = source
+	parent_ref.interacting = false

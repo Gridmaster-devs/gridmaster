@@ -2,6 +2,7 @@ extends Control
 
 var dragging := false
 var drag_offset := Vector2.ZERO
+var parent_ref = null
 var tile_lib = null
 var cur_source = 0
 var cur_texture = Texture.new()

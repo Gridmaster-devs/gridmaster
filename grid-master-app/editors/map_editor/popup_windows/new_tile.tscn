@@ -177,7 +177,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "Crop"
 
-[node name="Button" type="Button" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Image/Image"]
+[node name="create_new_tile_button" type="Button" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Image/Image"]
 layout_mode = 2
 text = "Save"
 script = ExtResource("4_p8hom")
