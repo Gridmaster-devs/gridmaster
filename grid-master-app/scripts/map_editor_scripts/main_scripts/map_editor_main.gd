@@ -7,7 +7,7 @@ extends Control
 @onready var subview_cont = $VBoxContainer/HBoxContainer/SubViewControl/SubViewportContainer
 
 @onready var cur_set_cord := Vector2i(0,0)
-@onready var cur_source := 0
+@onready var cur_source := -1
 @onready var interacting := false
 
 @export var width = 100
