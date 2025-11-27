@@ -1,13 +1,13 @@
 [gd_scene load_steps=12 format=3 uid="uid://nwroc3fkan84"]
 
-[ext_resource type="Script" uid="uid://c30cixnwoblrw" path="res://scripts/map-editor-scripts/map-editing-script.gd" id="1_7x244"]
-[ext_resource type="Script" uid="uid://pfgcd2tk24gn" path="res://scripts/map-editor-scripts/sub_viewport_script.gd" id="2_qqlts"]
-[ext_resource type="Script" uid="uid://6g2o1upyh5q4" path="res://scripts/map-editor-scripts/map-camera-script.gd" id="3_x2l8i"]
+[ext_resource type="Script" uid="uid://c30cixnwoblrw" path="res://scripts/map_editor_scripts/main_scripts/map_editor_main.gd" id="1_7x244"]
+[ext_resource type="Script" uid="uid://pfgcd2tk24gn" path="res://scripts/map_editor_scripts/other/sub_viewport_script.gd" id="2_qqlts"]
+[ext_resource type="Script" uid="uid://6g2o1upyh5q4" path="res://scripts/map_editor_scripts/other/map_camera_script.gd" id="3_x2l8i"]
 [ext_resource type="Texture2D" uid="uid://doqe1u6vume5c" path="res://sprites/map_editor_sprites/grid_invis.png" id="4_woml6"]
-[ext_resource type="Script" uid="uid://dgeudson3p1wa" path="res://scripts/map-editor-scripts/tile_grid_gen.gd" id="5_7x244"]
+[ext_resource type="Script" uid="uid://dgeudson3p1wa" path="res://scripts/map_editor_scripts/other/tile_grid_gen.gd" id="5_7x244"]
 [ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/editor_panel.tscn" id="6_woml6"]
 [ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/panel_item.tscn" id="7_woml6"]
-[ext_resource type="Script" uid="uid://bg4hv7x0k1qvk" path="res://scripts/map-editor-scripts/open_new_tile_popup.gd" id="8_7x244"]
+[ext_resource type="Script" uid="uid://bg4hv7x0k1qvk" path="res://scripts/map_editor_scripts/open_popup/open_new_tile_popup.gd" id="8_7x244"]
 
 [sub_resource type="TileSet" id="TileSet_3s3gj"]
 tile_size = Vector2i(64, 64)
@@ -38,9 +38,47 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Panel" type="Panel" parent="VBoxContainer"]
-custom_minimum_size = Vector2(0, 50)
+[node name="EditorPanel" parent="VBoxContainer" instance=ExtResource("6_woml6")]
+custom_minimum_size = Vector2(0, 70)
 layout_mode = 2
+mouse_filter = 2
+title = "Map Editor"
+
+[node name="TopLabel" parent="VBoxContainer/EditorPanel/TopVBox" index="0"]
+text = "Map Editor"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
+layout_mode = 2
+
+[node name="settings_button" type="Button" parent="VBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Settings"
+
+[node name="save_button" type="Button" parent="VBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Save"
+
+[node name="load_button" type="Button" parent="VBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Load"
+
+[node name="paint_button" type="Button" parent="VBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Paint"
+
+[node name="erase_button" type="Button" parent="VBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Erase"
+
+[node name="interact_button" type="Button" parent="VBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Interact"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
@@ -253,4 +291,5 @@ vertical_alignment = 1
 layout_mode = 2
 columns = 6
 
+[editable path="VBoxContainer/EditorPanel"]
 [editable path="VBoxContainer/HBoxContainer/EditorPanel"]

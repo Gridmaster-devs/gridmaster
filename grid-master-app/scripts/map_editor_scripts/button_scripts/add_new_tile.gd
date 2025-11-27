@@ -15,8 +15,11 @@ func _on_button_pressed():
 	var vbox := VBoxContainer.new()
 	var new_button := Button.new()
 	new_button.icon = parent_ref.cur_texture
+	new_button.expand_icon = true
+	new_button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	new_button.vertical_icon_alignment = VERTICAL_ALIGNMENT_CENTER
 	new_button.custom_minimum_size = Vector2(84, 84)
-	var tile_button_script := load("res://scripts/map-editor-scripts/side_panel_scripts/tile_button_script.gd")
+	var tile_button_script := load("res://scripts/map_editor_scripts/button_scripts/tile_button_script.gd")
 	new_button.set_script(tile_button_script)
 	new_button.source = parent_ref.cur_source
 
