@@ -14,7 +14,7 @@ enum PanelType {FIELD, CHECKBOX, DROPDOWN, SPINBOX}
 @export_tool_button("Update Item", "Callable") var update_action = update_item
 
 # this is pretty jank, it should automatically find the parent on ready
-@export var parent_editor_panel : EditorPanel
+var root_editor : UnitEditor
 
 # Array for the dropdown menu option
 var items : Array[String] = []
@@ -38,6 +38,7 @@ func get_content():
 	return get_child(1)
 
 func save_to_unit_resource(resource_p : UnitResourceDict):
+	print("got here")
 	resource_p.set_attribute(attribute_name, get_value())
 	
 func load_from_unit_resource(resource_p : UnitResourceDict):
@@ -53,10 +54,13 @@ func get_value():
 		PanelType.CHECKBOX:
 			var node : CheckBox = get_content() as CheckBox
 			return node.is_pressed()
-		PanelType.SPINBOX:
+		PanelType.DROPDOWN:
 			var node : OptionButton = get_content() as OptionButton
 			var index = node.selected
 			return items[index]
+		PanelType.SPINBOX:
+			var node : SpinBox = get_content() as SpinBox
+			return node.get_line_edit().text as float
 			
 func set_value(val): 
 	match type:
@@ -69,6 +73,9 @@ func set_value(val):
 		PanelType.DROPDOWN:
 			var node : OptionButton = get_content() as OptionButton
 			node.selected = val
+		PanelType.SPINBOX:
+			var node : SpinBox = get_content() as SpinBox
+			node.get_line_edit().text = val
 
 func update_item():
 	if Engine.is_editor_hint():
@@ -203,7 +210,17 @@ func _on_save_to_resource(resource : UnitResourceDict):
 	
 func _on_load_from_resource(resource : UnitResourceDict):
 	load_from_unit_resource(resource)
-
+	
+# super super jank but I don't know a better way right now
+func find_root_unit_editor():
+	var cur_node = self.get_parent()
+	while true:
+		if cur_node is UnitEditor:
+			root_editor = cur_node
+		elif cur_node == null:
+			break
+		cur_node = cur_node.get_parent()
+	
 func _get(property):
 	if property == "items":
 		return items
@@ -214,8 +231,19 @@ func _set(property, value):
 		return true
 	return false
 	
+func test_parent():
+	var parent = self.get_parent()
+	while parent != null:
+		print("name: " + self.name + ", parent: " + str(parent))
+		parent = parent.get_parent()
+	
 func _ready():
-	if (parent_editor_panel != null):
-		parent_editor_panel.save_to_resource.connect(save_to_unit_resource)
-		parent_editor_panel.load_from_resource.connect(load_from_unit_resource)
+	# test_parent()
+	if !Engine.is_editor_hint():
+		find_root_unit_editor()
+		if root_editor != null:
+			root_editor.save_to_resource.connect(save_to_unit_resource)
+			root_editor.load_from_resource.connect(load_from_unit_resource)
+			# print(root_editor)
+		# root_editor.test()
 	self.mouse_filter = Control.MOUSE_FILTER_IGNORE

@@ -4,9 +4,6 @@ extends PanelContainer
 
 @export var title : String
 
-signal save_to_resource(resource : UnitResourceDict)
-signal load_from_resource(resource : UnitResourceDict)
-
 @export_category("Contents")
 @export_group("Sections")
 @export var section_headers : Array[String]
