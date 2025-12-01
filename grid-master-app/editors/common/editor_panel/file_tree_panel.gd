@@ -15,7 +15,7 @@ var tree_root : TreeItem
 func add_unit():
 	var item : TreeItem = tree.create_item(null, units)
 	units += 1
-	item.set_text(0, "Unit" + str(units))
+	item.set_text(0, "Unnamed unit")
 	unit_resources.append(UnitResourceDict.new())
 	
 func add_unit_from_resource(unit_resource : UnitResourceDict):
