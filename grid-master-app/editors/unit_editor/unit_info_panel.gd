@@ -31,6 +31,12 @@ func load_from_resource(unit_resource : UnitResourceDict):
 			description_box.text = ""
 		else:
 			description_box.text = unit_description
+			
+func get_save_button() -> Button:
+	return save_button
+	
+func get_load_button() -> Button:
+	return load_button
 		
 func _ready():
 	if (unit_editor != null):

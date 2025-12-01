@@ -1,13 +1,11 @@
-[gd_scene load_steps=9 format=3 uid="uid://d1mgyle0o8kx3"]
+[gd_scene load_steps=7 format=3 uid="uid://d1mgyle0o8kx3"]
 
 [ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://themes/editor-theme.tres" id="1_ke4m8"]
 [ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/editor_panel.tscn" id="2_7lyne"]
-[ext_resource type="Script" uid="uid://bfh2rof2xgrvj" path="res://editors/unit_editor/event_handler.gd" id="2_ad1yx"]
 [ext_resource type="Script" uid="uid://cdd3u0q68b4jw" path="res://editors/unit_editor/unit_editor.gd" id="2_k1fjl"]
 [ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/panel_item.tscn" id="3_ad1yx"]
-[ext_resource type="Script" uid="uid://cwoy43aaig3mp" path="res://resources/units/unit_resource.gd" id="3_ip3j4"]
 [ext_resource type="PackedScene" uid="uid://ba5as4lpqxka2" path="res://editors/common/editor_panel/FileTreePanel.tscn" id="5_67da3"]
-[ext_resource type="PackedScene" uid="uid://b8u4a8d5rc0yj" path="res://editors/unit_editor/unit_description_panel.tscn" id="6_k1fjl"]
+[ext_resource type="PackedScene" uid="uid://b8u4a8d5rc0yj" path="res://editors/unit_editor/unit_info_panel.tscn" id="6_k1fjl"]
 
 [node name="UnitEditor" type="PanelContainer"]
 anchors_preset = 15
@@ -19,26 +17,23 @@ theme = ExtResource("1_ke4m8")
 theme_type_variation = &"BackgroundPanel"
 script = ExtResource("2_k1fjl")
 
-[node name="EventHandler" type="Node" parent="." node_paths=PackedStringArray("load_dialog", "image_picker", "movement_type_source", "movement_speed_source", "capturable_source", "health_source", "morale_source")]
-script = ExtResource("2_ad1yx")
-load_dialog = NodePath("LoadUnitDialog")
-image_picker = NodePath("SelectImageDialog")
-unit_resource_base = ExtResource("3_ip3j4")
-movement_type_source = NodePath("HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Movement/Movement Type")
-movement_speed_source = NodePath("HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Movement/Movement Speed")
-capturable_source = NodePath("HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Interaction/Capturable")
-health_source = NodePath("HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox/ScrollContainer/ContentsVBox/Vitality/Health")
-morale_source = NodePath("HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox/ScrollContainer/ContentsVBox/Vitality/Morale")
+[node name="Dialogs" type="Node" parent="."]
 
-[node name="LoadUnitDialog" type="FileDialog" parent="EventHandler"]
+[node name="SaveUnitDialog" type="FileDialog" parent="Dialogs"]
+display_mode = 1
+access = 2
+filters = PackedStringArray("*.tres")
+
+[node name="LoadUnitDialog" type="FileDialog" parent="Dialogs"]
 title = "Open a File"
 initial_position = 1
 ok_button_text = "Load"
 file_mode = 0
-access = 1
-filters = PackedStringArray("*.tres", "*.res")
+display_mode = 1
+access = 2
+filters = PackedStringArray("*.tres")
 
-[node name="SelectImageDialog" type="FileDialog" parent="EventHandler"]
+[node name="SelectImageDialog" type="FileDialog" parent="Dialogs"]
 oversampling_override = 1.0
 title = "Open a File"
 initial_position = 1
@@ -46,68 +41,65 @@ file_mode = 0
 access = 2
 filters = PackedStringArray("*.jpeg", "*.png")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="EventHandler"]
-offset_left = 10.0
-offset_top = 10.0
-offset_right = 1910.0
-offset_bottom = 1070.0
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
 theme = ExtResource("1_ke4m8")
 theme_type_variation = &"EditorHBox"
 
-[node name="UnitTreePanel" parent="EventHandler/HBoxContainer" node_paths=PackedStringArray("unit_editor") instance=ExtResource("5_67da3")]
+[node name="UnitTreePanel" parent="HBoxContainer" node_paths=PackedStringArray("unit_editor") instance=ExtResource("5_67da3")]
 layout_mode = 2
 size_flags_horizontal = 3
-unit_editor = NodePath("../../..")
+unit_editor = NodePath("../..")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="EventHandler/HBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
 custom_minimum_size = Vector2(800, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 theme = ExtResource("1_ke4m8")
 theme_type_variation = &"EditorVBox"
 
-[node name="UnitInfoPanel" parent="EventHandler/HBoxContainer/VBoxContainer" node_paths=PackedStringArray("unit_editor") instance=ExtResource("6_k1fjl")]
+[node name="UnitInfoPanel" parent="HBoxContainer/VBoxContainer" node_paths=PackedStringArray("unit_editor") instance=ExtResource("6_k1fjl")]
 layout_mode = 2
-unit_editor = NodePath("../../../..")
+unit_editor = NodePath("../../..")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="EventHandler/HBoxContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 theme = ExtResource("1_ke4m8")
 theme_type_variation = &"EditorHBox"
 
-[node name="AttributesPanel" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer" instance=ExtResource("2_7lyne")]
+[node name="AttributesPanel" parent="HBoxContainer/VBoxContainer/HBoxContainer" instance=ExtResource("2_7lyne")]
 layout_mode = 2
 size_flags_horizontal = 3
 title = "Attributes"
 section_headers = Array[String](["Movement", "Interaction"])
 
-[node name="TopLabel" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox" index="0"]
+[node name="TopLabel" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox" index="0"]
 text = "Attributes"
 
-[node name="Movement" type="VBoxContainer" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
+[node name="Movement" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Movement"]
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Movement"]
 layout_mode = 2
 theme_type_variation = &"SectionLabel"
 text = "Movement"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Movement Type" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Movement" instance=ExtResource("3_ad1yx")]
+[node name="Movement Type" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Movement" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "movement_type"
 text = "Movement Type"
 type = 2
 items = Array[String](["Walking", "Wheels", "Tracks", "Hovering", "Flying", "Floating", "Teleporting"])
 
-[node name="Label" type="Label" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Movement/Movement Type"]
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Movement/Movement Type"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Movement Type"
 
-[node name="OptionButton" type="OptionButton" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Movement/Movement Type"]
+[node name="OptionButton" type="OptionButton" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Movement/Movement Type"]
 layout_mode = 2
 size_flags_horizontal = 3
 selected = 0
@@ -127,258 +119,258 @@ popup/item_5/id = 5
 popup/item_6/text = "Teleporting"
 popup/item_6/id = 6
 
-[node name="Movement Speed" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Movement" instance=ExtResource("3_ad1yx")]
+[node name="Movement Speed" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Movement" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "movement_speed"
 text = "Movement Speed"
 type = 3
 
-[node name="Label" type="Label" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Movement/Movement Speed"]
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Movement/Movement Speed"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Movement Speed"
 
-[node name="SpinBox" type="SpinBox" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Movement/Movement Speed"]
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Movement/Movement Speed"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Interaction" type="VBoxContainer" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox" index="1"]
+[node name="Interaction" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox" index="1"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Interaction"]
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Interaction"]
 layout_mode = 2
 theme_type_variation = &"SectionLabel"
 text = "Interaction"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Capturable" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Interaction" instance=ExtResource("3_ad1yx")]
+[node name="Capturable" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Interaction" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "capturable"
 text = "Capturable"
 type = 1
 
-[node name="Label" type="Label" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Interaction/Capturable"]
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Interaction/Capturable"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Capturable"
 
-[node name="CheckBox" type="CheckBox" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Interaction/Capturable"]
+[node name="CheckBox" type="CheckBox" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Interaction/Capturable"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ResourcesPanel" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer" instance=ExtResource("2_7lyne")]
+[node name="ResourcesPanel" parent="HBoxContainer/VBoxContainer/HBoxContainer" instance=ExtResource("2_7lyne")]
 layout_mode = 2
 size_flags_horizontal = 3
 title = "Resources"
 section_headers = Array[String](["Vitality"])
 
-[node name="TopLabel" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox" index="0"]
+[node name="TopLabel" parent="HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox" index="0"]
 text = "Resources"
 
-[node name="Vitality" type="VBoxContainer" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
+[node name="Vitality" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox/ScrollContainer/ContentsVBox/Vitality"]
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox/ScrollContainer/ContentsVBox/Vitality"]
 layout_mode = 2
 theme_type_variation = &"SectionLabel"
 text = "Vitality"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Health" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox/ScrollContainer/ContentsVBox/Vitality" instance=ExtResource("3_ad1yx")]
+[node name="Health" parent="HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox/ScrollContainer/ContentsVBox/Vitality" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "health"
 text = "Health"
 type = 3
 
-[node name="Label" type="Label" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox/ScrollContainer/ContentsVBox/Vitality/Health"]
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox/ScrollContainer/ContentsVBox/Vitality/Health"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Health"
 
-[node name="SpinBox" type="SpinBox" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox/ScrollContainer/ContentsVBox/Vitality/Health"]
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox/ScrollContainer/ContentsVBox/Vitality/Health"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Morale" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox/ScrollContainer/ContentsVBox/Vitality" instance=ExtResource("3_ad1yx")]
+[node name="Morale" parent="HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox/ScrollContainer/ContentsVBox/Vitality" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "morale"
 text = "Morale"
 type = 3
 
-[node name="Label" type="Label" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox/ScrollContainer/ContentsVBox/Vitality/Morale"]
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox/ScrollContainer/ContentsVBox/Vitality/Morale"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Morale"
 
-[node name="SpinBox" type="SpinBox" parent="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox/ScrollContainer/ContentsVBox/Vitality/Morale"]
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox/ScrollContainer/ContentsVBox/Vitality/Morale"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="StatsPanel" parent="EventHandler/HBoxContainer" instance=ExtResource("2_7lyne")]
+[node name="StatsPanel" parent="HBoxContainer" instance=ExtResource("2_7lyne")]
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 title = "Stats"
 section_headers = Array[String](["Offensive", "Defensive", "Utility", "Value"])
 
-[node name="TopLabel" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox" index="0"]
+[node name="TopLabel" parent="HBoxContainer/StatsPanel/TopVBox" index="0"]
 text = "Stats"
 
-[node name="Offensive" type="VBoxContainer" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
+[node name="Offensive" type="VBoxContainer" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive"]
+[node name="Label" type="Label" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive"]
 layout_mode = 2
 theme_type_variation = &"SectionLabel"
 text = "Offensive"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Damage" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive" instance=ExtResource("3_ad1yx")]
+[node name="Damage" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "damage"
 text = "Damage"
 type = 3
 
-[node name="Label" type="Label" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Damage"]
+[node name="Label" type="Label" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Damage"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Damage"
 
-[node name="SpinBox" type="SpinBox" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Damage"]
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Damage"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Piercing" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive" instance=ExtResource("3_ad1yx")]
+[node name="Piercing" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "piercing"
 text = "Piercing"
 type = 3
 
-[node name="Label" type="Label" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Piercing"]
+[node name="Label" type="Label" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Piercing"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Piercing"
 
-[node name="SpinBox" type="SpinBox" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Piercing"]
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Piercing"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Accuracy" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive" instance=ExtResource("3_ad1yx")]
+[node name="Accuracy" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "accuracy"
 text = "Accuracy"
 type = 3
 
-[node name="Label" type="Label" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Accuracy"]
+[node name="Label" type="Label" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Accuracy"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Accuracy"
 
-[node name="SpinBox" type="SpinBox" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Accuracy"]
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Accuracy"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Range" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive" instance=ExtResource("3_ad1yx")]
+[node name="Range" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "range"
 text = "Range"
 type = 3
 
-[node name="Label" type="Label" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Range"]
+[node name="Label" type="Label" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Range"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Range"
 
-[node name="SpinBox" type="SpinBox" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Range"]
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Range"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Defensive" type="VBoxContainer" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox" index="1"]
+[node name="Defensive" type="VBoxContainer" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox" index="1"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Defensive"]
+[node name="Label" type="Label" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Defensive"]
 layout_mode = 2
 theme_type_variation = &"SectionLabel"
 text = "Defensive"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Armor" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Defensive" instance=ExtResource("3_ad1yx")]
+[node name="Armor" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Defensive" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "armor"
 text = "Armor"
 type = 3
 
-[node name="Label" type="Label" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Defensive/Armor"]
+[node name="Label" type="Label" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Defensive/Armor"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Armor"
 
-[node name="SpinBox" type="SpinBox" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Defensive/Armor"]
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Defensive/Armor"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Evasion" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Defensive" instance=ExtResource("3_ad1yx")]
+[node name="Evasion" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Defensive" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "evasion"
 text = "Evasion"
 type = 3
 
-[node name="Label" type="Label" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Defensive/Evasion"]
+[node name="Label" type="Label" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Defensive/Evasion"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Evasion"
 
-[node name="SpinBox" type="SpinBox" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Defensive/Evasion"]
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Defensive/Evasion"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Utility" type="VBoxContainer" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox" index="2"]
+[node name="Utility" type="VBoxContainer" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox" index="2"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Utility"]
+[node name="Label" type="Label" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Utility"]
 layout_mode = 2
 theme_type_variation = &"SectionLabel"
 text = "Utility"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Value" type="VBoxContainer" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox" index="3"]
+[node name="Value" type="VBoxContainer" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox" index="3"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="EventHandler/HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Value"]
+[node name="Label" type="Label" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Value"]
 layout_mode = 2
 theme_type_variation = &"SectionLabel"
 text = "Value"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ActionsPanel" parent="EventHandler/HBoxContainer" instance=ExtResource("2_7lyne")]
+[node name="ActionsPanel" parent="HBoxContainer" instance=ExtResource("2_7lyne")]
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 title = "Actions"
 section_headers = Array[String](["Orders"])
 
-[node name="TopLabel" parent="EventHandler/HBoxContainer/ActionsPanel/TopVBox" index="0"]
+[node name="TopLabel" parent="HBoxContainer/ActionsPanel/TopVBox" index="0"]
 text = "Actions"
 
-[node name="Orders" type="VBoxContainer" parent="EventHandler/HBoxContainer/ActionsPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
+[node name="Orders" type="VBoxContainer" parent="HBoxContainer/ActionsPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="EventHandler/HBoxContainer/ActionsPanel/TopVBox/ScrollContainer/ContentsVBox/Orders"]
+[node name="Label" type="Label" parent="HBoxContainer/ActionsPanel/TopVBox/ScrollContainer/ContentsVBox/Orders"]
 layout_mode = 2
 theme_type_variation = &"SectionLabel"
 text = "Orders"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[connection signal="file_selected" from="EventHandler/SelectImageDialog" to="EventHandler" method="_set_image"]
+[connection signal="file_selected" from="Dialogs/SelectImageDialog" to="Dialogs" method="_set_image"]
 
-[editable path="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel"]
-[editable path="EventHandler/HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel"]
-[editable path="EventHandler/HBoxContainer/StatsPanel"]
-[editable path="EventHandler/HBoxContainer/ActionsPanel"]
+[editable path="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel"]
+[editable path="HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel"]
+[editable path="HBoxContainer/StatsPanel"]
+[editable path="HBoxContainer/ActionsPanel"]

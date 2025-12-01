@@ -1,10 +1,11 @@
 class_name Attribute
+extends Resource
 
 enum Type {STRING, INT, FLOAT}
 
-var name : String
-var type : Type
-var value
+@export var name : String
+@export var type : Type
+@export var value : Variant
 
 # creates a new instance of Attribute
 # _p here means parameter, distinguishing it from the other variables

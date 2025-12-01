@@ -5,17 +5,38 @@ signal save_to_resource(resource : UnitResourceDict)
 signal load_from_resource(resource : UnitResourceDict)
 
 var unit_resource : UnitResourceDict
-@onready var tree = $EventHandler/HBoxContainer/FileTreePanel/Tree
+@onready var tree_panel : FileTreePanel = $HBoxContainer/UnitTreePanel
+@onready var info_panel : UnitInfoPanel = $HBoxContainer/VBoxContainer/UnitInfoPanel
+@onready var save_dialog : FileDialog = $Dialogs/SaveUnitDialog
+@onready var load_dialog : FileDialog = $Dialogs/LoadUnitDialog
+
+
+func show_save_dialog():
+	save_to_resource.emit(unit_resource)
+	save_dialog.show()
+	
+func show_load_dialog():
+	load_dialog.show()
+
+func save_to_file(path : String):
+	ResourceSaver.save(unit_resource, path)
+	
+func load_from_file(path : String):
+	if (ResourceLoader.exists(path)):
+		var data : UnitResourceDict = ResourceLoader.load(path) as UnitResourceDict
+		tree_panel.add_unit_from_resource(data)
+		
 
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	# unit_resource = UnitResourceDict.new()
-	# test()
-	# save_to_resource.emit(unit_resource)
-	# unit_resource.print_all()
-	pass
+	save_dialog.file_selected.connect(save_to_file)
+	load_dialog.file_selected.connect(load_from_file)
+	info_panel.get_save_button().button_up.connect(show_save_dialog)
+	info_panel.get_load_button().button_up.connect(show_load_dialog)
+	
+	
 
 func new_unit_resource(unit_resource_p : UnitResourceDict):
 	save_to_resource.emit(unit_resource)

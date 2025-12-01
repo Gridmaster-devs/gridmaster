@@ -18,6 +18,13 @@ func add_unit():
 	item.set_text(0, "Unit" + str(units))
 	unit_resources.append(UnitResourceDict.new())
 	
+func add_unit_from_resource(unit_resource : UnitResourceDict):
+	var item : TreeItem = tree.create_item(null, units)
+	units += 1
+	item.set_text(0, "Unit" + str(units))
+	unit_resources.append(unit_resource)
+	
+	
 func remove_unit():
 	var selected = tree.get_selected()
 	if (selected != null):

@@ -2,7 +2,7 @@ class_name UnitResourceDict
 extends Resource
 
 # holds string : Attribute pairs
-var attributes : Dictionary
+@export var attributes : Dictionary
 
 func set_attribute(name_p : String, value_p):
 	#TODO: Probably need to check for null values
