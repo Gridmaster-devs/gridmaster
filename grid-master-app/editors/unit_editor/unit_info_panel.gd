@@ -37,8 +37,13 @@ func get_save_button() -> Button:
 	
 func get_load_button() -> Button:
 	return load_button
+	
+func reset():
+	name_line.text = ""
+	description_box.text = ""
 		
 func _ready():
 	if (unit_editor != null):
 		unit_editor.save_to_resource.connect(save_to_resource)
 		unit_editor.load_from_resource.connect(load_from_resource)
+		unit_editor.reset.connect(reset)

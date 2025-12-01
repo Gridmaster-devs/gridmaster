@@ -31,6 +31,7 @@ func remove_unit():
 		var index = selected.get_index()
 		unit_resources.remove_at(index) # this does not check for out of bounds
 		tree_root.remove_child(selected)
+		unit_editor.unit_resource_removed()
 	
 
 func new_selection():

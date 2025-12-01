@@ -3,6 +3,7 @@ extends PanelContainer
 
 signal save_to_resource(resource : UnitResourceDict)
 signal load_from_resource(resource : UnitResourceDict)
+signal reset
 
 var unit_resource : UnitResourceDict
 @onready var tree_panel : FileTreePanel = $HBoxContainer/UnitTreePanel
@@ -27,6 +28,9 @@ func load_from_file(path : String):
 		tree_panel.add_unit_from_resource(data)
 		
 
+func unit_resource_removed():
+	unit_resource = null
+	reset.emit()
 
 
 # Called when the node enters the scene tree for the first time.

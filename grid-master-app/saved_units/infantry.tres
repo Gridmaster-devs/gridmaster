@@ -1,0 +1,97 @@
+[gd_resource type="Resource" script_class="UnitResourceDict" load_steps=16 format=3]
+
+[ext_resource type="Script" path="res://resources/units/attribute.gd" id="1_jbflv"]
+[ext_resource type="Script" path="res://resources/units/unit_resource_dict.gd" id="2_w1blv"]
+
+[sub_resource type="Resource" id="Resource_fj0kg"]
+script = ExtResource("1_jbflv")
+name = "name"
+value = "Infantry"
+
+[sub_resource type="Resource" id="Resource_yqrcn"]
+script = ExtResource("1_jbflv")
+name = "description"
+value = "Basic infantry unit"
+
+[sub_resource type="Resource" id="Resource_sxb6l"]
+script = ExtResource("1_jbflv")
+name = "movement_type"
+type = 1
+value = 0
+
+[sub_resource type="Resource" id="Resource_2n0s3"]
+script = ExtResource("1_jbflv")
+name = "movement_speed"
+type = 2
+value = 3.0
+
+[sub_resource type="Resource" id="Resource_ql4ii"]
+script = ExtResource("1_jbflv")
+name = "capturable"
+value = true
+
+[sub_resource type="Resource" id="Resource_hs0mb"]
+script = ExtResource("1_jbflv")
+name = "health"
+type = 2
+value = 10.0
+
+[sub_resource type="Resource" id="Resource_p67eq"]
+script = ExtResource("1_jbflv")
+name = "morale"
+type = 2
+value = 5.0
+
+[sub_resource type="Resource" id="Resource_2j7vy"]
+script = ExtResource("1_jbflv")
+name = "damage"
+type = 2
+value = 10.0
+
+[sub_resource type="Resource" id="Resource_wgrhm"]
+script = ExtResource("1_jbflv")
+name = "piercing"
+type = 2
+value = 5.0
+
+[sub_resource type="Resource" id="Resource_qx5q5"]
+script = ExtResource("1_jbflv")
+name = "accuracy"
+type = 2
+value = 10.0
+
+[sub_resource type="Resource" id="Resource_76w8k"]
+script = ExtResource("1_jbflv")
+name = "range"
+type = 2
+value = 5.0
+
+[sub_resource type="Resource" id="Resource_nuipr"]
+script = ExtResource("1_jbflv")
+name = "armor"
+type = 2
+value = 0.0
+
+[sub_resource type="Resource" id="Resource_6ys8w"]
+script = ExtResource("1_jbflv")
+name = "evasion"
+type = 2
+value = 0.0
+
+[resource]
+script = ExtResource("2_w1blv")
+attributes = {
+"accuracy": SubResource("Resource_qx5q5"),
+"armor": SubResource("Resource_nuipr"),
+"capturable": SubResource("Resource_ql4ii"),
+"damage": SubResource("Resource_2j7vy"),
+"description": SubResource("Resource_yqrcn"),
+"evasion": SubResource("Resource_6ys8w"),
+"health": SubResource("Resource_hs0mb"),
+"morale": SubResource("Resource_p67eq"),
+"movement_speed": SubResource("Resource_2n0s3"),
+"movement_type": SubResource("Resource_sxb6l"),
+"name": SubResource("Resource_fj0kg"),
+"piercing": SubResource("Resource_wgrhm"),
+"range": SubResource("Resource_76w8k")
+}

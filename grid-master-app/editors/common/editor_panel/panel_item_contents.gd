@@ -264,6 +264,7 @@ func _ready():
 		if root_editor != null:
 			root_editor.save_to_resource.connect(save_to_unit_resource)
 			root_editor.load_from_resource.connect(load_from_unit_resource)
+			root_editor.reset.connect(reset)
 			# print(root_editor)
 		# root_editor.test()
 	self.mouse_filter = Control.MOUSE_FILTER_IGNORE
