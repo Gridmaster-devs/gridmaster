@@ -50,7 +50,7 @@ func reset():
 			node.selected = 0
 		PanelType.SPINBOX:
 			var node : SpinBox = get_content() as SpinBox
-			node.get_line_edit().text = "0"
+			node.value = 0
 
 func save_to_unit_resource(resource_p : UnitResourceDict):
 	if (resource_p != null):
@@ -59,10 +59,11 @@ func save_to_unit_resource(resource_p : UnitResourceDict):
 func load_from_unit_resource(resource_p : UnitResourceDict):
 	if (resource_p != null):
 		var value = resource_p.get_attribute(attribute_name)
-		if (value == null):
-			reset()
-		else:
+		if (value != null):
 			set_value(value) # this assumes that the type of the attribute is the same in the dictionary and in here
+			return
+
+	reset()
 
 func get_value():
 	match type:
@@ -93,7 +94,7 @@ func set_value(val):
 			node.selected = val
 		PanelType.SPINBOX:
 			var node : SpinBox = get_content() as SpinBox
-			node.get_line_edit().text = str(val)
+			node.value = val
 
 func update_item():
 	if Engine.is_editor_hint():

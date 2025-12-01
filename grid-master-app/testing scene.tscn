@@ -26,12 +26,11 @@ text = "header 1"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Swag amount" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/header 1" node_paths=PackedStringArray("parent_editor_panel") instance=ExtResource("2_ckwvq")]
+[node name="Swag amount" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/header 1" instance=ExtResource("2_ckwvq")]
 layout_mode = 2
 attribute_name = "swag"
 text = "Swag amount"
 type = 2
-parent_editor_panel = NodePath("../../../../..")
 items = Array[String]([])
 
 [node name="Label" type="Label" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/header 1/Swag amount"]

@@ -19,6 +19,7 @@ func new_selection():
 	var selected : TreeItem = tree.get_selected()
 	var index : int = selected.get_index()
 	unit_editor.new_unit_resource(unit_resources[index])
+	# print("new resource: " + str(unit_resources[index]))
 	
 
 func hello():
