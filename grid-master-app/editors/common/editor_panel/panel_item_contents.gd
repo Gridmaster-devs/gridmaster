@@ -79,6 +79,7 @@ func get_value():
 			return index
 		PanelType.SPINBOX:
 			var node : SpinBox = get_content() as SpinBox
+			node.apply()
 			return node.get_line_edit().text as float
 			
 func set_value(val): 
