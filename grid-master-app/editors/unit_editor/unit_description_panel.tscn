@@ -57,8 +57,7 @@ theme_type_variation = &"UnitDescriptionVBox"
 layout_mode = 2
 theme = ExtResource("1_g6td7")
 theme_type_variation = &"UnitNameLineEdit"
-text = "Name"
-placeholder_text = "name your unit..."
+placeholder_text = "Unit name"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="TopVBox/PanelContainer/ContentsVBox"]
 layout_mode = 2

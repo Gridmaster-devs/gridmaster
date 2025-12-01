@@ -11,7 +11,7 @@ func save_to_resource(unit_resource : UnitResourceDict):
 	if (unit_resource != null):
 		var unit_name = name_line.text
 		if (unit_name == ""):
-			unit_resource.set_attribute("name", "unnamed unit")
+			unit_resource.set_attribute("name", "")
 		else:
 			unit_resource.set_attribute("name", unit_name)
 			
@@ -22,7 +22,7 @@ func load_from_resource(unit_resource : UnitResourceDict):
 	if (unit_resource != null):
 		var unit_name = unit_resource.get_attribute("name")
 		if (unit_name == "" or unit_name == null):
-			name_line.text = "unnamed unit"
+			name_line.text = ""
 		else:
 			name_line.text = unit_name
 			
