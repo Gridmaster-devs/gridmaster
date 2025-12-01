@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/editor_panel.tscn" id="2_7lyne"]
 [ext_resource type="Script" uid="uid://cdd3u0q68b4jw" path="res://editors/unit_editor/unit_editor.gd" id="2_k1fjl"]
 [ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/panel_item.tscn" id="3_ad1yx"]
-[ext_resource type="PackedScene" uid="uid://ba5as4lpqxka2" path="res://editors/common/editor_panel/FileTreePanel.tscn" id="5_67da3"]
+[ext_resource type="PackedScene" uid="uid://ba5as4lpqxka2" path="res://editors/unit_editor/FileTreePanel.tscn" id="5_67da3"]
 [ext_resource type="PackedScene" uid="uid://b8u4a8d5rc0yj" path="res://editors/unit_editor/unit_info_panel.tscn" id="6_k1fjl"]
 
 [node name="UnitEditor" type="PanelContainer"]
@@ -208,6 +208,31 @@ text = "Morale"
 layout_mode = 2
 size_flags_horizontal = 3
 
+[node name="Game" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox/ScrollContainer/ContentsVBox/Vitality"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox/ScrollContainer/ContentsVBox/Vitality/Game"]
+layout_mode = 2
+theme_type_variation = &"SectionLabel"
+text = "Game"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Victory points" parent="HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox/ScrollContainer/ContentsVBox/Vitality/Game" instance=ExtResource("3_ad1yx")]
+layout_mode = 2
+attribute_name = "victory_points"
+text = "Victory points"
+type = 3
+
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox/ScrollContainer/ContentsVBox/Vitality/Game/Victory points"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Victory points"
+
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox/ScrollContainer/ContentsVBox/Vitality/Game/Victory points"]
+layout_mode = 2
+size_flags_horizontal = 3
+
 [node name="StatsPanel" parent="HBoxContainer" instance=ExtResource("2_7lyne")]
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
@@ -337,6 +362,36 @@ theme_type_variation = &"SectionLabel"
 text = "Utility"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="Vision range" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Utility" instance=ExtResource("3_ad1yx")]
+layout_mode = 2
+attribute_name = "vision_range"
+text = "Vision range"
+type = 3
+
+[node name="Label" type="Label" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Utility/Vision range"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Vision range"
+
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Utility/Vision range"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Perception" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Utility" instance=ExtResource("3_ad1yx")]
+layout_mode = 2
+attribute_name = "perception"
+text = "Perception"
+type = 3
+
+[node name="Label" type="Label" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Utility/Perception"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Perception"
+
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Utility/Perception"]
+layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="Value" type="VBoxContainer" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox" index="3"]
 layout_mode = 2

@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://ba5as4lpqxka2"]
 
 [ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://themes/editor-theme.tres" id="1_gb7x8"]
-[ext_resource type="Script" uid="uid://dujvdxu2kbgkp" path="res://editors/common/editor_panel/file_tree_panel.gd" id="2_lodvf"]
+[ext_resource type="Script" uid="uid://dujvdxu2kbgkp" path="res://editors/unit_editor/file_tree_panel.gd" id="2_lodvf"]
 
 [node name="UnitTreePanel" type="PanelContainer"]
 anchors_preset = 15
