@@ -11,6 +11,9 @@ var unit_resource : UnitResourceDict
 @onready var save_dialog : FileDialog = $Dialogs/SaveUnitDialog
 @onready var load_dialog : FileDialog = $Dialogs/LoadUnitDialog
 
+func update_name_in_tree(new_name : String):
+	if (unit_resource != null):
+		tree_panel.update_selected_name(new_name)
 
 func show_save_dialog():
 	save_to_resource.emit(unit_resource)

@@ -7,6 +7,11 @@ extends PanelContainer
 @onready var name_line = $TopVBox/PanelContainer/ContentsVBox/NameLine
 @onready var description_box = $TopVBox/PanelContainer/ContentsVBox/HBoxContainer/ScrollContainer/Description
 
+
+func unit_name_changed(new_text : String):
+	unit_editor.update_name_in_tree(new_text)
+	
+
 func save_to_resource(unit_resource : UnitResourceDict):
 	if (unit_resource != null):
 		var unit_name = name_line.text
@@ -47,3 +52,4 @@ func _ready():
 		unit_editor.save_to_resource.connect(save_to_resource)
 		unit_editor.load_from_resource.connect(load_from_resource)
 		unit_editor.reset.connect(reset)
+		name_line.text_changed.connect(unit_name_changed)

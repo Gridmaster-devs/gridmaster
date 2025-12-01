@@ -32,6 +32,13 @@ func remove_unit():
 		unit_resources.remove_at(index) # this does not check for out of bounds
 		tree_root.remove_child(selected)
 		unit_editor.unit_resource_removed()
+		
+func update_selected_name(new_name : String):
+	var selected : TreeItem = tree.get_selected()
+	if new_name == "":
+		selected.set_text(0, "Unnamed unit")
+	else:
+		selected.set_text(0, new_name)
 	
 
 func new_selection():
