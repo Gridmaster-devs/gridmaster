@@ -23,6 +23,8 @@ static func create(name_p : String, value_p):
 	assert(attribute.type != null, "The value of the attribute must be an int, string, or float")
 	return attribute
 
+
+
 # debugging, prints all there is to the Attribute
 func print_all():
 	print("Attribute: " + str(name) + ", value: " + str(value) + "\n")

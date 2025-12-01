@@ -6,11 +6,16 @@ var attributes : Dictionary
 
 func set_attribute(name_p : String, value_p):
 	#TODO: Probably need to check for null values
-	var attribute = Attribute.create(name_p, value_p)
-	attributes[name_p] = attribute
+	if (name_p != null and value_p != null):
+		var attribute = Attribute.create(name_p, value_p)
+		attributes[name_p] = attribute
 
 func get_attribute(name_p : String):
-	return attributes[name_p]
+	var attribute : Attribute = attributes.get(name_p)
+	if (attribute != null):
+		return attribute.value
+	else:
+		return null
 	
 # debugging
 func print_all():

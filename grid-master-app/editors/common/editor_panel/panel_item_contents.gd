@@ -36,15 +36,33 @@ func get_label():
 func get_content():
 	# assert(has_type == true, "the panel item has not been given a type, and thus does not have any children")
 	return get_child(1)
+	
+func reset():
+	match type:
+		PanelType.FIELD:
+			var node : LineEdit = get_content() as LineEdit
+			node.text = ""
+		PanelType.CHECKBOX:
+			var node : CheckBox = get_content() as CheckBox
+			node.set_pressed(false)
+		PanelType.DROPDOWN:
+			var node : OptionButton = get_content() as OptionButton
+			node.selected = 0
+		PanelType.SPINBOX:
+			var node : SpinBox = get_content() as SpinBox
+			node.get_line_edit().text = "0"
 
 func save_to_unit_resource(resource_p : UnitResourceDict):
-	print("got here")
-	resource_p.set_attribute(attribute_name, get_value())
+	if (resource_p != null):
+		resource_p.set_attribute(attribute_name, get_value())
 	
 func load_from_unit_resource(resource_p : UnitResourceDict):
-	var value = resource_p.get_attribute(attribute_name)
-	if (value != null):
-		set_value(value) # this assumes that the type of the attribute is the same in the dictionary and in here
+	if (resource_p != null):
+		var value = resource_p.get_attribute(attribute_name)
+		if (value == null):
+			reset()
+		else:
+			set_value(value) # this assumes that the type of the attribute is the same in the dictionary and in here
 
 func get_value():
 	match type:
@@ -57,7 +75,7 @@ func get_value():
 		PanelType.DROPDOWN:
 			var node : OptionButton = get_content() as OptionButton
 			var index = node.selected
-			return items[index]
+			return index
 		PanelType.SPINBOX:
 			var node : SpinBox = get_content() as SpinBox
 			return node.get_line_edit().text as float
@@ -75,7 +93,7 @@ func set_value(val):
 			node.selected = val
 		PanelType.SPINBOX:
 			var node : SpinBox = get_content() as SpinBox
-			node.get_line_edit().text = val
+			node.get_line_edit().text = str(val)
 
 func update_item():
 	if Engine.is_editor_hint():

@@ -5,14 +5,22 @@ signal save_to_resource(resource : UnitResourceDict)
 signal load_from_resource(resource : UnitResourceDict)
 
 var unit_resource : UnitResourceDict
+@onready var tree = $EventHandler/HBoxContainer/FileTreePanel/Tree
+
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	unit_resource = UnitResourceDict.new()
-	test()
-	save_to_resource.emit(unit_resource)
-	unit_resource.print_all()
+	# unit_resource = UnitResourceDict.new()
+	# test()
+	# save_to_resource.emit(unit_resource)
+	# unit_resource.print_all()
+	pass
 
+func new_unit_resource(unit_resource_p : UnitResourceDict):
+	save_to_resource.emit(unit_resource)
+	load_from_resource.emit(unit_resource_p)
+	unit_resource = unit_resource_p
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
