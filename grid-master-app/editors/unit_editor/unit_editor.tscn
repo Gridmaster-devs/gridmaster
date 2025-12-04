@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://d1mgyle0o8kx3"]
+[gd_scene load_steps=8 format=3 uid="uid://d1mgyle0o8kx3"]
 
 [ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://themes/editor-theme.tres" id="1_ke4m8"]
 [ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/editor_panel.tscn" id="2_7lyne"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/panel_item.tscn" id="3_ad1yx"]
 [ext_resource type="PackedScene" uid="uid://ba5as4lpqxka2" path="res://editors/unit_editor/FileTreePanel.tscn" id="5_67da3"]
 [ext_resource type="PackedScene" uid="uid://b8u4a8d5rc0yj" path="res://editors/unit_editor/unit_info_panel.tscn" id="6_k1fjl"]
+[ext_resource type="PackedScene" uid="uid://sakhpsv2g3n5" path="res://editors/unit_editor/Action panels/action_panel_item.tscn" id="7_ip3j4"]
 
 [node name="UnitEditor" type="PanelContainer"]
 anchors_preset = 15
@@ -422,6 +423,9 @@ theme_type_variation = &"SectionLabel"
 text = "Orders"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="ActionPanelItem" parent="HBoxContainer/ActionsPanel/TopVBox/ScrollContainer/ContentsVBox/Orders" instance=ExtResource("7_ip3j4")]
+layout_mode = 2
 
 [connection signal="file_selected" from="Dialogs/SelectImageDialog" to="Dialogs" method="_set_image"]
 

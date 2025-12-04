@@ -18,7 +18,7 @@ func set_produced(produced_name : String, amount : int) -> void:
 
 func get_consumed_name() -> String:
 	return consumed_resource
-	
+
 func get_produced_name() -> String:
 	return produced_resource
 

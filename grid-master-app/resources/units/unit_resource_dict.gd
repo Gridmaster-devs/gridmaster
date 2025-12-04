@@ -3,6 +3,7 @@ extends Resource
 
 # holds string : Attribute pairs
 @export var attributes : Dictionary
+@export var actions : Array[Action]
 
 func set_attribute(name_p : String, value_p):
 	#TODO: Probably need to check for null values

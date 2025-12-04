@@ -2,11 +2,28 @@
 
 [ext_resource type="Script" uid="uid://cg3j0nb33j6bb" path="res://editors/unit_editor/Action panels/action_panel_item.gd" id="1_rfyan"]
 
-[node name="ActionPanelItem" type="Control"]
-layout_mode = 3
+[node name="ActionPanelItem" type="VBoxContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_rfyan")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Action type"
+
+[node name="OptionButton" type="OptionButton" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+item_count = 1
+popup/item_0/text = "Consume / Produce"
+popup/item_0/id = 0
+
+[node name="Child Panel Parent" type="PanelContainer" parent="."]
+layout_mode = 2
