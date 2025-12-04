@@ -26,6 +26,9 @@ size_flags_vertical = 3
 
 [node name="Actions" type="VBoxContainer" parent="VBoxContainer/ScrollContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 20
 
 [node name="Add action" type="Button" parent="VBoxContainer"]
 layout_mode = 2

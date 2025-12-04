@@ -8,6 +8,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
 script = ExtResource("1_rfyan")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
@@ -28,6 +29,6 @@ popup/item_0/id = 0
 [node name="Child Panel Parent" type="PanelContainer" parent="."]
 layout_mode = 2
 
-[node name="Remove unit" type="Button" parent="."]
+[node name="Remove action" type="Button" parent="."]
 layout_mode = 2
-text = "- Remove unit"
+text = "- Remove action"
