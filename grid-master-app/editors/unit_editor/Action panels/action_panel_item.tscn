@@ -27,3 +27,7 @@ popup/item_0/id = 0
 
 [node name="Child Panel Parent" type="PanelContainer" parent="."]
 layout_mode = 2
+
+[node name="Remove unit" type="Button" parent="."]
+layout_mode = 2
+text = "- Remove unit"

@@ -6,7 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/panel_item.tscn" id="3_ad1yx"]
 [ext_resource type="PackedScene" uid="uid://ba5as4lpqxka2" path="res://editors/unit_editor/FileTreePanel.tscn" id="5_67da3"]
 [ext_resource type="PackedScene" uid="uid://b8u4a8d5rc0yj" path="res://editors/unit_editor/unit_info_panel.tscn" id="6_k1fjl"]
-[ext_resource type="PackedScene" uid="uid://sakhpsv2g3n5" path="res://editors/unit_editor/Action panels/action_panel_item.tscn" id="7_ip3j4"]
+[ext_resource type="PackedScene" uid="uid://rtqqyrnt8pr0" path="res://editors/unit_editor/action_panel.tscn" id="7_ip3j4"]
 
 [node name="UnitEditor" type="PanelContainer"]
 anchors_preset = 15
@@ -404,32 +404,12 @@ text = "Value"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ActionsPanel" parent="HBoxContainer" instance=ExtResource("2_7lyne")]
-custom_minimum_size = Vector2(400, 0)
+[node name="ActionPanel" parent="HBoxContainer" instance=ExtResource("7_ip3j4")]
 layout_mode = 2
 size_flags_horizontal = 3
-title = "Actions"
-section_headers = Array[String](["Orders"])
-
-[node name="TopLabel" parent="HBoxContainer/ActionsPanel/TopVBox" index="0"]
-text = "Actions"
-
-[node name="Orders" type="VBoxContainer" parent="HBoxContainer/ActionsPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="HBoxContainer/ActionsPanel/TopVBox/ScrollContainer/ContentsVBox/Orders"]
-layout_mode = 2
-theme_type_variation = &"SectionLabel"
-text = "Orders"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="ActionPanelItem" parent="HBoxContainer/ActionsPanel/TopVBox/ScrollContainer/ContentsVBox/Orders" instance=ExtResource("7_ip3j4")]
-layout_mode = 2
 
 [connection signal="file_selected" from="Dialogs/SelectImageDialog" to="Dialogs" method="_set_image"]
 
 [editable path="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel"]
 [editable path="HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel"]
 [editable path="HBoxContainer/StatsPanel"]
-[editable path="HBoxContainer/ActionsPanel"]

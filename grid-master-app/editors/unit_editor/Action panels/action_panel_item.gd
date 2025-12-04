@@ -8,6 +8,7 @@ var action_type : Action.Type
 var resources : Array[String]
 @onready var panel_type_box : OptionButton = $HBoxContainer/OptionButton
 @onready var child_panel_parent : Control = $"Child Panel Parent"
+@onready var remove_unit_button : Button = $"Remove unit"
 
 func update_panel_type(selected : int):
 	action_type = selected as Action.Type
@@ -25,9 +26,12 @@ func create_consumeproduce_panel():
 	child_panel_parent.add_child(scene)
 	scene.initiate(resources)
 	
+func self_destruct():
+	queue_free()
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	remove_unit_button.button_up.connect(self_destruct)
 	panel_type_box.item_selected.connect(update_panel_type)
 
 

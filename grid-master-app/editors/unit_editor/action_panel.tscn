@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://rtqqyrnt8pr0"]
+[gd_scene load_steps=3 format=3 uid="uid://rtqqyrnt8pr0"]
 
 [ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://themes/editor-theme.tres" id="1_cn1ym"]
+[ext_resource type="Script" uid="uid://exmgfdpro6ut" path="res://editors/unit_editor/action_panel.gd" id="1_yqkx1"]
 
 [node name="ActionPanel" type="PanelContainer"]
 anchors_preset = 15
@@ -8,6 +9,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_yqkx1")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 2
@@ -15,10 +17,14 @@ layout_mode = 2
 [node name="Label" type="Label" parent="VBoxContainer"]
 layout_mode = 2
 theme = ExtResource("1_cn1ym")
-theme_type_variation = &"HeaderMedium"
+theme_type_variation = &"TopLabel"
 text = "Actions"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Actions" type="VBoxContainer" parent="VBoxContainer/ScrollContainer"]
 layout_mode = 2
 
 [node name="Add action" type="Button" parent="VBoxContainer"]
