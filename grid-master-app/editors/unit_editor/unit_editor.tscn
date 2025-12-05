@@ -47,10 +47,9 @@ layout_mode = 2
 theme = ExtResource("1_ke4m8")
 theme_type_variation = &"EditorHBox"
 
-[node name="UnitTreePanel" parent="HBoxContainer" node_paths=PackedStringArray("unit_editor") instance=ExtResource("5_67da3")]
+[node name="UnitTreePanel" parent="HBoxContainer" instance=ExtResource("5_67da3")]
 layout_mode = 2
 size_flags_horizontal = 3
-unit_editor = NodePath("../..")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
 custom_minimum_size = Vector2(800, 0)
@@ -59,9 +58,8 @@ size_flags_horizontal = 3
 theme = ExtResource("1_ke4m8")
 theme_type_variation = &"EditorVBox"
 
-[node name="UnitInfoPanel" parent="HBoxContainer/VBoxContainer" node_paths=PackedStringArray("unit_editor") instance=ExtResource("6_k1fjl")]
+[node name="UnitInfoPanel" parent="HBoxContainer/VBoxContainer" instance=ExtResource("6_k1fjl")]
 layout_mode = 2
-unit_editor = NodePath("../../..")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer"]
 layout_mode = 2

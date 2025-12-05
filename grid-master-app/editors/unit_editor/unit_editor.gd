@@ -48,6 +48,8 @@ func _ready() -> void:
 	info_panel.get_load_button().button_up.connect(show_load_dialog)
 	update_resources.emit(resources)
 	action_panel.add_resource_saveload_signals(save_to_resource, load_from_resource)
+	info_panel.link_unit_editor(self)
+	tree_panel.link_unit_editor(self)
 	
 	
 

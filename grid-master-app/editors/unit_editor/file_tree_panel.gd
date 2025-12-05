@@ -5,7 +5,7 @@ extends PanelContainer
 var unit_resources : Array[UnitResourceDict] = []
 var units : int = 0
 
-@export var unit_editor : UnitEditor
+var unit_editor : UnitEditor
 
 @onready var tree : Tree = $TopVBox/Tree
 @onready var add_button = $TopVBox/Buttons/Add
@@ -52,8 +52,8 @@ func new_selection():
 	# print("new resource: " + str(unit_resources[index]))
 	
 
-func hello():
-	print("hello")
+func link_unit_editor(ue : UnitEditor):
+	unit_editor = ue
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

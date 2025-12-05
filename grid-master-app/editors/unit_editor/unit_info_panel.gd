@@ -1,7 +1,7 @@
 class_name UnitInfoPanel
 extends PanelContainer
 
-@export var unit_editor : UnitEditor
+var unit_editor : UnitEditor
 @onready var save_button = $TopVBox/PanelContainer/ContentsVBox/HBoxContainer/VBoxContainer/Buttons/SaveButton
 @onready var load_button = $TopVBox/PanelContainer/ContentsVBox/HBoxContainer/VBoxContainer/Buttons/LoadButton
 @onready var name_line = $TopVBox/PanelContainer/ContentsVBox/NameLine
@@ -46,10 +46,13 @@ func get_load_button() -> Button:
 func reset():
 	name_line.text = ""
 	description_box.text = ""
+	
+func link_unit_editor(ue : UnitEditor):
+	unit_editor = ue
+	unit_editor.save_to_resource.connect(save_to_resource)
+	unit_editor.load_from_resource.connect(load_from_resource)
+	unit_editor.reset.connect(reset)
+	name_line.text_changed.connect(unit_name_changed)
 		
 func _ready():
-	if (unit_editor != null):
-		unit_editor.save_to_resource.connect(save_to_resource)
-		unit_editor.load_from_resource.connect(load_from_resource)
-		unit_editor.reset.connect(reset)
-		name_line.text_changed.connect(unit_name_changed)
+	pass
