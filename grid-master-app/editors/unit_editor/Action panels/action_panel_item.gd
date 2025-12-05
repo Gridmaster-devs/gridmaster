@@ -41,10 +41,15 @@ func self_destruct():
 	queue_free()
 	
 func save_action_to_array(action_array : Array[Action]):
+	var action : Action
 	if (child_panel != null):
-		var action : Action = child_panel.save_to_action()
-		action.action_name = action_name_line.text # I don't think this can ever be null?
-		action_array.append(action)
+		action = child_panel.save_to_action()
+	else:
+		action = NoneAction.new()
+		action.action_type = Action.Type.NONE
+		
+	action.action_name = action_name_line.text # I don't think this can ever be null?
+	action_array.append(action)
 		
 func load_from_action(action : Action):
 	if (action != null):
@@ -53,6 +58,11 @@ func load_from_action(action : Action):
 			update_panel_type(Action.Type.CONSUMEPRODUCE as int)
 			panel_type_box.select(Action.Type.CONSUMEPRODUCE as int)
 			child_panel.load_from_action(action)
+			
+		if action is NoneAction:
+			update_panel_type(Action.Type.NONE as int)
+			panel_type_box.select(Action.Type.NONE as int)
+			
 	
 
 # Called when the node enters the scene tree for the first time.
