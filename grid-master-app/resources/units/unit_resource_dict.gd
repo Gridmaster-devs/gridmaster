@@ -17,6 +17,12 @@ func get_attribute(name_p : String):
 		return attribute.value
 	else:
 		return null
+		
+func save_actions(action_array : Array[Action]):
+	actions = action_array
+	
+func load_actions():
+	return actions
 	
 # debugging
 func print_all():

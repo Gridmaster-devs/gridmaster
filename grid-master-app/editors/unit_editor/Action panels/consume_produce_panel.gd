@@ -1,5 +1,5 @@
 class_name ConsumeProducePanel
-extends VBoxContainer
+extends Control
 
 var resources : Array[String]
 @onready var consumes_amount : SpinBox = $Consumes/ResourceAmount
@@ -8,6 +8,8 @@ var resources : Array[String]
 @onready var produces_name : OptionButton = $Produces/ResourceName
 
 
+# EVERY TYPE OF ACTION SUBPANEL MUST HAVE THIS FUNCTION
+# I'd enforce this with abstract classes, but the godot editor doesn't seem to work with them
 func load_from_action(action : Action):
 	
 	if !(action is ConsumeProduce) or (action == null):
@@ -16,34 +18,44 @@ func load_from_action(action : Action):
 	var cp = action as ConsumeProduce
 	
 	if (cp.consumed_resource != null):
-		consumes_name.select_with_text(cp.consumed_resource)
+		HelperFuncs.select_with_text(consumes_name, cp.consumed_resource)
 		
 	if (cp.produced_resource != null):
-		produces_name.select_with_text(cp.produced_resource)
+		HelperFuncs.select_with_text(produces_name, cp.produced_resource)
 		
 	if (cp.consumed_amount != null):
-		consumes_amount = cp.consumed_amount
+		consumes_amount.value = cp.consumed_amount
 		
 	if (cp.produced_amount != null):
-		produces_amount = cp.produced_amount
+		produces_amount.value = cp.produced_amount
 		
 
+# EVERY TYPE OF ACTION SUBPANEL MUST HAVE THIS FUNCTION
+# I'd enforce this with abstract classes, but the godot editor doesn't seem to work with them
 func save_to_action() -> ConsumeProduce:
 	var cp = ConsumeProduce.new()
 	
+	consumes_amount.apply()
+	produces_amount.apply()
+	
 	if (consumes_amount.value != null):
-		cp.consumed_amount = consumes_amount
+		cp.consumed_amount = consumes_amount.value
 		
 	if (produces_amount.value != null):
-		cp.produced_amount = produces_amount
+		cp.produced_amount = produces_amount.value
 		
 	if (consumes_name != null):
-		cp.consumed_resource = consumes_name
+		cp.consumed_resource = HelperFuncs.get_text_selected(consumes_name)
 		
 	if (produces_name != null):
-		cp.produced_resource = produces_name
-	
+		cp.produced_resource = HelperFuncs.get_text_selected(produces_name)
+		
+	cp.action_type = Action.Type.CONSUMEPRODUCE
+		
 	return cp
+	
+	
+
 	
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

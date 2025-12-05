@@ -12,6 +12,7 @@ enum PanelType {FIELD, CHECKBOX, DROPDOWN, SPINBOX}
 
 @export_enum("Field", "Checkbox", "Dropdown", "Spinbox") var type : int
 @export_tool_button("Update Item", "Callable") var update_action = update_item
+@export_flags ("Resource") var flags : int = 0
 
 # this is pretty jank, it should automatically find the parent on ready
 var root_editor : UnitEditor
@@ -256,6 +257,16 @@ func test_parent():
 	while parent != null:
 		print("name: " + self.name + ", parent: " + str(parent))
 		parent = parent.get_parent()
+		
+func resource_flag() -> bool:
+	if ((flags & 1) > 0):
+		return true
+	else:
+		return false
+
+func update_resources(resources : Array[String]):
+	if (resource_flag()):
+		resources.append(attribute_name)
 	
 func _ready():
 	# test_parent()
@@ -265,6 +276,7 @@ func _ready():
 			root_editor.save_to_resource.connect(save_to_unit_resource)
 			root_editor.load_from_resource.connect(load_from_unit_resource)
 			root_editor.reset.connect(reset)
+			root_editor.update_resources.connect(update_resources)
 			# print(root_editor)
 		# root_editor.test()
 	self.mouse_filter = Control.MOUSE_FILTER_IGNORE
