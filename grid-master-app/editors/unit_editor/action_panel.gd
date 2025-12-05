@@ -2,6 +2,7 @@ class_name ActionPanel
 extends PanelContainer
 
 var resources : Array[String]
+var unit_editor : UnitEditor
 signal save_to_action_array(resources : Array[Action])
 @onready var actions_box : VBoxContainer = $VBoxContainer/ScrollContainer/Actions
 @onready var add_action_button : Button = $"VBoxContainer/Add action"
@@ -44,10 +45,12 @@ func load_from_resource(unit_resource : UnitResourceDict):
 		
 	for action in action_array:
 		add_action_from_resource(action)
-		
-func add_resource_saveload_signals(save_r : Signal, load_r : Signal):
-	save_r.connect(save_to_resource)
-	load_r.connect(load_from_resource)
+	
+func link_unit_editor(ue : UnitEditor):
+	unit_editor = ue
+	unit_editor.save_to_resource.connect(save_to_resource)
+	unit_editor.load_from_resource.connect(load_from_resource)
+	unit_editor.reset.connect(reset_children)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
