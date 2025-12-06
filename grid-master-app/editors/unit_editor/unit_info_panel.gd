@@ -25,13 +25,14 @@ func save_to_resource(unit_resource : UnitResourceDict):
 
 func load_from_resource(unit_resource : UnitResourceDict):
 	if (unit_resource != null):
-		var unit_name = unit_resource.get_attribute("name")
+
+		var unit_name = unit_resource.get_attribute_value("name")
 		if (unit_name == "" or unit_name == null):
 			name_line.text = ""
 		else:
 			name_line.text = unit_name
 			
-		var unit_description = unit_resource.get_attribute("description")
+		var unit_description = unit_resource.get_attribute_value("description")
 		if (unit_description == null):
 			description_box.text = ""
 		else:

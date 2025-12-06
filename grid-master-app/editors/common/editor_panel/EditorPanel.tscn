@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://duyxluc3ja031"]
 
 [ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://themes/editor-theme.tres" id="1_38p7f"]
-[ext_resource type="Script" uid="uid://gk6a0hyjl081" path="res://editors/common/editor_panel/content_manager.gd" id="2_ifgyv"]
+[ext_resource type="Script" uid="uid://gk6a0hyjl081" path="res://editors/common/editor_panel/editor_panel.gd" id="2_ifgyv"]
 
 [node name="EditorPanel" type="PanelContainer"]
 anchors_preset = 15
@@ -12,7 +12,6 @@ grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("1_38p7f")
 script = ExtResource("2_ifgyv")
-title = "EditorPanel"
 
 [node name="TopVBox" type="VBoxContainer" parent="."]
 layout_mode = 2

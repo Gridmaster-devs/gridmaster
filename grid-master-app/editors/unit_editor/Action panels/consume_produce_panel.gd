@@ -1,3 +1,7 @@
+# child of an action panel item
+# if abstract classes start working one day, please
+# add one for action panel item subclasses so that
+# the functions can be enforced
 class_name ConsumeProducePanel
 extends Control
 
@@ -66,7 +70,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	pass
 	
-
+# just adds the resources to the dropdown menus
 func initiate(editor_resources : Array[String]) -> void:
 	resources = editor_resources
 	for item in editor_resources:

@@ -1,12 +1,12 @@
 [gd_scene load_steps=8 format=3 uid="uid://d1mgyle0o8kx3"]
 
 [ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://themes/editor-theme.tres" id="1_ke4m8"]
-[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/editor_panel.tscn" id="2_7lyne"]
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/EditorPanel.tscn" id="2_7lyne"]
 [ext_resource type="Script" uid="uid://cdd3u0q68b4jw" path="res://editors/unit_editor/unit_editor.gd" id="2_k1fjl"]
-[ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/panel_item.tscn" id="3_ad1yx"]
+[ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/UnitPanelItem.tscn" id="3_ad1yx"]
 [ext_resource type="PackedScene" uid="uid://ba5as4lpqxka2" path="res://editors/unit_editor/FileTreePanel.tscn" id="5_67da3"]
-[ext_resource type="PackedScene" uid="uid://b8u4a8d5rc0yj" path="res://editors/unit_editor/unit_info_panel.tscn" id="6_k1fjl"]
-[ext_resource type="PackedScene" uid="uid://rtqqyrnt8pr0" path="res://editors/unit_editor/action_panel.tscn" id="7_ip3j4"]
+[ext_resource type="PackedScene" uid="uid://b8u4a8d5rc0yj" path="res://editors/unit_editor/UnitInfoPanel.tscn" id="6_k1fjl"]
+[ext_resource type="PackedScene" uid="uid://rtqqyrnt8pr0" path="res://editors/unit_editor/ActionPanel.tscn" id="7_ip3j4"]
 
 [node name="UnitEditor" type="PanelContainer"]
 anchors_preset = 15
@@ -70,8 +70,6 @@ theme_type_variation = &"EditorHBox"
 [node name="AttributesPanel" parent="HBoxContainer/VBoxContainer/HBoxContainer" instance=ExtResource("2_7lyne")]
 layout_mode = 2
 size_flags_horizontal = 3
-title = "Attributes"
-section_headers = Array[String](["Movement", "Interaction"])
 
 [node name="TopLabel" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox" index="0"]
 text = "Attributes"
@@ -161,8 +159,6 @@ size_flags_horizontal = 3
 [node name="ResourcesPanel" parent="HBoxContainer/VBoxContainer/HBoxContainer" instance=ExtResource("2_7lyne")]
 layout_mode = 2
 size_flags_horizontal = 3
-title = "Resources"
-section_headers = Array[String](["Vitality"])
 
 [node name="TopLabel" parent="HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox" index="0"]
 text = "Resources"
@@ -239,8 +235,6 @@ size_flags_horizontal = 3
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 size_flags_horizontal = 3
-title = "Stats"
-section_headers = Array[String](["Offensive", "Defensive", "Utility", "Value"])
 
 [node name="TopLabel" parent="HBoxContainer/StatsPanel/TopVBox" index="0"]
 text = "Stats"

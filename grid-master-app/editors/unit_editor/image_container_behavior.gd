@@ -1,3 +1,5 @@
+# old code for the image selector in the unit editor
+# maybe reusable
 extends TextureRect
 
 signal left_clicked()

@@ -1,3 +1,8 @@
+# subclass of action that represents an action
+# where one resource is consumed, and another is produced
+# it wouldn't be a bad idea to add the possibility of multiple different resources
+# being consumed and/or produced, or the possibility of a "None" resource
+# (although the latter is the simple matter of adding "none" to the resource list
 class_name ConsumeProduce
 extends Action
 
@@ -6,6 +11,8 @@ extends Action
 @export var produced_resource : String
 @export var produced_amount : int
 
+# I forgot to use these because I'm stupid
+# Don't be like me and use these please
 func set_consumed(consumed_name : String, amount : int) -> void:
 	if (consumed_name != null and consumed_name != "" and amount >= 0):
 		consumed_resource = consumed_name

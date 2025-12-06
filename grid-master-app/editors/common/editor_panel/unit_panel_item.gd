@@ -1,5 +1,5 @@
 @tool
-class_name PanelItem
+class_name UnitPanelItem
 extends HBoxContainer
 
 enum PanelType {FIELD, CHECKBOX, DROPDOWN, SPINBOX}
@@ -10,24 +10,19 @@ enum PanelType {FIELD, CHECKBOX, DROPDOWN, SPINBOX}
 # the text that will be shown to the user, explains the attribute
 @export var text : String
 
+# reasonably you could and should make these into their own subclass scenes
+# which can then be created as a child for this scene, like the actions work
+# this would make implementing more complex values far easier, and isn't that much work
 @export_enum("Field", "Checkbox", "Dropdown", "Spinbox") var type : int
 @export_tool_button("Update Item", "Callable") var update_action = update_item
-@export_flags ("Resource") var flags : int = 0
 
-# this is pretty jank, it should automatically find the parent on ready
+# various flags
+# the resource flag determines whether the attribute counts as a resource, and thus
+# whether it shows up in places for resources, like certain actions
+@export_flags ("Resource") var flags : int = 0
 var root_editor : UnitEditor
 
-# Array for the dropdown menu option
-var items : Array[String] = []
-
-# THIS IS THE ISSUE, GETS RESET WHEN THE SCENE IS NOT LIVE
-# REPLACE THE USAGE OF THIS WITH ABSOLUTE PATHS FOR GETTERS AND SETTERS
-# ALSO NOTICE THAT THE TOOL SCRIPT FUNCTION THAT MAKES THE DROPDOWN USES THIS
-# TO SET VALUES IN EDITOR; THIS IS NOT USELESS, JUST NOT FIT FOR GET_VALUE AND SET_VALUE
-# (the get and set at the bottom relate to godot's internal logic and work fine
-# this problem has to do with the top most functions)
-# var value_container_path = ""
-
+var items : Array[String] = [] # Array for the dropdown menu option
 
 # The label is always child 0, and the content (field, checkbox, etc) is always child 1
 func get_label():
@@ -59,9 +54,12 @@ func save_to_unit_resource(resource_p : UnitResourceDict):
 	
 func load_from_unit_resource(resource_p : UnitResourceDict):
 	if (resource_p != null):
-		var value = resource_p.get_attribute(attribute_name)
+		var value = resource_p.get_attribute_value(attribute_name)
 		if (value != null):
-			set_value(value) # this assumes that the type of the attribute is the same in the dictionary and in here
+			# this assumes that the type of the attribute is the same in the dictionary and in here
+			# this obviously means that if the value type of an attribute changes between versions their units
+			# won't be compatible with each other
+			set_value(value) 
 			return
 
 	reset()
@@ -133,6 +131,9 @@ func update_dropdown():
 		for item in items:
 			dropdown.add_item(item)
 	
+# you could very easily make this more modular by making one basic
+# "make item" function that then can be called inside each specific
+# item type function
 func make_field_item():
 	var root = get_tree().edited_scene_root
 	var label = Label.new()
@@ -208,6 +209,7 @@ func make_spinbox_item():
 	label.size_flags_horizontal = SIZE_EXPAND_FILL
 	spinbox.size_flags_horizontal = SIZE_EXPAND_FILL
 
+# making this work with child scenes like mentioned above would fix having to do this
 func _get_property_list():
 	var properties = []
 	match type:
@@ -233,6 +235,7 @@ func _on_load_from_resource(resource : UnitResourceDict):
 	load_from_unit_resource(resource)
 	
 # super super jank but I don't know a better way right now
+# some way to do globals would probably be the best way
 func find_root_unit_editor():
 	var cur_node = self.get_parent()
 	while true:
@@ -241,35 +244,27 @@ func find_root_unit_editor():
 		elif cur_node == null:
 			break
 		cur_node = cur_node.get_parent()
-	
-func _get(property):
-	if property == "items":
-		return items
-		
-func _set(property, value):
-	if property == "items":
-		items = value
-		return true
-	return false
-	
+
+# solely for debugging
 func test_parent():
 	var parent = self.get_parent()
 	while parent != null:
 		print("name: " + self.name + ", parent: " + str(parent))
 		parent = parent.get_parent()
 		
+# checks whether the resource flag is on
 func resource_flag() -> bool:
 	if ((flags & 1) > 0):
 		return true
 	else:
 		return false
 
+# adds itself to the resources if the resource flag is set
 func update_resources(resources : Array[String]):
 	if (resource_flag()):
 		resources.append(attribute_name)
 	
 func _ready():
-	# test_parent()
 	if !Engine.is_editor_hint():
 		find_root_unit_editor()
 		if root_editor != null:
@@ -277,6 +272,4 @@ func _ready():
 			root_editor.load_from_resource.connect(load_from_unit_resource)
 			root_editor.reset.connect(reset)
 			root_editor.update_resources.connect(update_resources)
-			# print(root_editor)
-		# root_editor.test()
 	self.mouse_filter = Control.MOUSE_FILTER_IGNORE

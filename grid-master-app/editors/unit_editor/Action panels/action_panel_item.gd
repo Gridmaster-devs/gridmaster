@@ -3,12 +3,14 @@ extends Control
 
 # IMPORTANT NOTE!!!!!!!
 # every child item MUST have the methods save_to_action and load_from_action
+# you need to impplement them if you add another action subclass
 
 # what type of action is represented
 var action_type : Action.Type
 
 # all resources that can be selected
 var resources : Array[String]
+
 @onready var panel_type_box : OptionButton = $HBoxContainer/OptionButton
 @onready var child_panel_parent : Control = $"Child Panel Parent"
 @onready var remove_action_button : Button = $"Remove action"
@@ -28,9 +30,7 @@ func update_panel_type(selected : int):
 		Action.Type.CONSUMEPRODUCE:
 			create_consumeproduce_panel()
 			
-
 	
-
 func create_consumeproduce_panel():
 	var scene : ConsumeProducePanel = preload("res://editors/unit_editor/Action panels/ConsumeProducePanel.tscn").instantiate()
 	child_panel_parent.add_child(scene)
