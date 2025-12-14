@@ -1,0 +1,29 @@
+name: GUT Tests
+
+on:
+  push:
+    paths:
+      - 'grid-master-app/**'
+  pull_request:
+    paths:
+      - 'grid-master-app/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Godot
+      uses: lihop/setup-godot@v3
+      with:
+        version: 4.5-stable
+
+    - name: Import Godot project
+      run: godot --headless --path grid-master-app --import
+    
+    - name: Run GUT Tests
+      shell: bash
+      run: godot --headless --path grid-master-app -s addons/gut/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit
