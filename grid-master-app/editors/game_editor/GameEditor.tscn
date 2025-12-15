@@ -1,0 +1,54 @@
+[gd_scene load_steps=2 format=3 uid="uid://bo7oe8477f30h"]
+
+[ext_resource type="Script" uid="uid://rm27rb7okfxv" path="res://editors/game_editor/game_editor.gd" id="1_rp7ar"]
+
+[node name="Game Editor" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_rp7ar")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+
+[node name="Game name" type="LineEdit" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+placeholder_text = "Game name"
+
+[node name="Save game" type="Button" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Save game"
+
+[node name="Load game" type="Button" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Load game"
+
+[node name="Dialogs" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="SaveUnitDialog" type="FileDialog" parent="Dialogs"]
+display_mode = 1
+access = 2
+filters = PackedStringArray("*.tres")
+
+[node name="LoadUnitDialog" type="FileDialog" parent="Dialogs"]
+title = "Open a File"
+initial_position = 1
+ok_button_text = "Load"
+file_mode = 0
+display_mode = 1
+access = 2
+filters = PackedStringArray("*.tres")

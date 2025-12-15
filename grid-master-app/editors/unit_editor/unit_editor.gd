@@ -15,11 +15,13 @@ var unit_resource : UnitResourceDict
 
 # list of resource attributes
 var resources : Array[String] = []
+var editor_main : EditorMain
 @onready var tree_panel : FileTreePanel = $HBoxContainer/UnitTreePanel
 @onready var info_panel : UnitInfoPanel = $HBoxContainer/VBoxContainer/UnitInfoPanel
 @onready var save_dialog : FileDialog = $Dialogs/SaveUnitDialog
 @onready var load_dialog : FileDialog = $Dialogs/LoadUnitDialog
 @onready var action_panel : ActionPanel = $HBoxContainer/ActionPanel
+
 
 # called when the user changes the name of the unit in the editor
 func update_name_in_tree(new_name : String):
@@ -49,6 +51,12 @@ func load_from_file(path : String):
 		var data : UnitResourceDict = ResourceLoader.load(path) as UnitResourceDict
 		tree_panel.add_unit_from_resource(data)
 		
+func set_units(units_p : Array[UnitResourceDict]):
+	tree_panel.set_units(units_p)
+		
+		
+func get_units() -> Array[UnitResourceDict]:
+	return tree_panel.get_units()
 
 # lets the UI elements know the current edited unit was removed, so they
 # should reset their values
@@ -81,6 +89,10 @@ func new_unit_resource(unit_resource_p : UnitResourceDict):
 	save_to_resource.emit(unit_resource)
 	load_from_resource.emit(unit_resource_p)
 	unit_resource = unit_resource_p
+	
+
+func link_editor_main(editor_main_p : EditorMain):
+	editor_main = editor_main_p
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
