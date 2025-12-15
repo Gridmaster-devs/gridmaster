@@ -14,12 +14,12 @@ attribute_value = 0
 script = ExtResource("2_ls0hv")
 attribute_name = "movement_speed"
 type = 2
-attribute_value = 3.0
+attribute_value = 0.0
 
 [sub_resource type="Resource" id="Resource_8v5qn"]
 script = ExtResource("2_ls0hv")
 attribute_name = "capturable"
-attribute_value = true
+attribute_value = false
 
 [sub_resource type="Resource" id="Resource_4gbpr"]
 script = ExtResource("2_ls0hv")
@@ -43,25 +43,25 @@ attribute_value = 0.0
 script = ExtResource("2_ls0hv")
 attribute_name = "damage"
 type = 2
-attribute_value = 3.0
+attribute_value = 0.0
 
 [sub_resource type="Resource" id="Resource_7l2ot"]
 script = ExtResource("2_ls0hv")
 attribute_name = "piercing"
 type = 2
-attribute_value = 1.0
+attribute_value = 0.0
 
 [sub_resource type="Resource" id="Resource_pwc8o"]
 script = ExtResource("2_ls0hv")
 attribute_name = "accuracy"
 type = 2
-attribute_value = 1.0
+attribute_value = 0.0
 
 [sub_resource type="Resource" id="Resource_ja3m3"]
 script = ExtResource("2_ls0hv")
 attribute_name = "range"
 type = 2
-attribute_value = 1.0
+attribute_value = 0.0
 
 [sub_resource type="Resource" id="Resource_h4nt8"]
 script = ExtResource("2_ls0hv")
@@ -90,12 +90,12 @@ attribute_value = 0.0
 [sub_resource type="Resource" id="Resource_ctl70"]
 script = ExtResource("2_ls0hv")
 attribute_name = "name"
-attribute_value = "Infantry"
+attribute_value = "infantry"
 
 [sub_resource type="Resource" id="Resource_dewed"]
 script = ExtResource("2_ls0hv")
 attribute_name = "description"
-attribute_value = "Description"
+attribute_value = ""
 
 [resource]
 script = ExtResource("3_g8y2x")

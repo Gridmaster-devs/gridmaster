@@ -16,6 +16,15 @@ var unit_editor : UnitEditor
 @onready var remove_button = $TopVBox/Buttons/Remove
 var tree_root : TreeItem
 
+
+func reset_units():
+	units = 0
+	unit_resources.clear()
+	for child in tree_root.get_children():
+		tree_root.remove_child(child)
+	
+	unit_editor.unit_resource_removed()
+
 # adds a new unit to the tree and to the unit array
 func add_unit():
 	var item : TreeItem = tree.create_item(null, units)
@@ -65,6 +74,16 @@ func new_selection():
 # called once by the unit editor at the start of the program
 func link_unit_editor(ue : UnitEditor):
 	unit_editor = ue
+
+
+func get_units() -> Array[UnitResourceDict]:
+	return unit_resources
+	
+
+func set_units(units_p : Array[UnitResourceDict]):
+	reset_units()
+	for unit in units_p:
+		add_unit_from_resource(unit)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
