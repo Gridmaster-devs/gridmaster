@@ -1,6 +1,8 @@
 services:
   nginx:
-    image: nginx:1.29
+    build: 
+      context: .
+      dockerfile: nginx.Dockerfile
     ports: 
       - 8080:80
 
