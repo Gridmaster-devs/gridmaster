@@ -81,6 +81,12 @@ func new_unit_resource(unit_resource_p : UnitResourceDict):
 	save_to_resource.emit(unit_resource)
 	load_from_resource.emit(unit_resource_p)
 	unit_resource = unit_resource_p
+	
+
+func save_to_json():
+	if unit_resource != null:
+		var json = JSON.new()
+		var str = JSON.stringify(unit_resource)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
