@@ -1,0 +1,15 @@
+services:
+  nginx:
+    image: nginx:1.29
+    ports: 
+      - 8080:80
+
+  client:
+    build: 
+      context: .
+      dockerfile: client.Dockerfile
+
+  server:
+    build: 
+      context: .
+      dockerfile: server.Dockerfile
