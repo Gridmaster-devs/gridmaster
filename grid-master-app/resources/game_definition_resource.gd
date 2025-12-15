@@ -8,14 +8,10 @@ extends Resource
 func save_units(unit_array : Array[UnitResourceDict]):
 	if (unit_array != null):
 		units.clear()
-		for unit in unit_array:
-			units.append(unit)
+		units = unit_array.duplicate_deep()
 
 func load_units() -> Array[UnitResourceDict]:
-	var return_array : Array[UnitResourceDict] = []
-	for unit in units:
-		return_array.append(unit)
-	return return_array
+	return units.duplicate_deep()
 	
 
 func save_name(name_p : String):
@@ -31,9 +27,3 @@ func load_name() -> String:
 		return game_name
 	
 # TODO: add map functions here
-
-#func _init(name_p : String, units_p : Array[UnitResourceDict]):
-	#if (name_p != null and units_p != null):
-		#game_name = name_p
-		#save_units(units_p)
-	
