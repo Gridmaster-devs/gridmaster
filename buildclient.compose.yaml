@@ -1,0 +1,7 @@
+services:
+  build-client:
+    build:
+      context: .
+      dockerfile: build-client.Dockerfile
+      volumes:
+        - ./build:
