@@ -19,8 +19,12 @@ config/icon="res://icon.svg"
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
-window/size/mode=3
 window/stretch/mode="viewport"
+
+[editor]
+
+movie_writer/movie_file="E:/Godot/videos/test.avi"
+movie_writer/fps=30
 
 [file_customization]
 

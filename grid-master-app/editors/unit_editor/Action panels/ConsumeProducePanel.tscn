@@ -1,0 +1,51 @@
+[gd_scene load_steps=3 format=3 uid="uid://bkwlaousuap3t"]
+
+[ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://themes/editor-theme.tres" id="1_fouc0"]
+[ext_resource type="Script" uid="uid://ckeb2nwxcp6ib" path="res://editors/unit_editor/Action panels/consume_produce_panel.gd" id="1_jpsyg"]
+
+[node name="ConsumeProducePanel" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource("1_fouc0")
+script = ExtResource("1_jpsyg")
+
+[node name="Consumes" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Consumes" type="Label" parent="Consumes"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+text = "Consumes"
+
+[node name="ResourceAmount" type="SpinBox" parent="Consumes"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ResourceName" type="OptionButton" parent="Consumes"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+
+[node name="Produces" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Produces" type="Label" parent="Produces"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+text = "Produces"
+
+[node name="ResourceAmount" type="SpinBox" parent="Produces"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ResourceName" type="OptionButton" parent="Produces"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
