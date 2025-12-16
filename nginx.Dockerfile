@@ -1,3 +1,3 @@
 FROM nginx:1.29
 
-COPY ./build/ /usr/share/nginx/html
+COPY ./grid-master-app/build/ /usr/share/nginx/html
