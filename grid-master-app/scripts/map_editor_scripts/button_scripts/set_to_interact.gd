@@ -8,4 +8,4 @@ func _ready() -> void:
 
 	
 func _on_button_pressed():
-	parent_ref.interacting = true
+	parent_ref.change_input_state(parent_ref.InputState.INTERACT)

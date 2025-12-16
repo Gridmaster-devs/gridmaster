@@ -1,7 +1,7 @@
 extends Node
 
 
-@onready var tile_map = get_node("/root/MapEditor/VBoxContainer/HBoxContainer/SubViewControl/SubViewportContainer/SubViewport/TileMapLayer")
+@onready var tile_grid = get_node("/root/MapEditor/VBoxContainer/HBoxContainer/SubViewControl/SubViewportContainer/SubViewport/TileGrid")
 @onready var new_tile_button = get_node("/root/MapEditor/VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tile library/GridContainer")
 @onready var color_picker = $"../ColorPicker"
 @onready var parent_ref = $"../../../../../.."
@@ -12,7 +12,7 @@ func _ready() -> void:
 
 	
 func _on_button_pressed():
-	var tile_set = tile_map.tile_set 
+	var tile_set = tile_grid.tile_set 
 	var source = TileSetAtlasSource.new()
 	var width = 64
 	var height = 64 

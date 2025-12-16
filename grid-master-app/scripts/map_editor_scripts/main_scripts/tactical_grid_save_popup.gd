@@ -3,8 +3,15 @@ extends Control
 var dragging := false
 var drag_offset := Vector2.ZERO
 var parent_ref = null
-var cur_source = 0
-var cur_texture = Texture.new()
+
+@onready var line_edit = $"EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tactical map name/HBoxContainer/tactical_grid_name_line_edit"
+
+func init(parent_path: String): 
+	parent_ref = get_node(parent_path)
+
+func set_tactical_grid_name(name: String): 
+	line_edit.text = name
+
 
 func _gui_input(event):
 	if event is InputEventMouseButton:

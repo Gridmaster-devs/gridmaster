@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3 uid="uid://n3u2eqs7fkbj"]
+
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/editor_panel.tscn" id="1_vtwcx"]
+
+[node name="LoadPopup" type="Control"]
+layout_mode = 3
+anchor_right = 0.38300002
+anchor_bottom = 0.39600003
+offset_right = 76.63995
+offset_bottom = 75.31998
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="FileDialog" type="FileDialog" parent="."]
+oversampling_override = 1.0
+visible = true
+
+[node name="EditorPanel" parent="." instance=ExtResource("1_vtwcx")]
+layout_mode = 1
+mouse_filter = 2
+
+[editable path="EditorPanel"]

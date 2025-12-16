@@ -1,0 +1,45 @@
+[gd_scene load_steps=5 format=3 uid="uid://cc2o2tr5gktpy"]
+
+[ext_resource type="Script" uid="uid://xs1mgbwsp0ha" path="res://scripts/map_editor_scripts/main_scripts/tactical_grid_save_popup.gd" id="1_najgk"]
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/editor_panel.tscn" id="2_najgk"]
+[ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/panel_item.tscn" id="3_r1ypf"]
+[ext_resource type="Script" uid="uid://kc5bnibrr6x8" path="res://scripts/map_editor_scripts/button_scripts/save_tactical_map.gd" id="4_najgk"]
+
+[node name="TacticalGridSavePopup" type="Control"]
+layout_mode = 3
+anchor_right = 0.335
+anchor_bottom = 0.132
+offset_right = -0.2000122
+offset_bottom = 0.44000244
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_najgk")
+
+[node name="EditorPanel" parent="." instance=ExtResource("2_najgk")]
+layout_mode = 1
+mouse_filter = 2
+
+[node name="Tactical map name" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="0" instance=ExtResource("3_r1ypf")]
+layout_mode = 2
+mouse_filter = 2
+text = "Tactical map name"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tactical map name"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tactical map name/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Tactical map name"
+
+[node name="tactical_grid_name_line_edit" type="LineEdit" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tactical map name/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="save_tactical_map_button" type="Button" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="1"]
+layout_mode = 2
+text = "save"
+script = ExtResource("4_najgk")
+
+[editable path="EditorPanel"]
