@@ -1,48 +1,31 @@
-[gd_scene load_steps=25 format=3 uid="uid://nwroc3fkan84"]
+[gd_scene load_steps=18 format=3 uid="uid://nwroc3fkan84"]
 
 [ext_resource type="Script" uid="uid://c30cixnwoblrw" path="res://scripts/map_editor_scripts/main_scripts/map_editor_main.gd" id="1_7x244"]
 [ext_resource type="Script" uid="uid://pfgcd2tk24gn" path="res://scripts/map_editor_scripts/other/sub_viewport_script.gd" id="2_qqlts"]
 [ext_resource type="Script" uid="uid://cs6w2hy2ibo16" path="res://scripts/map_editor_scripts/open_popup/open_settings_popup.gd" id="3_cekfr"]
 [ext_resource type="Script" uid="uid://6g2o1upyh5q4" path="res://scripts/map_editor_scripts/other/map_camera_script.gd" id="3_x2l8i"]
-[ext_resource type="Script" uid="uid://b2q7gxxdh3w6v" path="res://scripts/map_editor_scripts/open_popup/open_save_tactical_grid_popup.gd" id="4_1xdc5"]
+[ext_resource type="Script" uid="uid://kc5bnibrr6x8" path="res://scripts/map_editor_scripts/button_scripts/save_tactical_map.gd" id="4_1xdc5"]
 [ext_resource type="Texture2D" uid="uid://doqe1u6vume5c" path="res://sprites/map_editor_sprites/grid_invis.png" id="4_woml6"]
 [ext_resource type="Script" uid="uid://b0ctigp6j0fim" path="res://scripts/map_editor_scripts/button_scripts/set_to_erase.gd" id="4_x2l8i"]
 [ext_resource type="Script" uid="uid://dgeudson3p1wa" path="res://scripts/map_editor_scripts/other/tile_grid_gen.gd" id="5_7x244"]
-[ext_resource type="Script" uid="uid://d4njvsv5v0y1u" path="res://scripts/map_editor_scripts/button_scripts/load_from_file_button.gd" id="5_41jle"]
 [ext_resource type="Script" uid="uid://dtp2ue4bwuyq6" path="res://scripts/map_editor_scripts/button_scripts/set_to_interact.gd" id="5_yhpca"]
 [ext_resource type="Script" uid="uid://xlo37wc3iykq" path="res://scripts/map_editor_scripts/button_scripts/change_grid_view.gd" id="6_8b7ru"]
 [ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/editor_panel.tscn" id="6_woml6"]
 [ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/panel_item.tscn" id="7_woml6"]
 [ext_resource type="Script" uid="uid://bg4hv7x0k1qvk" path="res://scripts/map_editor_scripts/open_popup/open_new_tile_popup.gd" id="8_7x244"]
-[ext_resource type="Texture2D" uid="uid://dp1ky8epuaiv" path="res://sprites/map_editor_sprites/grid_invis_highlight.png" id="9_t7crc"]
-[ext_resource type="Texture2D" uid="uid://cy4pdp1xl7ssw" path="res://sprites/map_editor_sprites/grid_invis_highlight_pink.png" id="11_jdx3v"]
 [ext_resource type="Script" uid="uid://cvjm52agqrh1q" path="res://scripts/map_editor_scripts/button_scripts/add_new_tact_map.gd" id="12_rqsyi"]
-[ext_resource type="Script" uid="uid://4hv8nyi5ol0u" path="res://scripts/map_editor_scripts/button_scripts/edit_tactical_button.gd" id="17_0v43f"]
-[ext_resource type="Script" uid="uid://dpoq4lw1cl5ni" path="res://scripts/map_editor_scripts/button_scripts/remove_tactical_grid_button.gd" id="18_ato2m"]
 
 [sub_resource type="TileSet" id="TileSet_3s3gj"]
 tile_size = Vector2i(64, 64)
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jdx3v"]
-texture = ExtResource("9_t7crc")
-texture_region_size = Vector2i(64, 64)
-0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7x244"]
 texture = ExtResource("4_woml6")
 texture_region_size = Vector2i(64, 64)
 0:0/0 = 0
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_0v43f"]
-texture = ExtResource("11_jdx3v")
-texture_region_size = Vector2i(64, 64)
-0:0/0 = 0
-
 [sub_resource type="TileSet" id="TileSet_cekfr"]
 tile_size = Vector2i(64, 64)
 sources/1 = SubResource("TileSetAtlasSource_7x244")
-sources/0 = SubResource("TileSetAtlasSource_jdx3v")
-sources/2 = SubResource("TileSetAtlasSource_0v43f")
 
 [node name="MapEditor" type="Control"]
 layout_mode = 3
@@ -89,7 +72,6 @@ script = ExtResource("4_1xdc5")
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Load"
-script = ExtResource("5_41jle")
 
 [node name="erase_button" type="Button" parent="VBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer"]
 layout_mode = 2
@@ -136,7 +118,6 @@ script = ExtResource("2_qqlts")
 tile_set = SubResource("TileSet_3s3gj")
 
 [node name="BackgroundGrid" type="TileMapLayer" parent="VBoxContainer/HBoxContainer/SubViewControl/SubViewportContainer/SubViewport"]
-tile_map_data = PackedByteArray(0, 0, 1, 0, 3, 0, 1, 0, 0, 0, 0, 0, 0, 0, 3, 0, 3, 0, 1, 0, 0, 0, 0, 0, 0, 0, 3, 0, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 4, 0, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 4, 0, 5, 0, 1, 0, 0, 0, 0, 0, 0, 0)
 tile_set = SubResource("TileSet_cekfr")
 script = ExtResource("5_7x244")
 
@@ -229,24 +210,6 @@ size_flags_horizontal = 3
 text = "Hiding"
 
 [node name="LineEdit" type="LineEdit" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/Hiding/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="Tactical map" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile" instance=ExtResource("7_woml6")]
-layout_mode = 2
-mouse_filter = 2
-text = "Tactical map"
-
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/Tactical map"]
-layout_mode = 2
-mouse_filter = 2
-
-[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/Tactical map/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Tactical map"
-
-[node name="LineEdit" type="LineEdit" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/Tactical map/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -353,27 +316,5 @@ layout_mode = 2
 text = "New"
 autowrap_mode = 3
 
-[node name="Tactical Options" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="3"]
-visible = false
-layout_mode = 2
-
-[node name="edit_button" type="Button" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tactical Options"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Edit"
-script = ExtResource("17_0v43f")
-
-[node name="remove_button" type="Button" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tactical Options"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Remove"
-script = ExtResource("18_ato2m")
-
-[node name="SaveDialog" type="FileDialog" parent="."]
-oversampling_override = 1.0
-
-[node name="LoadDialog" type="FileDialog" parent="."]
-
 [editable path="VBoxContainer/EditorPanel"]
 [editable path="VBoxContainer/HBoxContainer/EditorPanel"]
-[editable path="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/Tactical map"]

@@ -33,3 +33,7 @@ folder_colors={
 "res://resources/": "yellow",
 "res://themes/": "pink"
 }
+
+[rendering]
+
+environment/defaults/default_clear_color=Color(0.28851813, 0.28851795, 0.28851798, 1)
