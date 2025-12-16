@@ -1,26 +1,23 @@
 [gd_scene load_steps=6 format=3 uid="uid://ds0w463f0tq7w"]
 
 [ext_resource type="Script" uid="uid://b60lcnw54cidu" path="res://scripts/map_editor_scripts/new_tile_scripts/new_tile_root.gd" id="1_p8hom"]
-[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/editor_panel.tscn" id="1_uhk68"]
-[ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/panel_item.tscn" id="2_ilbg8"]
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/EditorPanel.tscn" id="1_uhk68"]
+[ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/UnitPanelItem.tscn" id="2_ilbg8"]
 [ext_resource type="Script" uid="uid://c7dvdg0w230je" path="res://scripts/map_editor_scripts/open_popup/open_tile_color_picker.gd" id="3_4yvtc"]
 [ext_resource type="Script" uid="uid://p45oo81db6vn" path="res://scripts/map_editor_scripts/button_scripts/add_new_tile.gd" id="4_p8hom"]
 
 [node name="NewTile" type="Control"]
 layout_mode = 3
-anchor_right = 0.25300002
-anchor_bottom = 0.344
-offset_right = 0.23995972
-offset_bottom = -0.52001953
+anchor_right = 0.35300002
+anchor_bottom = 0.30400002
+offset_right = -0.76000977
+offset_bottom = -0.32000732
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_p8hom")
 
 [node name="EditorPanel" parent="." instance=ExtResource("1_uhk68")]
 layout_mode = 1
-mouse_filter = 2
-title = "Create New Tile"
-section_headers = Array[String](["General", "Stats", "Image"])
 
 [node name="TopLabel" parent="EditorPanel/TopVBox" index="0"]
 text = "Create New Tile"
@@ -37,7 +34,6 @@ vertical_alignment = 1
 
 [node name="Name" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/General" instance=ExtResource("2_ilbg8")]
 layout_mode = 2
-mouse_filter = 2
 text = "Name"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/General/Name"]
@@ -65,7 +61,6 @@ vertical_alignment = 1
 
 [node name="Protection" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Stats" instance=ExtResource("2_ilbg8")]
 layout_mode = 2
-mouse_filter = 2
 text = "Protection"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Stats/Protection"]
@@ -83,7 +78,6 @@ size_flags_horizontal = 3
 
 [node name="Movement" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Stats" instance=ExtResource("2_ilbg8")]
 layout_mode = 2
-mouse_filter = 2
 text = "Movement"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Stats/Movement"]
@@ -101,7 +95,6 @@ size_flags_horizontal = 3
 
 [node name="Hiding" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Stats" instance=ExtResource("2_ilbg8")]
 layout_mode = 2
-mouse_filter = 2
 text = "Hiding"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Stats/Hiding"]
@@ -129,7 +122,6 @@ vertical_alignment = 1
 
 [node name="Image" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Image" instance=ExtResource("2_ilbg8")]
 layout_mode = 2
-mouse_filter = 2
 text = "Image"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Image/Image"]
