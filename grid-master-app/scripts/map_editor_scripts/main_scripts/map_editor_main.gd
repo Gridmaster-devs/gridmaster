@@ -12,7 +12,7 @@ enum InputState {
 
 @onready var tact_options = $"VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tactical Options"
 @onready var grid_view_button = $VBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer/grid_view_button
-@onready var tact_lib = $"VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tactical library/GridContainer"
+@onready var tact_lib = $"VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tactical library"
 @onready var new_tile_button = $"VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tile library/GridContainer/VBoxContainer"
 @onready var tile_lib = $"VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tile library/GridContainer"
 @onready var tile_grid = $VBoxContainer/HBoxContainer/SubViewControl/SubViewportContainer/SubViewport/TileGrid
@@ -126,8 +126,6 @@ func save_tactical_grid(tact_grid_name: String):
 
 func create_tactical_grid_button_from_texture(tact_grid_name: String, tex: Texture2D): 
 	# Build output image
-	var img : Image = Image.create(width[cur_gw], height[cur_gw], false, Image.FORMAT_RGBA8)
-	var tileset : TileSet = tile_grid.tile_set
 	var vbox := VBoxContainer.new()
 	var new_button := Button.new()
 	new_button.icon = tex
@@ -148,7 +146,7 @@ func create_tactical_grid_button_from_texture(tact_grid_name: String, tex: Textu
 	vbox.add_child(label)
 	return vbox
 	
-func create_tile_lib_button(src: int, tex: Texture2D, name: String): 
+func create_tile_lib_button(src: int, tex: Texture2D, n: String): 
 	var vbox := VBoxContainer.new()
 	var new_button := Button.new()
 	new_button.icon = tex
@@ -162,7 +160,7 @@ func create_tile_lib_button(src: int, tex: Texture2D, name: String):
 	new_button.parent_ref = self
 	
 	var label := Label.new()
-	label.text = name
+	label.text = n
 	label.custom_minimum_size = Vector2(84, 84)
 	vbox.add_child(new_button)
 	vbox.add_child(label)
