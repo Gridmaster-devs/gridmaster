@@ -1,8 +1,8 @@
 [gd_scene load_steps=5 format=3 uid="uid://d27v75vsmk7v8"]
 
 [ext_resource type="Script" uid="uid://bwqcq5xsksi7y" path="res://scripts/common-scripts/ui-element-scripts/draggable.gd" id="1_2fwbw"]
-[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/editor_panel.tscn" id="1_8yskk"]
-[ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/panel_item.tscn" id="2_qfd4r"]
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/EditorPanel.tscn" id="1_8yskk"]
+[ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/PanelItem.tscn" id="2_qfd4r"]
 [ext_resource type="Script" uid="uid://bu0l5wb0xwreq" path="res://scripts/map_editor_scripts/button_scripts/save_settings.gd" id="4_w216f"]
 
 [node name="Settings" type="Control"]

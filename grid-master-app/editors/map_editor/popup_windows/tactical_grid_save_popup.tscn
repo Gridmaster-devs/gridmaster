@@ -1,8 +1,8 @@
 [gd_scene load_steps=5 format=3 uid="uid://cc2o2tr5gktpy"]
 
 [ext_resource type="Script" uid="uid://xs1mgbwsp0ha" path="res://scripts/map_editor_scripts/main_scripts/tactical_grid_save_popup.gd" id="1_najgk"]
-[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/editor_panel.tscn" id="2_najgk"]
-[ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/panel_item.tscn" id="3_r1ypf"]
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/EditorPanel.tscn" id="2_najgk"]
+[ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/PanelItem.tscn" id="3_r1ypf"]
 [ext_resource type="Script" uid="uid://kc5bnibrr6x8" path="res://scripts/map_editor_scripts/button_scripts/save_tactical_map.gd" id="4_najgk"]
 
 [node name="TacticalGridSavePopup" type="Control"]
