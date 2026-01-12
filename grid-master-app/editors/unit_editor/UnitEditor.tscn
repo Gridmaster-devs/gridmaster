@@ -87,10 +87,9 @@ vertical_alignment = 1
 [node name="Movement type" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Movement" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "movement_type"
-flags = 1
 text = "Movement type"
 type = 2
-items = Array[String]([])
+items = Array[String](["Walking", "Hovering", "Teleporting", "Wheels", "Tracks", "Water", "Flying"])
 
 [node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Movement/Movement type"]
 layout_mode = 2
@@ -100,11 +99,26 @@ text = "Movement type"
 [node name="OptionButton" type="OptionButton" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Movement/Movement type"]
 layout_mode = 2
 size_flags_horizontal = 3
+selected = 0
+item_count = 7
+popup/item_0/text = "Walking"
+popup/item_0/id = 0
+popup/item_1/text = "Hovering"
+popup/item_1/id = 1
+popup/item_2/text = "Teleporting"
+popup/item_2/id = 2
+popup/item_3/text = "Wheels"
+popup/item_3/id = 3
+popup/item_4/text = "Tracks"
+popup/item_4/id = 4
+popup/item_5/text = "Water"
+popup/item_5/id = 5
+popup/item_6/text = "Flying"
+popup/item_6/id = 6
 
 [node name="Movement speed" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Movement" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "movement_speed"
-flags = 1
 text = "Movement speed"
 type = 3
 
@@ -130,7 +144,6 @@ vertical_alignment = 1
 [node name="Capturable" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Interaction" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "capturable"
-flags = 1
 text = "Capturable"
 type = 1
 
@@ -239,7 +252,6 @@ vertical_alignment = 1
 [node name="Damage" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "damage"
-flags = 1
 text = "Damage"
 type = 3
 
@@ -255,7 +267,6 @@ size_flags_horizontal = 3
 [node name="Piercing" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "piercing"
-flags = 1
 text = "Piercing"
 type = 3
 
@@ -271,7 +282,6 @@ size_flags_horizontal = 3
 [node name="Accuracy" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "accuracy"
-flags = 1
 text = "Accuracy"
 type = 3
 
@@ -287,7 +297,6 @@ size_flags_horizontal = 3
 [node name="Range" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "range"
-flags = 1
 text = "Range"
 type = 3
 
@@ -313,7 +322,6 @@ vertical_alignment = 1
 [node name="Armor" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Defensive" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "armor"
-flags = 1
 text = "Armor"
 type = 3
 
@@ -329,7 +337,6 @@ size_flags_horizontal = 3
 [node name="Evasion" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Defensive" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "evasion"
-flags = 1
 text = "Evasion"
 type = 3
 
@@ -355,7 +362,6 @@ vertical_alignment = 1
 [node name="Vision range" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Utility" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "vision_range"
-flags = 1
 text = "Vision range"
 type = 3
 
@@ -371,7 +377,6 @@ size_flags_horizontal = 3
 [node name="Perception" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Utility" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "perception"
-flags = 1
 text = "Perception"
 type = 3
 
