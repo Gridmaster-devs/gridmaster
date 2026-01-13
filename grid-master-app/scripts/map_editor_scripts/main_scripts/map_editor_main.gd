@@ -471,9 +471,7 @@ func load_sources(tile_map_layer: TileMapLayer) -> Dictionary[int, Texture2D]:
 	return result
 	
 
-
-
-func save_game_map(path: String): 
+func saveMapToResource() -> GameMap:
 	var new_game_map = GameMap.new()
 	new_game_map.grid = Grid.new()
 	new_game_map.grid.height = height[GridView.STRATEGIC]
@@ -485,6 +483,11 @@ func save_game_map(path: String):
 	new_game_map.strategic_tile_information_map = tile_strategic_map
 	new_game_map.texture_map = load_sources(tile_grid)
 	new_game_map.tactical_grid_thumbnail_texture_map = tactical_grid_texture_map
+	return new_game_map
+
+
+func save_game_map(path: String): 
+	var new_game_map = saveMapToResource()
 	
 	var err := ResourceSaver.save(new_game_map, path)
 	if err != OK:
@@ -518,6 +521,8 @@ func add_sources_to_external(texs: Dictionary[int, Texture2D]):
 
 
 func load_from_data(gm: GameMap):
+	if gm == null: return
+	
 	tactical_grid_strategic_tile_map = gm.tactical_grid_strategic_tile_map
 	tactical_grid_map = gm.tactical_grid_map
 	tile_tactical_map = gm.tactical_tile_information_map
