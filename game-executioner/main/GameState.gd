@@ -1,5 +1,5 @@
 class_name GameState
-
+## Class that represents everything that makes up the current state of the game, ex. the units, the map, etc
 
 
 

@@ -1,5 +1,5 @@
-class_name GameGrid
-## Represents the map, which is a grid of grid tiles
+class_name TileType
+## Class that represents a type of tile on the map
 
 
 # Called when the node enters the scene tree for the first time.
