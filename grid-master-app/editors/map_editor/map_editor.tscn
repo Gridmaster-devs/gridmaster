@@ -362,8 +362,14 @@ script = ExtResource("18_ato2m")
 
 [node name="SaveDialog" type="FileDialog" parent="."]
 oversampling_override = 1.0
+access = 2
+filters = PackedStringArray("*.tres")
 
 [node name="LoadDialog" type="FileDialog" parent="."]
+title = "Open a File"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.tres")
 
 [editable path="VBoxContainer/EditorPanel"]
 [editable path="VBoxContainer/HBoxContainer/EditorPanel"]
