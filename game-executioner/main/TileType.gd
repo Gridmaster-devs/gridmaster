@@ -16,8 +16,3 @@ var texture : Texture2D ## Texture used for drawing the tile
 var attributes : Dictionary[TILE_ATTRIBUTE_TYPE, int]
 var flat_modifiers : Dictionary[TILE_ATTRIBUTE_TYPE, float]
 var percentage_modifiers : Dictionary[TILE_ATTRIBUTE_TYPE, float]
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass # Replace with function body.

@@ -31,7 +31,3 @@ func _init(unit_type : UnitType, unit_id_p : int, player_id_p : int) -> void:
 	player_id = player_id_p
 	type = unit_type
 	initFromUnitType()
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass # Replace with function body.

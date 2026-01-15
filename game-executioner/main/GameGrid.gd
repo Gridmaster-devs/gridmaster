@@ -5,10 +5,27 @@ class_name GameGrid
 var tiles : Array2D
 
 
+## Returns the tile at the specified index
+func getTile(width : int, height : int) -> GridTile:
+	return tiles.getItem(width, height)
+
+
+## Returns the tile type of the grid tile at the specified index
+func getTileType(width : int, height : int) -> TileType:
+	return getTile(width, height).getTileType()
+	
+	
+func setTileType(width : int, height : int, tile_type : TileType) -> void:
+	getTile(width, height).setTileType(tile_type)
+	
+	
+func getUnits(width : int, height : int) -> Array[Unit]:
+	return getTile(width, height).getUnits()
+	
+	
+
+
+
 # TODO: In the future should ask for a map to convert into a game grid
 func _init(width : int, height : int):
 	tiles = Array2D.new(width, height)
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass # Replace with function body.

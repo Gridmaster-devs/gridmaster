@@ -21,7 +21,3 @@ func _init(map_width : int, map_height : int, players_p : Array[Player], teams_p
 	players = players_p
 	teams = teams_p
 	game_name = game_name_p
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass # Replace with function body.
