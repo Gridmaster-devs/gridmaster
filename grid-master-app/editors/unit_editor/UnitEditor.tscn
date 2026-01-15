@@ -89,7 +89,7 @@ layout_mode = 2
 attribute_name = "movement_type"
 text = "Movement type"
 type = 2
-items = Array[String](["Walking", "Hovering", "Teleporting", "Wheels", "Tracks", "Water", "Flying"])
+items = Array[String](["Walking", "Tires", "Tracks", "Hovering", "Teleporting", "Water", "Flying"])
 
 [node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Movement/Movement type"]
 layout_mode = 2
@@ -249,18 +249,18 @@ text = "Offensive"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Damage" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive" instance=ExtResource("3_ad1yx")]
+[node name="Attack" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
-attribute_name = "damage"
-text = "Damage"
+attribute_name = "attack"
+text = "Attack"
 type = 3
 
-[node name="Label" type="Label" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Damage"]
+[node name="Label" type="Label" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Attack"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Damage"
+text = "Attack"
 
-[node name="SpinBox" type="SpinBox" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Damage"]
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Attack"]
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -273,7 +273,7 @@ type = 3
 [node name="Label" type="Label" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Piercing"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Piercing"
+text = "Armor piercing"
 
 [node name="SpinBox" type="SpinBox" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Piercing"]
 layout_mode = 2
@@ -294,18 +294,18 @@ text = "Accuracy"
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Range" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive" instance=ExtResource("3_ad1yx")]
+[node name="Attack range" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
-attribute_name = "range"
-text = "Range"
+attribute_name = "attack_range"
+text = "Attack range"
 type = 3
 
-[node name="Label" type="Label" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Range"]
+[node name="Label" type="Label" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Attack range"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Range"
+text = "Attack range"
 
-[node name="SpinBox" type="SpinBox" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Range"]
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Attack range"]
 layout_mode = 2
 size_flags_horizontal = 3
 

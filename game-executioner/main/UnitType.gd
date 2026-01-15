@@ -3,7 +3,7 @@ class_name UnitType
 
 ## What type of movement the unit has
 ## Custom is futureproofing for custom movement types in the future
-enum UNIT_MOVEMENT_TYPE{WALKING = 0, TIRES = 1, TRACKS = 2, HOVERING = 3, TELEPORTING = 4, WATER = 5, CUSTOM = -1}
+enum UNIT_MOVEMENT_TYPE{WALKING = 0, TIRES = 1, TRACKS = 2, HOVERING = 3, TELEPORTING = 4, WATER = 5, FLYING = 6, CUSTOM = -1}
 
 ## Whether the unit is capturable or not
 ## Possible to add options in the future (ex. capturable at some % morale/hp)
@@ -18,7 +18,7 @@ enum UNIT_ATTRIBUTE_TYPE{ATTACK,
 					CAPTURABLE,
 					ARMOR,
 					DODGE,
-					SPEED,
+					MOVEMENT_SPEED,
 					MOVEMENT_TYPE,
 					VISION_RANGE,
 					PERCEPTION,
@@ -30,13 +30,14 @@ enum UNIT_ATTRIBUTE_TYPE{ATTACK,
 ## ones understood by the game executioner
 const attribute_conversion_table : Dictionary[String, UNIT_ATTRIBUTE_TYPE] = {
 	"attack" : UNIT_ATTRIBUTE_TYPE.ATTACK,
+	"armor_piercing" : UNIT_ATTRIBUTE_TYPE.ARMOR_PIERCING,
 	"accuracy" : UNIT_ATTRIBUTE_TYPE.ACCURACY,
 	"attack_range" : UNIT_ATTRIBUTE_TYPE.ATTACK_RANGE,
 	"max_hp" : UNIT_ATTRIBUTE_TYPE.MAX_HP,
 	"capturable" : UNIT_ATTRIBUTE_TYPE.CAPTURABLE,
 	"armor" : UNIT_ATTRIBUTE_TYPE.ARMOR,
 	"dodge" : UNIT_ATTRIBUTE_TYPE.DODGE,
-	"speed" : UNIT_ATTRIBUTE_TYPE.SPEED,
+	"movement_speed" : UNIT_ATTRIBUTE_TYPE.MOVEMENT_SPEED,
 	"movement_type" : UNIT_ATTRIBUTE_TYPE.MOVEMENT_TYPE,
 	"vision_range" : UNIT_ATTRIBUTE_TYPE.VISION_RANGE,
 	"perception" : UNIT_ATTRIBUTE_TYPE.PERCEPTION,
@@ -71,9 +72,14 @@ func checkAttributes() -> void:
 		assert(attributes.get(type) != null, "Attribute %s missing after loading from resource!" % UNIT_ATTRIBUTE_TYPE.keys()[type])
 
 
+# TODO: This isn't checking the values from the unit resource too closely.
+# Problems may occur with attributes like capturable
+# Might be a good idea to check that each attribute's value is of the correct type and makes sense
 ## Initializes a unit type from a unit resource
 func initFromUnitResource(unit_resource : UnitResourceDict) -> void:
 	var resource_attributes = unit_resource.getAttributes()
+	unit_name = unit_resource.get_attribute_value("name")
+	description = unit_resource.get_attribute_value("description")
 	
 	for key in resource_attributes.keys():
 		var value = resource_attributes.get(key)
@@ -85,3 +91,9 @@ func initFromUnitResource(unit_resource : UnitResourceDict) -> void:
 			attributes.set(attribute_type, value)
 			
 		checkAttributes()
+
+
+## Constructor
+func _init(unit_resource : UnitResourceDict, unit_type_id : int) -> void:
+	initFromUnitResource(unit_resource)
+	type_id = unit_type_id
