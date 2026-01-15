@@ -6,23 +6,30 @@ var tiles : Array2D ## all the tiles on the map
 
 
 ## Returns the tile at the specified index
-func getTile(width : int, height : int) -> GridTile:
-	return tiles.getItem(width, height)
+func getTile(x : int, y : int) -> GridTile:
+	return tiles.getItem(x, y)
 
 
 ## Returns the tile type of the grid tile at the specified index
-func getTileType(width : int, height : int) -> TileType:
-	return getTile(width, height).getTileType()
+func getTileType(x : int, y : int) -> TileType:
+	return getTile(x, y).getTileType()
 	
+
+## Sets the type of tile at specified position
+func setTileType(x : int, y : int, tile_type : TileType) -> void:
+	getTile(x, y).setTileType(tile_type)
 	
-func setTileType(width : int, height : int, tile_type : TileType) -> void:
-	getTile(width, height).setTileType(tile_type)
-	
-	
-func getUnitsOnTile(width : int, height : int) -> Array[Unit]:
-	return getTile(width, height).getUnits()
-	
-	
+
+## Returns the units that are on the specified tile
+func getUnitsOnTile(x : int, y : int) -> Array[Unit]:
+	return getTile(x, y).getUnits()
+
+
+## Adds a unit to the grid
+func addUnit(unit : Unit):
+	var pos = unit.getPosition()
+	assert(pos != null, "Unit's position cannot be null!")
+	getTile(pos.x, pos.y).addUnit(unit)
 
 
 

@@ -1,5 +1,7 @@
 class_name GameMaster
 extends Node
+## Game master class which manages the game state and communicates
+## with other game elements
 
 var game_state : GameState
 
@@ -28,6 +30,22 @@ func getUnits() -> Variant:
 		return null
 	else:
 		return game_state.getUnits()
+		
+
+# DEBUG ONLY!!
+## Creates a debug unit for testing
+func createDebugUnit(position : Position2DInt) -> void:
+	if game_state != null:
+		game_state.createDebugUnit(position)
+
+
+# DEBUG ONLY!!
+## Creates a debug game for testing
+func debugInitGame() -> void:
+	var teams : Array[Team] = []
+	var players : Array[Player] = []
+	initGame(10, 10, players, teams, "Test game")
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

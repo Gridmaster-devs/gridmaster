@@ -76,7 +76,8 @@ func checkAttributes() -> void:
 # Problems may occur with attributes like capturable
 # Might be a good idea to check that each attribute's value is of the correct type and makes sense
 ## Initializes a unit type from a unit resource
-func initFromUnitResource(unit_resource : UnitResourceDict) -> void:
+func initFromUnitResource(unit_resource : UnitResourceDict, unit_type_id : int) -> void:
+	type_id = unit_type_id
 	var resource_attributes = unit_resource.getAttributes()
 	unit_name = unit_resource.get_attribute_value("name")
 	description = unit_resource.get_attribute_value("description")
@@ -93,7 +94,21 @@ func initFromUnitResource(unit_resource : UnitResourceDict) -> void:
 		checkAttributes()
 
 
+static func debugType() -> UnitType:
+	var type = UnitType.new()
+	type.debugInit()
+	return type
+
+
+func debugInit() -> void:
+	type_id = -1
+	unit_name = "Test unit"
+	description = "Unit for testing"
+	for a in UNIT_ATTRIBUTE_TYPE:
+		attributes.set(a, 1)
+	
+
+
 ## Constructor
-func _init(unit_resource : UnitResourceDict, unit_type_id : int) -> void:
-	initFromUnitResource(unit_resource)
-	type_id = unit_type_id
+func _init() -> void:
+	pass
