@@ -2,11 +2,11 @@ class_name GridTile
 ## Class that represents a single tile on the grid
 ## Contains information about the units on the tile and the type of the tile
 
-## Array of units on the tile
-var units : Array[Unit] = []
+# NOTE: Units are stored in both the grid tile and the game state object,
+# you have to remember to remove it from both places
+var units : Array[Unit] = [] ## Array of the units on the tile
+var tile_type : TileType ## Reference to the type of tile
 
-# Reference to the type of tile
-var tile_type : TileType
 
 ## Returns the array of all the units on the grid tile
 func getUnits() -> Array[Unit]:

@@ -7,16 +7,17 @@ var type : UnitType
 
 var unit_id : int ## The ID of the unit
 var player_id : int ## The ID of the player who owns the unit
-var hp : int
-var morale : int
-var grid_position : Vector2
+var hp : int ## The current HP of the unit
+var morale : int ## The current morale of the unit
+# NOTE: Vector2 stores floats, not ints!!
+var grid_position : Vector2 ## The current position of the unit on the grid
 
 
 ## Initializes the unit from a specific unit type
 func initFromUnitType() -> void:
 	assert(type != null, "Unit type should not be null!")
-	hp = type.attributes.get(UnitType.ATTRIBUTE_TYPE.MAX_HP)
-	morale = type.attributes.get(UnitType.ATTRIBUTE_TYPE.INITIAL_MORALE)
+	hp = type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.MAX_HP)
+	morale = type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.INITIAL_MORALE)
 	morale = type.initial_morale
 
 
