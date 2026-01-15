@@ -266,7 +266,7 @@ size_flags_horizontal = 3
 
 [node name="Piercing" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
-attribute_name = "piercing"
+attribute_name = "armor_piercing"
 text = "Piercing"
 type = 3
 
