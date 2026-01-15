@@ -1,8 +1,8 @@
 class_name GameGrid
 ## Represents the map, which is a grid of grid tiles
 
-## all the tiles on the map
-var tiles : Array2D
+
+var tiles : Array2D ## all the tiles on the map
 
 
 ## Returns the tile at the specified index
@@ -19,7 +19,7 @@ func setTileType(width : int, height : int, tile_type : TileType) -> void:
 	getTile(width, height).setTileType(tile_type)
 	
 	
-func getUnits(width : int, height : int) -> Array[Unit]:
+func getUnitsOnTile(width : int, height : int) -> Array[Unit]:
 	return getTile(width, height).getUnits()
 	
 	

@@ -6,13 +6,20 @@ var width : int ## Width of the array
 var height : int ## Height of the array
 
 
+## Makes sure the parameters of a function call are within bounds
+func checkBounds(width_p : int, height_p : int):
+	assert(width_p >= 0 and width_p < width and height_p >= 0 and height_p < height, "Array2D parameters out of bounds!")
+
+
 ## Returns the item at the specified index
 func getItem(width_p : int, height_p : int) -> Variant:
+	checkBounds(width_p, height_p)
 	return internal_array[width_p * height_p + width_p]
 	
 
 ## Sets the item at the specified index to value
 func setItem(width_p : int, height_p : int, value : Variant) -> void:
+	checkBounds(width_p, height_p)
 	internal_array[width_p * height_p + width_p] = value
 
 
