@@ -63,7 +63,7 @@ func foreach(process_func : Callable, ignore_null : bool) -> void:
 func fill(fill_func : Callable):
 	for i in height:
 		for j in width: 
-			setItem(width, height, fill_func.call(width, height))
+			setItem(i, j, fill_func.call(i, j))
 
 
 
