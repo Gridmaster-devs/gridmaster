@@ -14,6 +14,18 @@ var tentative_actions : Array[GameAction] = []
 var action_queue : Array[GameAction] = []
 
 
+# These functions exist so that the graphics element can request the
+# map and units so it can draw them
+## Returns the game grid
+func getGameGrid() -> GameGrid:
+	return grid
+	
+
+## Returns the unit array
+func getUnits() -> Array[Unit]:
+	return units
+
+
 # TODO: This should take a map resource and turn it into the grid instead of asking for
 # map width and height
 func _init(map_width : int, map_height : int, players_p : Array[Player], teams_p : Array[Team], game_name_p : String):
