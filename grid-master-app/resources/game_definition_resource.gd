@@ -3,7 +3,7 @@ extends Resource
 
 @export var game_name : String
 @export var units : Array[UnitResourceDict]
-# TODO: MAP DATA GOES HERE
+@export var map : GameMap
 
 func save_units(unit_array : Array[UnitResourceDict]):
 	if (unit_array != null):
@@ -25,5 +25,13 @@ func load_name() -> String:
 	else:
 		game_name = ""
 		return game_name
+
+
+func saveMap(map_p : GameMap):
+	if (map_p == null): return
 	
-# TODO: add map functions here
+	map = map_p
+	
+	
+func loadMap() -> GameMap:
+	return map
