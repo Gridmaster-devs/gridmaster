@@ -11,8 +11,8 @@
 [ext_resource type="Script" uid="uid://d4njvsv5v0y1u" path="res://scripts/map_editor_scripts/button_scripts/load_from_file_button.gd" id="5_41jle"]
 [ext_resource type="Script" uid="uid://dtp2ue4bwuyq6" path="res://scripts/map_editor_scripts/button_scripts/set_to_interact.gd" id="5_yhpca"]
 [ext_resource type="Script" uid="uid://xlo37wc3iykq" path="res://scripts/map_editor_scripts/button_scripts/change_grid_view.gd" id="6_8b7ru"]
-[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/editor_panel.tscn" id="6_woml6"]
-[ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/panel_item.tscn" id="7_woml6"]
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/EditorPanel.tscn" id="6_woml6"]
+[ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/PanelItem.tscn" id="7_woml6"]
 [ext_resource type="Script" uid="uid://bg4hv7x0k1qvk" path="res://scripts/map_editor_scripts/open_popup/open_new_tile_popup.gd" id="8_7x244"]
 [ext_resource type="Texture2D" uid="uid://dp1ky8epuaiv" path="res://sprites/map_editor_sprites/grid_invis_highlight.png" id="9_t7crc"]
 [ext_resource type="Texture2D" uid="uid://cy4pdp1xl7ssw" path="res://sprites/map_editor_sprites/grid_invis_highlight_pink.png" id="11_jdx3v"]
@@ -64,8 +64,6 @@ grow_vertical = 2
 [node name="EditorPanel" parent="VBoxContainer" instance=ExtResource("6_woml6")]
 custom_minimum_size = Vector2(0, 70)
 layout_mode = 2
-mouse_filter = 2
-title = "Map Editor"
 
 [node name="TopLabel" parent="VBoxContainer/EditorPanel/TopVBox" index="0"]
 text = "Map Editor"
@@ -147,8 +145,6 @@ script = ExtResource("3_x2l8i")
 [node name="EditorPanel" parent="VBoxContainer/HBoxContainer" instance=ExtResource("6_woml6")]
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
-mouse_filter = 2
-section_headers = Array[String](["Current tile", "Tile library", "Tactical library"])
 
 [node name="Current tile" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
 layout_mode = 2
@@ -162,7 +158,6 @@ vertical_alignment = 1
 
 [node name="Name" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile" instance=ExtResource("7_woml6")]
 layout_mode = 2
-mouse_filter = 2
 text = "Name"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/Name"]
@@ -180,7 +175,6 @@ size_flags_horizontal = 3
 
 [node name="Protection" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile" instance=ExtResource("7_woml6")]
 layout_mode = 2
-mouse_filter = 2
 text = "Protection"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/Protection"]
@@ -198,7 +192,6 @@ size_flags_horizontal = 3
 
 [node name="Movement" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile" instance=ExtResource("7_woml6")]
 layout_mode = 2
-mouse_filter = 2
 text = "Movement"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/Movement"]
@@ -216,7 +209,6 @@ size_flags_horizontal = 3
 
 [node name="Hiding" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile" instance=ExtResource("7_woml6")]
 layout_mode = 2
-mouse_filter = 2
 text = "Hiding"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/Hiding"]
@@ -234,7 +226,6 @@ size_flags_horizontal = 3
 
 [node name="Tactical map" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile" instance=ExtResource("7_woml6")]
 layout_mode = 2
-mouse_filter = 2
 text = "Tactical map"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Current tile/Tactical map"]

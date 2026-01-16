@@ -18,12 +18,13 @@ func link_editor_main(editor_main_p : EditorMain):
 # called by pressing the save button
 func save_to_resource():
 	var units = editor_main.get_units()
+	var map = editor_main.getMap()
 	
 	game_resource = GameDefinitionResource.new()
 	game_resource.save_name(get_game_name())
 	game_resource.save_units(units)
+	game_resource.saveMap(map)
 	
-	# TODO: Get map data
 	save_dialog.show()
 
 
@@ -36,6 +37,7 @@ func show_load_dialog():
 func load_from_resource(resource : GameDefinitionResource):
 	set_game_name(resource.game_name)
 	editor_main.set_units(resource.load_units())
+	editor_main.setMap(resource.loadMap())
 
 
 # called by the save dialog when a file is selected

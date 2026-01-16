@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://nxldab0hpse0"]
+[gd_scene load_steps=5 format=3 uid="uid://nxldab0hpse0"]
 
 [ext_resource type="Script" uid="uid://1gwvpfoqpqr4" path="res://editors/editor_main/editor_main.gd" id="1_yiakk"]
 [ext_resource type="PackedScene" uid="uid://d1mgyle0o8kx3" path="res://editors/unit_editor/UnitEditor.tscn" id="2_fi5xj"]
+[ext_resource type="PackedScene" uid="uid://nwroc3fkan84" path="res://editors/map_editor/map_editor.tscn" id="3_2wy7d"]
 [ext_resource type="PackedScene" uid="uid://bo7oe8477f30h" path="res://editors/game_editor/GameEditor.tscn" id="3_fi5xj"]
 
 [node name="EditorMain" type="Node"]
@@ -23,6 +24,9 @@ metadata/_tab_index = 0
 visible = false
 layout_mode = 2
 metadata/_tab_index = 1
+
+[node name="MapEditor" parent="TabContainer/Map editor" instance=ExtResource("3_2wy7d")]
+layout_mode = 1
 
 [node name="Game Editor" parent="TabContainer" instance=ExtResource("3_fi5xj")]
 visible = false

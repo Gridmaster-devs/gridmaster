@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://dwbescfigvm0m"]
 
 [ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/EditorPanel.tscn" id="1_nc4hq"]
-[ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/UnitPanelItem.tscn" id="2_ckwvq"]
+[ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/PanelItem.tscn" id="2_ckwvq"]
 [ext_resource type="Script" uid="uid://kn4tvh4cvpwf" path="res://testing.gd" id="3_e10wp"]
 
 [node name="TestingScene" type="Control"]
