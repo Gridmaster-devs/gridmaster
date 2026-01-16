@@ -7,7 +7,7 @@ var grid : GameGrid ## Grid that represents the map
 var units : Array[Unit] = [] ## All the units in the game, NOTE: also stored in each map tile
 var players : Array[Player] = [] ## All the players in the game
 var teams : Array[Team] = [] ## All the teams in the game
-var unit_types : Array[UnitType] ## All the types of units in the game
+var unit_types : Dictionary[int, UnitType] ## All the types of units in the game
 
 
 ## tracks the id to be given to the next unit that spawns
@@ -60,7 +60,7 @@ func initUnitTypesFromResource(game_definition : GameDefinitionResource) -> void
 	var gd_units : Array[UnitResourceDict] = game_definition.load_units()
 	var type_count : int = 0
 	for unit in gd_units:
-		unit_types.append(UnitType.initFromUnitResource(unit, type_count))
+		unit_types.set(type_count, UnitType.initFromUnitResource(unit, type_count))
 		type_count += 1
 
 
@@ -69,7 +69,7 @@ static func initFromGameDefinition(game_definition : GameDefinitionResource) -> 
 	var game_state = GameState.new()
 	game_state.initUnitTypesFromResource(game_definition)
 	game_state.game_name = game_definition.game_name
-	# TODO: Add map stuff
+	game_state.grid = GameGrid.initFromMapResource(game_definition.loadMap())
 	
 	return game_state
 	
