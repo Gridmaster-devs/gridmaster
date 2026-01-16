@@ -8,8 +8,8 @@ var game_state : GameState
 # TODO: this should take the game definition as a parameter and initialize the game from that
 # it will still need the players, however
 ## Initializes a game
-func initGame(map_width : int, map_height : int, players : Array[Player], teams : Array[Team], game_name : String):
-	game_state = GameState.new(map_width, map_height, players, teams, game_name)
+func initGame(map_width : int, map_height : int, game_name : String):
+	game_state = GameState.debugInit(map_width, map_height, game_name)
 	
 
 # This is ONLY for drawing the map and the units!!
@@ -34,7 +34,7 @@ func getUnits() -> Variant:
 
 # DEBUG ONLY!!
 ## Creates a debug unit for testing
-func createDebugUnit(position : Position2DInt) -> void:
+func createDebugUnit(position : Vector2i) -> void:
 	if game_state != null:
 		game_state.createDebugUnit(position)
 
@@ -42,9 +42,7 @@ func createDebugUnit(position : Position2DInt) -> void:
 # DEBUG ONLY!!
 ## Creates a debug game for testing
 func debugInitGame() -> void:
-	var teams : Array[Team] = []
-	var players : Array[Player] = []
-	initGame(10, 10, players, teams, "Test game")
+	initGame(10, 10, "Test game")
 
 
 # Called when the node enters the scene tree for the first time.

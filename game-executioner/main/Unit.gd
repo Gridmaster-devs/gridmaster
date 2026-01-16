@@ -9,7 +9,7 @@ var unit_id : int ## The ID of the unit
 var player_id : int ## The ID of the player who owns the unit
 var hp : int ## The current HP of the unit
 var morale : int ## The current morale of the unit
-var grid_position : Position2DInt ## The current position of the unit on the grid
+var grid_position : Vector2i ## The current position of the unit on the grid
 
 
 ## Initializes the unit from a specific unit type
@@ -24,11 +24,11 @@ func getId() -> int:
 	return unit_id
 
 
-func getPosition() -> Position2DInt:
+func getPosition() -> Vector2i:
 	return grid_position
 
 
-func _init(unit_type : UnitType, unit_id_p : int, player_id_p : int, position : Position2DInt) -> void:
+func _init(unit_type : UnitType, unit_id_p : int, player_id_p : int, position : Vector2i) -> void:
 	grid_position = position
 	unit_id = unit_id_p
 	player_id = player_id_p
