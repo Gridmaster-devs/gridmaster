@@ -14,12 +14,12 @@ func getTile(x : int, y : int) -> GridTile:
 ## Returns the tile type of the grid tile at the specified index
 func getTileType(x : int, y : int) -> TileType:
 	return getTile(x, y).getTileType()
-	
+
 
 ## Sets the type of tile at specified position
 func setTileType(x : int, y : int, tile_type : TileType) -> void:
 	getTile(x, y).setTileType(tile_type)
-	
+
 
 ## Returns the units that are on the specified tile
 func getUnitsOnTile(x : int, y : int) -> Array[Unit]:
