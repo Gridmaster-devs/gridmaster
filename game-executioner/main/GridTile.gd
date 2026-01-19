@@ -4,7 +4,7 @@ class_name GridTile
 
 # NOTE: Units are stored in both the grid tile and the game state object,
 # you have to remember to remove it from both places
-var units : Array[Unit] = [] ## Array of the units on the tile
+var units : Array[Unit] ## Array of the units on the tile
 var tile_type : TileType ## Reference to the type of tile
 
 
@@ -72,7 +72,7 @@ func _to_string():
 	if (unit == null):
 		ret_string += ("N/A")
 	else:
-		ret_string += (unit.type.unit_name) # bad
+		ret_string += str(unit.unit_id) # bad
 	
 	ret_string += (")")
 	
@@ -80,4 +80,5 @@ func _to_string():
 
 
 func _init(grid_tile_type : TileType) -> void:
+	units = []
 	tile_type = grid_tile_type

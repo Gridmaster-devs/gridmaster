@@ -14,13 +14,13 @@ func checkBounds(x : int, y : int):
 ## Returns the item at the specified index
 func getItem(x : int, y : int) -> Variant:
 	checkBounds(x, y)
-	return internal_array[x * y + x]
+	return internal_array[width * y + x]
 	
 
 ## Sets the item at the specified index to value
 func setItem(x : int, y : int, value : Variant) -> void:
 	checkBounds(x, y)
-	internal_array[x * y + x] = value
+	internal_array[width * y + x] = value
 
 
 ## Function that maps an array to another array

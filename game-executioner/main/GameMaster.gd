@@ -58,7 +58,7 @@ func printMap() -> void:
 func debugTest():
 	debugInitGame()
 	game_state.createDebugUnit(Vector2i(0,0))
-	game_state.createDebugUnit(Vector2i(9,9))
+	game_state.createDebugUnit(Vector2i(5,5))
 	printMap()
 
 
