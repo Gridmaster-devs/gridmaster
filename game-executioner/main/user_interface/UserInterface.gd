@@ -12,7 +12,8 @@ func openLoadGameDialog() -> void:
 
 ## Called by the load game dialog
 func loadGameDefinition(path : String):
-	var game_definition = ResourceLoader.load(path) as GameDefinitionResource
+	var game_definition : GameDefinitionResource = ResourceLoader.load(path) as GameDefinitionResource
+	assert(game_definition != null, "Invalid game definition in file!")
 	game_master.playerSelectedGameDefinition(game_definition)
 
 
@@ -23,7 +24,7 @@ func linkGameMaster(game_master_p : GameMaster) -> void:
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	load_game_dialog.file_selected.connect(loadGameDefinition)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

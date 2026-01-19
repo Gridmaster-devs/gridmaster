@@ -14,5 +14,7 @@ script = ExtResource("1_d4x01")
 [node name="Dialogs" type="Node" parent="."]
 
 [node name="Load game dialog" type="FileDialog" parent="Dialogs"]
+title = "Open a File"
+file_mode = 0
 access = 2
-filters = PackedStringArray("*.trsc")
+filters = PackedStringArray("*.tres")
