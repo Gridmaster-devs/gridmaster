@@ -71,6 +71,19 @@ static func initFromMapResource(map : GameMap) -> GameGrid:
 	return game_grid
 
 
+## Prints the entire map into the console
+func printMap():
+	tiles.printAll()
+
+
+## Fills the entire map with a debug tile
+func debugFill():
+	var fill_func = func(_x : int, _y : int):
+		return GridTile.new(TileType.debugTile())
+	
+	fillTiles(fill_func)
+
+
 # TODO: In the future should ask for a map to convert into a game grid
 func _init(width : int, height : int):
 	tiles = Array2D.new(width, height)

@@ -107,7 +107,7 @@ func debugInit() -> void:
 	type_id = -1
 	unit_name = "Test unit"
 	description = "Unit for testing"
-	for a in UNIT_ATTRIBUTE_TYPE:
+	for a : int in UNIT_ATTRIBUTE_TYPE.values():
 		attributes.set(a, 1)
 	
 

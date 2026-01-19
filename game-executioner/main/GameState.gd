@@ -78,8 +78,14 @@ static func initFromGameDefinition(game_definition : GameDefinitionResource) -> 
 static func debugInit(map_width : int, map_height : int, game_name_p : String) -> GameState:
 	var gs = GameState.new()
 	gs.grid = GameGrid.new(map_width, map_height)
+	gs.grid.debugFill()
 	gs.game_name = game_name_p
 	return gs
+	
+
+func printMap():
+	if (grid != null):
+		grid.printMap()
 
 
 

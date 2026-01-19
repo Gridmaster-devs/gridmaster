@@ -56,5 +56,28 @@ func removeUnitById(unit_id : int) -> void:
 	units.remove_at(index)
 
 
+func _to_string():
+	var ret_string : String = ""
+	ret_string += ("(")
+	ret_string += ("Tile: ")
+	if (tile_type == null):
+		ret_string += ("N/A")
+	else:
+		ret_string += (tile_type.tile_name)
+	
+	ret_string += (" | ")
+	var unit = units.front()
+	
+	ret_string += ("Unit: ")
+	if (unit == null):
+		ret_string += ("N/A")
+	else:
+		ret_string += (unit.type.unit_name) # bad
+	
+	ret_string += (")")
+	
+	return ret_string
+
+
 func _init(grid_tile_type : TileType) -> void:
 	tile_type = grid_tile_type

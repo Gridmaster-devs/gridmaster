@@ -66,6 +66,26 @@ func fill(fill_func : Callable):
 			setItem(i, j, fill_func.call(i, j))
 
 
+## Calls the to string function on all the elements
+func printAll():
+	for i in height:
+		for j in width:
+			var ret_string : String = ""
+			ret_string += ("(%s, %s) " % [j, i])
+			var obj = getItem(j, i)
+			if (obj == null):
+				ret_string += ("N/A")
+			else:
+				ret_string += (obj._to_string())
+			
+			print(ret_string)
+			
+			#if (j == width - 1):
+				#print("\n")
+			#else:
+				#print(", ")
+
+
 
 func _init(width_p : int, height_p : int):
 	width = width_p

@@ -3,7 +3,7 @@ extends Node
 ## Game master class which manages the game state and communicates
 ## with other game elements
 
-var game_state : GameState
+var game_state : GameState ## The state of the game
 
 # TODO: this should take the game definition as a parameter and initialize the game from that
 # it will still need the players, however
@@ -39,12 +39,29 @@ func createDebugUnit(position : Vector2i) -> void:
 		game_state.createDebugUnit(position)
 
 
+## Initializes a game state from a game definition
+func initGameStateFromGameDefinition(game_definition : GameDefinitionResource):
+	game_state = GameState.initFromGameDefinition(game_definition)
+
+
 # DEBUG ONLY!!
 ## Creates a debug game for testing
 func debugInitGame() -> void:
 	initGame(10, 10, "Test game")
+	
+
+func printMap() -> void:
+	if (game_state != null):
+		game_state.printMap()
+
+
+func debugTest():
+	debugInitGame()
+	game_state.createDebugUnit(Vector2i(0,0))
+	game_state.createDebugUnit(Vector2i(9,9))
+	printMap()
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	debugTest()

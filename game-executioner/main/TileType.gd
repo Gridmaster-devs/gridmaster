@@ -16,3 +16,12 @@ var texture : Texture2D ## Texture used for drawing the tile
 var attributes : Dictionary[TILE_ATTRIBUTE_TYPE, int]
 var flat_modifiers : Dictionary[TILE_ATTRIBUTE_TYPE, float]
 var percentage_modifiers : Dictionary[TILE_ATTRIBUTE_TYPE, float]
+
+
+## creates a debug tile for testing
+static func debugTile() -> TileType:
+	var tile_type = TileType.new()
+	tile_type.type_id = -1
+	tile_type.tile_name = "Debug tile"
+	tile_type.description = "Tile for testing"
+	return tile_type
