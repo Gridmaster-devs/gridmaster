@@ -1,8 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://cpsdnpca0xb06"]
+[gd_scene load_steps=3 format=3 uid="uid://cpsdnpca0xb06"]
 
 [ext_resource type="Script" uid="uid://bqg42x551mvyw" path="res://main/GameMaster.gd" id="1_8ixyn"]
+[ext_resource type="PackedScene" uid="uid://ce70msfolg6m7" path="res://main/user_interface/UserInterface.tscn" id="2_tlvut"]
 
 [node name="Game master" type="Node"]
 script = ExtResource("1_8ixyn")
 
-[node name="User interface" type="Node" parent="."]
+[node name="User Interface" parent="." instance=ExtResource("2_tlvut")]

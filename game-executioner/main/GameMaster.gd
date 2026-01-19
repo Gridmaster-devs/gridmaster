@@ -4,6 +4,7 @@ extends Node
 ## with other game elements
 
 var game_state : GameState ## The state of the game
+@onready var user_interface : UserInterface = $"User Interface"
 
 # TODO: this should take the game definition as a parameter and initialize the game from that
 # it will still need the players, however
@@ -20,7 +21,7 @@ func getGameGrid() -> Variant:
 		return null
 	else:
 		return game_state.getGameGrid()
-		
+
 
 # This is ONLY for drawing the map and the units!!
 # Only the game master should EVER modify the game state
@@ -30,7 +31,7 @@ func getUnits() -> Variant:
 		return null
 	else:
 		return game_state.getUnits()
-		
+
 
 # DEBUG ONLY!!
 ## Creates a debug unit for testing
@@ -42,6 +43,11 @@ func createDebugUnit(position : Vector2i) -> void:
 ## Initializes a game state from a game definition
 func initGameStateFromGameDefinition(game_definition : GameDefinitionResource):
 	game_state = GameState.initFromGameDefinition(game_definition)
+	printMap() # DEBUG
+
+
+func playerSelectedGameDefinition(game_definition : GameDefinitionResource):
+	initGameStateFromGameDefinition(game_definition)
 
 
 # DEBUG ONLY!!
@@ -64,4 +70,6 @@ func debugTest():
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	debugTest()
+	user_interface.linkGameMaster(self)
+	user_interface.openLoadGameDialog()
+	# debugTest()

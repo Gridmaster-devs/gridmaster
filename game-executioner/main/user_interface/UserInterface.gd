@@ -1,0 +1,31 @@
+class_name UserInterface
+extends Control
+
+@onready var load_game_dialog : FileDialog = $"Dialogs/Load game dialog"
+var game_master : GameMaster
+
+
+## Opens the load game dialog
+func openLoadGameDialog() -> void:
+	load_game_dialog.show()
+
+
+## Called by the load game dialog
+func loadGameDefinition(path : String):
+	var game_definition = ResourceLoader.load(path) as GameDefinitionResource
+	game_master.playerSelectedGameDefinition(game_definition)
+
+
+## Called by the game master to give a reference to itself
+func linkGameMaster(game_master_p : GameMaster) -> void:
+	game_master = game_master_p
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
