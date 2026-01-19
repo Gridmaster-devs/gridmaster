@@ -68,7 +68,7 @@ var percentage_modifiers : Dictionary[UNIT_ATTRIBUTE_TYPE, float]
 
 ## Makes sure all attributes are present after loading from resource
 func checkAttributes() -> void:
-	for type in UNIT_ATTRIBUTE_TYPE:
+	for type in UNIT_ATTRIBUTE_TYPE.values():
 		assert(attributes.get(type) != null, "Attribute %s missing after loading from resource!" % UNIT_ATTRIBUTE_TYPE.keys()[type])
 
 
@@ -84,6 +84,8 @@ static func initFromUnitResource(unit_resource : UnitResourceDict, unit_type_id 
 	unit_type.description = unit_resource.get_attribute_value("description")
 	
 	for key in resource_attributes.keys():
+		if (key == "name" or key == "description"):
+			continue
 		var value = resource_attributes.get(key)
 		
 		assert(value != null, "Attribute %s value in unit resource should not be null!" % key)
@@ -92,7 +94,8 @@ static func initFromUnitResource(unit_resource : UnitResourceDict, unit_type_id 
 		if (attribute_type != null):
 			unit_type.attributes.set(attribute_type, value)
 			
-		unit_type.checkAttributes()
+		
+	unit_type.checkAttributes()
 	
 	return unit_type
 
