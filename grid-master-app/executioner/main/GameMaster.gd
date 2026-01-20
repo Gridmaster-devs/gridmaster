@@ -45,6 +45,7 @@ func initGameStateFromGameDefinition(game_definition : GameDefinitionResource):
 	game_state = GameState.initFromGameDefinition(game_definition)
 
 
+## Called by the user interface when the player has selected a game definition file and hit the load button
 func playerSelectedGameDefinition(game_definition : GameDefinitionResource):
 	initGameStateFromGameDefinition(game_definition)
 
@@ -55,21 +56,25 @@ func debugInitGame() -> void:
 	initGame(10, 10, "Test game")
 	
 
+## Prints the map into console
 func printMap() -> void:
 	if (game_state != null):
 		game_state.printMap()
 		
-		
+
+## Prints all the unit types into the console
 func printUnitTypes() -> void:
 	if (game_state != null):
 		game_state.printUnitTypes()
 		
 
+## Prints all of the tile types into the console
 func printTileTypes() -> void:
 	if (game_state != null):
 		game_state.printTileTypes()
 
 
+## Creates a debug game, places some units, and prints the map
 func debugTest():
 	debugInitGame()
 	game_state.createDebugUnit(Vector2i(0,0))
@@ -81,4 +86,3 @@ func debugTest():
 func _ready() -> void:
 	user_interface.linkGameMaster(self)
 	user_interface.openLoadGameDialog()
-	# debugTest()

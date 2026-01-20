@@ -4,10 +4,10 @@ class_name GameState
 
 var game_name : String
 var grid : GameGrid ## Grid that represents the map
-var units : Array[Unit] = [] ## All the units in the game, NOTE: also stored in each map tile
+var units : Dictionary[int, Unit] = {} ## All the units in the game, NOTE: also stored in each map tile
 var players : Array[Player] = [] ## All the players in the game
 var teams : Array[Team] = [] ## All the teams in the game
-var unit_types : Dictionary[int, UnitType] ## All the types of units in the game
+var unit_types : Dictionary[int, UnitType] = {} ## All the types of units in the game
 
 
 ## tracks the id to be given to the next unit that spawns
@@ -34,7 +34,7 @@ func getGameGrid() -> GameGrid:
 # map and units so it can draw them
 ## Returns the unit array
 func getUnits() -> Array[Unit]:
-	return units
+	return units.values()
 	
 
 ## Gets a unit id for a new unit
@@ -45,14 +45,15 @@ func getNewUnitId() -> int:
 
 ## Creates a unit for testing
 func createDebugUnit(position : Vector2i) -> void:
-	var unit = Unit.new(UnitType.debugType(), getNewUnitId(), -1, position)
-	addUnit(unit)
+	addUnit(UnitType.debugType(), position, -1)
 	
 
 ## Adds a unit to the game
-func addUnit(unit : Unit):
+func addUnit(unit_type : UnitType, position : Vector2i, player_id : int):
+	var id = getNewUnitId()
+	var unit = Unit.new(unit_type, id, player_id, position)
 	grid.addUnit(unit)
-	units.append(unit)
+	units.set(id, unit)
 
 
 ## Initializes the unit types from a game definition
@@ -83,16 +84,19 @@ static func debugInit(map_width : int, map_height : int, game_name_p : String) -
 	return gs
 	
 
+## Prints the map into stdout
 func printMap():
 	if (grid != null):
 		grid.printMap()
 
 
+## Prints the unit types into stdout
 func printUnitTypes():
 	for type in unit_types.values():
 		print(type._to_string())
 
 
+## Prints the tile types into stdout
 func printTileTypes():
 	if (grid != null):
 		grid.printTileTypes()

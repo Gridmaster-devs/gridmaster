@@ -22,7 +22,7 @@ func setTileType(x : int, y : int, tile_type : TileType) -> void:
 
 
 ## Returns the units that are on the specified tile
-func getUnitsOnTile(x : int, y : int) -> Array[Unit]:
+func getUnitsOnTile(x : int, y : int) -> Dictionary[int, Unit]:
 	return getTile(x, y).getUnits()
 
 

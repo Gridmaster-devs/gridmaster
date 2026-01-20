@@ -4,12 +4,12 @@ class_name GridTile
 
 # NOTE: Units are stored in both the grid tile and the game state object,
 # you have to remember to remove it from both places
-var units : Array[Unit] ## Array of the units on the tile
+var units : Dictionary[int, Unit] = {} ## Array of the units on the tile
 var tile_type : TileType ## Reference to the type of tile
 
 
 ## Returns the array of all the units on the grid tile
-func getUnits() -> Array[Unit]:
+func getUnits() -> Dictionary[int, Unit]:
 	return units
 
 
@@ -26,24 +26,12 @@ func setTileType(type : TileType) -> void:
 ## Returns the unit with the corresponding ID
 ## Returns null if no such unit exists
 func getUnitById(unit_id : int) -> Variant:
-	var hasId = func(unit : Unit):
-		return (unit.getId() == unit_id)
-	
-	var index = units.find_custom(hasId)
-	return units.get(index)
-
-
-## Gets the index of the unit in the unit array by the unit id
-func getUnitIndexById(unit_id : int) -> int:
-	var hasId = func(unit : Unit):
-		return (unit.getId() == unit_id)
-	
-	return units.find_custom(hasId)
+	return units.get(unit_id)
 
 
 ## Adds the unit to the unit array
 func addUnit(unit : Unit) -> void:
-	units.append(unit)
+	units.set(unit.getId(), unit)
 	
 
 ## Removes the unit from the tile
@@ -51,9 +39,8 @@ func addUnit(unit : Unit) -> void:
 ## This does not necessarily mean killing the unit, this happens
 ## when the unit moves
 func removeUnitById(unit_id : int) -> void:
-	var index = getUnitIndexById(unit_id)
-	assert(index != -1, "Trying to remove unit that isn't there!")
-	units.remove_at(index)
+	var success : bool = units.erase(unit_id)
+	assert(success == true, "Trying to remove unit that isn't there!")
 
 
 func _to_string():
@@ -66,7 +53,7 @@ func _to_string():
 		ret_string += (tile_type.tile_name)
 	
 	ret_string += (" | ")
-	var unit = units.front()
+	var unit = units.values().front()
 	
 	ret_string += ("Unit: ")
 	if (unit == null):
@@ -80,5 +67,4 @@ func _to_string():
 
 
 func _init(grid_tile_type : TileType) -> void:
-	units = []
 	tile_type = grid_tile_type
