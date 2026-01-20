@@ -1,6 +1,9 @@
 extends Node
 ## GML, which stands for Game Master Logger
 
+# this isn't very good and we should probably just use the built in
+# godot logging tools
+
 var log_dir = "res://logs/"
 var date : String
 var logfile : FileAccess

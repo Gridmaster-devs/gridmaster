@@ -56,6 +56,8 @@ func set_units(units_p : Array[UnitResourceDict]):
 		
 		
 func get_units() -> Array[UnitResourceDict]:
+	if (unit_resource != null):
+		save_to_resource.emit(unit_resource)
 	return tree_panel.get_units()
 
 # lets the UI elements know the current edited unit was removed, so they
