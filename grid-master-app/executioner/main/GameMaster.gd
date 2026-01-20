@@ -6,12 +6,6 @@ extends Node
 var game_state : GameState ## The state of the game
 @onready var user_interface : UserInterface = $"User Interface"
 
-# TODO: this should take the game definition as a parameter and initialize the game from that
-# it will still need the players, however
-## Initializes a game
-func initGame(map_width : int, map_height : int, game_name : String):
-	game_state = GameState.debugInit(map_width, map_height, game_name)
-	
 
 # This is ONLY for drawing the map and the units!!
 # Only the game master should EVER modify the game state
@@ -65,7 +59,7 @@ func playerSelectedGameDefinition(game_definition : GameDefinitionResource):
 # DEBUG ONLY!!
 ## Creates a debug game for testing
 func debugInitGame() -> void:
-	initGame(10, 10, "Test game")
+	game_state = GameState.debugInit(10, 10, "Test game")
 	
 
 ## Prints the map into console
