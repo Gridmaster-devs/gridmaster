@@ -27,7 +27,7 @@ func getUnitsOnTile(x : int, y : int) -> Dictionary[int, Unit]:
 
 
 ## Adds a unit to the grid
-func addUnit(unit : Unit):
+func addUnit(unit : Unit) -> void:
 	var pos = unit.getPosition()
 	assert(pos != null, "Unit's position cannot be null!")
 	getTile(pos.x, pos.y).addUnit(unit)
@@ -46,7 +46,7 @@ func initTileTypesFromMapResource(map : GameMap) -> void:
 		
 
 ## Calls the tiles Array2D's fill method with the fill func as the parameter
-func fillTiles(fill_func : Callable):
+func fillTiles(fill_func : Callable) -> void:
 	tiles.fill(fill_func)
 
 
@@ -71,7 +71,7 @@ static func initFromMapResource(map : GameMap) -> GameGrid:
 	return game_grid
 
 
-## Prints the entire map into the console
+## Prints the entire map into stdout
 func printMap():
 	tiles.printAll()
 
@@ -84,6 +84,7 @@ func debugFill():
 	fillTiles(fill_func)
 
 
+## Prints all the tile types into stdout
 func printTileTypes():
 	for type : TileType in strategic_tile_types.values():
 		print(type._to_string())

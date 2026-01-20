@@ -48,6 +48,11 @@ func initGameStateFromGameDefinition(game_definition : GameDefinitionResource):
 ## Called by the user interface when the player has selected a game definition file and hit the load button
 func playerSelectedGameDefinition(game_definition : GameDefinitionResource):
 	initGameStateFromGameDefinition(game_definition)
+	
+	# DEBUG
+	printTileTypes()
+	printUnitTypes()
+	printMap()
 
 
 # DEBUG ONLY!!
