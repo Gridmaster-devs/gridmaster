@@ -1,0 +1,4 @@
+# Godot 4+ specific ignores
+grid-master-app/.godot/
+grid-master-app/export/*.exe
+grid-master-app/logs/*.txt
