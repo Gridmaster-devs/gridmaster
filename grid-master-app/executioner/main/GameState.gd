@@ -35,7 +35,7 @@ func getGameGrid() -> GameGrid:
 ## Returns the unit array
 func getUnits() -> Array[Unit]:
 	return units.values()
-	
+
 
 ## Gets a unit id for a new unit
 func getNewUnitId() -> int:

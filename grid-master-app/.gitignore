@@ -1,6 +1,5 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
-/saved_units/
-/export/
-/logs/
+/export/*
+/logs/*
