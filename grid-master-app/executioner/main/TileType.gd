@@ -25,3 +25,7 @@ static func debugTile() -> TileType:
 	tile_type.tile_name = "Debug tile"
 	tile_type.description = "Tile for testing"
 	return tile_type
+
+
+func _to_string() -> String:
+	return "(Tile type name: %s, Tile type ID: %s)" % [tile_name, type_id]

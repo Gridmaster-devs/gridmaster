@@ -114,6 +114,11 @@ func debugInit() -> void:
 		attributes.set(a, 1)
 	
 
+## Returns a string with info about the unit type
+func _to_string() -> String:
+	return "(Unit type name: %s, Unit type ID: %s)" % [unit_name, str(type_id)]
+
+
 
 ## Constructor
 func _init() -> void:

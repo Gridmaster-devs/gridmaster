@@ -43,7 +43,6 @@ func createDebugUnit(position : Vector2i) -> void:
 ## Initializes a game state from a game definition
 func initGameStateFromGameDefinition(game_definition : GameDefinitionResource):
 	game_state = GameState.initFromGameDefinition(game_definition)
-	printMap() # DEBUG
 
 
 func playerSelectedGameDefinition(game_definition : GameDefinitionResource):
@@ -59,6 +58,16 @@ func debugInitGame() -> void:
 func printMap() -> void:
 	if (game_state != null):
 		game_state.printMap()
+		
+		
+func printUnitTypes() -> void:
+	if (game_state != null):
+		game_state.printUnitTypes()
+		
+
+func printTileTypes() -> void:
+	if (game_state != null):
+		game_state.printTileTypes()
 
 
 func debugTest():

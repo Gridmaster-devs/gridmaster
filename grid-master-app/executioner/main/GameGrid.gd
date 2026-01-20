@@ -61,7 +61,7 @@ static func initFromMapResource(map : GameMap) -> GameGrid:
 	var fill_func = func(x: int, y: int):
 		var grid_tile : GridTile =  GridTile.new(
 										game_grid.strategic_tile_types.get(
-											grid.grid[x * y + x]
+											grid.grid[grid.width * y + x]
 										)
 									)
 		return grid_tile
@@ -82,6 +82,11 @@ func debugFill():
 		return GridTile.new(TileType.debugTile())
 	
 	fillTiles(fill_func)
+
+
+func printTileTypes():
+	for type : TileType in strategic_tile_types.values():
+		print(type._to_string())
 
 
 # TODO: In the future should ask for a map to convert into a game grid

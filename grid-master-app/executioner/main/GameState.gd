@@ -88,6 +88,15 @@ func printMap():
 		grid.printMap()
 
 
+func printUnitTypes():
+	for type in unit_types.values():
+		print(type._to_string())
+
+
+func printTileTypes():
+	if (grid != null):
+		grid.printTileTypes()
+
 
 func _init():
 	pass
