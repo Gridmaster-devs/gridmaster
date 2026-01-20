@@ -85,21 +85,24 @@ static func debugInit(map_width : int, map_height : int, game_name_p : String) -
 	
 
 ## Prints the map into stdout
-func printMap():
+func printMap(to_log : bool):
 	if (grid != null):
-		grid.printMap()
+		grid.printMap(to_log)
 
 
 ## Prints the unit types into stdout
-func printUnitTypes():
+func printUnitTypes(to_log : bool):
 	for type in unit_types.values():
-		print(type._to_string())
+		if (to_log == true):
+			GML.log(type._to_string())
+		else:
+			print(type._to_string())
 
 
 ## Prints the tile types into stdout
-func printTileTypes():
+func printTileTypes(to_log : bool):
 	if (grid != null):
-		grid.printTileTypes()
+		grid.printTileTypes(to_log)
 
 
 func _init():

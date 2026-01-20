@@ -86,6 +86,21 @@ func printAll():
 				#print(", ")
 
 
+func contentToString() -> String:
+	var ret_string : String = ""
+	for i in height:
+		for j in width:
+			ret_string += ("(%s, %s) " % [j, i])
+			var obj = getItem(j, i)
+			if (obj == null):
+				ret_string += ("N/A")
+			else:
+				ret_string += (obj._to_string())
+			
+			ret_string += "\n"
+			
+	return ret_string
+
 
 func _init(width_p : int, height_p : int):
 	width = width_p

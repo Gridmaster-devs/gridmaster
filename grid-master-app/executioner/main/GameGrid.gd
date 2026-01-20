@@ -72,8 +72,11 @@ static func initFromMapResource(map : GameMap) -> GameGrid:
 
 
 ## Prints the entire map into stdout
-func printMap():
-	tiles.printAll()
+func printMap(to_log : bool):
+	if (to_log == true):
+		GML.log(tiles.contentToString())
+	else:
+		tiles.printAll()
 
 
 ## Fills the entire map with a debug tile
@@ -85,9 +88,12 @@ func debugFill():
 
 
 ## Prints all the tile types into stdout
-func printTileTypes():
+func printTileTypes(to_log : bool):
 	for type : TileType in strategic_tile_types.values():
-		print(type._to_string())
+		if (to_log == true):
+			GML.log(type._to_string())
+		else:
+			print(type._to_string())
 
 
 # TODO: In the future should ask for a map to convert into a game grid

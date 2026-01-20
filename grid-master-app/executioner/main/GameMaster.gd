@@ -64,19 +64,19 @@ func debugInitGame() -> void:
 ## Prints the map into console
 func printMap() -> void:
 	if (game_state != null):
-		game_state.printMap()
+		game_state.printMap(true)
 		
 
 ## Prints all the unit types into the console
 func printUnitTypes() -> void:
 	if (game_state != null):
-		game_state.printUnitTypes()
+		game_state.printUnitTypes(true)
 		
 
 ## Prints all of the tile types into the console
 func printTileTypes() -> void:
 	if (game_state != null):
-		game_state.printTileTypes()
+		game_state.printTileTypes(true)
 
 
 ## Creates a debug game, places some units, and prints the map
