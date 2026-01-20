@@ -40,6 +40,13 @@ func createDebugUnit(position : Vector2i) -> void:
 		game_state.createDebugUnit(position)
 
 
+func getGameName() -> String:
+	if game_state != null:
+		return game_state.getGameName()
+	else:
+		return ""
+
+
 ## Initializes a game state from a game definition
 func initGameStateFromGameDefinition(game_definition : GameDefinitionResource):
 	game_state = GameState.initFromGameDefinition(game_definition)

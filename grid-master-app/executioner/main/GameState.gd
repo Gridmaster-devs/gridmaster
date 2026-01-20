@@ -105,5 +105,9 @@ func printTileTypes(to_log : bool):
 		grid.printTileTypes(to_log)
 
 
+func getGameName() -> String:
+	return game_name
+
+
 func _init():
 	pass

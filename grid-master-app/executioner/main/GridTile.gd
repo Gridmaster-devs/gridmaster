@@ -53,7 +53,12 @@ func _to_string():
 		ret_string += (tile_type.tile_name)
 	
 	ret_string += (" | ")
-	var unit = units.values().front()
+	var unit : Unit
+	
+	if units.values().is_empty():
+		unit = null
+	else:
+		unit = units.values().front()
 	
 	ret_string += ("Unit: ")
 	if (unit == null):
