@@ -54,6 +54,13 @@ func addUnit(unit_type : UnitType, position : Vector2i, player_id : int):
 	var unit = Unit.new(unit_type, id, player_id, position)
 	grid.addUnit(unit)
 	units.set(id, unit)
+	
+
+## Adds a unit by unit type id
+## will fail if there is no unit type corresponding to the id
+func addUnitByTypeId(id : int, position : Vector2i, player_id : int):
+	var unit_type = unit_types.get(id)
+	addUnit(unit_type, position, player_id)
 
 
 ## Initializes the unit types from a game definition

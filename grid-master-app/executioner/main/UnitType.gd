@@ -86,7 +86,8 @@ static func initFromUnitResource(unit_resource : UnitResourceDict, unit_type_id 
 	for key in resource_attributes.keys():
 		if (key == "name" or key == "description"):
 			continue
-		var value = resource_attributes.get(key)
+			
+		var value = unit_resource.get_attribute_value(key)
 		
 		assert(value != null, "Attribute %s value in unit resource should not be null!" % key)
 		

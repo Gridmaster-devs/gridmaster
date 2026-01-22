@@ -32,6 +32,12 @@ func getUnits() -> Variant:
 func createDebugUnit(position : Vector2i) -> void:
 	if game_state != null:
 		game_state.createDebugUnit(position)
+		
+		
+## SOLELY FOR TESTING
+## NEVER EVER USE IN ACTUAL PRODUCTION CODE
+func createUnit(unit_type_id : int, position : Vector2i) -> void:
+	game_state.addUnitByTypeId(unit_type_id, position, -1)
 
 
 func getGameName() -> String:
@@ -49,6 +55,8 @@ func initGameStateFromGameDefinition(game_definition : GameDefinitionResource):
 ## Called by the user interface when the player has selected a game definition file and hit the load button
 func playerSelectedGameDefinition(game_definition : GameDefinitionResource):
 	initGameStateFromGameDefinition(game_definition)
+	
+	createUnit(0, Vector2i(0,0))
 	
 	# DEBUG
 	printTileTypes()

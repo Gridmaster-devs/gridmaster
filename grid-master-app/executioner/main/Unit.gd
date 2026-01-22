@@ -1,7 +1,7 @@
 class_name Unit
 ## Class that represents a single unit on the battlefield
 
-# object with attributes shared by all units of the same type
+## object with attributes shared by all units of the same type
 var type : UnitType
 
 
