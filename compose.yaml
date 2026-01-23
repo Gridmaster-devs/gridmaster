@@ -1,8 +1,8 @@
 services:
-  nginx:
+  editors:
     build: 
       context: .
-      dockerfile: nginx.Dockerfile
+      dockerfile: editors.Dockerfile
     ports: 
       - 8080:80
 
