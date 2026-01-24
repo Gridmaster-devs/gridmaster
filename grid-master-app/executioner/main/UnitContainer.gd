@@ -3,8 +3,6 @@ class_name UnitContainer
 ## Class that represents a single unit on the battlefield
 
 # object with attributes shared by all units of the same type
-var type : UnitType
-
 var unit: Unit
 var sprite: Sprite2D
 
