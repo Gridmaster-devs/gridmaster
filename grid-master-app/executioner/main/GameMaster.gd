@@ -10,7 +10,8 @@ var tile_size = 64
 @onready var game_name_ui = $"User Interface/GameName"
 @onready var sub_viewport = $"User Interface/SubViewportContainer/SubViewport"
 
-
+## array of the currently drawn units, should only be used for drawing purposes 
+## maybe later just have it take the texture from the unit? 
 var active_units: Array[UnitContainer]
 
 
@@ -117,6 +118,10 @@ func _ready() -> void:
 	user_interface.openLoadGameDialog()
 	
 	
+	
+	
+##initializes tile sources for the tileMapLayer from the loaded GameGrid
+##should only be called from initTileGrid
 func initTileSources(game_grid: GameGrid) -> void: 
 	for tile_type in game_grid.strategic_tile_types.values():
 		var source = TileSetAtlasSource.new()
@@ -125,15 +130,18 @@ func initTileSources(game_grid: GameGrid) -> void:
 		source.create_tile(Vector2i(0,0))
 		ui_map_grid.tile_set.add_source(source, tile_type.type_id)
 
-
+##initializes the map element of the game from data loaded into the game_state
 func initTileGrid() -> void: 
-	var game_grid = game_state.getGameGrid()
-	initTileSources(game_grid)
-	for y in range(game_grid.tiles.height):
-		for x in range(game_grid.tiles.width):
-			var id = game_grid.getTile(x, y).getTileType().type_id
-			ui_map_grid.set_cell(Vector2i(x, y), id , Vector2i(0,0), 0) 
-			
+	if(game_state != null):
+		var game_grid = game_state.getGameGrid()
+		initTileSources(game_grid)
+		for y in range(game_grid.tiles.height):
+			for x in range(game_grid.tiles.width):
+				var id = game_grid.getTile(x, y).getTileType().type_id
+				ui_map_grid.set_cell(Vector2i(x, y), id , Vector2i(0,0), 0) 
+
+
+##converts game grid coordinates to screen coordinates
 func gridToScreen(grid_pos: Vector2i) -> Vector2i: 
 	return Vector2i(grid_pos.x * tile_size + tile_size / 2, grid_pos.y * tile_size + tile_size /2)
 	
