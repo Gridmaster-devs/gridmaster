@@ -42,6 +42,12 @@ func getNewUnitId() -> int:
 	unit_id_count += 1
 	return unit_id_count
 
+#gets the game grid width
+func getGridWidth() -> int: 
+	return grid.tiles.width
+
+func getGridHeight() -> int: 
+	return grid.tiles.height
 
 ## Creates a unit for testing
 func createDebugUnit(position : Vector2i)-> Unit:

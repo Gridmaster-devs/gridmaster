@@ -9,6 +9,7 @@ var tile_size = 64
 @onready var ui_map_grid = $"User Interface/SubViewportContainer/SubViewport/TileGrid"
 @onready var game_name_ui = $"User Interface/GameName"
 @onready var sub_viewport = $"User Interface/SubViewportContainer/SubViewport"
+@onready var background_grid = $"User Interface/SubViewportContainer/SubViewport/BackgroundGrid"
 
 ## array of the currently drawn units, should only be used for drawing purposes 
 ## maybe later just have it take the texture from the unit? 
@@ -74,6 +75,7 @@ func playerSelectedGameDefinition(game_definition : GameDefinitionResource):
 	game_name_ui.text = game_definition.game_name
 	createUnit(0, Vector2i(0,0))
 	initTileGrid()
+	initBackgroundGrid()
 	# DEBUG
 	printTileTypes()
 	printUnitTypes()
@@ -118,8 +120,6 @@ func _ready() -> void:
 	user_interface.openLoadGameDialog()
 	
 	
-	
-	
 ##initializes tile sources for the tileMapLayer from the loaded GameGrid
 ##should only be called from initTileGrid
 func initTileSources(game_grid: GameGrid) -> void: 
@@ -140,9 +140,12 @@ func initTileGrid() -> void:
 				var id = game_grid.getTile(x, y).getTileType().type_id
 				ui_map_grid.set_cell(Vector2i(x, y), id , Vector2i(0,0), 0) 
 
-
 ##converts game grid coordinates to screen coordinates
 func gridToScreen(grid_pos: Vector2i) -> Vector2i: 
 	return Vector2i(grid_pos.x * tile_size + tile_size / 2, grid_pos.y * tile_size + tile_size /2)
 	
+	
+func initBackgroundGrid(): 
+	if(game_state != null): 
+		background_grid.resize(game_state.getGridWidth(), game_state.getGridHeight())
 	

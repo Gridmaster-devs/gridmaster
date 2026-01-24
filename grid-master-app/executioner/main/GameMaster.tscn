@@ -56,7 +56,6 @@ script = ExtResource("3_a5c74")
 tile_set = SubResource("TileSet_5a1nj")
 
 [node name="BackgroundGrid" type="TileMapLayer" parent="User Interface/SubViewportContainer/SubViewport"]
-tile_map_data = PackedByteArray(0, 0, 1, 0, 3, 0, 1, 0, 0, 0, 0, 0, 0, 0, 3, 0, 3, 0, 1, 0, 0, 0, 0, 0, 0, 0, 3, 0, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 4, 0, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 4, 0, 5, 0, 1, 0, 0, 0, 0, 0, 0, 0)
 tile_set = SubResource("TileSet_rwyl3")
 script = ExtResource("7_a5c74")
 
