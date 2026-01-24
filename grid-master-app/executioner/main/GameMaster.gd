@@ -4,7 +4,14 @@ extends Node
 ## with other game elements
 
 var game_state : GameState ## The state of the game
+var tile_size = 64
 @onready var user_interface : UserInterface = $"User Interface"
+@onready var ui_map_grid = $"User Interface/SubViewportContainer/SubViewport/TileGrid"
+@onready var game_name_ui = $"User Interface/GameName"
+@onready var sub_viewport = $"User Interface/SubViewportContainer/SubViewport"
+
+
+var active_units: Array[UnitContainer]
 
 
 # This is ONLY for drawing the map and the units!!
@@ -31,13 +38,21 @@ func getUnits() -> Variant:
 ## Creates a debug unit for testing
 func createDebugUnit(position : Vector2i) -> void:
 	if game_state != null:
-		game_state.createDebugUnit(position)
+		var new_unit_cont = UnitContainer.new(game_state.createDebugUnit(position), gridToScreen(position))
+		addNewUnitContainer(new_unit_cont)
 		
 		
 ## SOLELY FOR TESTING
 ## NEVER EVER USE IN ACTUAL PRODUCTION CODE
 func createUnit(unit_type_id : int, position : Vector2i) -> void:
-	game_state.addUnitByTypeId(unit_type_id, position, -1)
+	var new_unit_cont = UnitContainer.new(game_state.addUnitByTypeId(unit_type_id, position, -1), gridToScreen(position)) 
+	addNewUnitContainer(new_unit_cont)
+	
+	
+
+func addNewUnitContainer(unit_cont: UnitContainer): 
+	active_units.append(unit_cont)
+	sub_viewport.add_child(unit_cont)
 
 
 func getGameName() -> String:
@@ -55,9 +70,9 @@ func initGameStateFromGameDefinition(game_definition : GameDefinitionResource):
 ## Called by the user interface when the player has selected a game definition file and hit the load button
 func playerSelectedGameDefinition(game_definition : GameDefinitionResource):
 	initGameStateFromGameDefinition(game_definition)
-	
+	game_name_ui.text = game_definition.game_name
 	createUnit(0, Vector2i(0,0))
-	
+	initTileGrid()
 	# DEBUG
 	printTileTypes()
 	printUnitTypes()
@@ -100,3 +115,26 @@ func debugTest():
 func _ready() -> void:
 	user_interface.linkGameMaster(self)
 	user_interface.openLoadGameDialog()
+	
+	
+func initTileSources(game_grid: GameGrid) -> void: 
+	for tile_type in game_grid.strategic_tile_types.values():
+		var source = TileSetAtlasSource.new()
+		source.texture = tile_type.texture
+		source.texture_region_size = Vector2i(64, 64)
+		source.create_tile(Vector2i(0,0))
+		ui_map_grid.tile_set.add_source(source, tile_type.type_id)
+
+
+func initTileGrid() -> void: 
+	var game_grid = game_state.getGameGrid()
+	initTileSources(game_grid)
+	for y in range(game_grid.tiles.height):
+		for x in range(game_grid.tiles.width):
+			var id = game_grid.getTile(x, y).getTileType().type_id
+			ui_map_grid.set_cell(Vector2i(x, y), id , Vector2i(0,0), 0) 
+			
+func gridToScreen(grid_pos: Vector2i) -> Vector2i: 
+	return Vector2i(grid_pos.x * tile_size + tile_size / 2, grid_pos.y * tile_size + tile_size /2)
+	
+	

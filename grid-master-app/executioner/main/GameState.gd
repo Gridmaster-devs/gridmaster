@@ -44,23 +44,24 @@ func getNewUnitId() -> int:
 
 
 ## Creates a unit for testing
-func createDebugUnit(position : Vector2i) -> void:
-	addUnit(UnitType.debugType(), position, -1)
+func createDebugUnit(position : Vector2i)-> Unit:
+	return addUnit(UnitType.debugType(), position, -1)
 	
 
 ## Adds a unit to the game
-func addUnit(unit_type : UnitType, position : Vector2i, player_id : int):
+func addUnit(unit_type : UnitType, position : Vector2i, player_id : int) -> Unit:
 	var id = getNewUnitId()
 	var unit = Unit.new(unit_type, id, player_id, position)
 	grid.addUnit(unit)
 	units.set(id, unit)
+	return unit
 	
 
 ## Adds a unit by unit type id
 ## will fail if there is no unit type corresponding to the id
-func addUnitByTypeId(id : int, position : Vector2i, player_id : int):
+func addUnitByTypeId(id : int, position : Vector2i, player_id : int) -> Unit:
 	var unit_type = unit_types.get(id)
-	addUnit(unit_type, position, player_id)
+	return addUnit(unit_type, position, player_id)
 
 
 ## Initializes the unit types from a game definition

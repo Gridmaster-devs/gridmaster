@@ -1,9 +1,70 @@
-[gd_scene load_steps=3 format=3 uid="uid://cpsdnpca0xb06"]
+[gd_scene load_steps=14 format=3 uid="uid://cpsdnpca0xb06"]
 
 [ext_resource type="Script" uid="uid://bqg42x551mvyw" path="res://executioner/main/GameMaster.gd" id="1_8ixyn"]
 [ext_resource type="PackedScene" uid="uid://ce70msfolg6m7" path="res://executioner/main/user_interface/UserInterface.tscn" id="2_tlvut"]
+[ext_resource type="Script" uid="uid://blhe7742yushy" path="res://executioner/main/SubViewport.gd" id="3_a5c74"]
+[ext_resource type="Texture2D" uid="uid://dp1ky8epuaiv" path="res://editor/sprites/map_editor_sprites/grid_invis_highlight.png" id="4_fmphi"]
+[ext_resource type="Texture2D" uid="uid://doqe1u6vume5c" path="res://editor/sprites/map_editor_sprites/grid_invis.png" id="5_76ivq"]
+[ext_resource type="Texture2D" uid="uid://cy4pdp1xl7ssw" path="res://editor/sprites/map_editor_sprites/grid_invis_highlight_pink.png" id="6_h45bl"]
+[ext_resource type="Script" uid="uid://dt42lu3jva7s3" path="res://executioner/main/BackgroundGrid.gd" id="7_a5c74"]
+[ext_resource type="Script" uid="uid://6g2o1upyh5q4" path="res://editor/scripts/map_editor_scripts/other/map_camera_script.gd" id="8_b3lme"]
+
+[sub_resource type="TileSet" id="TileSet_5a1nj"]
+tile_size = Vector2i(64, 64)
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_xjsnq"]
+texture = ExtResource("4_fmphi")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_rt3k5"]
+texture = ExtResource("5_76ivq")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_aqy81"]
+texture = ExtResource("6_h45bl")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_rwyl3"]
+tile_size = Vector2i(64, 64)
+sources/1 = SubResource("TileSetAtlasSource_rt3k5")
+sources/0 = SubResource("TileSetAtlasSource_xjsnq")
+sources/2 = SubResource("TileSetAtlasSource_aqy81")
 
 [node name="Game master" type="Node"]
 script = ExtResource("1_8ixyn")
 
 [node name="User Interface" parent="." instance=ExtResource("2_tlvut")]
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="User Interface"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SubViewport" type="SubViewport" parent="User Interface/SubViewportContainer"]
+handle_input_locally = false
+size = Vector2i(2, 2)
+render_target_update_mode = 4
+script = ExtResource("3_a5c74")
+
+[node name="TileGrid" type="TileMapLayer" parent="User Interface/SubViewportContainer/SubViewport"]
+tile_set = SubResource("TileSet_5a1nj")
+
+[node name="BackgroundGrid" type="TileMapLayer" parent="User Interface/SubViewportContainer/SubViewport"]
+tile_map_data = PackedByteArray(0, 0, 1, 0, 3, 0, 1, 0, 0, 0, 0, 0, 0, 0, 3, 0, 3, 0, 1, 0, 0, 0, 0, 0, 0, 0, 3, 0, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 4, 0, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 4, 0, 5, 0, 1, 0, 0, 0, 0, 0, 0, 0)
+tile_set = SubResource("TileSet_rwyl3")
+script = ExtResource("7_a5c74")
+
+[node name="Camera2D" type="Camera2D" parent="User Interface/SubViewportContainer/SubViewport"]
+anchor_mode = 0
+script = ExtResource("8_b3lme")
+
+[node name="GameName" type="Label" parent="User Interface"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0

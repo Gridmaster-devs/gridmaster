@@ -8,7 +8,7 @@ extends Resource
 @export var hiding: int
 @export var texture: Texture2D
 
-func _init(s := -1, n := "", p := 0, m := 0, h := 0, t := Texture2D.new()):
+func _init(s := 0, n := "", p := 0, m := 0, h := 0, t := Texture2D.new()):
 	source = s
 	name = n
 	protection = p
