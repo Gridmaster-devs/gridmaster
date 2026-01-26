@@ -5,7 +5,6 @@ extends PanelItem
 # this is the name of the attribute that will be saved in the dictionary
 @export var attribute_name : String
 
-
 # the resource flag determines whether the attribute counts as a resource, and thus
 # whether it shows up in places for resources, like certain actions
 @export_flags ("Resource") var flags : int = 0
@@ -64,6 +63,6 @@ func _ready():
 		if root_editor != null:
 			root_editor.save_to_resource.connect(save_to_unit_resource)
 			root_editor.load_from_resource.connect(load_from_unit_resource)
-			root_editor.reset.connect(reset)
 			root_editor.update_resources.connect(update_resources)
+			self.add_to_group("value_fields")
 	self.mouse_filter = Control.MOUSE_FILTER_IGNORE

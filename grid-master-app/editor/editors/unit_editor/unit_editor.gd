@@ -6,7 +6,6 @@ extends PanelContainer
 signal save_to_resource(resource : UnitResourceDict)
 signal load_from_resource(resource : UnitResourceDict)
 signal update_resources(resources : Array[String])
-signal reset
 
 # the current unit resource
 # note that the full array of unit resources is held by the tree panel,
@@ -22,29 +21,24 @@ var editor_main : EditorMain
 @onready var load_dialog : FileDialog = $Dialogs/LoadUnitDialog
 @onready var action_panel : ActionPanel = $HBoxContainer/ActionPanel
 
-
 # called when the user changes the name of the unit in the editor
 func update_name_in_tree(new_name : String):
 	if (unit_resource != null):
 		tree_panel.update_selected_name(new_name)
-
 
 # called when the user clicks the save button
 func show_save_dialog():
 	save_to_resource.emit(unit_resource)
 	save_dialog.show()
 	
-
 # called when the user clicks the load button
 func show_load_dialog():
 	load_dialog.show()
-
 
 # called by the save dialog itself if a filepath is selected
 func save_to_file(path : String):
 	ResourceSaver.save(unit_resource, path)
 	
-
 # called by the load dialog itself if a filepath is selected
 func load_from_file(path : String):
 	if (ResourceLoader.exists(path)):
@@ -64,8 +58,7 @@ func get_units() -> Array[UnitResourceDict]:
 # should reset their values
 func unit_resource_removed():
 	unit_resource = null
-	reset.emit()
-
+	get_tree().call_group("value_fields", "reset")
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -91,11 +84,6 @@ func new_unit_resource(unit_resource_p : UnitResourceDict):
 	save_to_resource.emit(unit_resource)
 	load_from_resource.emit(unit_resource_p)
 	unit_resource = unit_resource_p
-	
 
 func link_editor_main(editor_main_p : EditorMain):
 	editor_main = editor_main_p
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass

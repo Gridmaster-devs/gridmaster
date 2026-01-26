@@ -70,6 +70,7 @@ theme_type_variation = &"EditorHBox"
 [node name="AttributesPanel" parent="HBoxContainer/VBoxContainer/HBoxContainer" instance=ExtResource("2_7lyne")]
 layout_mode = 2
 size_flags_horizontal = 3
+section_headers = Array[String](["Movement", "Interaction"])
 
 [node name="TopLabel" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox" index="0"]
 text = "Attributes"
@@ -159,6 +160,7 @@ size_flags_horizontal = 3
 [node name="ResourcesPanel" parent="HBoxContainer/VBoxContainer/HBoxContainer" instance=ExtResource("2_7lyne")]
 layout_mode = 2
 size_flags_horizontal = 3
+section_headers = Array[String](["Vitality"])
 
 [node name="TopLabel" parent="HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel/TopVBox" index="0"]
 text = "Resources"
@@ -235,6 +237,7 @@ size_flags_horizontal = 3
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 size_flags_horizontal = 3
+section_headers = Array[String](["Offensive", "Defensive", "Utility", "Value"])
 
 [node name="TopLabel" parent="HBoxContainer/StatsPanel/TopVBox" index="0"]
 text = "Stats"
