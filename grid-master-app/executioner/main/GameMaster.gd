@@ -55,7 +55,6 @@ func getGameName() -> String:
 ## Initializes a game state from a game definition
 func initGameStateFromGameDefinition(game_definition : GameDefinitionResource):
 	game_state = GameState.initFromGameDefinition(game_definition)
-	initGraphics()
 	
 	# DEBUG
 	createUnit(0, Vector2i(0,0))
@@ -63,6 +62,7 @@ func initGameStateFromGameDefinition(game_definition : GameDefinitionResource):
 	printTileTypes()
 	# DEBUG
 
+	initGraphics()
 
 ## Called by the user interface when the player has selected a game definition file and hit the load button
 func playerSelectedGameDefinition(game_definition : GameDefinitionResource):
