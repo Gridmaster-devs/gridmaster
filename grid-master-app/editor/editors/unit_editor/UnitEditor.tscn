@@ -1,12 +1,12 @@
 [gd_scene load_steps=8 format=3 uid="uid://d1mgyle0o8kx3"]
 
-[ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://themes/editor-theme.tres" id="1_ke4m8"]
-[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/EditorPanel.tscn" id="2_7lyne"]
-[ext_resource type="Script" uid="uid://cdd3u0q68b4jw" path="res://editors/unit_editor/unit_editor.gd" id="2_k1fjl"]
-[ext_resource type="PackedScene" uid="uid://ci5ml18rk2mih" path="res://editors/unit_editor/UnitPanelItem.tscn" id="3_ad1yx"]
-[ext_resource type="PackedScene" uid="uid://ba5as4lpqxka2" path="res://editors/unit_editor/FileTreePanel.tscn" id="5_67da3"]
-[ext_resource type="PackedScene" uid="uid://b8u4a8d5rc0yj" path="res://editors/unit_editor/UnitInfoPanel.tscn" id="6_k1fjl"]
-[ext_resource type="PackedScene" uid="uid://rtqqyrnt8pr0" path="res://editors/unit_editor/ActionPanel.tscn" id="7_ip3j4"]
+[ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://editor/themes/editor-theme.tres" id="1_ke4m8"]
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="2_7lyne"]
+[ext_resource type="Script" uid="uid://cdd3u0q68b4jw" path="res://editor/editors/unit_editor/unit_editor.gd" id="2_k1fjl"]
+[ext_resource type="PackedScene" uid="uid://ci5ml18rk2mih" path="res://editor/editors/unit_editor/UnitPanelItem.tscn" id="3_ad1yx"]
+[ext_resource type="PackedScene" uid="uid://ba5as4lpqxka2" path="res://editor/editors/unit_editor/FileTreePanel.tscn" id="5_67da3"]
+[ext_resource type="PackedScene" uid="uid://b8u4a8d5rc0yj" path="res://editor/editors/unit_editor/UnitInfoPanel.tscn" id="6_k1fjl"]
+[ext_resource type="PackedScene" uid="uid://rtqqyrnt8pr0" path="res://editor/editors/unit_editor/ActionPanel.tscn" id="7_ip3j4"]
 
 [node name="UnitEditor" type="PanelContainer"]
 anchors_preset = 15

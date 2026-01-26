@@ -68,7 +68,6 @@ func link_unit_editor(ue : UnitEditor):
 func _ready() -> void:
 	add_action_button.button_up.connect(add_action)
 
-
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
