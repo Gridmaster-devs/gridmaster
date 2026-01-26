@@ -14,6 +14,7 @@ var active_units: Array[UnitContainer]
 
 func linkGameMaster(game_master_p : GameMaster):
 	game_master = game_master_p
+	game_master.units_changed.connect(unitsChanged)
 
 
 ## Currently called by the game master
@@ -35,6 +36,7 @@ func initTileSources(game_grid: GameGrid) -> void:
 ## initializes the map element of the game from data loaded into the game_state
 func initTileGrid(game_grid : GameGrid) -> void: 
 	initTileSources(game_grid)
+	initBackgroundGrid(game_grid)
 	for y in range(game_grid.tiles.height):
 		for x in range(game_grid.tiles.width):
 			var id = game_grid.getTileType(x, y).type_id
@@ -70,6 +72,12 @@ func getUnits():
 func addNewUnitContainer(unit_cont: UnitContainer): 
 	active_units.append(unit_cont)
 	sub_viewport.add_child(unit_cont)
+
+
+## Called when the Game Master emits the units_changed signal
+func unitsChanged() -> void:
+	clearUnits()
+	getUnits()
 
 
 # Called when the node enters the scene tree for the first time.

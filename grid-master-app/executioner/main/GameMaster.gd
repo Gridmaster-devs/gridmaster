@@ -3,6 +3,8 @@ extends Node
 ## Game master class which manages the game state and communicates
 ## with other game elements
 
+signal units_changed
+
 var game_state : GameState ## The state of the game
 @onready var user_interface : UserInterface = $"User Interface"
 @onready var grid_graphics : GridGraphics = $"User Interface/GridGraphics"
@@ -58,14 +60,13 @@ func initGameStateFromGameDefinition(game_definition : GameDefinitionResource):
 ## Called by the user interface when the player has selected a game definition file and hit the load button
 func playerSelectedGameDefinition(game_definition : GameDefinitionResource):
 	initGameStateFromGameDefinition(game_definition)
+	
 	# DEBUG
 	createUnit(0, Vector2i(0,0))
 	printTileTypes()
 	printUnitTypes()
 	printMap()
-	grid_graphics.linkGameMaster(self)
-	grid_graphics.initFromGameGrid(getGameGrid())
-	grid_graphics.getUnits()
+	# DEBUG
 
 
 # DEBUG ONLY!!
@@ -74,13 +75,20 @@ func debugInitGame() -> void:
 	game_state = GameState.debugInit(10, 10, "Test game")
 
 
-## Prints the map into console
+## Initializes the graphics elements at the start of the game
+func initGraphics() -> void:
+	grid_graphics.linkGameMaster(self)
+	grid_graphics.initFromGameGrid(getGameGrid())
+	grid_graphics.getUnits()
+
+
+## Prints the map into a log file
 func printMap() -> void:
 	if (game_state != null):
 		game_state.printMap(true)
 
 
-## Prints all the unit types into the console
+## Prints all the unit types into a log file
 func printUnitTypes() -> void:
 	if (game_state != null):
 		game_state.printUnitTypes(true)

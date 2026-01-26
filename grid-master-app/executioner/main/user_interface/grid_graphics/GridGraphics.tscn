@@ -1,11 +1,11 @@
 [gd_scene load_steps=13 format=3 uid="uid://col1qb3vuji1l"]
 
-[ext_resource type="Script" uid="uid://blhe7742yushy" path="res://executioner/main/SubViewport.gd" id="1_4cchx"]
+[ext_resource type="Script" uid="uid://blhe7742yushy" path="res://executioner/main/user_interface/grid_graphics/SubViewport.gd" id="1_4cchx"]
 [ext_resource type="Script" uid="uid://d00g7dklp0g33" path="res://executioner/main/user_interface/grid_graphics/GridGraphics.gd" id="1_i8nvr"]
 [ext_resource type="Texture2D" uid="uid://dp1ky8epuaiv" path="res://editor/sprites/map_editor_sprites/grid_invis_highlight.png" id="2_i8nvr"]
 [ext_resource type="Texture2D" uid="uid://doqe1u6vume5c" path="res://editor/sprites/map_editor_sprites/grid_invis.png" id="3_ksf4j"]
 [ext_resource type="Texture2D" uid="uid://cy4pdp1xl7ssw" path="res://editor/sprites/map_editor_sprites/grid_invis_highlight_pink.png" id="4_fxvlp"]
-[ext_resource type="Script" uid="uid://dt42lu3jva7s3" path="res://executioner/main/BackgroundGrid.gd" id="5_30r7l"]
+[ext_resource type="Script" uid="uid://dt42lu3jva7s3" path="res://executioner/main/user_interface/grid_graphics/BackgroundGrid.gd" id="5_30r7l"]
 [ext_resource type="Script" uid="uid://6g2o1upyh5q4" path="res://editor/scripts/map_editor_scripts/other/map_camera_script.gd" id="6_gcgmb"]
 
 [sub_resource type="TileSet" id="TileSet_3wctu"]
