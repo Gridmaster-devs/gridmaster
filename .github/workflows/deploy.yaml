@@ -18,7 +18,7 @@ jobs:
         with:
           godot_executable_download_url: https://downloads.godotengine.org/?version=4.5.1&flavor=stable&slug=linux.x86_64.zip&platform=linux.64
           godot_export_templates_download_url: https://downloads.godotengine.org/?version=4.5.1&flavor=stable&slug=export_templates.tpz&platform=templates
-          relative_project_path: ./
+          relative_project_path: ./grid-master-app
           use_preset_export_path: true
           cache: true
       - name: Set up Docker Buildx
