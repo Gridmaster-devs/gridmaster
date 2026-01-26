@@ -20,6 +20,7 @@ jobs:
           godot_export_templates_download_url: https://downloads.godotengine.org/?version=4.5.1&flavor=stable&slug=export_templates.tpz&platform=templates
           relative_project_path: ./
           use_preset_export_path: true
+          cache: true
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to ACR
