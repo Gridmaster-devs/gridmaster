@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://d0ajwjf4gguua"]
+[gd_scene load_steps=3 format=3 uid="uid://d0ajwjf4gguua"]
 
 [ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="1_wata8"]
+[ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editor/editors/common/editor_panel/PanelItem.tscn" id="2_cp8te"]
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -13,8 +14,62 @@ grow_vertical = 2
 [node name="EditorPanel" parent="." instance=ExtResource("1_wata8")]
 layout_mode = 1
 title = "Jeee"
+section_headers = Array[String](["2", "4", "3", "1"])
 
 [node name="TopLabel" parent="EditorPanel/TopVBox" index="0"]
 text = "Jeee"
+
+[node name="2" type="VBoxContainer" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/2"]
+layout_mode = 2
+theme_type_variation = &"SectionLabel"
+text = "2"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="4" type="VBoxContainer" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="1"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/4"]
+layout_mode = 2
+theme_type_variation = &"SectionLabel"
+text = "4"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="E" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/4" instance=ExtResource("2_cp8te")]
+layout_mode = 2
+text = "E"
+
+[node name="Label" type="Label" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/4/E"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "E"
+
+[node name="LineEdit" type="LineEdit" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/4/E"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="3" type="VBoxContainer" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="2"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/3"]
+layout_mode = 2
+theme_type_variation = &"SectionLabel"
+text = "3"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="1" type="VBoxContainer" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="3"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/1"]
+layout_mode = 2
+theme_type_variation = &"SectionLabel"
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [editable path="EditorPanel"]

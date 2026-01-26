@@ -66,9 +66,10 @@ func update_headers():
 # Gives the panel its pre-existing subheaders, as var sub_sections is reset between
 # instantiations.
 func _ready() -> void:
+	section_headers = []
 	var content_box : VBoxContainer = get_node("TopVBox/ScrollContainer/ContentsVBox")
 	var headers : Array[Node] = content_box.get_children()
 	for header in headers:
+		section_headers.append(header.name)
 		sub_sections.get_or_add(header.name, header)
-	
-	
+		print("Added header " + header.name)
