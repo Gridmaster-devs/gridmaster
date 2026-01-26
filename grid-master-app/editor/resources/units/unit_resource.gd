@@ -1,4 +1,4 @@
-class_name UnitResourceDict
+class_name UnitResource
 extends Resource
 ## Resource that describes a unit as defined by the unit editor
 

@@ -1,13 +1,13 @@
 [gd_resource type="Resource" script_class="GameDefinitionResource" load_steps=48 format=3]
 
-[ext_resource type="Script" path="res://editor/scripts/map_editor_scripts/classes/grid.gd" id="1_4w5n0"]
-[ext_resource type="Script" path="res://editor/scripts/map_editor_scripts/classes/game_map.gd" id="2_cpig2"]
-[ext_resource type="Script" path="res://editor/scripts/map_editor_scripts/classes/strategic_tile_information.gd" id="3_8w8m7"]
-[ext_resource type="Script" path="res://editor/scripts/map_editor_scripts/classes/tactical_tile_information.gd" id="4_xep65"]
-[ext_resource type="Script" path="res://editor/resources/game_definition_resource.gd" id="5_o54wk"]
-[ext_resource type="Script" path="res://editor/resources/units/unit_resource_dict.gd" id="6_fjqj8"]
-[ext_resource type="Script" path="res://editor/resources/units/Actions/Action.gd" id="7_mtld8"]
-[ext_resource type="Script" path="res://editor/resources/units/attribute.gd" id="8_goxy0"]
+[ext_resource type="Script" uid="uid://cob8v1v2epjv3" path="res://editor/scripts/map_editor_scripts/classes/grid.gd" id="1_4w5n0"]
+[ext_resource type="Script" uid="uid://jhqbai3y4qt3" path="res://editor/scripts/map_editor_scripts/classes/game_map.gd" id="2_cpig2"]
+[ext_resource type="Script" uid="uid://db3ksdw4bedm7" path="res://editor/scripts/map_editor_scripts/classes/strategic_tile_information.gd" id="3_8w8m7"]
+[ext_resource type="Script" uid="uid://q0mcf3188k2n" path="res://editor/scripts/map_editor_scripts/classes/tactical_tile_information.gd" id="4_xep65"]
+[ext_resource type="Script" uid="uid://b03l7cwr1mnen" path="res://editor/resources/game_definition_resource.gd" id="5_o54wk"]
+[ext_resource type="Script" uid="uid://rhmurm0urx3r" path="res://editor/resources/units/unit_resource.gd" id="6_fjqj8"]
+[ext_resource type="Script" uid="uid://foooxj4ood8w" path="res://editor/resources/units/Actions/Action.gd" id="7_mtld8"]
+[ext_resource type="Script" uid="uid://jvuhdliiwhuv" path="res://editor/resources/units/attribute.gd" id="8_goxy0"]
 
 [sub_resource type="Resource" id="Resource_aychi"]
 script = ExtResource("1_4w5n0")

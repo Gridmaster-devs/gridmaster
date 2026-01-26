@@ -10,11 +10,14 @@ extends PanelItem
 @export_flags ("Resource") var flags : int = 0
 var root_editor : UnitEditor
 
-func save_to_unit_resource(resource_p : UnitResourceDict):
+func save_to_unit_resource(resource_p : UnitResource):
 	if (resource_p != null):
 		resource_p.set_attribute(attribute_name, get_value())
 	
-func load_from_unit_resource(resource_p : UnitResourceDict):
+
+#TODO shouldn't reset when fails, should instead throw an error and show error to user, but stay where it is
+# or load previous value
+func load_from_unit_resource(resource_p : UnitResource):
 	if (resource_p != null):
 		var value = resource_p.get_attribute_value(attribute_name)
 		if (value != null):
@@ -23,16 +26,10 @@ func load_from_unit_resource(resource_p : UnitResourceDict):
 			# won't be compatible with each other
 			set_value(value) 
 			return
-
 	reset()
-		
+	
 
-func _on_save_to_resource(resource : UnitResourceDict):
-	save_to_unit_resource(resource)
-	
-func _on_load_from_resource(resource : UnitResourceDict):
-	load_from_unit_resource(resource)
-	
+#TODO replace
 # super super jank but I don't know a better way right now
 # some way to do globals would probably be the best way
 func find_root_unit_editor():
@@ -64,5 +61,5 @@ func _ready():
 			root_editor.save_to_resource.connect(save_to_unit_resource)
 			root_editor.load_from_resource.connect(load_from_unit_resource)
 			root_editor.update_resources.connect(update_resources)
-			self.add_to_group("value_fields")
+			self.add_to_group("panel_items")
 	self.mouse_filter = Control.MOUSE_FILTER_IGNORE

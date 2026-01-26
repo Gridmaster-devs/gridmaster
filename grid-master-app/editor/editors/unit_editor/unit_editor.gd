@@ -3,14 +3,14 @@ class_name UnitEditor
 extends PanelContainer
 
 # these signals are sent to the various children of the unit editor
-signal save_to_resource(resource : UnitResourceDict)
-signal load_from_resource(resource : UnitResourceDict)
+signal save_to_resource(resource : UnitResource)
+signal load_from_resource(resource : UnitResource)
 signal update_resources(resources : Array[String])
 
 # the current unit resource
 # note that the full array of unit resources is held by the tree panel,
 # not the unit editor
-var unit_resource : UnitResourceDict
+var unit_resource : UnitResource
 
 # list of resource attributes
 var resources : Array[String] = []
@@ -42,14 +42,14 @@ func save_to_file(path : String):
 # called by the load dialog itself if a filepath is selected
 func load_from_file(path : String):
 	if (ResourceLoader.exists(path)):
-		var data : UnitResourceDict = ResourceLoader.load(path) as UnitResourceDict
+		var data : UnitResource = ResourceLoader.load(path) as UnitResource
 		tree_panel.add_unit_from_resource(data)
 		
-func set_units(units_p : Array[UnitResourceDict]):
+func set_units(units_p : Array[UnitResource]):
 	tree_panel.set_units(units_p)
 		
 		
-func get_units() -> Array[UnitResourceDict]:
+func get_units() -> Array[UnitResource]:
 	if (unit_resource != null):
 		save_to_resource.emit(unit_resource)
 	return tree_panel.get_units()
@@ -58,7 +58,19 @@ func get_units() -> Array[UnitResourceDict]:
 # should reset their values
 func unit_resource_removed():
 	unit_resource = null
-	get_tree().call_group("value_fields", "reset")
+	get_tree().call_group("panel_items", "reset")
+	get_tree().call_group("info_panel", "reset")
+	get_tree().call_group("action_panel_items", "self_destruct")
+
+# called by the tree panel when the user selects a new unit from the list
+# and the new unit's info should be displayed
+func new_unit_resource(unit_resource_p : UnitResource):
+	save_to_resource.emit(unit_resource)
+	load_from_resource.emit(unit_resource_p)
+	unit_resource = unit_resource_p
+
+func link_editor_main(editor_main_p : EditorMain):
+	editor_main = editor_main_p
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -76,14 +88,3 @@ func _ready() -> void:
 	action_panel.link_unit_editor(self)
 	info_panel.link_unit_editor(self)
 	tree_panel.link_unit_editor(self)
-	
-	
-# called by the tree panel when the user selects a new unit from the list
-# and the new unit's info should be displayed
-func new_unit_resource(unit_resource_p : UnitResourceDict):
-	save_to_resource.emit(unit_resource)
-	load_from_resource.emit(unit_resource_p)
-	unit_resource = unit_resource_p
-
-func link_editor_main(editor_main_p : EditorMain):
-	editor_main = editor_main_p

@@ -62,18 +62,14 @@ func load_from_action(action : Action):
 		if action is NoneAction:
 			update_panel_type(Action.Type.NONE as int)
 			panel_type_box.select(Action.Type.NONE as int)
-			
 	
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	remove_action_button.button_up.connect(self_destruct)
-	panel_type_box.item_selected.connect(update_panel_type)
 
 func initiate(resource_array : Array[String], save_action : Signal):
 	save_action.connect(save_action_to_array)
 	resources = resource_array
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	remove_action_button.button_up.connect(self_destruct)
+	panel_type_box.item_selected.connect(update_panel_type)
+	self.add_to_group("action_panel_items")

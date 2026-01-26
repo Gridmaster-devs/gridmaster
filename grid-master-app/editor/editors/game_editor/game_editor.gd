@@ -65,8 +65,3 @@ func _ready() -> void:
 	load_dialog.file_selected.connect(load_from_file)
 	save_game_button.button_up.connect(save_to_resource)
 	load_game_button.button_up.connect(show_load_dialog)
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass

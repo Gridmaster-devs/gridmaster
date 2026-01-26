@@ -12,7 +12,7 @@ func unit_name_changed(new_text : String):
 	unit_editor.update_name_in_tree(new_text)
 	
 
-func save_to_resource(unit_resource : UnitResourceDict):
+func save_to_resource(unit_resource : UnitResource):
 	if (unit_resource != null):
 		var unit_name = name_line.text
 		if (unit_name == ""):
@@ -24,7 +24,7 @@ func save_to_resource(unit_resource : UnitResourceDict):
 		unit_resource.set_attribute("description", unit_description)
 
 
-func load_from_resource(unit_resource : UnitResourceDict):
+func load_from_resource(unit_resource : UnitResource):
 	if (unit_resource != null):
 
 		var unit_name = unit_resource.get_attribute_value("name")
@@ -56,9 +56,8 @@ func link_unit_editor(ue : UnitEditor):
 	unit_editor = ue
 	unit_editor.save_to_resource.connect(save_to_resource)
 	unit_editor.load_from_resource.connect(load_from_resource)
-	unit_editor.reset.connect(reset)
 	name_line.text_changed.connect(unit_name_changed)
 		
 		
 func _ready():
-	pass
+	self.add_to_group("info_panel")
