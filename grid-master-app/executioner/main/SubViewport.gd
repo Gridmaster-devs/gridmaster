@@ -14,7 +14,3 @@ func _ready() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	self.size = Vector2i(control_ref.size)
-
-
-
-	 

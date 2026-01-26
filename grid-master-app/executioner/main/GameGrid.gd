@@ -4,7 +4,16 @@ class_name GameGrid
 
 var tiles : Array2D ## all the tiles on the map
 var strategic_tile_types : Dictionary[int, TileType] ## Maps tile type IDs to the tile types
+var width : int
+var height : int
 
+
+func getWidth() -> int:
+	return width 
+
+
+func getHeight() -> int:
+	return height
 
 ## Returns the tile at the specified index
 func getTile(x : int, y : int) -> GridTile:
@@ -97,5 +106,7 @@ func printTileTypes(to_log : bool):
 
 
 # TODO: In the future should ask for a map to convert into a game grid
-func _init(width : int, height : int):
-	tiles = Array2D.new(width, height)
+func _init(width_p : int, height_p : int):
+	width = width_p
+	height = height_p
+	tiles = Array2D.new(width_p, height_p)
