@@ -54,8 +54,8 @@ jobs:
         with:
           resourceGroup: rg-gridmaster-prod
           acrName: gridmasterprivate
-          acrUsername: ${{ vars.AZURE_CLIENT_ID }}
-          acrPassword: ${{ secrets.AZURE_CLIENT_SECRET }}
+          acrUsername: ${{ secrets.ACR_USERNAME }}
+          acrPassword: ${{ secrets.ACR_PASSWORD }}
           containerAppName: gridmaster-editor
           imageToDeploy: gridmasterprivate.azurecr.io/gridmaster/editor:latest
           targetPort: 8080
