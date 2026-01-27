@@ -1,0 +1,62 @@
+name: Deploy
+
+on: workflow_dispatch
+
+concurrency: production
+
+jobs:
+  ACR-push:
+    name: Push to Azure Container Registry
+    runs-on: ubuntu-latest
+    environment:
+      name: Production
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v5
+      - name: export Godot project
+        uses: firebelley/godot-export@v7.0.0
+        with:
+          godot_executable_download_url: https://downloads.godotengine.org/?version=4.5.1&flavor=stable&slug=linux.x86_64.zip&platform=linux.64
+          godot_export_templates_download_url: https://downloads.godotengine.org/?version=4.5.1&flavor=stable&slug=export_templates.tpz&platform=templates
+          relative_project_path: ./grid-master-app
+          relative_export_path: ./grid-master-app/build
+          cache: true
+      - run: cd ./grid-master-app/build/Web && ls
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to ACR
+        uses: docker/login-action@v3
+        with:
+          registry: gridmasterprivate.azurecr.io
+          username: ${{ vars.AZURE_CLIENT_ID }}
+          password: ${{ secrets.AZURE_CLIENT_SECRET }}
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: gridmasterprivate.azurecr.io/gridmaster/editor:${{ github.sha }}
+          file: ./editors.prod.Dockerfile
+  Deploy:
+    name: Deploy image(s) from ACR to Azure Container Apps
+    runs-on: ubuntu-latest
+    environment:
+      name: Production
+    needs: ACR-push
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v5
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: '{"clientId":"${{ vars.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_TENANT_ID }}"}'
+      - name: Build and deploy Container App
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          resourceGroup: rg-gridmaster-prod
+          acrName: gridmasterprivate
+          acrUsername: ${{ secrets.ACR_USERNAME }}
+          acrPassword: ${{ secrets.ACR_PASSWORD }}
+          containerAppName: gridmaster-editor
+          imageToDeploy: gridmasterprivate.azurecr.io/gridmaster/editor:${{ github.sha }}
+          targetPort: 80
