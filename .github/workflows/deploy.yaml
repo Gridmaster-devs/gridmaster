@@ -36,7 +36,7 @@ jobs:
           context: .
           push: true
           tags: gridmasterprivate.azurecr.io/gridmaster/editor:${{ github.sha }}
-          file: ./editors.Dockerfile
+          file: ./editors.prod.Dockerfile
   Deploy:
     name: Deploy image(s) from ACR to Azure Container Apps
     runs-on: ubuntu-latest
