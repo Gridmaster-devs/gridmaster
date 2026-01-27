@@ -30,13 +30,20 @@ jobs:
           registry: gridmasterprivate.azurecr.io
           username: ${{ vars.AZURE_CLIENT_ID }}
           password: ${{ secrets.AZURE_CLIENT_SECRET }}
-      - name: Build and push
+      - name: Build and push editors image
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           tags: gridmasterprivate.azurecr.io/gridmaster/editor:${{ github.sha }}
           file: ./editors.prod.Dockerfile
+      - name: Build and push client image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: gridmasterprivate.azurecr.io/gridmaster/client:${{ github.sha }}
+          file: ./client.Dockerfile
   Deploy:
     name: Deploy image(s) from ACR to Azure Container Apps
     runs-on: ubuntu-latest
@@ -59,4 +66,14 @@ jobs:
           acrPassword: ${{ secrets.ACR_PASSWORD }}
           containerAppName: gridmaster-editor
           imageToDeploy: gridmasterprivate.azurecr.io/gridmaster/editor:${{ github.sha }}
+          targetPort: 80
+      - name: Build and deploy Container App
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          resourceGroup: rg-gridmaster-prod
+          acrName: gridmasterprivate
+          acrUsername: ${{ secrets.ACR_USERNAME }}
+          acrPassword: ${{ secrets.ACR_PASSWORD }}
+          containerAppName: gridmaster-client
+          imageToDeploy: gridmasterprivate.azurecr.io/gridmaster/client:${{ github.sha }}
           targetPort: 80
