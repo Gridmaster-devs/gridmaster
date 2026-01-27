@@ -8,7 +8,8 @@ properties:
     maxInactiveRevisions: 10
   template:
     containers:
-      - name: gridmaster-editor
+      - name: editor
+        image: gridmasterprivate.azurecr.io/gridmaster/editor:latest
     scale:
       minReplicas: 0
       maxReplicas: 1
