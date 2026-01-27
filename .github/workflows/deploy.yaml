@@ -39,6 +39,8 @@ jobs:
   Deploy:
     name: Deploy image(s) from ACR to Azure Container Apps
     runs-on: ubuntu-latest
+    environment:
+      name: Production
     needs: ACR-push
     steps:
       - name: Azure login
