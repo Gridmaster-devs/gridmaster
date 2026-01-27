@@ -2,7 +2,7 @@ services:
   editors:
     build: 
       context: .
-      dockerfile: editors.Dockerfile
+      dockerfile: editors.prod.Dockerfile
     ports: 
       - 8080:80
 
@@ -10,6 +10,8 @@ services:
     build: 
       context: .
       dockerfile: client.Dockerfile
+    ports:
+      - 8081:80
 
   server:
     build: 
