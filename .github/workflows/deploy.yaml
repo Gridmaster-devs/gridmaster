@@ -52,4 +52,4 @@ jobs:
           acrUsername: ${{ secrets.AZURE_CLIENT_ID }}
           acrPassword: ${{ secrets.AZURE_CLIENT_SECRET }}
           imageToDeploy: gridmasterprivate.azurecr.io/gridmaster/editor:latest
-          yamlConfigPath: buildclient.compose.yaml
+          yamlConfigPath: editor-container-app-cfg.yaml
