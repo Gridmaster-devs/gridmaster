@@ -9,7 +9,6 @@ properties:
   template:
     containers:
       - name: gridmaster-editor
-        image: gridmasterprivate.azurecr.io/gridmaster/editor:latest
     scale:
       minReplicas: 0
       maxReplicas: 1
