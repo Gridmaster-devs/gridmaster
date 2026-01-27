@@ -56,5 +56,6 @@ jobs:
           acrName: gridmasterprivate
           acrUsername: ${{ vars.AZURE_CLIENT_ID }}
           acrPassword: ${{ secrets.AZURE_CLIENT_SECRET }}
-          yamlConfigPath: editor-container-app-cfg.yaml
           containerAppName: gridmaster-editor
+          imageToDeploy: gridmasterprivate.azurecr.io/gridmaster/editor:latest
+          targetPort: 8080
