@@ -51,7 +51,7 @@ jobs:
         uses: azure/container-apps-deploy-action@v2
         with:
           resourceGroup: rg-gridmaster-prod
-          acrName: gridmasterprivate.azurecr.io
+          acrName: gridmasterprivate
           acrUsername: ${{ vars.AZURE_CLIENT_ID }}
           acrPassword: ${{ secrets.AZURE_CLIENT_SECRET }}
           imageToDeploy: gridmasterprivate.azurecr.io/gridmaster/editor:latest
