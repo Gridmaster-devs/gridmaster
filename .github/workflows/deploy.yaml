@@ -57,4 +57,4 @@ jobs:
           acrUsername: ${{ vars.AZURE_CLIENT_ID }}
           acrPassword: ${{ secrets.AZURE_CLIENT_SECRET }}
           yamlConfigPath: editor-container-app-cfg.yaml
-          containerAppName: Gridmaster-editor
+          containerAppName: gridmaster-editor
