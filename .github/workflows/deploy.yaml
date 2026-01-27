@@ -43,6 +43,8 @@ jobs:
       name: Production
     needs: ACR-push
     steps:
+      - name: Check out repository code
+        uses: actions/checkout@v5
       - name: Azure login
         uses: azure/login@v2
         with:
