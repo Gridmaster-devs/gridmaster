@@ -65,7 +65,7 @@ func addUnitByTypeId(id : int, position : Vector2i, player_id : int):
 
 ## Initializes the unit types from a game definition
 func initUnitTypesFromResource(game_definition : GameDefinitionResource) -> void:
-	var gd_units : Array[UnitResourceDict] = game_definition.load_units()
+	var gd_units : Array[UnitResource] = game_definition.load_units()
 	var type_count : int = 0
 	for unit in gd_units:
 		unit_types.set(type_count, UnitType.initFromUnitResource(unit, type_count))
