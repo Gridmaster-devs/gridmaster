@@ -2,6 +2,8 @@ class_name UserInterface
 extends Control
 
 @onready var load_game_dialog : FileDialog = $"Dialogs/Load game dialog"
+@onready var grid_graphics : GridGraphics = $"Grid Graphics"
+@onready var game_name_box : Label = $"Game Name"
 var game_master : GameMaster
 
 
@@ -10,6 +12,14 @@ func openLoadGameDialog() -> void:
 	load_game_dialog.show()
 
 
+## Initializes the user interface object from a game state at the start of the game
+func initFromGameState(game_state : GameState) -> void:
+	# Initialize grid graphics child
+	grid_graphics.initFromGameGrid(game_state.getGameGrid())
+	
+	# Initialize the game name object
+	game_name_box.text = game_state.getGameName()
+
 ## Called by the load game dialog
 func loadGameDefinition(path : String):
 	var game_definition : GameDefinitionResource = ResourceLoader.load(path) as GameDefinitionResource
@@ -17,9 +27,13 @@ func loadGameDefinition(path : String):
 	game_master.playerSelectedGameDefinition(game_definition)
 
 
-## Called by the game master to give a reference to itself
+## Gives this object a reference to the game master
+##
+## Called by the game master when a game is started to give a reference to itself
+## Also initializes user interface's children
 func linkGameMaster(game_master_p : GameMaster) -> void:
 	game_master = game_master_p
+	grid_graphics.linkGameMaster(game_master)
 
 
 # Called when the node enters the scene tree for the first time.
