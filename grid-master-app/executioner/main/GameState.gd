@@ -71,6 +71,7 @@ func addUnit(unit_type : UnitType, position : Vector2i, player_id : int) -> Unit
 ## will fail if there is no unit type corresponding to the id
 func addUnitByTypeId(id : int, position : Vector2i, player_id : int) -> Unit:
 	var unit_type = unit_types.get(id)
+	assert(unit_type != null, "Tried to add unit with invalid type ID!")
 	return addUnit(unit_type, position, player_id)
 
 

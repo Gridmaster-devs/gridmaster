@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://ce70msfolg6m7"]
+[gd_scene load_steps=3 format=3 uid="uid://ce70msfolg6m7"]
 
-[ext_resource type="Script" uid="uid://kxt1x2hof6tg" path="res://main/user_interface/UserInterface.gd" id="1_d4x01"]
+[ext_resource type="Script" uid="uid://kxt1x2hof6tg" path="res://executioner/main/user_interface/UserInterface.gd" id="1_d4x01"]
+[ext_resource type="PackedScene" uid="uid://col1qb3vuji1l" path="res://executioner/main/user_interface/grid_graphics/GridGraphics.tscn" id="2_311cg"]
 
 [node name="User Interface" type="Control"]
 layout_mode = 3
@@ -11,6 +12,9 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_d4x01")
 
+[node name="Grid Graphics" parent="." instance=ExtResource("2_311cg")]
+layout_mode = 1
+
 [node name="Dialogs" type="Node" parent="."]
 
 [node name="Load game dialog" type="FileDialog" parent="Dialogs"]
@@ -18,3 +22,11 @@ title = "Open a File"
 file_mode = 0
 access = 2
 filters = PackedStringArray("*.tres")
+
+[node name="Game Name" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 23.0
+grow_horizontal = 2
+horizontal_alignment = 1

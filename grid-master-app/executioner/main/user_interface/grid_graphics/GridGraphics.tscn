@@ -32,7 +32,7 @@ sources/1 = SubResource("TileSetAtlasSource_pakj7")
 sources/0 = SubResource("TileSetAtlasSource_040ns")
 sources/2 = SubResource("TileSetAtlasSource_pmqq0")
 
-[node name="GridGraphics" type="Control"]
+[node name="Grid Graphics" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -49,19 +49,19 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
+[node name="Grid Graphics Viewport" type="SubViewport" parent="SubViewportContainer"]
 handle_input_locally = false
 size = Vector2i(2, 2)
 render_target_update_mode = 4
 script = ExtResource("1_4cchx")
 
-[node name="TileGrid" type="TileMapLayer" parent="SubViewportContainer/SubViewport"]
+[node name="TileGrid" type="TileMapLayer" parent="SubViewportContainer/Grid Graphics Viewport"]
 tile_set = SubResource("TileSet_3wctu")
 
-[node name="BackgroundGrid" type="TileMapLayer" parent="SubViewportContainer/SubViewport"]
+[node name="BackgroundGrid" type="TileMapLayer" parent="SubViewportContainer/Grid Graphics Viewport"]
 tile_set = SubResource("TileSet_lnlci")
 script = ExtResource("5_30r7l")
 
-[node name="Camera2D" type="Camera2D" parent="SubViewportContainer/SubViewport"]
+[node name="Camera2D" type="Camera2D" parent="SubViewportContainer/Grid Graphics Viewport"]
 anchor_mode = 0
 script = ExtResource("6_gcgmb")

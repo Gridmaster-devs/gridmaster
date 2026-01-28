@@ -7,7 +7,6 @@ signal units_changed
 
 var game_state : GameState ## The state of the game
 @onready var user_interface : UserInterface = $"User Interface"
-@onready var grid_graphics : GridGraphics = $"User Interface/GridGraphics"
 
 
 # This is ONLY for drawing the map and the units!!
@@ -75,11 +74,10 @@ func debugInitGame() -> void:
 	game_state = GameState.debugInit(10, 10, "Test game")
 
 
-## Initializes the graphics elements at the start of the game
+## Initializes the user interface and graphics elements at the start of the game
 func initGraphics() -> void:
-	grid_graphics.linkGameMaster(self)
-	grid_graphics.initFromGameGrid(getGameGrid())
-	grid_graphics.getUnits()
+	user_interface.linkGameMaster(self)
+	user_interface.initFromGameState(game_state)
 
 
 ## Prints the map into a log file
