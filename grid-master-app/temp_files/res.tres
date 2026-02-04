@@ -1,0 +1,119 @@
+[gd_resource type="Resource" script_class="UnitResource" load_steps=20 format=3]
+
+[ext_resource type="Script" path="res://editor/resources/units/Actions/Action.gd" id="1_b130d"]
+[ext_resource type="Script" path="res://editor/resources/units/attribute.gd" id="2_w7je6"]
+[ext_resource type="Script" path="res://editor/resources/units/unit_resource.gd" id="3_f41ef"]
+
+[sub_resource type="Resource" id="Resource_w4cst"]
+script = ExtResource("2_w7je6")
+attribute_name = "movement_type"
+type = 1
+attribute_value = 0
+
+[sub_resource type="Resource" id="Resource_ma2bf"]
+script = ExtResource("2_w7je6")
+attribute_name = "movement_speed"
+type = 2
+attribute_value = 0.0
+
+[sub_resource type="Resource" id="Resource_vv4ah"]
+script = ExtResource("2_w7je6")
+attribute_name = "capturable"
+attribute_value = false
+
+[sub_resource type="Resource" id="Resource_q6osb"]
+script = ExtResource("2_w7je6")
+attribute_name = "health"
+type = 2
+attribute_value = 0.0
+
+[sub_resource type="Resource" id="Resource_go06h"]
+script = ExtResource("2_w7je6")
+attribute_name = "morale"
+type = 2
+attribute_value = 0.0
+
+[sub_resource type="Resource" id="Resource_pklcf"]
+script = ExtResource("2_w7je6")
+attribute_name = "victory_points"
+type = 2
+attribute_value = 0.0
+
+[sub_resource type="Resource" id="Resource_om7cc"]
+script = ExtResource("2_w7je6")
+attribute_name = "attack"
+type = 2
+attribute_value = 1.0
+
+[sub_resource type="Resource" id="Resource_giv7d"]
+script = ExtResource("2_w7je6")
+attribute_name = "armor_piercing"
+type = 2
+attribute_value = 2.0
+
+[sub_resource type="Resource" id="Resource_u1r2d"]
+script = ExtResource("2_w7je6")
+attribute_name = "accuracy"
+type = 2
+attribute_value = 3.0
+
+[sub_resource type="Resource" id="Resource_jx5jx"]
+script = ExtResource("2_w7je6")
+attribute_name = "attack_range"
+type = 2
+attribute_value = 4.0
+
+[sub_resource type="Resource" id="Resource_jfbcj"]
+script = ExtResource("2_w7je6")
+attribute_name = "armor"
+type = 2
+attribute_value = 0.0
+
+[sub_resource type="Resource" id="Resource_k1e6n"]
+script = ExtResource("2_w7je6")
+attribute_name = "evasion"
+type = 2
+attribute_value = 0.0
+
+[sub_resource type="Resource" id="Resource_c8ouh"]
+script = ExtResource("2_w7je6")
+attribute_name = "vision_range"
+type = 2
+attribute_value = 0.0
+
+[sub_resource type="Resource" id="Resource_ggnbi"]
+script = ExtResource("2_w7je6")
+attribute_name = "perception"
+type = 2
+attribute_value = 0.0
+
+[sub_resource type="Resource" id="Resource_aknx3"]
+script = ExtResource("2_w7je6")
+attribute_name = "name"
+attribute_value = "Infantry"
+
+[sub_resource type="Resource" id="Resource_p22et"]
+script = ExtResource("2_w7je6")
+attribute_name = "description"
+attribute_value = ""
+
+[resource]
+script = ExtResource("3_f41ef")
+attributes = {
+"accuracy": SubResource("Resource_u1r2d"),
+"armor": SubResource("Resource_jfbcj"),
+"armor_piercing": SubResource("Resource_giv7d"),
+"attack": SubResource("Resource_om7cc"),
+"attack_range": SubResource("Resource_jx5jx"),
+"capturable": SubResource("Resource_vv4ah"),
+"description": SubResource("Resource_p22et"),
+"evasion": SubResource("Resource_k1e6n"),
+"health": SubResource("Resource_q6osb"),
+"morale": SubResource("Resource_go06h"),
+"movement_speed": SubResource("Resource_ma2bf"),
+"movement_type": SubResource("Resource_w4cst"),
+"name": SubResource("Resource_aknx3"),
+"perception": SubResource("Resource_ggnbi"),
+"victory_points": SubResource("Resource_pklcf"),
+"vision_range": SubResource("Resource_c8ouh")
+}

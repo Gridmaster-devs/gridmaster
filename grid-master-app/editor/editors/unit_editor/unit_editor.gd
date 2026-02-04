@@ -20,6 +20,7 @@ var editor_main : EditorMain
 @onready var save_dialog : FileDialog = $Dialogs/SaveUnitDialog
 @onready var load_dialog : FileDialog = $Dialogs/LoadUnitDialog
 @onready var action_panel : ActionPanel = $HBoxContainer/ActionPanel
+@onready var ftm : FileTransferManager = $Dialogs/FileTransferManager
 
 # called when the user changes the name of the unit in the editor
 func update_name_in_tree(new_name : String):
@@ -29,11 +30,15 @@ func update_name_in_tree(new_name : String):
 # called when the user clicks the save button
 func show_save_dialog():
 	save_to_resource.emit(unit_resource)
-	save_dialog.show()
+	# save_dialog.show()
+	ftm.download_data(unit_resource, "Resource.tres", "*.tres", true)
 	
 # called when the user clicks the load button
 func show_load_dialog():
-	load_dialog.show()
+	# load_dialog.show()
+	ftm.resource_uploaded.connect(ftm_resource_load)
+	ftm.file_upload_cancelled.connect(ftm_cancel)
+	ftm.upload_data("*.tres", true)
 
 # called by the save dialog itself if a filepath is selected
 func save_to_file(path : String):
@@ -44,6 +49,16 @@ func load_from_file(path : String):
 	if (ResourceLoader.exists(path)):
 		var data : UnitResource = ResourceLoader.load(path) as UnitResource
 		tree_panel.add_unit_from_resource(data)
+
+
+func ftm_resource_load(resource : Resource):
+	tree_panel.add_unit_from_resource(resource)
+
+
+func ftm_cancel():
+	ftm.resource_uploaded.disconnect(ftm_resource_load)
+	ftm.file_upload_cancelled.disconnect(ftm_cancel)
+	
 		
 func set_units(units_p : Array[UnitResource]):
 	tree_panel.set_units(units_p)

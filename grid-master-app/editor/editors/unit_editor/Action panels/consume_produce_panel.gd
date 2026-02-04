@@ -65,10 +65,6 @@ func save_to_action() -> ConsumeProduce:
 func _ready() -> void:
 	pass # Replace with function body.
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
 	
 # just adds the resources to the dropdown menus
 func initiate(editor_resources : Array[String]) -> void:

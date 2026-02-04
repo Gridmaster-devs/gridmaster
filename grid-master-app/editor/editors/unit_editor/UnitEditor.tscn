@@ -1,8 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://d1mgyle0o8kx3"]
+[gd_scene load_steps=9 format=3 uid="uid://d1mgyle0o8kx3"]
 
 [ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://editor/themes/editor-theme.tres" id="1_ke4m8"]
 [ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="2_7lyne"]
 [ext_resource type="Script" uid="uid://cdd3u0q68b4jw" path="res://editor/editors/unit_editor/unit_editor.gd" id="2_k1fjl"]
+[ext_resource type="PackedScene" uid="uid://cehdpht6a7iw8" path="res://common/file_upload_download/file_transfer_manager.tscn" id="3_03owb"]
 [ext_resource type="PackedScene" uid="uid://ci5ml18rk2mih" path="res://editor/editors/unit_editor/UnitPanelItem.tscn" id="3_ad1yx"]
 [ext_resource type="PackedScene" uid="uid://ba5as4lpqxka2" path="res://editor/editors/unit_editor/FileTreePanel.tscn" id="5_67da3"]
 [ext_resource type="PackedScene" uid="uid://b8u4a8d5rc0yj" path="res://editor/editors/unit_editor/UnitInfoPanel.tscn" id="6_k1fjl"]
@@ -41,6 +42,8 @@ initial_position = 1
 file_mode = 0
 access = 2
 filters = PackedStringArray("*.jpeg", "*.png")
+
+[node name="FileTransferManager" parent="Dialogs" instance=ExtResource("3_03owb")]
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 2
