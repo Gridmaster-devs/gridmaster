@@ -1,6 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://cehdpht6a7iw8"]
-
-[ext_resource type="Script" uid="uid://dwobk45q1vubj" path="res://common/file_upload_download/resource_file_manager.gd" id="1_3ntbf"]
-
-[node name="ResourceFileManager" type="Node"]
-script = ExtResource("1_3ntbf")
