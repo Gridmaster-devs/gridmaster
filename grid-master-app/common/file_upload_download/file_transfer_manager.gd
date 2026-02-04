@@ -1,10 +1,20 @@
 class_name FileTransferManager
 extends Node
 ## Class that handles file downloads and uploads, on the web and locally
+##
+## For downloading, you can just call the download_data function.
+## For uploading, you have to first connect to the corresponding signals, and only
+## then call upload_data.
+## The "res.tres" files are because Godot's resource handlers cannot handle data directly,
+## and must have access to a file on the filesystem.
+
+# TODO: This currently only handles .tres files, not .res files
+# TODO: There is some jank with the windows on the web upload
+# TODO: This should clean up the "res.tres" files after they're used
 
 signal file_uploaded(file_data : PackedByteArray) ## Emitted when a non-resource is uploaded by the user
 signal resource_uploaded(resource : Resource) ## Emitted when a resource is uploaded by the user
-signal file_upload_cancelled() ## Emitted when file-upload is cancelled
+signal file_upload_cancelled() ## Emitted when a file-upload is cancelled
 
 var process_ongoing : bool = false ## Whether we have a file dialog open right now
 var current_dialog : FileDialog ## Reference to the current file dialog if there is one so it can be freed
@@ -18,7 +28,14 @@ var current_faw : FileAccessWeb ## Reference to the current file access web obje
 func download_data(input_data : Variant, default_filename : String, filetypes : String, resource : bool) -> void:
 	# If build is running in the browser
 	if (OS.has_feature("web") == true):
-		var data : PackedByteArray = var_to_bytes_with_objects(input_data)
+		var data : PackedByteArray
+		if (resource == true):
+			var path = "res.tres"
+			ResourceSaver.save(input_data, path)
+			data = FileAccess.get_file_as_bytes(path)
+		else:
+			data = var_to_bytes_with_objects(input_data)
+		
 		JavaScriptBridge.download_buffer(data, default_filename)
 
 	# If build is not running in the browser
@@ -66,7 +83,9 @@ func upload_data(filetypes : String, resource : bool) -> void:
 		current_faw.error.connect(_web_upload_cancelled)
 		
 		# Opening the pop-up window
-		current_faw.open(filetypes)
+		# Annoyingly, FAW takes the filetype parameter in a different way than the dialog window
+		# It wants ".jpg, .png" and not "*.jpg, *.png", hence the replace call
+		current_faw.open(filetypes.replace("*", ""))
 
 
 	# If build is not running in the browser
@@ -103,9 +122,9 @@ func _finish_local_download(path : String) -> void:
 ## Called by the File Access Web object if a file is successfully uploaded
 func _finish_web_upload(_file_name : String, _file_type : String, file_data : String) -> void:
 	if (is_type_resource == true):
-		var path = "res://temp_files/res.tres"
+		var path = "res.tres"
 		var file = FileAccess.open(path, FileAccess.WRITE)
-		file.store_buffer(var_to_bytes_with_objects(file_data))
+		file.store_buffer(Marshalls.base64_to_raw(file_data))
 		file.close()
 		var resource = ResourceLoader.load(path)
 		resource_uploaded.emit(resource)
