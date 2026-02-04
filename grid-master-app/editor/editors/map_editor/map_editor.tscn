@@ -1,24 +1,25 @@
-[gd_scene load_steps=25 format=3 uid="uid://nwroc3fkan84"]
+[gd_scene load_steps=26 format=3 uid="uid://nwroc3fkan84"]
 
-[ext_resource type="Script" uid="uid://c30cixnwoblrw" path="res://scripts/map_editor_scripts/main_scripts/map_editor_main.gd" id="1_7x244"]
-[ext_resource type="Script" uid="uid://pfgcd2tk24gn" path="res://scripts/map_editor_scripts/other/sub_viewport_script.gd" id="2_qqlts"]
-[ext_resource type="Script" uid="uid://cs6w2hy2ibo16" path="res://scripts/map_editor_scripts/open_popup/open_settings_popup.gd" id="3_cekfr"]
-[ext_resource type="Script" uid="uid://6g2o1upyh5q4" path="res://scripts/map_editor_scripts/other/map_camera_script.gd" id="3_x2l8i"]
-[ext_resource type="Script" uid="uid://b2q7gxxdh3w6v" path="res://scripts/map_editor_scripts/open_popup/open_save_tactical_grid_popup.gd" id="4_1xdc5"]
-[ext_resource type="Texture2D" uid="uid://doqe1u6vume5c" path="res://sprites/map_editor_sprites/grid_invis.png" id="4_woml6"]
-[ext_resource type="Script" uid="uid://b0ctigp6j0fim" path="res://scripts/map_editor_scripts/button_scripts/set_to_erase.gd" id="4_x2l8i"]
-[ext_resource type="Script" uid="uid://dgeudson3p1wa" path="res://scripts/map_editor_scripts/other/tile_grid_gen.gd" id="5_7x244"]
-[ext_resource type="Script" uid="uid://d4njvsv5v0y1u" path="res://scripts/map_editor_scripts/button_scripts/load_from_file_button.gd" id="5_41jle"]
-[ext_resource type="Script" uid="uid://dtp2ue4bwuyq6" path="res://scripts/map_editor_scripts/button_scripts/set_to_interact.gd" id="5_yhpca"]
-[ext_resource type="Script" uid="uid://xlo37wc3iykq" path="res://scripts/map_editor_scripts/button_scripts/change_grid_view.gd" id="6_8b7ru"]
-[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/EditorPanel.tscn" id="6_woml6"]
-[ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/PanelItem.tscn" id="7_woml6"]
-[ext_resource type="Script" uid="uid://bg4hv7x0k1qvk" path="res://scripts/map_editor_scripts/open_popup/open_new_tile_popup.gd" id="8_7x244"]
-[ext_resource type="Texture2D" uid="uid://dp1ky8epuaiv" path="res://sprites/map_editor_sprites/grid_invis_highlight.png" id="9_t7crc"]
-[ext_resource type="Texture2D" uid="uid://cy4pdp1xl7ssw" path="res://sprites/map_editor_sprites/grid_invis_highlight_pink.png" id="11_jdx3v"]
-[ext_resource type="Script" uid="uid://cvjm52agqrh1q" path="res://scripts/map_editor_scripts/button_scripts/add_new_tact_map.gd" id="12_rqsyi"]
-[ext_resource type="Script" uid="uid://4hv8nyi5ol0u" path="res://scripts/map_editor_scripts/button_scripts/edit_tactical_button.gd" id="17_0v43f"]
-[ext_resource type="Script" uid="uid://dpoq4lw1cl5ni" path="res://scripts/map_editor_scripts/button_scripts/remove_tactical_grid_button.gd" id="18_ato2m"]
+[ext_resource type="Script" uid="uid://c30cixnwoblrw" path="res://editor/scripts/map_editor_scripts/main_scripts/map_editor_main.gd" id="1_7x244"]
+[ext_resource type="Script" uid="uid://pfgcd2tk24gn" path="res://editor/scripts/map_editor_scripts/other/sub_viewport_script.gd" id="2_qqlts"]
+[ext_resource type="Script" uid="uid://cs6w2hy2ibo16" path="res://editor/scripts/map_editor_scripts/open_popup/open_settings_popup.gd" id="3_cekfr"]
+[ext_resource type="Script" uid="uid://6g2o1upyh5q4" path="res://editor/scripts/map_editor_scripts/other/map_camera_script.gd" id="3_x2l8i"]
+[ext_resource type="Script" uid="uid://b2q7gxxdh3w6v" path="res://editor/scripts/map_editor_scripts/open_popup/open_save_tactical_grid_popup.gd" id="4_1xdc5"]
+[ext_resource type="Texture2D" uid="uid://doqe1u6vume5c" path="res://editor/sprites/map_editor_sprites/grid_invis.png" id="4_woml6"]
+[ext_resource type="Script" uid="uid://b0ctigp6j0fim" path="res://editor/scripts/map_editor_scripts/button_scripts/set_to_erase.gd" id="4_x2l8i"]
+[ext_resource type="Script" uid="uid://dgeudson3p1wa" path="res://editor/scripts/map_editor_scripts/other/tile_grid_gen.gd" id="5_7x244"]
+[ext_resource type="Script" uid="uid://d4njvsv5v0y1u" path="res://editor/scripts/map_editor_scripts/button_scripts/load_from_file_button.gd" id="5_41jle"]
+[ext_resource type="Script" uid="uid://dtp2ue4bwuyq6" path="res://editor/scripts/map_editor_scripts/button_scripts/set_to_interact.gd" id="5_yhpca"]
+[ext_resource type="Script" uid="uid://xlo37wc3iykq" path="res://editor/scripts/map_editor_scripts/button_scripts/change_grid_view.gd" id="6_8b7ru"]
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="6_woml6"]
+[ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editor/editors/common/editor_panel/PanelItem.tscn" id="7_woml6"]
+[ext_resource type="Script" uid="uid://bg4hv7x0k1qvk" path="res://editor/scripts/map_editor_scripts/open_popup/open_new_tile_popup.gd" id="8_7x244"]
+[ext_resource type="Texture2D" uid="uid://dp1ky8epuaiv" path="res://editor/sprites/map_editor_sprites/grid_invis_highlight.png" id="9_t7crc"]
+[ext_resource type="Texture2D" uid="uid://cy4pdp1xl7ssw" path="res://editor/sprites/map_editor_sprites/grid_invis_highlight_pink.png" id="11_jdx3v"]
+[ext_resource type="Script" uid="uid://cvjm52agqrh1q" path="res://editor/scripts/map_editor_scripts/button_scripts/add_new_tact_map.gd" id="12_rqsyi"]
+[ext_resource type="Script" uid="uid://4hv8nyi5ol0u" path="res://editor/scripts/map_editor_scripts/button_scripts/edit_tactical_button.gd" id="17_0v43f"]
+[ext_resource type="Script" uid="uid://dpoq4lw1cl5ni" path="res://editor/scripts/map_editor_scripts/button_scripts/remove_tactical_grid_button.gd" id="18_ato2m"]
+[ext_resource type="PackedScene" uid="uid://cehdpht6a7iw8" path="res://common/file_upload_download/file_transfer_manager.tscn" id="20_32giu"]
 
 [sub_resource type="TileSet" id="TileSet_3s3gj"]
 tile_size = Vector2i(64, 64)
@@ -64,6 +65,7 @@ grow_vertical = 2
 [node name="EditorPanel" parent="VBoxContainer" instance=ExtResource("6_woml6")]
 custom_minimum_size = Vector2(0, 70)
 layout_mode = 2
+section_headers = Array[String](["HBoxContainer"])
 
 [node name="TopLabel" parent="VBoxContainer/EditorPanel/TopVBox" index="0"]
 text = "Map Editor"
@@ -145,6 +147,7 @@ script = ExtResource("3_x2l8i")
 [node name="EditorPanel" parent="VBoxContainer/HBoxContainer" instance=ExtResource("6_woml6")]
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
+section_headers = Array[String](["Current tile", "Tile library", "Tactical library", "Tactical Options"])
 
 [node name="Current tile" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
 layout_mode = 2
@@ -360,16 +363,7 @@ size_flags_horizontal = 3
 text = "Remove"
 script = ExtResource("18_ato2m")
 
-[node name="SaveDialog" type="FileDialog" parent="."]
-oversampling_override = 1.0
-access = 2
-filters = PackedStringArray("*.tres")
-
-[node name="LoadDialog" type="FileDialog" parent="."]
-title = "Open a File"
-file_mode = 0
-access = 2
-filters = PackedStringArray("*.tres")
+[node name="FileTransferManager" parent="." instance=ExtResource("20_32giu")]
 
 [editable path="VBoxContainer/EditorPanel"]
 [editable path="VBoxContainer/HBoxContainer/EditorPanel"]

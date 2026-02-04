@@ -17,8 +17,6 @@ var resources : Array[String] = []
 var editor_main : EditorMain
 @onready var tree_panel : FileTreePanel = $HBoxContainer/UnitTreePanel
 @onready var info_panel : UnitInfoPanel = $HBoxContainer/VBoxContainer/UnitInfoPanel
-@onready var save_dialog : FileDialog = $Dialogs/SaveUnitDialog
-@onready var load_dialog : FileDialog = $Dialogs/LoadUnitDialog
 @onready var action_panel : ActionPanel = $HBoxContainer/ActionPanel
 @onready var ftm : FileTransferManager = $Dialogs/FileTransferManager
 
@@ -27,39 +25,30 @@ func update_name_in_tree(new_name : String):
 	if (unit_resource != null):
 		tree_panel.update_selected_name(new_name)
 
-# called when the user clicks the save button
-func show_save_dialog():
+## Saves a unit to file
+##
+## Called when the user clicks the save button
+func save_to_file():
+	if (unit_resource == null): return
 	save_to_resource.emit(unit_resource)
-	# save_dialog.show()
 	ftm.download_data(unit_resource, "Resource.tres", "*.tres", true)
 	
-# called when the user clicks the load button
-func show_load_dialog():
-	# load_dialog.show()
-	ftm.resource_uploaded.connect(ftm_resource_load)
-	ftm.file_upload_cancelled.connect(ftm_cancel)
+## Loads a unit from file.
+##
+## Called when the user clicks the load button.
+func load_from_file():
 	ftm.upload_data("*.tres", true)
 
-# called by the save dialog itself if a filepath is selected
-func save_to_file(path : String):
-	ResourceSaver.save(unit_resource, path)
-	
-# called by the load dialog itself if a filepath is selected
-func load_from_file(path : String):
-	if (ResourceLoader.exists(path)):
-		var data : UnitResource = ResourceLoader.load(path) as UnitResource
-		tree_panel.add_unit_from_resource(data)
 
-
-func ftm_resource_load(resource : Resource):
+## Loads a resource
+func load_resource(resource : Resource):
 	tree_panel.add_unit_from_resource(resource)
 
-
-func ftm_cancel():
-	ftm.resource_uploaded.disconnect(ftm_resource_load)
-	ftm.file_upload_cancelled.disconnect(ftm_cancel)
 	
-		
+
+## Loads in a new set of units from an array to replace current ones.
+##
+## Called by the editor main when loading in a game definition
 func set_units(units_p : Array[UnitResource]):
 	tree_panel.set_units(units_p)
 		
@@ -92,11 +81,10 @@ func _ready() -> void:
 	
 	action_panel.update_resource_array(resources)
 	
-	save_dialog.file_selected.connect(save_to_file)
-	load_dialog.file_selected.connect(load_from_file)
+	info_panel.get_save_button().button_up.connect(save_to_file)
+	info_panel.get_load_button().button_up.connect(load_from_file)
 	
-	info_panel.get_save_button().button_up.connect(show_save_dialog)
-	info_panel.get_load_button().button_up.connect(show_load_dialog)
+	ftm.resource_uploaded.connect(load_resource)
 	
 	update_resources.emit(resources)
 	

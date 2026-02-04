@@ -10,6 +10,8 @@ enum InputState {
 	PAINT_TACTICAL
 }
 
+@onready var ftm : FileTransferManager = $FileTransferManager
+
 @onready var tact_options = $"VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tactical Options"
 @onready var grid_view_button = $VBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer/grid_view_button
 @onready var tact_lib = $"VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tactical library"
@@ -20,8 +22,6 @@ enum InputState {
 @onready var cam = $VBoxContainer/HBoxContainer/SubViewControl/SubViewportContainer/SubViewport/Camera2D
 @onready var subview = $VBoxContainer/HBoxContainer/SubViewControl/SubViewportContainer/SubViewport
 @onready var subview_cont = $VBoxContainer/HBoxContainer/SubViewControl/SubViewportContainer
-@onready var save_dialog = $SaveDialog
-@onready var load_dialog = $LoadDialog
 
 var width: Dictionary = {}
 var height: Dictionary = {}
@@ -367,8 +367,8 @@ func _ready():
 	setup_tile_lib_map()
 	setup_swap_callables_map()
 	background_grid.regenerate()
-	save_dialog.file_selected.connect(save_game_map)
-	load_dialog.file_selected.connect(load_game_map)
+	
+	ftm.resource_uploaded.connect(load_from_data)
 
 func resize(x: int, y: int): 
 	resize_tile_grid_map(x, y)
@@ -484,14 +484,6 @@ func saveMapToResource() -> GameMap:
 	new_game_map.texture_map = load_sources(tile_grid)
 	new_game_map.tactical_grid_thumbnail_texture_map = tactical_grid_texture_map
 	return new_game_map
-
-
-func save_game_map(path: String): 
-	var new_game_map = saveMapToResource()
-	
-	var err := ResourceSaver.save(new_game_map, path)
-	if err != OK:
-		push_error("Failed to save GameMap: %s" % err)
 	
 
 
@@ -545,7 +537,14 @@ func load_game_map(path: String):
 		var data : GameMap = ResourceLoader.load(path) as GameMap
 		load_from_data(data) 
 	
+
+func save_button_pressed():
+	var new_game_map = saveMapToResource()
+	ftm.download_data(new_game_map, "game_map.tres", "*.tres", true)
 	
+
+func load_button_pressed():
+	ftm.upload_data("*.tres", true)
 	
 	
 	

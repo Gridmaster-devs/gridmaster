@@ -21,28 +21,6 @@ script = ExtResource("2_k1fjl")
 
 [node name="Dialogs" type="Node" parent="."]
 
-[node name="SaveUnitDialog" type="FileDialog" parent="Dialogs"]
-display_mode = 1
-access = 2
-filters = PackedStringArray("*.tres")
-
-[node name="LoadUnitDialog" type="FileDialog" parent="Dialogs"]
-title = "Open a File"
-initial_position = 1
-ok_button_text = "Load"
-file_mode = 0
-display_mode = 1
-access = 2
-filters = PackedStringArray("*.tres")
-
-[node name="SelectImageDialog" type="FileDialog" parent="Dialogs"]
-oversampling_override = 1.0
-title = "Open a File"
-initial_position = 1
-file_mode = 0
-access = 2
-filters = PackedStringArray("*.jpeg", "*.png")
-
 [node name="FileTransferManager" parent="Dialogs" instance=ExtResource("3_03owb")]
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
@@ -408,8 +386,6 @@ vertical_alignment = 1
 [node name="ActionPanel" parent="HBoxContainer" instance=ExtResource("7_ip3j4")]
 layout_mode = 2
 size_flags_horizontal = 3
-
-[connection signal="file_selected" from="Dialogs/SelectImageDialog" to="Dialogs" method="_set_image"]
 
 [editable path="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel"]
 [editable path="HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel"]

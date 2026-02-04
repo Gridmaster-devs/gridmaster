@@ -12,6 +12,9 @@ extends Node
 # TODO: There is some jank with the windows on the web upload
 # TODO: This should clean up the "res.tres" files after they're used
 
+# NOTE: The temp files shouldn't start colliding because you'd need 2 perfectly timed
+# downloads at the same time, but it's not impossible
+
 signal file_uploaded(file_data : PackedByteArray) ## Emitted when a non-resource is uploaded by the user
 signal resource_uploaded(resource : Resource) ## Emitted when a resource is uploaded by the user
 signal file_upload_cancelled() ## Emitted when a file-upload is cancelled

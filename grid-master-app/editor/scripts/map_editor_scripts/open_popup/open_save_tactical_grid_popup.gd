@@ -14,6 +14,6 @@ func _on_button_pressed():
 		save_tactical_grid_popup.parent_ref = parent_ref
 		save_tactical_grid_popup.set_tactical_grid_name(parent_ref.cur_tactical_grid_name)
 	elif parent_ref.cur_gw == parent_ref.GridView.STRATEGIC: 
-		parent_ref.save_dialog.visible = true
+		parent_ref.save_button_pressed()
 	
 	
