@@ -24,7 +24,7 @@ var is_type_resource : bool ## Whether the uploaded / downloaded data is a resou
 var current_faw : FileAccessWeb ## Reference to the current file access web object for uploading
 
 
-## Prompts the user for a download of a file with a specific content and filename
+## Prompts the user for a download of a file with a specific content and filename.
 func download_data(input_data : Variant, default_filename : String, filetypes : String, resource : bool) -> void:
 	# If build is running in the browser
 	if (OS.has_feature("web") == true):
@@ -61,9 +61,9 @@ func download_data(input_data : Variant, default_filename : String, filetypes : 
 		dialog.show()
 
 
-## Gives the user an upload window to upload a file
+## Gives the user an upload window to upload a file.
 ##
-## You MUST connect to the file_uploaded signal before you call this function
+## You MUST connect to the file_uploaded signal before you call this function.
 func upload_data(filetypes : String, resource : bool) -> void:
 
 	# if we have another upload / download already going
@@ -105,9 +105,9 @@ func upload_data(filetypes : String, resource : bool) -> void:
 		current_dialog.show()
 
 
-## Finishes the local download
+## Finishes the local download.
 ##
-## Called by the dialog window when a filepath is selected
+## Called by the dialog window when a filepath is selected.
 func _finish_local_download(path : String) -> void:
 	if (is_type_resource == true):
 		ResourceSaver.save(current_data, path)
@@ -117,9 +117,9 @@ func _finish_local_download(path : String) -> void:
 
 	_process_done()
 
-## Finishes a web upload
+## Finishes a web upload.
 ##
-## Called by the File Access Web object if a file is successfully uploaded
+## Called by the File Access Web object if a file is successfully uploaded.
 func _finish_web_upload(_file_name : String, _file_type : String, file_data : String) -> void:
 	if (is_type_resource == true):
 		var path = "res.tres"
@@ -134,18 +134,18 @@ func _finish_web_upload(_file_name : String, _file_type : String, file_data : St
 	_process_done()
 
 
-## Called when a web upload is cancelled
+## Called when a web upload is cancelled.
 ##
-## Called by the File Access Web object if a file fails to upload or if the user cancels
-func _web_upload_cancelled():
+## Called by the File Access Web object if a file fails to upload or if the user cancels.
+func _web_upload_cancelled() -> void:
 	file_upload_cancelled.emit()
 	
 	_process_done()
 
 
-## Finishes a local upload
+## Finishes a local upload.
 ##
-## Called by the dialog window if the user selects a file
+## Called by the dialog window if the user selects a file.
 func _finish_local_upload(path : String) -> void:
 	if (is_type_resource == true):
 		var data = ResourceLoader.load(path)
@@ -164,18 +164,18 @@ func _finish_local_upload(path : String) -> void:
 	_process_done()
 
 
-## Called when a local upload is cancelled
+## Called when a local upload is cancelled.
 ##
-## Called by the dialog box if the user closes it or presses cancel
+## Called by the dialog box if the user closes it or presses cancel.
 func _local_upload_cancelled() -> void:
 	file_upload_cancelled.emit()
 	
 	_process_done()
 	
 
-## Frees resources and sets the FTM object to a neutral state
+## Frees resources and sets the FTM object to a neutral state.
 ##
-## Called by various functions at the end of a process
+## Called by various functions at the end of a process.
 func _process_done() -> void:
 	process_ongoing = false
 	if (current_dialog != null):
