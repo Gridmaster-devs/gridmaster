@@ -33,7 +33,9 @@ func download_data(input_data : Variant, default_filename : String, filetypes : 
 	if (OS.has_feature("web") == true):
 		var data : PackedByteArray
 		if (resource == true):
-			var path = "res.tres"
+			var dir := DirAccess.create_temp("temp", false)
+			var path : String = dir.get_current_dir() + "res.tres"
+
 			ResourceSaver.save(input_data, path)
 			data = FileAccess.get_file_as_bytes(path)
 		else:
@@ -125,10 +127,14 @@ func _finish_local_download(path : String) -> void:
 ## Called by the File Access Web object if a file is successfully uploaded.
 func _finish_web_upload(_file_name : String, _file_type : String, file_data : String) -> void:
 	if (is_type_resource == true):
-		var path = "res.tres"
+		
+		var dir := DirAccess.create_temp("temp", false)
+		var path : String = dir.get_current_dir() + "res.tres"
+		
 		var file = FileAccess.open(path, FileAccess.WRITE)
 		file.store_buffer(Marshalls.base64_to_raw(file_data))
 		file.close()
+		
 		var resource = ResourceLoader.load(path)
 		resource_uploaded.emit(resource)
 	else:
