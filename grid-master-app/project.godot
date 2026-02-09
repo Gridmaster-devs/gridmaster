@@ -14,10 +14,12 @@ config/name="GridMasterApp"
 run/main_scene="uid://nxldab0hpse0"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
+run/main_scene.executioner="uid://cpsdnpca0xb06"
+run/main_scene.editor="uid://nxldab0hpse0"
 
 [autoload]
 
-GML="*res://executioner/common/GML.gd"
+GML="*res://common/GML.gd"
 
 [display]
 
@@ -37,6 +39,10 @@ folder_colors={
 "res://resources/": "yellow",
 "res://themes/": "pink"
 }
+
+[global]
+
+main_scene.executioner=NodePath("")
 
 [rendering]
 

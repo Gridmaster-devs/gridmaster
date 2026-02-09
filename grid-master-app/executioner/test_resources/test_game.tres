@@ -1,13 +1,13 @@
 [gd_resource type="Resource" script_class="GameDefinitionResource" load_steps=48 format=3]
 
-[ext_resource type="Script" path="res://editor/scripts/map_editor_scripts/classes/grid.gd" id="1_p5ugl"]
-[ext_resource type="Script" path="res://editor/scripts/map_editor_scripts/classes/game_map.gd" id="2_exsyq"]
-[ext_resource type="Script" path="res://editor/scripts/map_editor_scripts/classes/strategic_tile_information.gd" id="3_6t4o2"]
-[ext_resource type="Script" path="res://editor/scripts/map_editor_scripts/classes/tactical_tile_information.gd" id="4_gbn7s"]
-[ext_resource type="Script" path="res://editor/resources/game_definition_resource.gd" id="5_vyyjx"]
-[ext_resource type="Script" path="res://editor/resources/units/unit_resource.gd" id="6_426x6"]
-[ext_resource type="Script" path="res://editor/resources/units/Actions/Action.gd" id="7_6ux24"]
-[ext_resource type="Script" path="res://editor/resources/units/attribute.gd" id="8_2q606"]
+[ext_resource type="Script" uid="uid://cob8v1v2epjv3" path="res://common/resources/map_editor/classes/grid.gd" id="1_p5ugl"]
+[ext_resource type="Script" uid="uid://jhqbai3y4qt3" path="res://common/resources/map_editor/classes/game_map.gd" id="2_exsyq"]
+[ext_resource type="Script" uid="uid://db3ksdw4bedm7" path="res://common/resources/map_editor/classes/strategic_tile_information.gd" id="3_6t4o2"]
+[ext_resource type="Script" uid="uid://q0mcf3188k2n" path="res://common/resources/map_editor/classes/tactical_tile_information.gd" id="4_gbn7s"]
+[ext_resource type="Script" uid="uid://b03l7cwr1mnen" path="res://common/resources/game_definition_resource.gd" id="5_vyyjx"]
+[ext_resource type="Script" uid="uid://rhmurm0urx3r" path="res://common/resources/unit_editor/units/unit_resource.gd" id="6_426x6"]
+[ext_resource type="Script" uid="uid://foooxj4ood8w" path="res://common/resources/unit_editor/units/Actions/Action.gd" id="7_6ux24"]
+[ext_resource type="Script" uid="uid://jvuhdliiwhuv" path="res://common/resources/unit_editor/units/attribute.gd" id="8_2q606"]
 
 [sub_resource type="Resource" id="Resource_77w3f"]
 script = ExtResource("1_p5ugl")

@@ -4,6 +4,7 @@ extends Control
 @onready var ftm : FileTransferManager = $Dialogs/FileTransferManager
 @onready var grid_graphics : GridGraphics = $"Grid Graphics"
 @onready var game_name_box : Label = $"Game Name"
+@onready var load_game_button : Button = $LoadGameButton
 var game_master : GameMaster
 
 
@@ -37,6 +38,7 @@ func linkGameMaster(game_master_p : GameMaster) -> void:
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	load_game_button.pressed.connect(openLoadGameDialog)
 	ftm.resource_uploaded.connect(loadGameDefinition)
 
 
