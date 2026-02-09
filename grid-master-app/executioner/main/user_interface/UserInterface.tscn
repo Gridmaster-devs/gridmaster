@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://ce70msfolg6m7"]
+[gd_scene load_steps=3 format=3 uid="uid://ce70msfolg6m7"]
 
 [ext_resource type="Script" uid="uid://kxt1x2hof6tg" path="res://executioner/main/user_interface/UserInterface.gd" id="1_d4x01"]
+[ext_resource type="PackedScene" uid="uid://cehdpht6a7iw8" path="res://common/file_upload_download/file_transfer_manager.tscn" id="2_311cg"]
 
 [node name="User Interface" type="Control"]
 layout_mode = 3
@@ -13,8 +14,4 @@ script = ExtResource("1_d4x01")
 
 [node name="Dialogs" type="Node" parent="."]
 
-[node name="Load game dialog" type="FileDialog" parent="Dialogs"]
-title = "Open a File"
-file_mode = 0
-access = 2
-filters = PackedStringArray("*.tres")
+[node name="FileTransferManager" parent="Dialogs" instance=ExtResource("2_311cg")]
