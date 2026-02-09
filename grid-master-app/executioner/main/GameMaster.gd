@@ -76,7 +76,6 @@ func debugInitGame() -> void:
 
 ## Initializes the user interface and graphics elements at the start of the game
 func initGraphics() -> void:
-	user_interface.linkGameMaster(self)
 	user_interface.initFromGameState(game_state)
 
 

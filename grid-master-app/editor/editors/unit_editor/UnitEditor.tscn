@@ -71,7 +71,6 @@ layout_mode = 2
 attribute_name = "movement_type"
 text = "Movement type"
 type = 2
-items = Array[String](["Walking", "Tires", "Tracks", "Hovering", "Teleporting", "Water", "Flying"])
 
 [node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Movement/Movement type"]
 layout_mode = 2

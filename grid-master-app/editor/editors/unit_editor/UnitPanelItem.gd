@@ -15,7 +15,7 @@ func save_to_unit_resource(resource_p : UnitResource):
 		resource_p.set_attribute(attribute_name, get_value())
 
 
-func load_from_unit_resource(resource_p : UnitResourceDict):
+func load_from_unit_resource(resource_p : UnitResource):
 	if (resource_p != null):
 		var value = resource_p.get_attribute_value(attribute_name)
 		if (value != null):
