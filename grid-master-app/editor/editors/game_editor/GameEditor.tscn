@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://bo7oe8477f30h"]
+[gd_scene load_steps=3 format=3 uid="uid://bo7oe8477f30h"]
 
-[ext_resource type="Script" uid="uid://rm27rb7okfxv" path="res://editors/game_editor/game_editor.gd" id="1_rp7ar"]
+[ext_resource type="Script" uid="uid://rm27rb7okfxv" path="res://editor/editors/game_editor/game_editor.gd" id="1_rp7ar"]
+[ext_resource type="PackedScene" uid="uid://cehdpht6a7iw8" path="res://common/file_upload_download/file_transfer_manager.tscn" id="2_n3gfw"]
 
 [node name="Game Editor" type="Control"]
 layout_mode = 3
@@ -39,16 +40,4 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="SaveUnitDialog" type="FileDialog" parent="Dialogs"]
-display_mode = 1
-access = 2
-filters = PackedStringArray("*.tres")
-
-[node name="LoadUnitDialog" type="FileDialog" parent="Dialogs"]
-title = "Open a File"
-initial_position = 1
-ok_button_text = "Load"
-file_mode = 0
-display_mode = 1
-access = 2
-filters = PackedStringArray("*.tres")
+[node name="FileTransferManager" parent="Dialogs" instance=ExtResource("2_n3gfw")]

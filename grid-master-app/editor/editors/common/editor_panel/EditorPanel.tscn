@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://duyxluc3ja031"]
 
-[ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://themes/editor-theme.tres" id="1_38p7f"]
-[ext_resource type="Script" uid="uid://gk6a0hyjl081" path="res://editors/common/editor_panel/editor_panel.gd" id="2_ifgyv"]
+[ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://editor/themes/editor-theme.tres" id="1_38p7f"]
+[ext_resource type="Script" uid="uid://gk6a0hyjl081" path="res://editor/editors/common/editor_panel/editor_panel.gd" id="2_ifgyv"]
 
 [node name="EditorPanel" type="PanelContainer"]
 anchors_preset = 15

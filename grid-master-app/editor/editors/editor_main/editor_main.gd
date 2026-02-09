@@ -8,13 +8,13 @@ extends Node
 
 # gets the units from the unit editor
 # TODO: get a unit pack when those are implemented
-func get_units() -> Array[UnitResourceDict]:
+func get_units() -> Array[UnitResource]:
 	return unit_editor.get_units()
 
 
 # tells the unit editor to replace the units with the ones from the array
 # TODO: Use a unit pack when those are implemented
-func set_units(units_p : Array[UnitResourceDict]):
+func set_units(units_p : Array[UnitResource]):
 	unit_editor.set_units(units_p)
 
 
@@ -31,8 +31,3 @@ func _ready() -> void:
 	unit_editor.link_editor_main(self)
 	game_editor.link_editor_main(self)
 	# TODO: ADD MAP EDITOR LINK
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass

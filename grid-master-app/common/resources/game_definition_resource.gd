@@ -2,15 +2,15 @@ class_name GameDefinitionResource
 extends Resource
 
 @export var game_name : String
-@export var units : Array[UnitResourceDict]
+@export var units : Array[UnitResource]
 @export var map : GameMap
 
-func save_units(unit_array : Array[UnitResourceDict]):
+func save_units(unit_array : Array[UnitResource]):
 	if (unit_array != null):
 		units.clear()
 		units = unit_array.duplicate_deep()
 
-func load_units() -> Array[UnitResourceDict]:
+func load_units() -> Array[UnitResource]:
 	return units.duplicate_deep()
 	
 

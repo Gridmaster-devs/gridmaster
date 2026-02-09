@@ -16,7 +16,7 @@ Then simply run
 
 Which will run the default compose file `compose.yaml`.
 
-Now when you pop `localhost:8080` in your browser, you'll be able to access the nginx web server that serves the game editor (the only real component of the app for now).
+Now when you pop `localhost:8080` in your browser, you'll be able to access the nginx web server that serves the game editor, and you'll find the game executioner at `localhost:8081`.
 
 ## TODO
 

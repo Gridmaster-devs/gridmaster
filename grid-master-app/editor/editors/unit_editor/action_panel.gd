@@ -35,13 +35,13 @@ func add_action_from_resource(action : Action):
 	actions_box.add_child(scene)
 	scene.load_from_action(action)
 	
-func save_to_resource(unit_resource : UnitResourceDict):
+func save_to_resource(unit_resource : UnitResource):
 	if (unit_resource != null):
 		var action_array : Array[Action] = []
 		save_to_action_array.emit(action_array)
 		unit_resource.save_actions(action_array)
 	
-func load_from_resource(unit_resource : UnitResourceDict):
+func load_from_resource(unit_resource : UnitResource):
 	
 	reset_children()
 	
@@ -62,13 +62,7 @@ func link_unit_editor(ue : UnitEditor):
 	unit_editor = ue
 	unit_editor.save_to_resource.connect(save_to_resource)
 	unit_editor.load_from_resource.connect(load_from_resource)
-	unit_editor.reset.connect(reset_children)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	add_action_button.button_up.connect(add_action)
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass

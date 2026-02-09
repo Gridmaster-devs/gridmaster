@@ -76,7 +76,6 @@ func debugInitGame() -> void:
 
 ## Initializes the user interface and graphics elements at the start of the game
 func initGraphics() -> void:
-	user_interface.linkGameMaster(self)
 	user_interface.initFromGameState(game_state)
 
 
@@ -109,4 +108,3 @@ func debugTest():
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	user_interface.linkGameMaster(self)
-	user_interface.openLoadGameDialog()

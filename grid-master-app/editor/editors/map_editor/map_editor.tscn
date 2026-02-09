@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://nwroc3fkan84"]
+[gd_scene load_steps=26 format=3 uid="uid://nwroc3fkan84"]
 
 [ext_resource type="Script" uid="uid://c30cixnwoblrw" path="res://editor/scripts/map_editor_scripts/main_scripts/map_editor_main.gd" id="1_7x244"]
 [ext_resource type="Script" uid="uid://pfgcd2tk24gn" path="res://editor/scripts/map_editor_scripts/other/sub_viewport_script.gd" id="2_qqlts"]
@@ -19,6 +19,7 @@
 [ext_resource type="Script" uid="uid://cvjm52agqrh1q" path="res://editor/scripts/map_editor_scripts/button_scripts/add_new_tact_map.gd" id="12_rqsyi"]
 [ext_resource type="Script" uid="uid://4hv8nyi5ol0u" path="res://editor/scripts/map_editor_scripts/button_scripts/edit_tactical_button.gd" id="17_0v43f"]
 [ext_resource type="Script" uid="uid://dpoq4lw1cl5ni" path="res://editor/scripts/map_editor_scripts/button_scripts/remove_tactical_grid_button.gd" id="18_ato2m"]
+[ext_resource type="PackedScene" uid="uid://cehdpht6a7iw8" path="res://common/file_upload_download/file_transfer_manager.tscn" id="20_32giu"]
 
 [sub_resource type="TileSet" id="TileSet_3s3gj"]
 tile_size = Vector2i(64, 64)
@@ -64,6 +65,7 @@ grow_vertical = 2
 [node name="EditorPanel" parent="VBoxContainer" instance=ExtResource("6_woml6")]
 custom_minimum_size = Vector2(0, 70)
 layout_mode = 2
+section_headers = Array[String](["HBoxContainer"])
 
 [node name="TopLabel" parent="VBoxContainer/EditorPanel/TopVBox" index="0"]
 text = "Map Editor"
@@ -145,6 +147,7 @@ script = ExtResource("3_x2l8i")
 [node name="EditorPanel" parent="VBoxContainer/HBoxContainer" instance=ExtResource("6_woml6")]
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
+section_headers = Array[String](["Current tile", "Tile library", "Tactical library", "Tactical Options"])
 
 [node name="Current tile" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
 layout_mode = 2
@@ -360,16 +363,7 @@ size_flags_horizontal = 3
 text = "Remove"
 script = ExtResource("18_ato2m")
 
-[node name="SaveDialog" type="FileDialog" parent="."]
-oversampling_override = 1.0
-access = 2
-filters = PackedStringArray("*.tres")
-
-[node name="LoadDialog" type="FileDialog" parent="."]
-title = "Open a File"
-file_mode = 0
-access = 2
-filters = PackedStringArray("*.tres")
+[node name="FileTransferManager" parent="." instance=ExtResource("20_32giu")]
 
 [editable path="VBoxContainer/EditorPanel"]
 [editable path="VBoxContainer/HBoxContainer/EditorPanel"]

@@ -6,7 +6,7 @@ extends PanelContainer
 # This does require there to be some indirect calls with the unit editor relaying
 # the information / signal / function call forward to its children
 
-var unit_resources : Array[UnitResourceDict] = []
+var unit_resources : Array[UnitResource] = []
 var units : int = 0
 
 var unit_editor : UnitEditor
@@ -30,11 +30,11 @@ func add_unit():
 	var item : TreeItem = tree.create_item(null, units)
 	units += 1
 	item.set_text(0, "Unnamed unit")
-	unit_resources.append(UnitResourceDict.new())
+	unit_resources.append(UnitResource.new())
 
 
 # only called when a unit is loaded from a file
-func add_unit_from_resource(unit_resource : UnitResourceDict):
+func add_unit_from_resource(unit_resource : UnitResource):
 	var item : TreeItem = tree.create_item(null, units)
 	units += 1
 	var unit_name = unit_resource.get_attribute_value("name")
@@ -76,11 +76,11 @@ func link_unit_editor(ue : UnitEditor):
 	unit_editor = ue
 
 
-func get_units() -> Array[UnitResourceDict]:
+func get_units() -> Array[UnitResource]:
 	return unit_resources
 	
 
-func set_units(units_p : Array[UnitResourceDict]):
+func set_units(units_p : Array[UnitResource]):
 	reset_units()
 	for unit in units_p:
 		add_unit_from_resource(unit)
@@ -93,8 +93,3 @@ func _ready() -> void:
 	
 	add_button.button_up.connect(add_unit)
 	remove_button.button_up.connect(remove_unit)
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
