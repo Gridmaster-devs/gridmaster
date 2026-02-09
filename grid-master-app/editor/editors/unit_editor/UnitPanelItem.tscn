@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://ci5ml18rk2mih"]
 
-[ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://themes/editor-theme.tres" id="1_ts4gi"]
-[ext_resource type="Script" uid="uid://cn7jrqxfu4wr7" path="res://editors/unit_editor/UnitPanelItem.gd" id="2_bfchj"]
+[ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://editor/themes/editor-theme.tres" id="1_ts4gi"]
+[ext_resource type="Script" uid="uid://cn7jrqxfu4wr7" path="res://editor/editors/unit_editor/UnitPanelItem.gd" id="2_bfchj"]
 
 [node name="PanelItem" type="HBoxContainer"]
 anchors_preset = 14

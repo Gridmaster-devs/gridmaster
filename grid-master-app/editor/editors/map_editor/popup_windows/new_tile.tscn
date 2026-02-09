@@ -1,10 +1,10 @@
 [gd_scene load_steps=6 format=3 uid="uid://ds0w463f0tq7w"]
 
-[ext_resource type="Script" uid="uid://b60lcnw54cidu" path="res://scripts/map_editor_scripts/new_tile_scripts/new_tile_root.gd" id="1_p8hom"]
-[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/EditorPanel.tscn" id="1_uhk68"]
-[ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editors/common/editor_panel/PanelItem.tscn" id="2_ilbg8"]
-[ext_resource type="Script" uid="uid://c7dvdg0w230je" path="res://scripts/map_editor_scripts/open_popup/open_tile_color_picker.gd" id="3_4yvtc"]
-[ext_resource type="Script" uid="uid://p45oo81db6vn" path="res://scripts/map_editor_scripts/button_scripts/add_new_tile.gd" id="4_p8hom"]
+[ext_resource type="Script" uid="uid://b60lcnw54cidu" path="res://editor/scripts/map_editor_scripts/new_tile_scripts/new_tile_root.gd" id="1_p8hom"]
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="1_uhk68"]
+[ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editor/editors/common/editor_panel/PanelItem.tscn" id="2_ilbg8"]
+[ext_resource type="Script" uid="uid://c7dvdg0w230je" path="res://editor/scripts/map_editor_scripts/open_popup/open_tile_color_picker.gd" id="3_4yvtc"]
+[ext_resource type="Script" uid="uid://p45oo81db6vn" path="res://editor/scripts/map_editor_scripts/button_scripts/add_new_tile.gd" id="4_p8hom"]
 
 [node name="NewTile" type="Control"]
 layout_mode = 3

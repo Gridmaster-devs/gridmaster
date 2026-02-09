@@ -9,8 +9,8 @@ var parent_ref = null
 func init(parent_path: String): 
 	parent_ref = get_node(parent_path)
 
-func set_tactical_grid_name(name: String): 
-	line_edit.text = name
+func set_tactical_grid_name(grid_name: String): 
+	line_edit.text = grid_name
 
 
 func _gui_input(event):

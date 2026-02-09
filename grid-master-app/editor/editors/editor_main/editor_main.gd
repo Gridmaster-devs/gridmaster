@@ -16,12 +16,12 @@ func get_units() -> Array[UnitResource]:
 # TODO: Use a unit pack when those are implemented
 func set_units(units_p : Array[UnitResource]):
 	unit_editor.set_units(units_p)
-	
-	
+
+
 func getMap() -> GameMap:
 	return map_editor.saveMapToResource()
-	
-	
+
+
 func setMap(map_p : GameMap):
 	map_editor.load_from_data(map_p)
 

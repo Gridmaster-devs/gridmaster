@@ -3,6 +3,8 @@ extends Node
 ## Game master class which manages the game state and communicates
 ## with other game elements
 
+signal units_changed
+
 var game_state : GameState ## The state of the game
 @onready var user_interface : UserInterface = $"User Interface"
 
@@ -32,14 +34,16 @@ func getUnits() -> Variant:
 func createDebugUnit(position : Vector2i) -> void:
 	if game_state != null:
 		game_state.createDebugUnit(position)
-		
-		
+
+
 ## SOLELY FOR TESTING
 ## NEVER EVER USE IN ACTUAL PRODUCTION CODE
 func createUnit(unit_type_id : int, position : Vector2i) -> void:
-	game_state.addUnitByTypeId(unit_type_id, position, -1)
+	if game_state != null:
+		game_state.addUnitByTypeId(unit_type_id, position, -1)
 
 
+## gets the game name
 func getGameName() -> String:
 	if game_state != null:
 		return game_state.getGameName()
@@ -50,37 +54,43 @@ func getGameName() -> String:
 ## Initializes a game state from a game definition
 func initGameStateFromGameDefinition(game_definition : GameDefinitionResource):
 	game_state = GameState.initFromGameDefinition(game_definition)
+	
+	# DEBUG
+	createUnit(0, Vector2i(0,0))
+	printUnitTypes()
+	printTileTypes()
+	# DEBUG
 
+	initGraphics()
 
 ## Called by the user interface when the player has selected a game definition file and hit the load button
 func playerSelectedGameDefinition(game_definition : GameDefinitionResource):
 	initGameStateFromGameDefinition(game_definition)
-	
-	createUnit(0, Vector2i(0,0))
-	
-	# DEBUG
-	printTileTypes()
-	printUnitTypes()
-	printMap()
 
 
 # DEBUG ONLY!!
 ## Creates a debug game for testing
 func debugInitGame() -> void:
 	game_state = GameState.debugInit(10, 10, "Test game")
-	
 
-## Prints the map into console
+
+## Initializes the user interface and graphics elements at the start of the game
+func initGraphics() -> void:
+	user_interface.linkGameMaster(self)
+	user_interface.initFromGameState(game_state)
+
+
+## Prints the map into a log file
 func printMap() -> void:
 	if (game_state != null):
 		game_state.printMap(true)
-		
 
-## Prints all the unit types into the console
+
+## Prints all the unit types into a log file
 func printUnitTypes() -> void:
 	if (game_state != null):
 		game_state.printUnitTypes(true)
-		
+
 
 ## Prints all of the tile types into the console
 func printTileTypes() -> void:

@@ -1,0 +1,15 @@
+properties:
+  managedEnvironmentId: /subscriptions/772a131d-ad37-4b24-91ad-0dab4ddfe1ff/resourceGroups/rg-gridmaster-prod/providers/Microsoft.App/managedEnvironments/production
+  configuration:
+    ingress:
+      external: true
+      targetPort: 8080
+      allowInsecure: false
+    maxInactiveRevisions: 10
+  template:
+    containers:
+      - name: editor
+        image: gridmasterprivate.azurecr.io/gridmaster/editor:latest
+    scale:
+      minReplicas: 0
+      maxReplicas: 1

@@ -1,0 +1,19 @@
+services:
+  editors:
+    build: 
+      context: .
+      dockerfile: editors.prod.Dockerfile
+    ports: 
+      - 8080:80
+
+  client:
+    build: 
+      context: .
+      dockerfile: client.Dockerfile
+    ports:
+      - 8081:80
+
+  server:
+    build: 
+      context: .
+      dockerfile: server.Dockerfile

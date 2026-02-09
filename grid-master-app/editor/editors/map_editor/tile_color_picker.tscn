@@ -1,8 +1,8 @@
 [gd_scene load_steps=4 format=3 uid="uid://da7gwnaom168w"]
 
-[ext_resource type="Script" uid="uid://bwqcq5xsksi7y" path="res://scripts/common-scripts/ui-element-scripts/draggable.gd" id="1_ysqkv"]
-[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editors/common/editor_panel/EditorPanel.tscn" id="2_1gbrt"]
-[ext_resource type="Script" uid="uid://dcy8dnormxxvq" path="res://scripts/map_editor_scripts/button_scripts/add_tile_color.gd" id="3_v5gri"]
+[ext_resource type="Script" uid="uid://bwqcq5xsksi7y" path="res://editor/scripts/common-scripts/ui-element-scripts/draggable.gd" id="1_ysqkv"]
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="2_1gbrt"]
+[ext_resource type="Script" uid="uid://dcy8dnormxxvq" path="res://editor/scripts/map_editor_scripts/button_scripts/add_tile_color.gd" id="3_v5gri"]
 
 [node name="CreateNewTile" type="Control"]
 layout_mode = 3

@@ -1,9 +1,5 @@
 extends Node
 
-
-@onready var tile_map = get_node("/root/MapEditor/VBoxContainer/HBoxContainer/SubViewControl/SubViewportContainer/SubViewport/TileMapLayer")
-@onready var tile_lib = get_node("/root/MapEditor/VBoxContainer/HBoxContainer/EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Tile library/GridContainer")
-@onready var color_picker = $"../ColorPicker"
 @onready var parent_ref = $"../../../../../../../.."
 
 

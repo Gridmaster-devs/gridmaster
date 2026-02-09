@@ -13,11 +13,9 @@ var root_editor : UnitEditor
 func save_to_unit_resource(resource_p : UnitResource):
 	if (resource_p != null):
 		resource_p.set_attribute(attribute_name, get_value())
-	
 
-#TODO shouldn't reset when fails, should instead throw an error and show error to user, but stay where it is
-# or load previous value
-func load_from_unit_resource(resource_p : UnitResource):
+
+func load_from_unit_resource(resource_p : UnitResourceDict):
 	if (resource_p != null):
 		var value = resource_p.get_attribute_value(attribute_name)
 		if (value != null):
@@ -27,7 +25,6 @@ func load_from_unit_resource(resource_p : UnitResource):
 			set_value(value) 
 			return
 	reset()
-	
 
 #TODO replace
 # super super jank but I don't know a better way right now
