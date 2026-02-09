@@ -11,6 +11,8 @@ var init_done : bool = false
 
 
 func log(message : String) -> void:
+	if (OS.has_feature("web")): return # Don't try to log on the web builds
+	
 	if (init_done == false):
 		init()
 	logfile.store_string(message + "\n")
