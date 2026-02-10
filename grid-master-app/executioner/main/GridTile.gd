@@ -4,7 +4,7 @@ class_name GridTile
 
 # NOTE: Units are stored in both the grid tile and the game state object,
 # you have to remember to remove it from both places
-var units : Dictionary[int, Unit] = {} ## Array of the units on the tile
+var units : Dictionary[int, Unit] = {} ## Dictionary from Unit ID to the Units on the tile
 var tile_type : TileType ## Reference to the type of tile
 
 

@@ -10,6 +10,7 @@ var player_id : int ## The ID of the player who owns the unit
 var hp : int ## The current HP of the unit
 var morale : int ## The current morale of the unit
 var grid_position : Vector2i ## The current position of the unit on the grid
+var current_action : UnitAction = null ## The action the unit is set to perform on this turn
 
 
 ## Initializes the unit from a specific unit type

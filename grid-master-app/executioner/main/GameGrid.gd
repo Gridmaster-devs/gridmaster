@@ -69,14 +69,13 @@ static func initFromMapResource(map : GameMap) -> GameGrid:
 	
 	var fill_func = func(x: int, y: int):
 		var grid_tile : GridTile =  GridTile.new(
-										game_grid.strategic_tile_types.get(
-											grid.grid[grid.width * y + x]
-										)
-									)
+			game_grid.strategic_tile_types.get(
+				grid.grid[grid.width * y + x]
+			)
+		)
 		return grid_tile
 	
 	game_grid.fillTiles(fill_func)
-	
 	return game_grid
 
 

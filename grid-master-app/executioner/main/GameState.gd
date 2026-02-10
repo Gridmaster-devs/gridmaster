@@ -16,10 +16,8 @@ var unit_id_count : int = 0
 
 var turn_number : int = 0 ## What turn it is
 
-## The actions the player plans to do
-var tentative_actions : Array[GameAction] = []
-
-## The actions the player locked in by pressing "end turn"
+## Contains the actions of the players. The actions are executed when all players
+## have pressed the "end turn" button.
 var action_queue : Array[GameAction] = []
 
 
