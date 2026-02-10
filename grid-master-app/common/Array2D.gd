@@ -51,7 +51,7 @@ func foreach(process_func : Callable, ignore_null : bool) -> void:
 		for j in width:
 			var item = getItem(i, j)
 			
-			if (item == null) and (ignore_null == true) :
+			if (item == null) and (ignore_null == true):
 				pass
 			else:
 				process_func.call(item)

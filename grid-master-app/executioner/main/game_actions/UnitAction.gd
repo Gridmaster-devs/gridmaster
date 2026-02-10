@@ -1,3 +1,4 @@
+@abstract
 class_name UnitAction
 extends GameAction
 ## Class that represents an action involving a unit a player can take
