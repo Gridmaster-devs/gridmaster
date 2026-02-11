@@ -1,4 +1,4 @@
-class_name DjikstraPathfinder
+class_name DijkstraPathfinder
 extends RefCounted
 
 # NOTE: If this is too slow it can be rewritten in a high-performance language 
@@ -10,7 +10,6 @@ var _djikstra_grid : Array2D
 var _game_grid : GameGrid
 var _grid_width : int
 var _grid_height : int
-var _possible : Array[Vector2i] = [] # Possible to reach tiles
 
 
 ## Initializes the Djikstra Pathfinder's grid from a game_grid.
@@ -23,7 +22,7 @@ func add_game_grid(game_grid : GameGrid) -> void:
 	_djikstra_grid = Array2D.new(_grid_width, _grid_height)
 	
 	var fill_func = func(x, y):
-		return DjikstraNode.new(Vector2i(x, y))
+		return DijkstraNode.new(Vector2i(x, y))
 	
 	_djikstra_grid.fill(fill_func)
 	update_grid()
@@ -35,12 +34,12 @@ func update_grid() -> void:
 	for y in range(0, _grid_height):
 		for x in range(0, _grid_width):
 			var tile_type : TileType = _game_grid.getTileType(x, y)
-			var node : DjikstraNode = _djikstra_grid.getItem(x, y)
+			var node : DijkstraNode = _djikstra_grid.getItem(x, y)
 			node.movement = tile_type.get_attribute(TileType.TILE_ATTRIBUTE_TYPE.MOVEMENT)
 
 
-func get_neighbors(node : DjikstraNode) -> Array[DjikstraNode]:
-	var neighbors : Array[DjikstraNode] = []
+func get_neighbors(node : DijkstraNode) -> Array[DijkstraNode]:
+	var neighbors : Array[DijkstraNode] = []
 	var x = node.position.x
 	var y = node.position.y
 	
@@ -57,20 +56,30 @@ func get_neighbors(node : DjikstraNode) -> Array[DjikstraNode]:
 		neighbors.append(_djikstra_grid.getItem(x,y-1))
 	
 	return neighbors
+
+
+func reset_nodes() -> void:
+	var reset_func = func(node : DijkstraNode):
+		node.movement_required = MAX_INT
+		node.visited = false
+		node.previous = null
 	
+	_djikstra_grid.foreach(reset_func, false)
 
 
 ## Returns an array of all tiles that are possible to reach from
 ## the starting position with a set amount of movement
 func tiles_from_position(start_position : Vector2i, movement_available : int) -> Array[Vector2i]:
-	var unvisited := PriorityQueue.new(DjikstraNode.priority_func)
+	var unvisited := PriorityQueue.new(DijkstraNode.priority_func)
+	var possible : Array[Vector2i] = [] # Possible to reach tiles
+	reset_nodes() # Reset the nodes from a previous calculation
 	
-	var start_node : DjikstraNode = _djikstra_grid.get_item_vec(start_position)
+	var start_node : DijkstraNode = _djikstra_grid.get_item_vec(start_position)
 	start_node.movement_required = 0
-	_possible.append(start_position)
+	possible.append(start_position)
 	unvisited.add_item(start_position)
 	
-	var current_node : DjikstraNode
+	var current_node : DijkstraNode
 	while(true):
 		# Get the unvisited node with the lowest movement required
 		current_node = unvisited.pop_first()
@@ -85,7 +94,7 @@ func tiles_from_position(start_position : Vector2i, movement_available : int) ->
 			
 			# If our unit has enough movement to reach this tile
 			if (current_node.movement_required <= movement_available):
-				_possible.append(current_node.position)
+				possible.append(current_node.position)
 				
 				var neighbors = get_neighbors(current_node)
 				
@@ -94,7 +103,7 @@ func tiles_from_position(start_position : Vector2i, movement_available : int) ->
 					if (node.visited == false):
 						unvisited.add_item(node)
 					
-	return _possible
+	return possible
 
 
 ## Returns a path from a previously calculated starting position
@@ -102,7 +111,7 @@ func tiles_from_position(start_position : Vector2i, movement_available : int) ->
 func get_path_to_pos(position : Vector2i) -> Array[Vector2i]:
 	var path : Array[Vector2i] = []
 	
-	var current_node : DjikstraNode = _djikstra_grid.get_item_vec(position)
+	var current_node : DijkstraNode = _djikstra_grid.get_item_vec(position)
 	while(true):
 		path.append(current_node)
 		current_node = current_node.previous
@@ -116,28 +125,28 @@ func get_path_to_pos(position : Vector2i) -> Array[Vector2i]:
 
 
 
-## Class that represents a node in the pathfinder
-class DjikstraNode extends RefCounted:
+## Class that represents a node in the pathfinder.
+class DijkstraNode extends RefCounted:
 	
 	var position : Vector2i
 	var movement : int = 1
 	
 	var visited : bool = false
-	var previous : DjikstraNode = null
+	var previous : DijkstraNode = null
 	var movement_required : int = MAX_INT
 	
 	
-	## Updates the movement_required value of the node if
-	## it's less than previously. Returns true if the new value
-	## is less than the old value.
-	func update_movement_req(node : DjikstraNode) -> void:
+	## Updates the movement_required and previous variables of the node if
+	## the new movement required is less than previously.
+	func update_movement_req(node : DijkstraNode) -> void:
 		var prev_movement = node.movement_required
 		if (prev_movement + movement) < movement_required:
 			movement_required = prev_movement + movement
+			previous = node
 
 
-	## Returns the movement required value for the djikstra algorithm
-	static func priority_func(node : DjikstraNode):
+	## Returns the movement required value for the djikstra algorithm.
+	static func priority_func(node : DijkstraNode):
 		return node.movement_required
 		
 
