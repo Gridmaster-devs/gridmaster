@@ -1,4 +1,5 @@
 class_name GameState
+extends RefCounted
 ## Class that represents everything that makes up the current state of the game, ex. the units, the map, etc
 
 

@@ -1,4 +1,5 @@
 class_name UnitType
+extends RefCounted
 ## Class that represents a type of unit and its attributes
 
 ## What type of movement the unit has

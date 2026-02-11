@@ -1,4 +1,5 @@
 class_name Unit
+extends RefCounted
 ## Class that represents a single unit on the battlefield
 
 ## object with attributes shared by all units of the same type
