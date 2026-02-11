@@ -1,0 +1,135 @@
+[gd_resource type="Resource" script_class="UnitResourceDict" load_steps=24 format=3]
+
+[ext_resource type="Script" path="res://resources/units/Actions/Action.gd" id="1_2cjr7"]
+[ext_resource type="Script" path="res://resources/units/Actions/ConsumeProduce.gd" id="2_72ro0"]
+[ext_resource type="Script" path="res://resources/units/Actions/NoneAction.gd" id="3_x478j"]
+[ext_resource type="Script" path="res://resources/units/attribute.gd" id="4_v45jy"]
+[ext_resource type="Script" path="res://resources/units/unit_resource_dict.gd" id="5_e315u"]
+
+[sub_resource type="Resource" id="Resource_i4ger"]
+script = ExtResource("2_72ro0")
+consumed_resource = "morale"
+consumed_amount = 1
+produced_resource = "health"
+produced_amount = 5
+action_name = "Heal at camp"
+
+[sub_resource type="Resource" id="Resource_nralj"]
+script = ExtResource("3_x478j")
+action_name = "don't know yet"
+action_type = -1
+
+[sub_resource type="Resource" id="Resource_it4cd"]
+script = ExtResource("4_v45jy")
+name = "movement_type"
+type = 1
+value = 0
+
+[sub_resource type="Resource" id="Resource_evthu"]
+script = ExtResource("4_v45jy")
+name = "movement_speed"
+type = 2
+value = 3.0
+
+[sub_resource type="Resource" id="Resource_e4wrc"]
+script = ExtResource("4_v45jy")
+name = "capturable"
+value = true
+
+[sub_resource type="Resource" id="Resource_6jmln"]
+script = ExtResource("4_v45jy")
+name = "health"
+type = 2
+value = 10.0
+
+[sub_resource type="Resource" id="Resource_mguys"]
+script = ExtResource("4_v45jy")
+name = "morale"
+type = 2
+value = 5.0
+
+[sub_resource type="Resource" id="Resource_bnsxg"]
+script = ExtResource("4_v45jy")
+name = "victory_points"
+type = 2
+value = 2.0
+
+[sub_resource type="Resource" id="Resource_sgbqr"]
+script = ExtResource("4_v45jy")
+name = "damage"
+type = 2
+value = 5.0
+
+[sub_resource type="Resource" id="Resource_tywes"]
+script = ExtResource("4_v45jy")
+name = "piercing"
+type = 2
+value = 1.0
+
+[sub_resource type="Resource" id="Resource_y3tcv"]
+script = ExtResource("4_v45jy")
+name = "accuracy"
+type = 2
+value = 5.0
+
+[sub_resource type="Resource" id="Resource_1dkco"]
+script = ExtResource("4_v45jy")
+name = "range"
+type = 2
+value = 5.0
+
+[sub_resource type="Resource" id="Resource_tmblo"]
+script = ExtResource("4_v45jy")
+name = "armor"
+type = 2
+value = 2.0
+
+[sub_resource type="Resource" id="Resource_5emc1"]
+script = ExtResource("4_v45jy")
+name = "evasion"
+type = 2
+value = 2.0
+
+[sub_resource type="Resource" id="Resource_vgc3x"]
+script = ExtResource("4_v45jy")
+name = "vision_range"
+type = 2
+value = 3.0
+
+[sub_resource type="Resource" id="Resource_n5vjr"]
+script = ExtResource("4_v45jy")
+name = "perception"
+type = 2
+value = 3.0
+
+[sub_resource type="Resource" id="Resource_1gvhj"]
+script = ExtResource("4_v45jy")
+name = "name"
+value = "Infantry"
+
+[sub_resource type="Resource" id="Resource_u1wrv"]
+script = ExtResource("4_v45jy")
+name = "description"
+value = "Basic infantry unit"
+
+[resource]
+script = ExtResource("5_e315u")
+attributes = {
+"accuracy": SubResource("Resource_y3tcv"),
+"armor": SubResource("Resource_tmblo"),
+"capturable": SubResource("Resource_e4wrc"),
+"damage": SubResource("Resource_sgbqr"),
+"description": SubResource("Resource_u1wrv"),
+"evasion": SubResource("Resource_5emc1"),
+"health": SubResource("Resource_6jmln"),
+"morale": SubResource("Resource_mguys"),
+"movement_speed": SubResource("Resource_evthu"),
+"movement_type": SubResource("Resource_it4cd"),
+"name": SubResource("Resource_1gvhj"),
+"perception": SubResource("Resource_n5vjr"),
+"piercing": SubResource("Resource_tywes"),
+"range": SubResource("Resource_1dkco"),
+"victory_points": SubResource("Resource_bnsxg"),
+"vision_range": SubResource("Resource_vgc3x")
+}
+actions = Array[ExtResource("1_2cjr7")]([SubResource("Resource_i4ger"), SubResource("Resource_nralj")])
