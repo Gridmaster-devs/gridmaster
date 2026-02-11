@@ -25,6 +25,10 @@ func getTile(x : int, y : int) -> GridTile:
 	return tiles.getItem(x, y)
 
 
+func get_tile_vec(pos : Vector2i) -> GridTile:
+	return tiles.getItem(pos.x, pos.y)
+
+
 ## Returns the tile type of the grid tile at the specified index
 func getTileType(x : int, y : int) -> TileType:
 	return getTile(x, y).getTileType()
@@ -39,6 +43,18 @@ func setTileType(x : int, y : int, tile_type : TileType) -> void:
 func getUnitsOnTile(x : int, y : int) -> Dictionary[int, Unit]:
 	return getTile(x, y).getUnits()
 
+
+# There's no error checking here because this SHOULD crash if
+# it gets wrong information
+## Removes a unit from the start tile, and adds it to the end tile.
+## Does NOT edit the unit's information at all.
+func move_unit(unit_id : int, start_pos : Vector2i, end_pos : Vector2i) -> void:
+	var start_tile = get_tile_vec(start_pos)
+	var end_tile = get_tile_vec(end_pos)
+	var unit = start_tile.getUnitById(unit_id)
+	
+	start_tile.removeUnitById(unit_id)
+	end_tile.addUnit(unit)
 
 ## Adds a unit to the grid
 func addUnit(unit : Unit) -> void:

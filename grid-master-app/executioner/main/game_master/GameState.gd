@@ -8,6 +8,7 @@ var units : Dictionary[int, Unit] = {} ## All the units in the game, NOTE: also 
 var players : Array[Player] = [] ## All the players in the game
 var teams : Array[Team] = [] ## All the teams in the game
 var unit_types : Dictionary[int, UnitType] = {} ## All the types of units in the game
+var _pathfinder : DijkstraPathfinder
 
 
 ## tracks the id to be given to the next unit that spawns
@@ -21,15 +22,69 @@ var turn_number : int = 0 ## What turn it is
 var action_queue : Array[GameAction] = []
 
 
-# These functions exist so that the graphics element can request the
-# map and units so it can draw them
+## Adds a unit to the game
+func addUnit(unit_type : UnitType, position : Vector2i, player_id : int) -> Unit:
+	var id = getNewUnitId()
+	var unit = Unit.new(unit_type, id, player_id, position)
+	grid.addUnit(unit)
+	units.set(id, unit)
+	return unit
+	
+
+## Adds a unit by unit type id
+## will fail if there is no unit type corresponding to the id
+func addUnitByTypeId(id : int, position : Vector2i, player_id : int) -> Unit:
+	var unit_type = unit_types.get(id)
+	assert(unit_type != null, "Tried to add unit with invalid type ID!")
+	return addUnit(unit_type, position, player_id)
+
+
+# NOTE: There's no cheat handling anywhere right now.
+# An opposing player could currently technically make their units have unlimited
+# movement if they hacked their side of the client
+## Moves a unit to a new position.
+func move_unit(unit_id : int, new_position : Vector2i) -> void:
+	var unit = get_unit_by_id(unit_id)
+	var cur_pos = unit.getPosition()
+	unit.set_position(new_position)
+	grid.move_unit(unit_id, cur_pos, new_position)
+
+
+## Initializes the unit types from a game definition
+func initUnitTypesFromResource(game_definition : GameDefinitionResource) -> void:
+	var gd_units : Array[UnitResource] = game_definition.load_units()
+	var type_count : int = 0
+	for unit in gd_units:
+		unit_types.set(type_count, UnitType.initFromUnitResource(unit, type_count))
+		type_count += 1
+
+
+## Initializes and returns a game state object from a game definition
+static func initFromGameDefinition(game_definition : GameDefinitionResource) -> GameState:
+	var game_state = GameState.new()
+	game_state.initUnitTypesFromResource(game_definition)
+	game_state.game_name = game_definition.game_name
+	game_state.grid = GameGrid.initFromMapResource(game_definition.loadMap())
+	
+	game_state._pathfinder = DijkstraPathfinder.new()
+	game_state._pathfinder.add_game_grid(game_state.grid)
+	
+	return game_state
+
+
+# ---
+# GETTERS AND SETTERS
+# ---
+
+func getGameName() -> String:
+	return game_name
+
+
 ## Returns the game grid
 func getGameGrid() -> GameGrid:
 	return grid
 
 
-# These functions exist so that the graphics element can request the
-# map and units so it can draw them
 ## Returns the unit array
 func getUnits() -> Array[Unit]:
 	return units.values()
@@ -49,48 +104,21 @@ func getGridWidth() -> int:
 ## gets the game grid height
 func getGridHeight() -> int: 
 	return grid.getWidth()
+	
 
+func get_unit_by_id(id : int) -> Unit:
+	return units.get(id)
+
+
+
+# ---
+# DEBUG FUNCTIONS
+# ---
 
 ## Creates a unit for testing
 func createDebugUnit(position : Vector2i)-> Unit:
 	return addUnit(UnitType.debugType(), position, -1)
-	
 
-## Adds a unit to the game
-func addUnit(unit_type : UnitType, position : Vector2i, player_id : int) -> Unit:
-	var id = getNewUnitId()
-	var unit = Unit.new(unit_type, id, player_id, position)
-	grid.addUnit(unit)
-	units.set(id, unit)
-	return unit
-	
-
-## Adds a unit by unit type id
-## will fail if there is no unit type corresponding to the id
-func addUnitByTypeId(id : int, position : Vector2i, player_id : int) -> Unit:
-	var unit_type = unit_types.get(id)
-	assert(unit_type != null, "Tried to add unit with invalid type ID!")
-	return addUnit(unit_type, position, player_id)
-
-
-## Initializes the unit types from a game definition
-func initUnitTypesFromResource(game_definition : GameDefinitionResource) -> void:
-	var gd_units : Array[UnitResource] = game_definition.load_units()
-	var type_count : int = 0
-	for unit in gd_units:
-		unit_types.set(type_count, UnitType.initFromUnitResource(unit, type_count))
-		type_count += 1
-
-
-## Initializes and returns a game state object from a game definition
-static func initFromGameDefinition(game_definition : GameDefinitionResource) -> GameState:
-	var game_state = GameState.new()
-	game_state.initUnitTypesFromResource(game_definition)
-	game_state.game_name = game_definition.game_name
-	game_state.grid = GameGrid.initFromMapResource(game_definition.loadMap())
-	
-	return game_state
-	
 
 ## Creates a simple test game for debugging
 static func debugInit(map_width : int, map_height : int, game_name_p : String) -> GameState:
@@ -101,13 +129,13 @@ static func debugInit(map_width : int, map_height : int, game_name_p : String) -
 	return gs
 	
 
-## Prints the map into stdout
+## Prints the map into a logfile
 func printMap(to_log : bool):
 	if (grid != null):
 		grid.printMap(to_log)
 
 
-## Prints the unit types into stdout
+## Prints the unit types into a logfile
 func printUnitTypes(to_log : bool):
 	for type in unit_types.values():
 		if (to_log == true):
@@ -116,15 +144,15 @@ func printUnitTypes(to_log : bool):
 			print(type._to_string())
 
 
-## Prints the tile types into stdout
+## Prints the tile types into a logfile
 func printTileTypes(to_log : bool):
 	if (grid != null):
 		grid.printTileTypes(to_log)
 
 
-func getGameName() -> String:
-	return game_name
-
+# ---
+# GODOT PREDEFINED
+# ---
 
 func _init():
 	pass

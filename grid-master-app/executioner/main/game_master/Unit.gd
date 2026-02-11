@@ -29,6 +29,10 @@ func getPosition() -> Vector2i:
 	return grid_position
 
 
+func set_position(new_pos : Vector2i) -> void:
+	grid_position = new_pos
+
+
 func _init(unit_type : UnitType, unit_id_p : int, player_id_p : int, position : Vector2i) -> void:
 	grid_position = position
 	unit_id = unit_id_p

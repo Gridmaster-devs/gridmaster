@@ -38,7 +38,7 @@ func update_grid() -> void:
 			node.movement = tile_type.get_attribute(TileType.TILE_ATTRIBUTE_TYPE.MOVEMENT)
 
 
-func get_neighbors(node : DijkstraNode) -> Array[DijkstraNode]:
+func _get_neighbors(node : DijkstraNode) -> Array[DijkstraNode]:
 	var neighbors : Array[DijkstraNode] = []
 	var x = node.position.x
 	var y = node.position.y
@@ -58,7 +58,7 @@ func get_neighbors(node : DijkstraNode) -> Array[DijkstraNode]:
 	return neighbors
 
 
-func reset_nodes() -> void:
+func _reset_nodes() -> void:
 	var reset_func = func(node : DijkstraNode):
 		node.movement_required = MAX_INT
 		node.visited = false
@@ -72,7 +72,7 @@ func reset_nodes() -> void:
 func tiles_from_position(start_position : Vector2i, movement_available : int) -> Array[Vector2i]:
 	var unvisited := PriorityQueue.new(DijkstraNode.priority_func)
 	var possible : Array[Vector2i] = [] # Possible to reach tiles
-	reset_nodes() # Reset the nodes from a previous calculation
+	_reset_nodes() # Reset the nodes from a previous calculation
 	
 	var start_node : DijkstraNode = _djikstra_grid.get_item_vec(start_position)
 	start_node.movement_required = 0
@@ -96,7 +96,7 @@ func tiles_from_position(start_position : Vector2i, movement_available : int) ->
 			if (current_node.movement_required <= movement_available):
 				possible.append(current_node.position)
 				
-				var neighbors = get_neighbors(current_node)
+				var neighbors = _get_neighbors(current_node)
 				
 				for node in neighbors:
 					node.update_movement_req(current_node)
@@ -129,11 +129,13 @@ func get_path_to_pos(position : Vector2i) -> Array[Vector2i]:
 class DijkstraNode extends RefCounted:
 	
 	var position : Vector2i
-	var movement : int = 1
+	var movement : int = 1 # movement required to move onto the node from a neighbor
 	
 	var visited : bool = false
 	var previous : DijkstraNode = null
-	var movement_required : int = MAX_INT
+	
+	# movement required to move to the node from the beginning node
+	var movement_required : int = MAX_INT 
 	
 	
 	## Updates the movement_required and previous variables of the node if
