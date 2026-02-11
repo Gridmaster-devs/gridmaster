@@ -18,6 +18,10 @@ var flat_modifiers : Dictionary[TILE_ATTRIBUTE_TYPE, float]
 var percentage_modifiers : Dictionary[TILE_ATTRIBUTE_TYPE, float]
 
 
+func get_attribute(type : TILE_ATTRIBUTE_TYPE) -> int:
+	return attributes.get(type)
+
+
 ## creates a debug tile for testing
 static func debugTile() -> TileType:
 	var tile_type = TileType.new()

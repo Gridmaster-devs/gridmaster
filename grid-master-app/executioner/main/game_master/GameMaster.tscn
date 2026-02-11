@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://cpsdnpca0xb06"]
 
-[ext_resource type="Script" uid="uid://bqg42x551mvyw" path="res://executioner/main/GameMaster.gd" id="1_8ixyn"]
-[ext_resource type="PackedScene" uid="uid://col1qb3vuji1l" path="res://executioner/main/user_interface/grid_graphics/GridGraphics.tscn" id="2_ol8qj"]
+[ext_resource type="Script" uid="uid://bqg42x551mvyw" path="res://executioner/main/game_master/GameMaster.gd" id="1_8ixyn"]
+[ext_resource type="PackedScene" uid="uid://col1qb3vuji1l" path="res://executioner/main/grid_graphics/GridGraphics.tscn" id="2_ol8qj"]
 [ext_resource type="PackedScene" uid="uid://cehdpht6a7iw8" path="res://common/file_upload_download/file_transfer_manager.tscn" id="3_61xsh"]
 
 [node name="Game master" type="Node"]

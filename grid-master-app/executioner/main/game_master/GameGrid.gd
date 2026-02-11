@@ -15,6 +15,11 @@ func getWidth() -> int:
 func getHeight() -> int:
 	return height
 
+
+func get_tiles() -> Array2D:
+	return tiles
+
+
 ## Returns the tile at the specified index
 func getTile(x : int, y : int) -> GridTile:
 	return tiles.getItem(x, y)

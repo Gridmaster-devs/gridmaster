@@ -71,6 +71,7 @@ func load_game_definition(game_definition : Resource):
 	assert(game_definition != null, "Invalid game definition in file!")
 	initGameStateFromGameDefinition(game_definition)
 
+
 ## Prints the map into a log file
 func printMap() -> void:
 	if (game_state != null):
