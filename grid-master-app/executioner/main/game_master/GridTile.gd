@@ -1,4 +1,5 @@
 class_name GridTile
+extends RefCounted
 ## Class that represents a single tile on the grid
 ## Contains information about the units on the tile and the type of the tile
 

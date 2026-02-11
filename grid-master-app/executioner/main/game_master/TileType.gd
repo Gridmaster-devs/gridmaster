@@ -1,4 +1,5 @@
 class_name TileType
+extends RefCounted
 ## Class that represents a type of tile on the map
 
 # NOTE: In the future we might have to implement a system where some units

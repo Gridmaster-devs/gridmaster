@@ -1,4 +1,5 @@
 class_name GameGrid
+extends RefCounted
 ## Represents the map, which is a grid of grid tiles
 
 

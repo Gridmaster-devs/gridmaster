@@ -1,4 +1,5 @@
 class_name Player
+extends RefCounted
 ## Class that represenets a player connected to the game
 
 var player_name : String ## The name of the player
