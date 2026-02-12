@@ -10,8 +10,6 @@ Briefly describe what this pull request changes.
 ## Why
 Explain the problem this PR solves or the motivation behind it.
 
----
-
 # Changes
 
 - [ ] Feature
@@ -20,7 +18,7 @@ Explain the problem this PR solves or the motivation behind it.
 - [ ] Documentation
 - [ ] Chore / maintenance
 
----
+
 
 # How was this tested?
 
@@ -34,20 +32,20 @@ Describe how you verified the changes.
 Testing details:
 - 
 
----
+
 
 # Screenshots / Logs (if applicable)
 
 Attach screenshots, recordings, or relevant logs.
 
----
+
 
 # Related Issues
 
 - Closes #
 - References #
 
----
+
 
 # Checklist
 
@@ -57,8 +55,6 @@ Attach screenshots, recordings, or relevant logs.
 - [ ] I have updated documentation where needed  
 - [ ] All tests pass locally  
 - [ ] No unnecessary commented-out code remains  
-
----
 
 # Additional Notes
 
