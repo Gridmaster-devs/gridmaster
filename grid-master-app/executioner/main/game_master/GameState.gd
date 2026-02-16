@@ -67,10 +67,6 @@ func end_turn() -> void:
 	turn_number += 1
 
 
-func get_pathfinder() -> DijkstraPathfinder:
-	return _pathfinder
-
-
 ## Initializes the unit types from a game definition
 func initUnitTypesFromResource(game_definition : GameDefinitionResource) -> void:
 	var gd_units : Array[UnitResource] = game_definition.load_units()
@@ -129,6 +125,10 @@ func getGridHeight() -> int:
 
 func get_unit_by_id(id : int) -> Unit:
 	return units.get(id)
+
+
+func get_pathfinder() -> DijkstraPathfinder:
+	return _pathfinder
 
 
 

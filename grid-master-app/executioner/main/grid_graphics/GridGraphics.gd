@@ -6,6 +6,7 @@ var tile_size = 64
 @onready var ui_map_grid = $"SubViewportContainer/Grid Graphics Viewport/TileGrid"
 @onready var background_grid = $"SubViewportContainer/Grid Graphics Viewport/BackgroundGrid"
 @onready var grid_graphics_viewport = $"SubViewportContainer/Grid Graphics Viewport"
+@onready var tile_grid = $"SubViewportContainer/Grid Graphics Viewport/TileGrid"
 var game_master : GameMaster
 
 ## array of the currently drawn units, should only be used for drawing purposes 
