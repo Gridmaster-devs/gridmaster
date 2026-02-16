@@ -2,7 +2,7 @@ class_name GridGraphics
 extends Control
 ## Class / Node that is responsible for drawing the grid graphics of the game
 
-var tile_size = 64
+const TILE_SIZE = 64
 @onready var ui_map_grid = $"SubViewportContainer/Grid Graphics Viewport/TileGrid"
 @onready var background_grid = $"SubViewportContainer/Grid Graphics Viewport/BackgroundGrid"
 @onready var grid_graphics_viewport = $"SubViewportContainer/Grid Graphics Viewport"
@@ -51,7 +51,7 @@ func initTileGrid(game_grid : GameGrid) -> void:
 
 ## Converts game grid coordinates to screen coordinates
 func gridToScreen(grid_pos: Vector2i) -> Vector2i: 
-	return Vector2i(grid_pos.x * tile_size + tile_size / 2, grid_pos.y * tile_size + tile_size / 2)
+	return Vector2i(grid_pos.x * TILE_SIZE + TILE_SIZE / 2, grid_pos.y * TILE_SIZE + TILE_SIZE / 2)
 
 
 ## Initializes the background grid
