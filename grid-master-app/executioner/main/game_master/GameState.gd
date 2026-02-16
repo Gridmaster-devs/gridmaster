@@ -9,7 +9,7 @@ var units : Dictionary[int, Unit] = {} ## All the units in the game, NOTE: also 
 var players : Array[Player] = [] ## All the players in the game
 var teams : Array[Team] = [] ## All the teams in the game
 var unit_types : Dictionary[int, UnitType] = {} ## All the types of units in the game
-var _pathfinder : DijkstraPathfinder
+var _pathfinder : DijkstraPathfinder ## Dijkstra pathfinder for unit pathing
 
 
 ## tracks the id to be given to the next unit that spawns
@@ -20,7 +20,7 @@ var turn_number : int = 0 ## What turn it is
 
 ## Contains the actions of the players. The actions are executed when all players
 ## have pressed the "end turn" button.
-var action_queue : Array[GameAction] = []
+var action_queue : Array[PlayerAction] = []
 
 
 ## Adds a unit to the game
@@ -49,6 +49,26 @@ func move_unit(unit_id : int, new_position : Vector2i) -> void:
 	var cur_pos = unit.getPosition()
 	unit.set_position(new_position)
 	grid.move_unit(unit_id, cur_pos, new_position)
+
+
+## Ends the turn and processes all the actions that have been queued up.
+## Unit actions are processed before other actions.
+func end_turn() -> void:
+	var unit_array = units.values()
+	unit_array.sort_custom(Unit.unit_compare)
+	
+	for unit : Unit in unit_array:
+		if unit.current_action != null:
+			unit.current_action.execute(self)
+	
+	for action : PlayerAction in action_queue:
+		action.execute(self)
+	
+	turn_number += 1
+
+
+func get_pathfinder() -> DijkstraPathfinder:
+	return _pathfinder
 
 
 ## Initializes the unit types from a game definition
