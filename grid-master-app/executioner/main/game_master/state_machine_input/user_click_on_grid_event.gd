@@ -1,6 +1,9 @@
-class_name UserClickOnGridEvent
+class_name GridTileClickedEvent
 extends StateMachineEvent
 
 var mouse_button : MouseButton ## Which mouse button was clicked
-var button_up : bool ## Whether the mouse button was pressed down or lifted up
 var grid_pos : Vector2i ## Which grid tile was clicked. (-1, -1) if user clicked outside the grid.
+
+func _init(button : MouseButton, pos : Vector2i):
+	mouse_button = button
+	grid_pos = pos

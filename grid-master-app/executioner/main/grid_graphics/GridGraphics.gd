@@ -2,12 +2,33 @@ class_name GridGraphics
 extends Control
 ## Class / Node that is responsible for drawing the grid graphics of the game
 
+## Time window for what counts as a a click
+## I.e. if the time between pressing the mouse button down
+## and raising it is less than this value, it will count as a click
+const CLICK_WINDOW = 500
+
+## Size for the tiles of the grid.
+## This is the internal size of the grid for the godot engine,
+## not the resolution. 
 const TILE_SIZE = 64
+
+const GROUP_NAME : StringName = "GridGraphics"
+const EVENT_INPUT_FUNC_NAME : StringName = "handle_input"
+
 @onready var ui_map_grid = $"SubViewportContainer/Grid Graphics Viewport/TileGrid"
 @onready var background_grid = $"SubViewportContainer/Grid Graphics Viewport/BackgroundGrid"
 @onready var grid_graphics_viewport = $"SubViewportContainer/Grid Graphics Viewport"
-@onready var tile_grid = $"SubViewportContainer/Grid Graphics Viewport/TileGrid"
-var game_master : GameMaster
+@onready var tile_grid : TileMapLayer = $"SubViewportContainer/Grid Graphics Viewport/TileGrid"
+
+var game_master : GameMaster # NOTE: Might be unnecessary when using groups
+var _grid_width : int
+var _grid_height : int
+
+
+## Stores the time when the specific mouse key was pressed down.
+## Used to detect whether the user is clicking or dragging.
+var _keypress_times : Dictionary[MouseButton, int]
+
 
 ## array of the currently drawn units, should only be used for drawing purposes 
 ## maybe later just have it take the texture from the unit? 
@@ -90,6 +111,40 @@ func unitsChanged() -> void:
 	getUnits()
 
 
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass # Replace with function body.
+## Returns the coordinates of the tile that 
+## the user currently has their mouse over.
+## Returns (-1, -1) if the player is not hovering over any tile.
+func get_current_hovered_tile_coords() -> Vector2i:
+	# Mouse position local to the Tile Map Grid
+	var mouse_pos_local : Vector2 = tile_grid.get_local_mouse_position()
+	var x_pos : int = floor(mouse_pos_local.x / TILE_SIZE)
+	var y_pos : int = floor(mouse_pos_local.y / TILE_SIZE)
+	
+	# Checking if coords are out of bounds
+	if (x_pos < 0 or x_pos >= _grid_width or y_pos < 0 or y_pos >= _grid_height):
+		return Vector2i(-1, -1)
+	else:
+		return Vector2i(x_pos, y_pos)
+
+
+# Handles user input that is not first handled by UI elements,
+# like buttons and the like.
+func handle_input(event: InputEvent) -> void:
+	# Event is a mouse button press
+	if event is InputEventMouseButton:
+		
+		# Button was just pressed down
+		if event.is_pressed():
+			_keypress_times.set(event.button_index, Time.get_ticks_msec())
+		
+		# Button was just released
+		else:
+			var time_diff : int = Time.get_ticks_msec() - _keypress_times.get(event.button_index, 0)
+			# Time between pressing down and releasing the button is within the specified window
+			if time_diff < CLICK_WINDOW:
+				var tile_coords = get_current_hovered_tile_coords()
+				get_tree().call_group(	GameMaster.GROUP_NAME,
+										GameMaster.EVENT_INPUT_FUNC_NAME,
+										GridTileClickedEvent.new(event.button_index, tile_coords))
+			
+	

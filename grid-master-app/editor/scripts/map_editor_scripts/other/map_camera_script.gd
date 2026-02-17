@@ -7,7 +7,7 @@ var last_mouse_pos := Vector2.ZERO
 @export var min_zoom = 0.4
 @export var max_zoom = 2.0
 
-func _input(event):
+func _unhandled_input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_RIGHT or event.button_index == MOUSE_BUTTON_MIDDLE :
 			if event.pressed:
