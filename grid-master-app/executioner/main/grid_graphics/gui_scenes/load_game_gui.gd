@@ -5,8 +5,12 @@ extends GUIScene
 
 
 func _load_game_button_pressed():
-	send_gm_signal(ButtonPressedEvent.new(ButtonPressedEvent.ButtonType.LOAD_GAME_BUTTON))
+	send_gm_signal(ButtonPressedEvent.new(ButtonPressedEvent.ButtonType.LOAD_GAME))
 
 
-func _init() -> void:
+func _custom_ready() -> void:
 	_load_game_button.pressed.connect(_load_game_button_pressed)
+
+
+func initialize(_args : Variant) -> void:
+	pass

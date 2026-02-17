@@ -32,7 +32,7 @@ sources/1 = SubResource("TileSetAtlasSource_pakj7")
 sources/0 = SubResource("TileSetAtlasSource_040ns")
 sources/2 = SubResource("TileSetAtlasSource_pmqq0")
 
-[node name="Grid Graphics" type="Control" groups=["GridGraphics"]]
+[node name="Grid Graphics" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
