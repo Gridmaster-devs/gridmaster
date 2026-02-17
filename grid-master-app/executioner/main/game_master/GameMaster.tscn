@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://col1qb3vuji1l" path="res://executioner/main/grid_graphics/GridGraphics.tscn" id="2_ol8qj"]
 [ext_resource type="PackedScene" uid="uid://cehdpht6a7iw8" path="res://common/file_upload_download/file_transfer_manager.tscn" id="3_61xsh"]
 
-[node name="Game master" type="Node"]
+[node name="Game master" type="Node" groups=["GameMaster"]]
 script = ExtResource("1_8ixyn")
 
 [node name="Grid Graphics" parent="." instance=ExtResource("2_ol8qj")]
@@ -12,21 +12,3 @@ script = ExtResource("1_8ixyn")
 [node name="Dialogs" type="Node" parent="."]
 
 [node name="FileTransferManager" parent="Dialogs" instance=ExtResource("3_61xsh")]
-
-[node name="UIElements" type="Node" parent="."]
-
-[node name="GameName" type="Label" parent="UIElements"]
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 23.0
-grow_horizontal = 2
-horizontal_alignment = 1
-
-[node name="LoadGameButton" type="Button" parent="UIElements"]
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_top = -56.0
-offset_right = 146.0
-grow_vertical = 0
-text = "Load game"
