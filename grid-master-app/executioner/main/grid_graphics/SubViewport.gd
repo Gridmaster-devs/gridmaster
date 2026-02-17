@@ -2,9 +2,12 @@ class_name GridGraphicsViewport
 extends SubViewport
 ## Class that represents the Grid Graphics viewport
 
+var scene_tree : SceneTree
+
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass
+	scene_tree = get_tree()
 
 
 ## Resizes the viewport to be of the specified size
@@ -18,3 +21,7 @@ func resize(new_size : Vector2) -> void:
 func _process(delta: float) -> void:
 	# self.size = Vector2i(control_ref.size)
 	pass
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	scene_tree.call_group(GridGraphics.GROUP_NAME, GridGraphics.EVENT_INPUT_FUNC_NAME, event)

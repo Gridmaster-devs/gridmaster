@@ -9,20 +9,23 @@ signal units_changed
 # where each subclass has a reference to the gamestate and handles the given input differently.
 # This might end up being a lot cleaner as the amount of possible UI states expands, and might
 # be needed to prevent the game master file being enormous.
-enum ControlState {LOAD_GAME, IN_GAME_DEFAULT, UNIT_MOVE}
+enum UIState {LOAD_GAME, IN_GAME_DEFAULT, UNIT_MOVE}
 
 const load_game_gui : PackedScene = preload("res://executioner/main/grid_graphics/gui_scenes/load_game_gui.tscn")
 const in_game_default_gui : PackedScene = preload("res://executioner/main/grid_graphics/gui_scenes/in_game_default_gui.tscn")
 
 static var GROUP_NAME : String = "GameMaster"
-static var EVENT_INPUT_FUNC_NAME : String = "receive_ui_input"
+static var EVENT_INPUT_FUNC_NAME : String = "receive_ui_event"
 
 @onready var ftm : FileTransferManager = $Dialogs/FileTransferManager
 @onready var grid_graphics : GridGraphics = $"Grid Graphics"
 
-var ui_state : ControlState = ControlState.LOAD_GAME
+var ui_state : UIState = UIState.LOAD_GAME
 var gui_scene : GUIScene
 var game_state : GameState ## The state of the game
+
+var moved_unit_id : int
+var movement_waypoints : Array[Vector2i]
 
 
 # This is ONLY for drawing the map and the units!!
@@ -79,6 +82,7 @@ func load_game_definition(game_definition : Resource):
 	assert(game_definition != null, "Invalid game definition in file!")
 	initGameStateFromGameDefinition(game_definition)
 	switch_gui_scene(in_game_default_gui, getGameName())
+	
 
 
 ## Prints the map into a log file
@@ -103,35 +107,41 @@ func printTileTypes() -> void:
 # STATE MACHINE FUNCTIONS
 
 ## Receives input from the graphics element.
+##
 ## Called by the graphics element or its children via a group.
 ## Calls the appropriate input handler based on the UI state.
-func receive_ui_input(input : StateMachineEvent):
+func receive_ui_event(event : StateMachineEvent):
+	print("received event")
 	match ui_state:
-		ControlState.LOAD_GAME:
-			_handle_input_load_game(input)
+		UIState.LOAD_GAME:
+			_handle_event_load_game(event)
 		
-		ControlState.IN_GAME_DEFAULT:
-			_handle_input_default_in_game(input)
+		UIState.IN_GAME_DEFAULT:
+			_handle_event_default_in_game(event)
 		
-		ControlState.UNIT_MOVE:
-			_handle_input_default_in_game(input)
+		UIState.UNIT_MOVE:
+			_handle_event_default_in_game(event)
 
 
-func _handle_input_load_game(input : StateMachineEvent):
-	if input is ButtonPressedEvent:
-		var button_press := input as ButtonPressedEvent
+func _handle_event_load_game(event : StateMachineEvent):
+	if event is ButtonPressedEvent:
+		var button_press := event as ButtonPressedEvent
 		if button_press.button_type == ButtonPressedEvent.ButtonType.LOAD_GAME:
 			load_game_from_file()
 
 
-func _handle_input_default_in_game(input : StateMachineEvent):
+func _handle_event_default_in_game(event : StateMachineEvent):
+	if event is GridTileClickedEvent:
+		print(event.grid_pos)
+
+
+func _handle_event_unit_move(event : StateMachineEvent):
 	pass
 
 
-func _handle_input_unit_move(input : StateMachineEvent):
-	pass
-
-
+## Switches the GUI scene to a new one and initializes it with the args.
+##
+## Frees the current GUI scene if there is one.
 func switch_gui_scene(new_scene : PackedScene, args : Variant):
 	if gui_scene != null:
 		gui_scene.queue_free()
