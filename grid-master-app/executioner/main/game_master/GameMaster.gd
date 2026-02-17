@@ -5,11 +5,20 @@ extends Node
 
 signal units_changed
 
-var game_state : GameState ## The state of the game
+# NOTE: The ui states could also be represented as instances of a UI state class
+# where each subclass has a reference to the gamestate and handles the given input differently.
+# This might end up being a lot cleaner as the amount of possible UI states expands, and might
+# be needed to prevent the game master file being enormous.
+enum ControlState {LOAD_GAME, IN_GAME_DEFAULT, UNIT_MOVE}
+
+static var GROUP_NAME : String = "GameMaster"
+static var EVENT_INPUT_FUNC_NAME : String = "receive_ui_input"
+
 @onready var ftm : FileTransferManager = $Dialogs/FileTransferManager
 @onready var grid_graphics : GridGraphics = $"Grid Graphics"
-@onready var game_name_box : Label = $UIElements/GameName
-@onready var load_game_button : Button = $UIElements/LoadGameButton
+
+var ui_state : ControlState = ControlState.LOAD_GAME
+var game_state : GameState ## The state of the game
 
 
 # This is ONLY for drawing the map and the units!!
@@ -49,11 +58,6 @@ func initGameStateFromGameDefinition(game_definition : GameDefinitionResource):
 	# DEBUG
 
 	initGraphics()
-	initUIElements()
-
-
-func initUIElements() -> void:
-	game_name_box.text = game_state.getGameName()
 
 
 ## Initializes the user interface and graphics elements at the start of the game
@@ -90,6 +94,36 @@ func printTileTypes() -> void:
 		game_state.printTileTypes(true)
 
 
+
+# STATE MACHINE FUNCTIONS
+
+## Receives input from the graphics element.
+## Called by the graphics element or its children via a group.
+## Calls the appropriate input handler based on the UI state.
+func receive_ui_input(input : StateMachineEvent):
+	match ui_state:
+		ControlState.LOAD_GAME:
+			_handle_input_load_game(input)
+		
+		ControlState.IN_GAME_DEFAULT:
+			_handle_input_default_in_game(input)
+		
+		ControlState.UNIT_MOVE:
+			_handle_input_default_in_game(input)
+
+
+func _handle_input_load_game(input : StateMachineEvent):
+	pass
+
+
+func _handle_input_default_in_game(input : StateMachineEvent):
+	pass
+
+
+func _handle_input_unit_move(input : StateMachineEvent):
+	pass
+
+
 # TESTING FUNCTIONS BLOCK
 # THESE FUNCTIONS ARE SOLELY FOR TESTING THE PROGRAM
 # THEY ARE ALWAYS TEMPORARY AND MUST EVENTUALLY BE REMOVED
@@ -118,11 +152,11 @@ func DEBUG_create_unit(unit_type_id : int, position : Vector2i) -> void:
 	if game_state != null:
 		game_state.addUnitByTypeId(unit_type_id, position, -1)
 
-# TESTING FUNCTIONS BLOCK END
 
+
+# GODOT PREDEFINED FUNCTIONS
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	grid_graphics.linkGameMaster(self)
 	ftm.resource_uploaded.connect(load_game_definition)
-	load_game_button.pressed.connect(load_game_from_file)
