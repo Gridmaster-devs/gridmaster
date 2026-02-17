@@ -7,7 +7,7 @@
 [node name="Game master" type="Node" groups=["GameMaster"]]
 script = ExtResource("1_8ixyn")
 
-[node name="Grid Graphics" parent="." instance=ExtResource("2_ol8qj")]
+[node name="Grid Graphics" parent="." groups=["GridGraphics"] instance=ExtResource("2_ol8qj")]
 
 [node name="Dialogs" type="Node" parent="."]
 

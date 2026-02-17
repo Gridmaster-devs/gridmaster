@@ -11,6 +11,9 @@ signal units_changed
 # be needed to prevent the game master file being enormous.
 enum ControlState {LOAD_GAME, IN_GAME_DEFAULT, UNIT_MOVE}
 
+const load_game_gui : PackedScene = preload("res://executioner/main/grid_graphics/gui_scenes/load_game_gui.tscn")
+const in_game_default_gui : PackedScene = preload("res://executioner/main/grid_graphics/gui_scenes/in_game_default_gui.tscn")
+
 static var GROUP_NAME : String = "GameMaster"
 static var EVENT_INPUT_FUNC_NAME : String = "receive_ui_input"
 
@@ -18,6 +21,7 @@ static var EVENT_INPUT_FUNC_NAME : String = "receive_ui_input"
 @onready var grid_graphics : GridGraphics = $"Grid Graphics"
 
 var ui_state : ControlState = ControlState.LOAD_GAME
+var gui_scene : GUIScene
 var game_state : GameState ## The state of the game
 
 
@@ -70,10 +74,11 @@ func load_game_from_file() -> void:
 	ftm.upload_data("*.tres", true)
 
 
-## Called by the load game dialog
+## Called by the FTM when file is loaded
 func load_game_definition(game_definition : Resource):
 	assert(game_definition != null, "Invalid game definition in file!")
 	initGameStateFromGameDefinition(game_definition)
+	switch_gui_scene(in_game_default_gui, getGameName())
 
 
 ## Prints the map into a log file
@@ -113,7 +118,10 @@ func receive_ui_input(input : StateMachineEvent):
 
 
 func _handle_input_load_game(input : StateMachineEvent):
-	pass
+	if input is ButtonPressedEvent:
+		var button_press := input as ButtonPressedEvent
+		if button_press.button_type == ButtonPressedEvent.ButtonType.LOAD_GAME:
+			load_game_from_file()
 
 
 func _handle_input_default_in_game(input : StateMachineEvent):
@@ -122,6 +130,14 @@ func _handle_input_default_in_game(input : StateMachineEvent):
 
 func _handle_input_unit_move(input : StateMachineEvent):
 	pass
+
+
+func switch_gui_scene(new_scene : PackedScene, args : Variant):
+	if gui_scene != null:
+		gui_scene.queue_free()
+	gui_scene = new_scene.instantiate()
+	self.add_child(gui_scene)
+	gui_scene.initialize(args)
 
 
 # TESTING FUNCTIONS BLOCK
@@ -160,3 +176,4 @@ func DEBUG_create_unit(unit_type_id : int, position : Vector2i) -> void:
 func _ready() -> void:
 	grid_graphics.linkGameMaster(self)
 	ftm.resource_uploaded.connect(load_game_definition)
+	switch_gui_scene(load_game_gui, null)
