@@ -24,8 +24,9 @@ var ui_state : UIState = UIState.LOAD_GAME
 var gui_scene : GUIScene
 var game_state : GameState ## The state of the game
 
-var moved_unit_id : int
-var movement_waypoints : Array[Vector2i]
+var moved_unit : Unit
+var movement_waypoints : Array[Vector2i] = []
+var current_possible_tiles : Array[Vector2i] = []
 
 
 # This is ONLY for drawing the map and the units!!
@@ -132,7 +133,14 @@ func _handle_event_load_game(event : StateMachineEvent):
 
 func _handle_event_default_in_game(event : StateMachineEvent):
 	if event is GridTileClickedEvent:
-		print(event.grid_pos)
+		if event.grid_pos == Vector2i(-1, -1): return # The user clicked outside the map
+		
+		var unit = game_state.get_first_unit_on_tile(event.grid_pos)
+		if unit == null: return # There is no unit on the tile
+		
+		moved_unit = unit
+		movement_waypoints.clear()
+		# TODO: Add graphics stuff here
 
 
 func _handle_event_unit_move(event : StateMachineEvent):

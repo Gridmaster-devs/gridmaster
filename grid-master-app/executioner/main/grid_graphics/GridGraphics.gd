@@ -10,10 +10,19 @@ const TILE_SIZE = 64
 const GROUP_NAME : StringName = "GridGraphics"
 const EVENT_INPUT_FUNC_NAME : StringName = "handle_input"
 
+enum GraphicsState {DEFAULT, UNIT_MOVE}
+
 @onready var ui_map_grid = $"SubViewportContainer/Grid Graphics Viewport/TileGrid"
 @onready var background_grid = $"SubViewportContainer/Grid Graphics Viewport/BackgroundGrid"
 @onready var grid_graphics_viewport = $"SubViewportContainer/Grid Graphics Viewport"
 @onready var tile_grid : TileMapLayer = $"SubViewportContainer/Grid Graphics Viewport/TileGrid"
+
+
+
+# Variables for UNIT_MOVE
+var possible_movement_tiles : Array[Vector2i]
+var moved_unit_pos : Vector2i
+
 
 var game_master : GameMaster # NOTE: Might be unnecessary when using groups
 var _grid_width : int
