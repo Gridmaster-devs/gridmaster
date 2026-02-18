@@ -14,7 +14,7 @@ func getScreenPosition() -> Vector2i:
 	return position
 
 
-func _init(internal_unit: Unit, screen_pos: Vector2i) -> void:
+func _init(internal_unit: Unit, screen_pos: Vector2) -> void:
 	unit = internal_unit
 	position = screen_pos
 	initSprite()
