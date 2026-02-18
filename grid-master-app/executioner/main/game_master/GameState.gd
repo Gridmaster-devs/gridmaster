@@ -131,6 +131,12 @@ func get_pathfinder() -> DijkstraPathfinder:
 	return _pathfinder
 
 
+## Returns the first unit on the specified tile.
+## Can return null if there are no units on the tile.
+func get_first_unit_on_tile(coords : Vector2i) -> Unit:
+	return grid.get_first_unit_on_tile(coords)
+
+
 
 # ---
 # DEBUG FUNCTIONS

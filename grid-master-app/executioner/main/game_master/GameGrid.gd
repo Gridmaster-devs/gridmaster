@@ -45,6 +45,16 @@ func getUnitsOnTile(x : int, y : int) -> Dictionary[int, Unit]:
 	return getTile(x, y).getUnits()
 
 
+## Returns the first unit on the tile.
+## Can return null if there are no units on the tile.
+func get_first_unit_on_tile(pos : Vector2i) -> Unit:
+	return get_tile_vec(pos).get_first_unit()
+
+
+func is_empty(pos : Vector2i) -> bool:
+	return get_tile_vec(pos).is_empty()
+
+
 # There's no error checking here because this SHOULD crash if
 # it gets wrong information
 ## Removes a unit from the start tile, and adds it to the end tile.

@@ -33,7 +33,21 @@ func getUnitById(unit_id : int) -> Variant:
 ## Adds the unit to the unit array
 func addUnit(unit : Unit) -> void:
 	units.set(unit.getId(), unit)
-	
+
+
+func get_first_unit() -> Unit:
+	if (units.values().is_empty()):
+		return null
+	else:
+		return units.values().front()
+
+
+func is_empty() -> bool:
+	if units.values().is_empty():
+		return true
+	else:
+		return false
+
 
 ## Removes the unit from the tile
 ##

@@ -76,7 +76,6 @@ func tiles_from_position(start_position : Vector2i, movement_available : int) ->
 	
 	var start_node : DijkstraNode = _djikstra_grid.get_item_vec(start_position)
 	start_node.movement_required = 0
-	possible.append(start_position)
 	unvisited.add_item(start_position)
 	
 	var current_node : DijkstraNode
@@ -92,9 +91,10 @@ func tiles_from_position(start_position : Vector2i, movement_available : int) ->
 		else:
 			current_node.visited = true
 			
-			# If our unit has enough movement to reach this tile
-			if (current_node.movement_required <= movement_available):
-				possible.append(current_node.position)
+			# If our unit has enough movement to reach this tile and there are no units on the tile yet
+			if (current_node.movement_required <= movement_available and _game_grid.is_empty(current_node.position)):
+				if current_node.position != start_position: # We don't want to add the start position to the possible moves
+					possible.append(current_node.position)
 				
 				var neighbors = _get_neighbors(current_node)
 				
