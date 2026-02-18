@@ -66,8 +66,8 @@ func initTileGrid(game_grid : GameGrid) -> void:
 
 
 ## Converts game grid coordinates to screen coordinates
-func gridToScreen(grid_pos: Vector2i) -> Vector2i: 
-	return Vector2i(grid_pos.x * TILE_SIZE + TILE_SIZE / 2, grid_pos.y * TILE_SIZE + TILE_SIZE / 2)
+func gridToScreen(grid_pos: Vector2i) -> Vector2: 
+	return Vector2(grid_pos.x * TILE_SIZE + TILE_SIZE / 2.0, grid_pos.y * TILE_SIZE + TILE_SIZE / 2.0)
 
 
 ## Initializes the background grid
@@ -122,6 +122,7 @@ func get_current_hovered_tile_coords() -> Vector2i:
 		return Vector2i(x_pos, y_pos)
 
 
+## Called when the click tracker emits a clicked signal
 func _clicked(button : MouseButton) -> void:
 	var tile_coords = get_current_hovered_tile_coords()
 	get_tree().call_group(	GameMaster.GROUP_NAME,

@@ -1,8 +1,9 @@
-[gd_scene load_steps=13 format=3 uid="uid://col1qb3vuji1l"]
+[gd_scene load_steps=14 format=3 uid="uid://col1qb3vuji1l"]
 
 [ext_resource type="Script" uid="uid://blhe7742yushy" path="res://executioner/main/grid_graphics/SubViewport.gd" id="1_4cchx"]
 [ext_resource type="Script" uid="uid://d00g7dklp0g33" path="res://executioner/main/grid_graphics/GridGraphics.gd" id="1_i8nvr"]
 [ext_resource type="Texture2D" uid="uid://dp1ky8epuaiv" path="res://editor/sprites/map_editor_sprites/grid_invis_highlight.png" id="2_i8nvr"]
+[ext_resource type="PackedScene" uid="uid://qjg886xkmr5h" path="res://executioner/main/grid_graphics/custom_graphics.tscn" id="3_1wvow"]
 [ext_resource type="Texture2D" uid="uid://doqe1u6vume5c" path="res://editor/sprites/map_editor_sprites/grid_invis.png" id="3_ksf4j"]
 [ext_resource type="Texture2D" uid="uid://cy4pdp1xl7ssw" path="res://editor/sprites/map_editor_sprites/grid_invis_highlight_pink.png" id="4_fxvlp"]
 [ext_resource type="Script" uid="uid://dt42lu3jva7s3" path="res://executioner/main/grid_graphics/BackgroundGrid.gd" id="5_30r7l"]
@@ -54,6 +55,9 @@ handle_input_locally = false
 size = Vector2i(2, 2)
 render_target_update_mode = 4
 script = ExtResource("1_4cchx")
+
+[node name="CustomGraphics" parent="SubViewportContainer/Grid Graphics Viewport" instance=ExtResource("3_1wvow")]
+z_index = 1
 
 [node name="TileGrid" type="TileMapLayer" parent="SubViewportContainer/Grid Graphics Viewport"]
 tile_set = SubResource("TileSet_3wctu")

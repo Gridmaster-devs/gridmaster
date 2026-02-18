@@ -1,5 +1,8 @@
 class_name ClickTracker
+## Class that handles mouse clicking input
+## and emits a signal when a click is detected.
 
+## Emitted when the click tracker detects a click
 signal clicked(button : MouseButton)
 
 ## Time window for what counts as a a click
