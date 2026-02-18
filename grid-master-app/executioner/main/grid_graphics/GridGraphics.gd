@@ -129,6 +129,7 @@ func get_current_hovered_tile_coords() -> Vector2i:
 
 # Handles user input that is not first handled by UI elements,
 # like buttons and the like.
+# Called by the sub viewport through groups
 func handle_input(event: InputEvent) -> void:
 	# Event is a mouse button press
 	if event is InputEventMouseButton:
@@ -146,5 +147,3 @@ func handle_input(event: InputEvent) -> void:
 				get_tree().call_group(	GameMaster.GROUP_NAME,
 										GameMaster.EVENT_INPUT_FUNC_NAME,
 										GridTileClickedEvent.new(event.button_index, tile_coords))
-			
-	

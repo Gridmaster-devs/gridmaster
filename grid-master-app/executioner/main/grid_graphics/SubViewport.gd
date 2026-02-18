@@ -23,5 +23,7 @@ func _process(delta: float) -> void:
 	pass
 
 
+# We're sending the events back to the grid graphics to be handled.
+# This is necessary because the events propagate from the viewport
 func _unhandled_input(event: InputEvent) -> void:
 	scene_tree.call_group(GridGraphics.GROUP_NAME, GridGraphics.EVENT_INPUT_FUNC_NAME, event)
