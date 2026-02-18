@@ -55,6 +55,10 @@ func initTileSources(game_grid: GameGrid) -> void:
 ## initializes the map element of the game from data loaded into the game_state
 func initTileGrid(game_grid : GameGrid) -> void: 
 	initTileSources(game_grid)
+	
+	_grid_width = game_grid.getWidth()
+	_grid_height = game_grid.getHeight()
+	
 	for y in range(game_grid.tiles.height):
 		for x in range(game_grid.tiles.width):
 			var id = game_grid.getTileType(x, y).type_id

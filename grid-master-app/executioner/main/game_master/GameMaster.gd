@@ -82,6 +82,7 @@ func load_game_definition(game_definition : Resource):
 	assert(game_definition != null, "Invalid game definition in file!")
 	initGameStateFromGameDefinition(game_definition)
 	switch_gui_scene(in_game_default_gui, getGameName())
+	ui_state = UIState.IN_GAME_DEFAULT
 	
 
 
