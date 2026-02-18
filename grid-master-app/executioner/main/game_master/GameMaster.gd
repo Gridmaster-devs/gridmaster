@@ -111,7 +111,6 @@ func printTileTypes() -> void:
 ## Called by the graphics element or its children via a group.
 ## Calls the appropriate input handler based on the UI state.
 func receive_ui_event(event : StateMachineEvent):
-	print("received event")
 	match ui_state:
 		UIState.LOAD_GAME:
 			_handle_event_load_game(event)

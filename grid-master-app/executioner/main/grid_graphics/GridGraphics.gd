@@ -2,11 +2,6 @@ class_name GridGraphics
 extends Control
 ## Class / Node that is responsible for drawing the grid graphics of the game
 
-## Time window for what counts as a a click
-## I.e. if the time between pressing the mouse button down
-## and raising it is less than this value, it will count as a click
-const CLICK_WINDOW = 500
-
 ## Size for the tiles of the grid.
 ## This is the internal size of the grid for the godot engine,
 ## not the resolution. 
@@ -24,11 +19,7 @@ var game_master : GameMaster # NOTE: Might be unnecessary when using groups
 var _grid_width : int
 var _grid_height : int
 
-
-## Stores the time when the specific mouse key was pressed down.
-## Used to detect whether the user is clicking or dragging.
-var _keypress_times : Dictionary[MouseButton, int]
-
+var click_tracker : ClickTracker = ClickTracker.new()
 
 ## array of the currently drawn units, should only be used for drawing purposes 
 ## maybe later just have it take the texture from the unit? 
@@ -127,23 +118,19 @@ func get_current_hovered_tile_coords() -> Vector2i:
 		return Vector2i(x_pos, y_pos)
 
 
+func _clicked(button : MouseButton) -> void:
+	var tile_coords = get_current_hovered_tile_coords()
+	get_tree().call_group(	GameMaster.GROUP_NAME,
+							GameMaster.EVENT_INPUT_FUNC_NAME,
+							GridTileClickedEvent.new(button, tile_coords))
+
+
 # Handles user input that is not first handled by UI elements,
 # like buttons and the like.
 # Called by the sub viewport through groups
 func handle_input(event: InputEvent) -> void:
-	# Event is a mouse button press
-	if event is InputEventMouseButton:
-		
-		# Button was just pressed down
-		if event.is_pressed():
-			_keypress_times.set(event.button_index, Time.get_ticks_msec())
-		
-		# Button was just released
-		else:
-			var time_diff : int = Time.get_ticks_msec() - _keypress_times.get(event.button_index, 0)
-			# Time between pressing down and releasing the button is within the specified window
-			if time_diff < CLICK_WINDOW:
-				var tile_coords = get_current_hovered_tile_coords()
-				get_tree().call_group(	GameMaster.GROUP_NAME,
-										GameMaster.EVENT_INPUT_FUNC_NAME,
-										GridTileClickedEvent.new(event.button_index, tile_coords))
+	click_tracker.handle_input(event)
+
+
+func _ready() -> void:
+	click_tracker.clicked.connect(_clicked)
