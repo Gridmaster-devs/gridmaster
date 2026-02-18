@@ -2,7 +2,7 @@ class_name InGameDefaultGUI
 extends GUIScene
 
 @onready var _game_name_label : Label = $GameNameLabel
-@onready var _end_turn_button : Button = $EndTurnButton
+@onready var _end_turn_button : GUIButton = $EndTurnButton
 
 
 func _end_turn_button_pressed() -> void:
