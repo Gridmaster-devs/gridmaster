@@ -148,7 +148,10 @@ func _handle_event_default_in_game(event : StateMachineEvent):
 		
 		moved_unit = unit
 		movement_waypoints.clear()
-		# TODO: Add graphics stuff here
+		
+		current_possible_tiles = game_state.get_pathfinder().tiles_from_position(unit.getPosition(), unit.movement_speed)
+		
+		_custom_graphics.draw_movement_tiles(current_possible_tiles, unit.getId())
 
 
 func _handle_event_unit_move(event : StateMachineEvent):
@@ -214,6 +217,7 @@ func DEBUG_create_unit(unit_type_id : int, position : Vector2i) -> void:
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	grid_graphics.linkGameMaster(self)
+	_click_tracker.clicked.connect(_clicked)
 	_custom_graphics = grid_graphics.get_custom_graphics()
 	ftm.resource_uploaded.connect(load_game_definition)
 	switch_gui_scene(load_game_gui, null)

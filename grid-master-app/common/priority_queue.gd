@@ -36,7 +36,7 @@ func add_item(item : Variant):
 		# There was an item with lower or equal priority in the queue,
 		# so we will put the new item right before it
 		else:
-			_items.insert(item, first_found)
+			_items.insert(first_found, item)
 
 ## Returns and removes the item with the lowest priority value from the queue.
 func pop_first() -> Variant:
