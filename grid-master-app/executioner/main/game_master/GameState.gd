@@ -3,6 +3,8 @@ extends RefCounted
 ## Class that represents everything that makes up the current state of the game, ex. the units, the map, etc
 
 
+var client_player_id : int = 0
+
 var game_name : String
 var grid : GameGrid ## Grid that represents the map
 var units : Dictionary[int, Unit] = {} ## All the units in the game, NOTE: also stored in each map tile
@@ -135,6 +137,10 @@ func get_pathfinder() -> DijkstraPathfinder:
 ## Can return null if there are no units on the tile.
 func get_first_unit_on_tile(coords : Vector2i) -> Unit:
 	return grid.get_first_unit_on_tile(coords)
+
+
+func get_client_player_id() -> int:
+	return client_player_id
 
 
 
