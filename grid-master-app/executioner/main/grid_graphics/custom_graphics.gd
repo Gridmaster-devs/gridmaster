@@ -18,13 +18,15 @@ const MOVEMENT_PATH_OUTSIDE_COLOR : Color = Color(0.6, 0.6, 0.6)
 const MOVEMENT_PATH_INSIDE_THICKNESS : int = 4
 const MOVEMENT_PATH_INSIDE_COLOR : Color = Color(0.2, 0.2, 0.2)
 
-const MOVEMENT_PATH_SMALL_PRIORITY : int = 1
+const MOVEMENT_PATH_SMALL_PRIORITY : int = 0
 const MOVEMENT_PATH_SMALL_OUTSIDE_THICKNESS : int = 8
 const MOVEMENT_PATH_SMALL_OUTSIDE_COLOR : Color = Color(0.6, 0.6, 0.6, 0.5)
 const MOVEMENT_PATH_SMALL_INSIDE_THICKNESS : int = 4
 const MOVEMENT_PATH_SMALL_INSIDE_COLOR : Color = Color(0.2, 0.2, 0.2, 0.5)
 
-const MOVEMENT_WAYPOINT : int = 3
+const MOVEMENT_WAYPOINT_PRIORITY : int = 3
+const MOVEMENT_TILE_PRIORTIY : int = 2
+
 
 ## The draw commands to be executed
 var _draw_commands : Array[CustomGraphicsCommand]
@@ -47,12 +49,12 @@ func draw_tile_cursor(pos : Vector2i):
 	add_draw_command(draw_func, TILE_CURSOR_ID, TILE_CURSOR_PRIORITY)
 
 
-func draw_movement_tiles(tiles : Array[Vector2i], id : int, priority : int):
+func draw_movement_tiles(tiles : Array[Vector2i], id : int):
 	var draw_func = func():
 		for tile : Vector2i in tiles:
 			draw_texture(movement_target, tile * GridGraphics.TILE_SIZE)
 	
-	add_draw_command(draw_func, id, priority)
+	add_draw_command(draw_func, id, MOVEMENT_TILE_PRIORTIY)
 
 
 func draw_waypoint(pos : Vector2i, id : int, priority : int):
