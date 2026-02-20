@@ -28,6 +28,7 @@ var gui_scene : GUIScene
 
 var game_state : GameState ## The state of the game
 
+# Variables for the unit movement state
 var moved_unit : Unit
 var movement_waypoints : Array[Vector2i] = []
 var current_possible_tiles : Array[Vector2i] = []
@@ -140,6 +141,7 @@ func receive_ui_event(event : StateMachineEvent):
 			_handle_event_unit_move(event)
 
 
+## Handles input when in the load game screen
 func _handle_event_load_game(event : StateMachineEvent):
 	if event is ButtonPressedEvent:
 		var button_press := event as ButtonPressedEvent
@@ -147,6 +149,7 @@ func _handle_event_load_game(event : StateMachineEvent):
 			load_game_from_file()
 
 
+## Default handler for in-game
 func _handle_event_default_in_game(event : StateMachineEvent):
 	if event is GridTileClickedEvent:
 		if event.mouse_button == MOUSE_BUTTON_LEFT:
@@ -169,9 +172,11 @@ func _handle_event_default_in_game(event : StateMachineEvent):
 			end_turn()
 
 
+## Handler for when the user has clicked on a unit and is moving it
 func _handle_event_unit_move(event : StateMachineEvent) -> void:
 	_custom_graphics.clear_id(moved_unit.getId())
 	
+	# User clicked on a tile
 	if event is GridTileClickedEvent:
 		# Right click cancels moving a unit
 		if event.mouse_button == MOUSE_BUTTON_RIGHT:
@@ -181,26 +186,40 @@ func _handle_event_unit_move(event : StateMachineEvent) -> void:
 		# the possible tiles
 		elif event.mouse_button == MOUSE_BUTTON_LEFT:
 			
+			# If the user clicks on the latest waypoint, accept the movement command
 			if (!movement_waypoints.is_empty() and movement_waypoints.back() == event.grid_pos):
 				moved_unit.current_action = MoveAction.new(current_path, game_state.get_client_player_id(), moved_unit.getId())
 				_exit_unit_move()
 				return
 			
+			# If the user clicked outside of the possible tiles,
+			# cancel movement
 			var path = game_state.get_pathfinder().get_path_to_pos(event.grid_pos)
 			if path.is_empty():
 				_exit_unit_move()
 				return
+				
+			# The movement hasn't been accepted or cancelled, so the user has clicked
+			# on a valid movement tile
 			
+			# If we don't have a current path yet
 			if (current_path.is_empty()):
 				path.reverse()
 				current_path = path
+				
+			# If we do have a current path we need to remove the first element of the
+			# new path to be added so we don't have duplicate tiles
 			else:
 				path.reverse()
 				path.remove_at(0)
 				current_path.append_array(path)
 			
-			movement_waypoints.append(event.grid_pos)
+			movement_waypoints.append(event.grid_pos) # Add the clicked tile as a waypoint
+			
+			# Calculate how much movement the unit has left
 			movement_left = movement_left - game_state.get_pathfinder().movement_required_to_position(event.grid_pos)
+			
+			# Calculate the new valid movement tiles
 			current_possible_tiles = game_state.get_pathfinder().tiles_from_position(event.grid_pos, movement_left)
 			
 			
