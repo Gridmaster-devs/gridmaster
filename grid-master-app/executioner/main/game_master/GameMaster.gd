@@ -31,6 +31,8 @@ var game_state : GameState ## The state of the game
 var moved_unit : Unit
 var movement_waypoints : Array[Vector2i] = []
 var current_possible_tiles : Array[Vector2i] = []
+var current_path : Array[Vector2i] = []
+var movement_left : int
 
 
 # This is ONLY for drawing the map and the units!!
@@ -109,6 +111,12 @@ func printTileTypes() -> void:
 		game_state.printTileTypes(true)
 
 
+func end_turn() -> void:
+	_custom_graphics.clear()
+	game_state.end_turn()
+	units_changed.emit()
+
+
 
 # STATE MACHINE FUNCTIONS
 
@@ -129,7 +137,7 @@ func receive_ui_event(event : StateMachineEvent):
 			_handle_event_default_in_game(event)
 		
 		UIState.UNIT_MOVE:
-			_handle_event_default_in_game(event)
+			_handle_event_unit_move(event)
 
 
 func _handle_event_load_game(event : StateMachineEvent):
@@ -141,22 +149,103 @@ func _handle_event_load_game(event : StateMachineEvent):
 
 func _handle_event_default_in_game(event : StateMachineEvent):
 	if event is GridTileClickedEvent:
-		if event.grid_pos == Vector2i(-1, -1): return # The user clicked outside the map
-		
-		var unit = game_state.get_first_unit_on_tile(event.grid_pos)
-		if unit == null: return # There is no unit on the tile
-		
-		moved_unit = unit
-		movement_waypoints.clear()
-		
-		current_possible_tiles = game_state.get_pathfinder().tiles_from_position(unit.getPosition(), unit.movement_speed)
-		
-		_custom_graphics.draw_movement_tiles(current_possible_tiles, unit.getId())
+		if event.mouse_button == MOUSE_BUTTON_LEFT:
+			if event.grid_pos == Vector2i(-1, -1): return # The user clicked outside the map
+			
+			var unit = game_state.get_first_unit_on_tile(event.grid_pos)
+			if unit == null: return # There is no unit on the tile
+			
+			moved_unit = unit
+			moved_unit.current_action = null
+			
+			current_possible_tiles = game_state.get_pathfinder().tiles_from_position(unit.getPosition(), unit.movement_speed)
+			movement_left = moved_unit.movement_speed
+			
+			_custom_graphics.draw_movement_tiles(current_possible_tiles, unit.getId())
+			ui_state = UIState.UNIT_MOVE
+	
+	elif event is ButtonPressedEvent:
+		if event.button_type == ButtonPressedEvent.ButtonType.END_TURN:
+			end_turn()
 
 
-func _handle_event_unit_move(event : StateMachineEvent):
-	pass
+func _handle_event_unit_move(event : StateMachineEvent) -> void:
+	_custom_graphics.clear_id(moved_unit.getId())
+	
+	if event is GridTileClickedEvent:
+		# Right click cancels moving a unit
+		if event.mouse_button == MOUSE_BUTTON_RIGHT:
+			_exit_unit_move()
+		
+		# Left click cancels moving a unit if the user clicks outside
+		# the possible tiles
+		elif event.mouse_button == MOUSE_BUTTON_LEFT:
+			
+			if (!movement_waypoints.is_empty() and movement_waypoints.back() == event.grid_pos):
+				moved_unit.current_action = MoveAction.new(current_path, game_state.get_client_player_id(), moved_unit.getId())
+				_exit_unit_move()
+				return
+			
+			var path = game_state.get_pathfinder().get_path_to_pos(event.grid_pos)
+			if path.is_empty():
+				_exit_unit_move()
+				return
+			
+			if (current_path.is_empty()):
+				path.reverse()
+				current_path = path
+			else:
+				path.reverse()
+				path.remove_at(0)
+				current_path.append_array(path)
+			
+			movement_waypoints.append(event.grid_pos)
+			movement_left = movement_left - game_state.get_pathfinder().movement_required_to_position(event.grid_pos)
+			current_possible_tiles = game_state.get_pathfinder().tiles_from_position(event.grid_pos, movement_left)
+			
+			
+			_custom_graphics.draw_movement_path(current_path, moved_unit.getId())
+			_custom_graphics.draw_waypoints(movement_waypoints, moved_unit.getId())
+			_custom_graphics.draw_movement_tiles(current_possible_tiles, moved_unit.getId())
+		
+		
+	elif event is MouseMovedToTileEvent:
+		var path = game_state.get_pathfinder().get_path_to_pos(event.new_pos)
+		
+		_custom_graphics.draw_waypoints(movement_waypoints, moved_unit.getId())
+		_custom_graphics.draw_movement_tiles(current_possible_tiles, moved_unit.getId())
+		_custom_graphics.draw_movement_path(current_path, moved_unit.getId())
+		
+		
+		# If there is a path (i.e. the unit can path to the selected tile)
+		if path.is_empty() == false:
+			_custom_graphics.draw_movement_path(path, moved_unit.getId())
+		
+		# If there is no path (i.e. the unnit cannot path to the selected tile)
+		else:
+			pass
+	
+	
+	elif event is ButtonPressedEvent:
+		if event.button_type == ButtonPressedEvent.ButtonType.END_TURN:
+			_exit_unit_move()
+			end_turn()
+		
 
+
+func _exit_unit_move() -> void:
+	_custom_graphics.clear_id(moved_unit.getId())
+	
+	if (moved_unit.current_action is MoveAction):
+		var action = moved_unit.current_action as MoveAction
+		_custom_graphics.draw_movement_path_small(action.path, moved_unit.getId())
+	
+	moved_unit = null
+	movement_waypoints.clear()
+	current_possible_tiles.clear()
+	current_path = []
+	movement_left = 0
+	ui_state = UIState.IN_GAME_DEFAULT
 
 ## Switches the GUI scene to a new one and initializes it with the args.
 ##

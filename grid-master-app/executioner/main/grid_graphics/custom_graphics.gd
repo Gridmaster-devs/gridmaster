@@ -57,14 +57,17 @@ func draw_movement_tiles(tiles : Array[Vector2i], id : int):
 	add_draw_command(draw_func, id, MOVEMENT_TILE_PRIORTIY)
 
 
-func draw_waypoint(pos : Vector2i, id : int, priority : int):
+func draw_waypoints(positions : Array[Vector2i], id : int):
 	var draw_func = func():
-		draw_texture(movement_waypoint, pos * GridGraphics.TILE_SIZE)
+		for pos in positions:
+			draw_texture(movement_waypoint, pos * GridGraphics.TILE_SIZE)
 	
-	add_draw_command(draw_func, id, priority)
+	add_draw_command(draw_func, id, MOVEMENT_WAYPOINT_PRIORITY)
 
 
-func draw_movement_path(path : Array[Vector2i], id : int, priority : int):
+func draw_movement_path(path : Array[Vector2i], id : int):
+	if path.size() < 2: return
+	
 	var point_path : PackedVector2Array = []
 	for point : Vector2i in path:
 		point_path.append((point * _tile_size) + Vector2i(_tile_size / 2, _tile_size / 2)) 
@@ -73,10 +76,12 @@ func draw_movement_path(path : Array[Vector2i], id : int, priority : int):
 		draw_polyline(point_path, MOVEMENT_PATH_OUTSIDE_COLOR, MOVEMENT_PATH_OUTSIDE_THICKNESS, true)
 		draw_polyline(point_path, MOVEMENT_PATH_INSIDE_COLOR, MOVEMENT_PATH_INSIDE_THICKNESS, true)
 	
-	add_draw_command(draw_func, id, priority)
+	add_draw_command(draw_func, id, MOVEMENT_PATH_PRIORITY)
 
 
-func draw_movement_path_small(path : Array[Vector2i], id : int, priority : int):
+func draw_movement_path_small(path : Array[Vector2i], id : int):
+	if path.size() < 2: return
+	
 	var point_path : PackedVector2Array = []
 	for point : Vector2i in path:
 		point_path.append((point * _tile_size) + Vector2i(_tile_size / 2, _tile_size / 2))
@@ -85,7 +90,7 @@ func draw_movement_path_small(path : Array[Vector2i], id : int, priority : int):
 		draw_polyline(point_path, MOVEMENT_PATH_SMALL_OUTSIDE_COLOR, MOVEMENT_PATH_SMALL_OUTSIDE_THICKNESS, true)
 		draw_polyline(point_path, MOVEMENT_PATH_SMALL_INSIDE_COLOR, MOVEMENT_PATH_SMALL_INSIDE_THICKNESS, true)
 	
-	add_draw_command(draw_func, id, priority)
+	add_draw_command(draw_func, id, MOVEMENT_PATH_SMALL_PRIORITY)
 
 
 ## Adds a draw command to the array

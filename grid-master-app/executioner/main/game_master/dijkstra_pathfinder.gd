@@ -63,6 +63,7 @@ func _reset_nodes() -> void:
 		node.movement_required = MAX_INT
 		node.visited = false
 		node.previous = null
+		node.possible = false
 	
 	_djikstra_grid.foreach(reset_func, false)
 
@@ -95,6 +96,7 @@ func tiles_from_position(start_position : Vector2i, movement_available : int) ->
 			if ((current_node.movement_required <= movement_available and _game_grid.is_empty(current_node.position)) or (current_node.position == start_position)):
 				if current_node.position != start_position: # We don't want to add the start position to the possible moves
 					possible.append(current_node.position)
+					current_node.possible = true
 				
 				var neighbors = _get_neighbors(current_node)
 				
@@ -106,18 +108,27 @@ func tiles_from_position(start_position : Vector2i, movement_available : int) ->
 	return possible
 
 
+func movement_required_to_position(pos : Vector2i):
+	var tile : DijkstraNode = _djikstra_grid.get_item_vec(pos)
+	return tile.movement_required
+
+
 ## Returns a path from a previously calculated starting position
 ## (with tiles_from_position), if it exists
 func get_path_to_pos(position : Vector2i) -> Array[Vector2i]:
 	var path : Array[Vector2i] = []
 	
 	var current_node : DijkstraNode = _djikstra_grid.get_item_vec(position)
+	if current_node.possible == false:
+		return []
+
 	while(true):
-		path.append(current_node)
+		path.append(current_node.position)
 		current_node = current_node.previous
 		if current_node == null: break
 	
 	# If path would only have the beginning position we return an empty array instead
+	# don't think this is required anymore
 	if (path.size() <= 1):
 		return []
 	else:
@@ -130,6 +141,7 @@ class DijkstraNode extends RefCounted:
 	
 	var position : Vector2i
 	var movement : int = 1 # movement required to move onto the node from a neighbor
+	var possible : bool = false
 	
 	var visited : bool = false
 	var previous : DijkstraNode = null

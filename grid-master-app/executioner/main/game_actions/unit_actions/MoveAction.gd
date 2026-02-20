@@ -13,3 +13,9 @@ var path : Array[Vector2i]
 
 func execute(game_state : GameState):
 	game_state.move_unit(unit_id, path.back())
+
+
+func _init(path_p : Array[Vector2i], p_id : int, unit_id_p : int):
+	path = path_p
+	player_id = p_id
+	unit_id = unit_id_p
