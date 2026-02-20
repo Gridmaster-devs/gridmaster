@@ -10,14 +10,19 @@ const TILE_SIZE = 64
 const GROUP_NAME : StringName = "GridGraphics"
 const EVENT_INPUT_FUNC_NAME : StringName = "handle_input"
 
+## What state the grid graphics object is in
+# DEFAULT: Only the selected tile hover graphic is drawn
+# UNIT_MOVE: Selected tile and the path from the last waypoint to the cursor is drawn
 enum GraphicsState {DEFAULT, UNIT_MOVE}
 
 @onready var ui_map_grid = $"SubViewportContainer/Grid Graphics Viewport/TileGrid"
 @onready var background_grid = $"SubViewportContainer/Grid Graphics Viewport/BackgroundGrid"
 @onready var grid_graphics_viewport = $"SubViewportContainer/Grid Graphics Viewport"
 @onready var tile_grid : TileMapLayer = $"SubViewportContainer/Grid Graphics Viewport/TileGrid"
+@onready var custom_graphics : CustomGraphics = $"SubViewportContainer/Grid Graphics Viewport/CustomGraphics"
 
 
+var graphics_state : GraphicsState = GraphicsState.DEFAULT
 
 # Variables for UNIT_MOVE
 var possible_movement_tiles : Array[Vector2i]
@@ -28,7 +33,6 @@ var game_master : GameMaster # NOTE: Might be unnecessary when using groups
 var _grid_width : int
 var _grid_height : int
 
-var click_tracker : ClickTracker = ClickTracker.new()
 
 ## array of the currently drawn units, should only be used for drawing purposes 
 ## maybe later just have it take the texture from the unit? 
@@ -131,20 +135,9 @@ func get_current_hovered_tile_coords() -> Vector2i:
 		return Vector2i(x_pos, y_pos)
 
 
-## Called when the click tracker emits a clicked signal
-func _clicked(button : MouseButton) -> void:
-	var tile_coords = get_current_hovered_tile_coords()
-	get_tree().call_group(	GameMaster.GROUP_NAME,
-							GameMaster.EVENT_INPUT_FUNC_NAME,
-							GridTileClickedEvent.new(button, tile_coords))
-
-
-# Handles user input that is not first handled by UI elements,
-# like buttons and the like.
-# Called by the sub viewport through groups
-func handle_input(event: InputEvent) -> void:
-	click_tracker.handle_input(event)
+func get_custom_graphics() -> CustomGraphics:
+	return custom_graphics
 
 
 func _ready() -> void:
-	click_tracker.clicked.connect(_clicked)
+	pass
