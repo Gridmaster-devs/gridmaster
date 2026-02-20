@@ -16,12 +16,16 @@ const in_game_default_gui : PackedScene = preload("res://executioner/main/grid_g
 
 static var GROUP_NAME : String = "GameMaster"
 static var EVENT_INPUT_FUNC_NAME : String = "receive_ui_event"
+const RAW_INPUT_FUNC_NAME : String = "receive_raw_input"
 
 @onready var ftm : FileTransferManager = $Dialogs/FileTransferManager
 @onready var grid_graphics : GridGraphics = $"Grid Graphics"
 
+var _custom_graphics : CustomGraphics
+var _click_tracker := ClickTracker.new()
 var ui_state : UIState = UIState.LOAD_GAME
 var gui_scene : GUIScene
+
 var game_state : GameState ## The state of the game
 
 var moved_unit : Unit
@@ -113,6 +117,10 @@ func printTileTypes() -> void:
 ## Called by the graphics element or its children via a group.
 ## Calls the appropriate input handler based on the UI state.
 func receive_ui_event(event : StateMachineEvent):
+	
+	if (event is MouseMovedToTileEvent):
+		_custom_graphics.draw_tile_cursor(event.new_pos)
+	
 	match ui_state:
 		UIState.LOAD_GAME:
 			_handle_event_load_game(event)
@@ -158,6 +166,19 @@ func switch_gui_scene(new_scene : PackedScene, args : Variant):
 	gui_scene.initialize(args)
 
 
+func _clicked(button : MouseButton):
+	var tile_coords = grid_graphics.get_current_hovered_tile_coords()
+	receive_ui_event(GridTileClickedEvent.new(button, tile_coords))
+
+
+func receive_raw_input(event : InputEvent):
+	if event is InputEventMouseButton:
+		_click_tracker.handle_input(event)
+	else:
+		if event is InputEventMouseMotion:
+			receive_ui_event(MouseMovedToTileEvent.new(grid_graphics.get_current_hovered_tile_coords()))
+
+
 # TESTING FUNCTIONS BLOCK
 # THESE FUNCTIONS ARE SOLELY FOR TESTING THE PROGRAM
 # THEY ARE ALWAYS TEMPORARY AND MUST EVENTUALLY BE REMOVED
@@ -193,5 +214,6 @@ func DEBUG_create_unit(unit_type_id : int, position : Vector2i) -> void:
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	grid_graphics.linkGameMaster(self)
+	_custom_graphics = grid_graphics.get_custom_graphics()
 	ftm.resource_uploaded.connect(load_game_definition)
 	switch_gui_scene(load_game_gui, null)
