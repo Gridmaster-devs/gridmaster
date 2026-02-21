@@ -34,6 +34,10 @@ window/stretch/mode="canvas_items"
 movie_writer/movie_file="E:/Godot/videos/test.avi"
 movie_writer/fps=30
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gut/plugin.cfg")
+
 [file_customization]
 
 folder_colors={
