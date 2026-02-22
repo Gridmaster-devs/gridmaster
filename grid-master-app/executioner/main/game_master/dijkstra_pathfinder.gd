@@ -6,9 +6,9 @@ extends RefCounted
 # Largest number an int can store, acting as infinity here
 const MAX_INT : int = 9223372036854775807
 
-var _djikstra_grid : Array2D
-var _game_grid : GameGrid
-var _units : Dictionary[int, Unit]
+var _djikstra_grid : Array2D # Array of Dijkstra nodes
+var _game_grid : GameGrid # Array of tiles as in the gamestate
+var _units : Dictionary[int, Unit] # Array of units as in the gamestate
 var _grid_width : int
 var _grid_height : int
 
@@ -101,7 +101,7 @@ func tiles_from_position(start_position : Vector2i, movement_available : int) ->
 		else:
 			current_node.visited = true
 			
-			# If our unit has enough movement to reach this tile and there are no units on the tile yet
+			# If our unit has enough movement to reach this tile, there are no units on the tile yet, and no other unit plans to move onto the tile
 			if ((current_node.movement_required <= movement_available and _game_grid.is_empty(current_node.position) and !movement_targets.get(current_node.position, false)) or (current_node.position == start_position)):
 				if current_node.position != start_position: # We don't want to add the start position to the possible moves
 					possible.append(current_node.position)
