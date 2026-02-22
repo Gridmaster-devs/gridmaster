@@ -92,7 +92,6 @@ func load_game_definition(game_definition : Resource):
 	initGameStateFromGameDefinition(game_definition)
 	switch_gui_scene(in_game_default_gui, getGameName())
 	ui_state = UIState.IN_GAME_DEFAULT
-	
 
 
 ## Prints the map into a log file
@@ -271,6 +270,7 @@ func _exit_unit_move() -> void:
 	current_path = []
 	movement_left = 0
 	ui_state = UIState.IN_GAME_DEFAULT
+
 
 ## Switches the GUI scene to a new one and initializes it with the args.
 ##
