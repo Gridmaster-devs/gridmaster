@@ -70,6 +70,7 @@ func initGameStateFromGameDefinition(game_definition : GameDefinitionResource):
 	
 	# DEBUG
 	DEBUG_create_unit(0, Vector2i(0,0))
+	DEBUG_create_unit(0, Vector2i(1,0))
 	# DEBUG
 
 	initGraphics()
@@ -152,14 +153,17 @@ func _handle_event_load_game(event : StateMachineEvent):
 ## Default handler for in-game
 func _handle_event_default_in_game(event : StateMachineEvent):
 	if event is GridTileClickedEvent:
-		if event.mouse_button == MOUSE_BUTTON_LEFT:
+		if event.mouse_button == MOUSE_BUTTON_LEFT: # User left clicked on the grid
 			if event.grid_pos == Vector2i(-1, -1): return # The user clicked outside the map
 			
 			var unit = game_state.get_first_unit_on_tile(event.grid_pos)
 			if unit == null: return # There is no unit on the tile
 			
+			# The user clicked on a tile in the map limits and there is a unit on the tile
+			
 			moved_unit = unit
-			moved_unit.current_action = null
+			moved_unit.current_action = null # clear the current action
+			_custom_graphics.clear_id(moved_unit.getId())
 			
 			current_possible_tiles = game_state.get_pathfinder().tiles_from_position(unit.getPosition(), unit.movement_speed)
 			movement_left = moved_unit.movement_speed
@@ -255,10 +259,12 @@ func _handle_event_unit_move(event : StateMachineEvent) -> void:
 func _exit_unit_move() -> void:
 	_custom_graphics.clear_id(moved_unit.getId())
 	
+	# If the movement action was confirmed, draw the small path for the unit
 	if (moved_unit.current_action is MoveAction):
 		var action = moved_unit.current_action as MoveAction
 		_custom_graphics.draw_movement_path_small(action.path, moved_unit.getId())
 	
+	# Clear movement parameters and change back to default state
 	moved_unit = null
 	movement_waypoints.clear()
 	current_possible_tiles.clear()

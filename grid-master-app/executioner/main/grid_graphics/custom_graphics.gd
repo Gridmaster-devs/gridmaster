@@ -32,13 +32,13 @@ const MOVEMENT_TILE_PRIORTIY : int = 2
 var _draw_commands : Array[CustomGraphicsCommand]
 var _tile_size : int = GridGraphics.TILE_SIZE
 
-
-
+# Textures for the graphics
 var movement_target : ImageTexture = ImageTexture.create_from_image(preload("res://executioner/media/movement_target_128.png").get_image())
 var movement_waypoint : ImageTexture = ImageTexture.create_from_image(preload("res://executioner/media/movement_waypoint_128.png").get_image())
 var selected_tile : ImageTexture = ImageTexture.create_from_image(preload("res://executioner/media/selected_tile_128.png").get_image())
 
 
+## Draws the tile cursor at a specific position
 func draw_tile_cursor(pos : Vector2i):
 	if (pos == Vector2i(-1, -1)): return
 	
@@ -49,6 +49,7 @@ func draw_tile_cursor(pos : Vector2i):
 	add_draw_command(draw_func, TILE_CURSOR_ID, TILE_CURSOR_PRIORITY)
 
 
+## Draws the movement tiles at specific positions
 func draw_movement_tiles(tiles : Array[Vector2i], id : int):
 	var draw_func = func():
 		for tile : Vector2i in tiles:
@@ -57,6 +58,7 @@ func draw_movement_tiles(tiles : Array[Vector2i], id : int):
 	add_draw_command(draw_func, id, MOVEMENT_TILE_PRIORTIY)
 
 
+## Draws waypoints at specific positions
 func draw_waypoints(positions : Array[Vector2i], id : int):
 	var draw_func = func():
 		for pos in positions:
@@ -65,6 +67,7 @@ func draw_waypoints(positions : Array[Vector2i], id : int):
 	add_draw_command(draw_func, id, MOVEMENT_WAYPOINT_PRIORITY)
 
 
+## Draws the currently being selected movement path
 func draw_movement_path(path : Array[Vector2i], id : int):
 	if path.size() < 2: return
 	
@@ -79,6 +82,7 @@ func draw_movement_path(path : Array[Vector2i], id : int):
 	add_draw_command(draw_func, id, MOVEMENT_PATH_PRIORITY)
 
 
+## Draws the already confirmed movement path
 func draw_movement_path_small(path : Array[Vector2i], id : int):
 	if path.size() < 2: return
 	
@@ -94,6 +98,8 @@ func draw_movement_path_small(path : Array[Vector2i], id : int):
 
 
 ## Adds a draw command to the array
+##
+## Can be used to add custom draw commands
 func add_draw_command(command : Callable, id : int, priority : int) -> void:
 	_draw_commands.append(CustomGraphicsCommand.new(command, id, priority))
 	queue_redraw()
@@ -105,22 +111,27 @@ func clear() -> void:
 	queue_redraw()
 
 
+## Clears all draw commands with a specific id
 func clear_id(id : int) -> void:
 	_draw_commands = _draw_commands.filter(func(command : CustomGraphicsCommand): return command.id != id)
 	queue_redraw()
 
 
+# Called to draw the object
 func _draw() -> void:
 	_draw_commands.sort_custom(CustomGraphicsCommand.sort_func)
 	for command in _draw_commands:
 		command.draw_command.call()
 
 
+# Prepares the graphics to be the right size
 func _ready() -> void:
 	movement_target.set_size_override(Vector2(_tile_size, _tile_size))
 	movement_waypoint.set_size_override(Vector2(_tile_size, _tile_size))
 	selected_tile.set_size_override(Vector2(_tile_size, _tile_size))
 
+
+## Class that represents a custom draw command for the custom graphics class
 class CustomGraphicsCommand:
 	var id : int
 	var priority : int

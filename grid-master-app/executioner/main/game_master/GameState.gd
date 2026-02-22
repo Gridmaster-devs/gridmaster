@@ -86,7 +86,7 @@ static func initFromGameDefinition(game_definition : GameDefinitionResource) -> 
 	game_state.grid = GameGrid.initFromMapResource(game_definition.loadMap())
 	
 	game_state._pathfinder = DijkstraPathfinder.new()
-	game_state._pathfinder.add_game_grid(game_state.grid)
+	game_state._pathfinder.initialize(game_state.grid, game_state.units)
 	
 	return game_state
 
