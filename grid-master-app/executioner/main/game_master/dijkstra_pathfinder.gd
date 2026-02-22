@@ -8,14 +8,16 @@ const MAX_INT : int = 9223372036854775807
 
 var _djikstra_grid : Array2D
 var _game_grid : GameGrid
+var _units : Dictionary[int, Unit]
 var _grid_width : int
 var _grid_height : int
 
 
 ## Initializes the Djikstra Pathfinder's grid from a game_grid.
 ## Only needs to be called once when a game is started.
-func add_game_grid(game_grid : GameGrid) -> void:
+func initialize(game_grid : GameGrid, units : Dictionary[int, Unit]) -> void:
 	assert(game_grid != null, "Tried giving null game grid to Djikstra Pathfinder!")
+	_units = units
 	_game_grid = game_grid
 	_grid_width = _game_grid.getWidth()
 	_grid_height = _game_grid.getHeight()
@@ -73,7 +75,14 @@ func _reset_nodes() -> void:
 func tiles_from_position(start_position : Vector2i, movement_available : int) -> Array[Vector2i]:
 	var unvisited := PriorityQueue.new(DijkstraNode.priority_func)
 	var possible : Array[Vector2i] = [] # Possible to reach tiles
+	var movement_targets : Dictionary[Vector2i, bool] = {}
 	_reset_nodes() # Reset the nodes from a previous calculation
+	
+	for unit : Unit in _units.values():
+		var action = unit.current_action
+		if action is MoveAction:
+			movement_targets.set(action.movement_target(), true)
+	
 	
 	var start_node : DijkstraNode = _djikstra_grid.get_item_vec(start_position)
 	start_node.movement_required = 0
@@ -93,7 +102,7 @@ func tiles_from_position(start_position : Vector2i, movement_available : int) ->
 			current_node.visited = true
 			
 			# If our unit has enough movement to reach this tile and there are no units on the tile yet
-			if ((current_node.movement_required <= movement_available and _game_grid.is_empty(current_node.position)) or (current_node.position == start_position)):
+			if ((current_node.movement_required <= movement_available and _game_grid.is_empty(current_node.position) and !movement_targets.get(current_node.position, false)) or (current_node.position == start_position)):
 				if current_node.position != start_position: # We don't want to add the start position to the possible moves
 					possible.append(current_node.position)
 					current_node.possible = true

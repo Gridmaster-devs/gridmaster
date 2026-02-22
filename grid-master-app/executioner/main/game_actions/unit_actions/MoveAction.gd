@@ -15,6 +15,10 @@ func execute(game_state : GameState):
 	game_state.move_unit(unit_id, path.back())
 
 
+func movement_target() -> Vector2i:
+	return path.back()
+
+
 func _init(path_p : Array[Vector2i], p_id : int, unit_id_p : int):
 	path = path_p
 	player_id = p_id
