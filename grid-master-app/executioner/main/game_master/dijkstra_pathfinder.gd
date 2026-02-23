@@ -6,7 +6,7 @@ extends RefCounted
 # Largest number an int can store, acting as infinity here
 const MAX_INT : int = 9223372036854775807
 
-var _djikstra_grid : Array2D # Array of Dijkstra nodes
+var _djikstra_grid : Array[DijkstraNode] # Array of Dijkstra nodes
 var _game_grid : GameGrid # Array of tiles as in the gamestate
 var _units : Dictionary[int, Unit] # Array of units as in the gamestate
 var _grid_width : int
@@ -21,15 +21,26 @@ func initialize(game_grid : GameGrid, units : Dictionary[int, Unit]) -> void:
 	_game_grid = game_grid
 	_grid_width = _game_grid.getWidth()
 	_grid_height = _game_grid.getHeight()
-	_djikstra_grid = Array2D.new()
-	_djikstra_grid.init(_grid_width, _grid_height)
-	
-	var fill_func = func(x, y):
-		return DijkstraNode.new(Vector2i(x, y))
-	
-	_djikstra_grid.fill(fill_func)
+
+	for y in range(0, _grid_height):
+		for x in range(0, _grid_width):
+			_djikstra_grid.append(DijkstraNode.new(Vector2i(x, y)))
+
 	update_grid()
+
+
+func get_node_vec(pos : Vector2i):
+	return _djikstra_grid[_grid_width * pos.y + pos.x]
 	
+func get_node(x : int, y : int):
+	return _djikstra_grid[_grid_width * y + x]
+
+func get_index(x : int, y : int):
+	return (_grid_width * y + x)
+
+func get_index_vec(pos : Vector2i):
+	return (_grid_width * pos.y + pos.x)
+
 
 ## Updates the values of the tiles on the grid.
 ## Call if grid tile movement values change.
@@ -37,7 +48,7 @@ func update_grid() -> void:
 	for y in range(0, _grid_height):
 		for x in range(0, _grid_width):
 			var tile_type : TileType = _game_grid.getTileType(x, y)
-			var node : DijkstraNode = _djikstra_grid.getItem(x, y)
+			var node : DijkstraNode = get_node(x, y)
 			node.movement = tile_type.get_attribute(TileType.TILE_ATTRIBUTE_TYPE.MOVEMENT)
 
 
@@ -47,16 +58,16 @@ func _get_neighbors(node : DijkstraNode) -> Array[DijkstraNode]:
 	var y = node.position.y
 	
 	if (x > 0):
-		neighbors.append(_djikstra_grid.getItem(x-1,y))
+		neighbors.append(get_node(x-1,y))
 	
 	if (x < _grid_width - 1):
-		neighbors.append(_djikstra_grid.getItem(x+1,y))
+		neighbors.append(get_node(x+1,y))
 	
 	if (y > 0):
-		neighbors.append(_djikstra_grid.getItem(x,y-1))
+		neighbors.append(get_node(x,y-1))
 	
 	if (y < _grid_height - 1):
-		neighbors.append(_djikstra_grid.getItem(x,y+1))
+		neighbors.append(get_node(x,y+1))
 	
 	return neighbors
 
@@ -67,43 +78,51 @@ func _reset_nodes() -> void:
 		node.visited = false
 		node.previous = null
 		node.possible = false
+		node.has_unit = false
+		node.movement_target = false
 	
-	_djikstra_grid.foreach(reset_func, false)
+	for node : DijkstraNode in _djikstra_grid:
+		reset_func.call(node)
+		if (!_game_grid.is_empty(node.position)): node.has_unit = true
+	
+	var action : GameAction
+	for unit : Unit in _units.values():
+		action = unit.current_action
+		if action is MoveAction:
+			var pos = action.movement_target()
+			get_node_vec(pos).movement_target = true
 
 
 ## Returns an array of all tiles that are possible to reach from
 ## the starting position with a set amount of movement
 func tiles_from_position(start_position : Vector2i, movement_available : int) -> Array[Vector2i]:
-	var unvisited := PriorityQueue.new(DijkstraNode.priority_func)
+	var time : int = Time.get_ticks_msec() # DEBUG
+	
+	var unvisited := DijkstraPriorityQueue.new()
 	var possible : Array[Vector2i] = [] # Possible to reach tiles
-	var movement_targets : Dictionary[Vector2i, bool] = {}
 	_reset_nodes() # Reset the nodes from a previous calculation
 	
-	for unit : Unit in _units.values():
-		var action = unit.current_action
-		if action is MoveAction:
-			movement_targets.set(action.movement_target(), true)
 	
-	
-	var start_node : DijkstraNode = _djikstra_grid.get_item_vec(start_position)
+	var start_node : DijkstraNode = get_node_vec(start_position)
 	start_node.movement_required = 0
-	unvisited.add_item(start_node)
+	unvisited.add_item(Vector2(0, get_index_vec(start_position)))
 	
+	var current_vec2 : Vector2
 	var current_node : DijkstraNode
 	while(true):
 		# Get the unvisited node with the lowest movement required
-		current_node = unvisited.pop_first() as DijkstraNode
 		
-		# There are no nodes left, so we're done
-		if current_node == null:
+		current_vec2 = unvisited.pop_first()
+		if (current_vec2 == Vector2(-1, -1)):
 			break
 		
 		# There is a node to process
 		else:
+			current_node = _djikstra_grid[int(current_vec2.y)]
 			current_node.visited = true
 			
 			# If our unit has enough movement to reach this tile, there are no units on the tile yet, and no other unit plans to move onto the tile
-			if ((current_node.movement_required <= movement_available and _game_grid.is_empty(current_node.position) and !movement_targets.get(current_node.position, false)) or (current_node.position == start_position)):
+			if ((current_node.movement_required <= movement_available and !current_node.has_unit and !current_node.movement_target) or (current_node.position == start_position)):
 				if current_node.position != start_position: # We don't want to add the start position to the possible moves
 					possible.append(current_node.position)
 					current_node.possible = true
@@ -113,13 +132,14 @@ func tiles_from_position(start_position : Vector2i, movement_available : int) ->
 				for node in neighbors:
 					node.update_movement_req(current_node)
 					if (node.visited == false):
-						unvisited.add_item(node)
+						unvisited.add_item(Vector2(node.movement_required, get_index_vec(node.position)))
 					
+	print("Pathfinding finished in: %s ms" % (Time.get_ticks_msec() - time))
 	return possible
 
 
 func movement_required_to_position(pos : Vector2i):
-	var tile : DijkstraNode = _djikstra_grid.get_item_vec(pos)
+	var tile : DijkstraNode = get_node_vec(pos)
 	return tile.movement_required
 
 
@@ -128,7 +148,7 @@ func movement_required_to_position(pos : Vector2i):
 func get_path_to_pos(position : Vector2i) -> Array[Vector2i]:
 	var path : Array[Vector2i] = []
 	
-	var current_node : DijkstraNode = _djikstra_grid.get_item_vec(position)
+	var current_node : DijkstraNode = get_node_vec(position)
 	if current_node.possible == false:
 		return []
 
@@ -152,6 +172,8 @@ class DijkstraNode extends RefCounted:
 	var position : Vector2i
 	var movement : int = 1 # movement required to move onto the node from a neighbor
 	var possible : bool = false
+	var has_unit : bool = false
+	var movement_target : bool = false
 	
 	var visited : bool = false
 	var previous : DijkstraNode = null
@@ -176,3 +198,42 @@ class DijkstraNode extends RefCounted:
 
 	func _init(position_p : Vector2i):
 		position = position_p
+
+
+class DijkstraPriorityQueue extends RefCounted:
+	## Simple priority queue implementation
+
+	# Highest priority (lowest priority value) is always the last element
+	# in the array. The array is always sorted.
+	var _items : PackedVector2Array = []
+
+	func add_item(item : Vector2):
+		# If there are no items in the array we can just put the item in
+		if (_items.is_empty()):
+			_items.append(item)
+
+		# If there are items in the array, we must keep the array sorted
+		# We find the first element with a priority
+		else:
+			var pos : int = _items.bsearch(item)
+			_items.insert(pos, item)
+
+	## Returns and removes the item with the lowest priority value from the queue.
+	func pop_first() -> Vector2:
+		if _items.is_empty():
+			return Vector2(-1, -1)
+		else:
+			var elem : Vector2 = _items[0]
+			_items.remove_at(0)
+			return elem
+
+
+	## Returns the number of items in the queue.
+	func item_count() -> int:
+		return _items.size()
+
+
+	## The priority func must return an int when fed
+	## an object of the stored type.
+	func _init() -> void:
+		pass
