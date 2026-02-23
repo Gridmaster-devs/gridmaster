@@ -52,22 +52,22 @@ func update_grid() -> void:
 			node.movement = tile_type.get_attribute(TileType.TILE_ATTRIBUTE_TYPE.MOVEMENT)
 
 
-func _get_neighbors(node : DijkstraNode) -> Array[DijkstraNode]:
-	var neighbors : Array[DijkstraNode] = []
+func _get_neighbors(node : DijkstraNode) -> Array[int]:
+	var neighbors : Array[int] = []
 	var x = node.position.x
 	var y = node.position.y
 	
 	if (x > 0):
-		neighbors.append(get_node(x-1,y))
+		neighbors.append(get_index(x-1,y))
 	
 	if (x < _grid_width - 1):
-		neighbors.append(get_node(x+1,y))
+		neighbors.append(get_index(x+1,y))
 	
 	if (y > 0):
-		neighbors.append(get_node(x,y-1))
+		neighbors.append(get_index(x,y-1))
 	
 	if (y < _grid_height - 1):
-		neighbors.append(get_node(x,y+1))
+		neighbors.append(get_index(x,y+1))
 	
 	return neighbors
 
@@ -96,6 +96,7 @@ func _reset_nodes() -> void:
 ## Returns an array of all tiles that are possible to reach from
 ## the starting position with a set amount of movement
 func tiles_from_position(start_position : Vector2i, movement_available : int) -> Array[Vector2i]:
+	var time : int = Time.get_ticks_msec() # DEBUG
 	
 	var unvisited := DijkstraPriorityQueue.new()
 	var possible : Array[Vector2i] = [] # Possible to reach tiles
@@ -108,6 +109,7 @@ func tiles_from_position(start_position : Vector2i, movement_available : int) ->
 	
 	var current_vec2 : Vector2
 	var current_node : DijkstraNode
+	var neighbor_node : DijkstraNode
 	while(true):
 		# Get the unvisited node with the lowest movement required
 		
@@ -128,11 +130,13 @@ func tiles_from_position(start_position : Vector2i, movement_available : int) ->
 				
 				var neighbors = _get_neighbors(current_node)
 				
-				for node in neighbors:
-					node.update_movement_req(current_node)
-					if (node.visited == false):
-						unvisited.add_item(Vector2(node.movement_required, get_index_vec(node.position)))
+				for index : int in neighbors:
+					neighbor_node = _djikstra_grid[index]
+					neighbor_node.update_movement_req(current_node)
+					if (neighbor_node.visited == false):
+						unvisited.add_item(Vector2(neighbor_node.movement_required, get_index_vec(neighbor_node.position)))
 					
+	print("Pathfinding finished in: %s ms" % (Time.get_ticks_msec() - time))
 	return possible
 
 
