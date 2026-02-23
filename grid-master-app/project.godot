@@ -20,11 +20,13 @@ run/main_scene.editor="uid://nxldab0hpse0"
 [autoload]
 
 GML="*res://common/GML.gd"
+Global="*res://common/global.gd"
 
 [display]
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
+window/size/mode=3
 window/stretch/mode="canvas_items"
 
 [editor]

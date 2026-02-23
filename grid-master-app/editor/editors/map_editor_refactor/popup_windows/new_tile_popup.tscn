@@ -1,0 +1,41 @@
+[gd_scene load_steps=3 format=3 uid="uid://curfo43si75t0"]
+
+[ext_resource type="Script" uid="uid://boic1s18yx4pd" path="res://editor/editors/map_editor_refactor/popup_windows/new_tile_popup.gd" id="1_y5ttk"]
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="2_pmxm7"]
+
+[node name="NewTilePopup" type="Control"]
+layout_mode = 3
+anchor_right = 0.37300003
+anchor_bottom = 0.37800002
+offset_right = 0.8399658
+offset_bottom = -0.24002075
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_y5ttk")
+
+[node name="EditorPanel" parent="." instance=ExtResource("2_pmxm7")]
+layout_mode = 1
+section_headers = Array[String](["AttributesVbox", "SaveButton", "CancelButton"])
+
+[node name="TopLabel" parent="EditorPanel/TopVBox" index="0"]
+text = "Create New Tile"
+
+[node name="AttributesVbox" type="VBoxContainer" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/AttributesVbox"]
+layout_mode = 2
+theme_type_variation = &"SectionLabel"
+text = "Tile Attributes"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SaveButton" type="Button" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="1"]
+layout_mode = 2
+text = "Save"
+
+[node name="CancelButton" type="Button" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="2"]
+layout_mode = 2
+text = "Cancel"
+
+[editable path="EditorPanel"]

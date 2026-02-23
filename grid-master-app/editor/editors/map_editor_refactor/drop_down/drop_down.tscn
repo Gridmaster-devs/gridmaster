@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3 uid="uid://fufksbrxil0a"]
+
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="1_17kym"]
+[ext_resource type="Script" uid="uid://dua5b7lbia28" path="res://editor/editors/map_editor_refactor/drop_down/drop_down.gd" id="1_dkqn5"]
+
+[node name="DropDown" type="Control"]
+layout_mode = 3
+anchor_right = 0.136
+anchor_bottom = 0.555
+offset_right = 0.87997437
+offset_bottom = -0.4000244
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_dkqn5")
+
+[node name="EditorPanel" parent="." instance=ExtResource("1_17kym")]
+layout_mode = 0
+anchors_preset = 0
+
+[node name="TopLabel" parent="EditorPanel/TopVBox" index="0"]
+text = "Drop down"
+
+[editable path="EditorPanel"]

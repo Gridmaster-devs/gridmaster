@@ -1,0 +1,153 @@
+[gd_scene load_steps=17 format=3 uid="uid://bkfi6pml23hic"]
+
+[ext_resource type="Script" uid="uid://cb4towuvrfhsk" path="res://editor/editors/map_editor_refactor/user_interfaces/map_painter.gd" id="1_v37v7"]
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="2_gp3mo"]
+[ext_resource type="Script" uid="uid://pfgcd2tk24gn" path="res://editor/scripts/map_editor_scripts/other/sub_viewport_script.gd" id="3_xpio1"]
+[ext_resource type="Texture2D" uid="uid://dp1ky8epuaiv" path="res://editor/sprites/map_editor_sprites/grid_invis_highlight.png" id="4_w07yu"]
+[ext_resource type="Texture2D" uid="uid://doqe1u6vume5c" path="res://editor/sprites/map_editor_sprites/grid_invis.png" id="5_f6bkk"]
+[ext_resource type="Texture2D" uid="uid://cy4pdp1xl7ssw" path="res://editor/sprites/map_editor_sprites/grid_invis_highlight_pink.png" id="6_442k7"]
+[ext_resource type="Script" uid="uid://6g2o1upyh5q4" path="res://editor/scripts/map_editor_scripts/other/map_camera_script.gd" id="8_38i74"]
+[ext_resource type="Script" uid="uid://bvqyndxvu4lnc" path="res://editor/editors/map_editor_refactor/user_interfaces/background_tile_map.gd" id="8_xpio1"]
+[ext_resource type="Script" uid="uid://ckmni16vo0e1p" path="res://editor/editors/map_editor_refactor/user_interfaces/tile_descriptor.gd" id="9_gp3mo"]
+[ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://editor/themes/editor-theme.tres" id="11_w07yu"]
+[ext_resource type="Script" uid="uid://cf8qu7xklg80w" path="res://editor/editors/map_editor_refactor/map_painter_popup_manager.gd" id="12_w07yu"]
+
+[sub_resource type="TileSet" id="TileSet_7q6w6"]
+tile_size = Vector2i(64, 64)
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_pglyl"]
+texture = ExtResource("4_w07yu")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_xmq4b"]
+texture = ExtResource("5_f6bkk")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4jmhn"]
+texture = ExtResource("6_442k7")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_fkpgh"]
+tile_size = Vector2i(64, 64)
+sources/1 = SubResource("TileSetAtlasSource_xmq4b")
+sources/0 = SubResource("TileSetAtlasSource_pglyl")
+sources/2 = SubResource("TileSetAtlasSource_4jmhn")
+
+[node name="MapPainter" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_v37v7")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LeftPanel" parent="HBoxContainer" instance=ExtResource("2_gp3mo")]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+section_headers = Array[String](["VBoxContainer", "SSLVbox"])
+
+[node name="ContentsVBox" parent="HBoxContainer/LeftPanel/TopVBox/ScrollContainer" index="0"]
+theme_override_constants/separation = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/LeftPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/LeftPanel/TopVBox/ScrollContainer/ContentsVBox/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("11_w07yu")
+theme_type_variation = &"SectionLabel"
+text = "  Paint Controls"
+
+[node name="EraseButton" type="Button" parent="HBoxContainer/LeftPanel/TopVBox/ScrollContainer/ContentsVBox/VBoxContainer"]
+layout_mode = 2
+text = "ERASE"
+
+[node name="InteractButton" type="Button" parent="HBoxContainer/LeftPanel/TopVBox/ScrollContainer/ContentsVBox/VBoxContainer"]
+layout_mode = 2
+text = "INTERACT"
+
+[node name="SSLVbox" type="VBoxContainer" parent="HBoxContainer/LeftPanel/TopVBox/ScrollContainer/ContentsVBox" index="1"]
+layout_mode = 2
+size_flags_vertical = 10
+
+[node name="Label" type="Label" parent="HBoxContainer/LeftPanel/TopVBox/ScrollContainer/ContentsVBox/SSLVbox"]
+layout_mode = 2
+
+[node name="SettingsButton" type="Button" parent="HBoxContainer/LeftPanel/TopVBox/ScrollContainer/ContentsVBox/SSLVbox"]
+layout_mode = 2
+text = "SETTINGS"
+
+[node name="SubViewControl" type="Control" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="HBoxContainer/SubViewControl"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SubViewport" type="SubViewport" parent="HBoxContainer/SubViewControl/SubViewportContainer"]
+handle_input_locally = false
+size = Vector2i(2, 2)
+render_target_update_mode = 4
+script = ExtResource("3_xpio1")
+
+[node name="TileGrid" type="TileMapLayer" parent="HBoxContainer/SubViewControl/SubViewportContainer/SubViewport"]
+tile_set = SubResource("TileSet_7q6w6")
+
+[node name="BackgroundGrid" type="TileMapLayer" parent="HBoxContainer/SubViewControl/SubViewportContainer/SubViewport"]
+tile_set = SubResource("TileSet_fkpgh")
+script = ExtResource("8_xpio1")
+
+[node name="Camera2D" type="Camera2D" parent="HBoxContainer/SubViewControl/SubViewportContainer/SubViewport"]
+anchor_mode = 0
+script = ExtResource("8_38i74")
+
+[node name="RightPanel" parent="HBoxContainer" instance=ExtResource("2_gp3mo")]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+section_headers = Array[String](["TileDescriptorContainer"])
+
+[node name="TileDescriptorContainer" type="VBoxContainer" parent="HBoxContainer/RightPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/RightPanel/TopVBox/ScrollContainer/ContentsVBox/TileDescriptorContainer"]
+layout_mode = 2
+theme = ExtResource("11_w07yu")
+theme_type_variation = &"SectionLabel"
+text = "  Current Tile Description"
+
+[node name="TileDescriptor" type="VBoxContainer" parent="HBoxContainer/RightPanel/TopVBox/ScrollContainer/ContentsVBox/TileDescriptorContainer"]
+layout_mode = 2
+script = ExtResource("9_gp3mo")
+
+[node name="PopupManager" type="Container" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("12_w07yu")
+
+[editable path="HBoxContainer/LeftPanel"]
+[editable path="HBoxContainer/RightPanel"]

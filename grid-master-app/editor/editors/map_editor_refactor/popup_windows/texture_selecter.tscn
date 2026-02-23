@@ -1,0 +1,25 @@
+[gd_scene load_steps=2 format=3 uid="uid://cqb5j51xl5sgn"]
+
+[ext_resource type="Script" uid="uid://cn2ecd856khy" path="res://editor/editors/map_editor_refactor/popup_windows/texture_selecter.gd" id="1_jkwk0"]
+
+[node name="TextureSelecter" type="HBoxContainer"]
+mouse_filter = 2
+script = ExtResource("1_jkwk0")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Tile Texture"
+
+[node name="TexturePreview" type="TextureRect" parent="."]
+layout_mode = 2
+
+[node name="OpenTexturePickerButton" type="Button" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Choose Image"
+
+[node name="CropButton" type="Button" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Crop"

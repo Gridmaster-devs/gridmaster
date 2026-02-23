@@ -1,0 +1,48 @@
+[gd_scene load_steps=3 format=3 uid="uid://gy3engmvk7a8"]
+
+[ext_resource type="Script" uid="uid://dyj4dtsehwxpc" path="res://editor/editors/map_editor_refactor/map_editor.gd" id="1_3hb3i"]
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="2_njdbt"]
+
+[node name="MapEditor" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_3hb3i")
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TopBar" parent="MainContainer" instance=ExtResource("2_njdbt")]
+custom_minimum_size = Vector2(0, 85)
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MainContainer/TopBar/TopVBox/ScrollContainer/ContentsVBox" index="0"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Save" type="Button" parent="MainContainer/TopBar/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "SAVE"
+
+[node name="Load" type="Button" parent="MainContainer/TopBar/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "LOAD"
+
+[node name="MapMode" type="Button" parent="MainContainer/TopBar/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "STRATEGIC"
+
+[editable path="MainContainer/TopBar"]

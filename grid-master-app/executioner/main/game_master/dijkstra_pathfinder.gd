@@ -21,7 +21,8 @@ func initialize(game_grid : GameGrid, units : Dictionary[int, Unit]) -> void:
 	_game_grid = game_grid
 	_grid_width = _game_grid.getWidth()
 	_grid_height = _game_grid.getHeight()
-	_djikstra_grid = Array2D.new(_grid_width, _grid_height)
+	_djikstra_grid = Array2D.new()
+	_djikstra_grid.init(_grid_width, _grid_height)
 	
 	var fill_func = func(x, y):
 		return DijkstraNode.new(Vector2i(x, y))

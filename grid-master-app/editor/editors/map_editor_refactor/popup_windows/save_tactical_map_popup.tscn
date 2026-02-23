@@ -1,0 +1,34 @@
+[gd_scene load_steps=3 format=3 uid="uid://byssfxeit8mdw"]
+
+[ext_resource type="Script" uid="uid://byn3w74kwfl3r" path="res://editor/editors/map_editor_refactor/popup_windows/save_tactical_map_popup.gd" id="1_wl56l"]
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="2_stl8x"]
+
+[node name="SaveTacticalMapPopup" type="Control"]
+layout_mode = 3
+anchor_right = 0.367
+anchor_bottom = 0.11800001
+offset_right = 0.35998535
+offset_bottom = -0.44001007
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_wl56l")
+
+[node name="EditorPanel" parent="." instance=ExtResource("2_stl8x")]
+layout_mode = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer"]
+layout_mode = 2
+text = "Tactical Map Name: "
+
+[node name="LineEdit" type="LineEdit" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SaveButton" type="Button" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="1"]
+layout_mode = 2
+text = "SAVE"
+
+[editable path="EditorPanel"]

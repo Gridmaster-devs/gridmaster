@@ -1,0 +1,43 @@
+[gd_scene load_steps=3 format=3 uid="uid://dxhr6l0sb1avr"]
+
+[ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://editor/themes/editor-theme.tres" id="1_3le5q"]
+[ext_resource type="Script" uid="uid://cc6m0a8de7olu" path="res://editor/editors/map_editor_refactor/user_interfaces/paint_library/paint_library.gd" id="1_uljhu"]
+
+[node name="PaintLibrary" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_3le5q")
+script = ExtResource("1_uljhu")
+
+[node name="LibName" type="Label" parent="."]
+layout_mode = 2
+theme = ExtResource("1_3le5q")
+theme_type_variation = &"SectionLabel"
+text = "Library name"
+
+[node name="ButtonsContainer" type="GridContainer" parent="."]
+layout_mode = 2
+columns = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ButtonsContainer"]
+layout_mode = 2
+
+[node name="NewButton" type="Button" parent="ButtonsContainer/VBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+text = "+"
+
+[node name="Label" type="Label" parent="ButtonsContainer/VBoxContainer"]
+layout_mode = 2
+text = "NEW"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Remove" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "REMOVE"
