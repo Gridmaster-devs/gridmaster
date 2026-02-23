@@ -3,3 +3,4 @@ grid-master-app/.godot/
 grid-master-app/export/*
 grid-master-app/logs/*.txt
 build/
+*.tmp
