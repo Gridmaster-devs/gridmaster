@@ -11,7 +11,7 @@ var units : Dictionary[int, Unit] = {} ## All the units in the game, NOTE: also 
 var players : Array[Player] = [] ## All the players in the game
 var teams : Array[Team] = [] ## All the teams in the game
 var unit_types : Dictionary[int, UnitType] = {} ## All the types of units in the game
-var _pathfinder : DijkstraPathfinder ## Dijkstra pathfinder for unit pathing
+var _pathfinder : OptimizedPathfinder ## Dijkstra pathfinder for unit pathing
 
 
 ## tracks the id to be given to the next unit that spawns
@@ -85,7 +85,7 @@ static func initFromGameDefinition(game_definition : GameDefinitionResource) -> 
 	game_state.game_name = game_definition.game_name
 	game_state.grid = GameGrid.initFromMapResource(game_definition.loadMap())
 	
-	game_state._pathfinder = DijkstraPathfinder.new()
+	game_state._pathfinder = OptimizedPathfinder.new()
 	game_state._pathfinder.initialize(game_state.grid, game_state.units)
 	
 	return game_state
@@ -129,7 +129,7 @@ func get_unit_by_id(id : int) -> Unit:
 	return units.get(id)
 
 
-func get_pathfinder() -> DijkstraPathfinder:
+func get_pathfinder() -> OptimizedPathfinder:
 	return _pathfinder
 
 
