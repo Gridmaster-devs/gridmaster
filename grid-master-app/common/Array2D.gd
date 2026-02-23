@@ -1,9 +1,10 @@
 class_name Array2D
+extends Resource
 ## Class that represents a 2D array
 
-var internal_array : Array[Variant] = [] ## The internal 1D array storing all the elements
-var width : int ## Width of the array
-var height : int ## Height of the array
+@export var internal_array : Array[Variant] = [] ## The internal 1D array storing all the elements
+@export var width : int ## Width of the array
+@export var height : int ## Height of the array
 
 
 ## Returns the item at the specified index
@@ -26,7 +27,8 @@ func setItem(x : int, y : int, value : Variant) -> void:
 ## has been processed by the process function.
 ## Use the ignore null flag to pass over items that are null
 func map(process_func : Callable, ignore_null : bool) -> Array2D:
-	var return_array = Array2D.new(width, height)
+	var return_array = Array2D.new()
+	return_array.init(width, height)
 	
 	for i in height:
 		for j in width:
@@ -99,7 +101,7 @@ func contentToString() -> String:
 	return ret_string
 
 
-func _init(width_p : int, height_p : int):
+func init(width_p : int, height_p : int):
 	width = width_p
 	height = height_p
 	

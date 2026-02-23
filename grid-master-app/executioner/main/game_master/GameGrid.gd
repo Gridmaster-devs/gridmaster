@@ -74,17 +74,25 @@ func addUnit(unit : Unit) -> void:
 	getTile(pos.x, pos.y).addUnit(unit)
 
 
-func initTileTypesFromMapResource(map : GameMap) -> void:
-	for tile : StrategicTileInformation in map.strategic_tile_information_map.values():
-		var grid_tile : TileType = TileType.new()
-		grid_tile.attributes.set(TileType.TILE_ATTRIBUTE_TYPE.MOVEMENT, tile.movement)
-		grid_tile.attributes.set(TileType.TILE_ATTRIBUTE_TYPE.HIDING, tile.hiding)
-		grid_tile.attributes.set(TileType.TILE_ATTRIBUTE_TYPE.PROTECTION, tile.protection)
-		grid_tile.type_id = tile.source
-		grid_tile.texture = tile.texture
-		grid_tile.tile_name = tile.name
-		strategic_tile_types.set(tile.source, grid_tile)
-		
+func initTileTypesFromMapResource(map : MapResource) -> void:
+	var strategic_map: MapPainterRes = map.get_strategic_map()
+	var attribute_grid: Array2D = strategic_map.get_attribute_grid()
+	var added: Array[String] = []
+	for x in attribute_grid.width: 
+		for y in attribute_grid.height: 
+			var tile = attribute_grid.getItem(x, y)
+			if added.has(tile["name"]):
+				continue
+			var id = int(tile["name"])
+			added.append(tile[MapAttributes.STRATEGIC_TILE_ID])
+			var grid_tile : TileType = TileType.new()
+			grid_tile.attributes.set(TileType.TILE_ATTRIBUTE_TYPE.MOVEMENT, tile["movement"])
+			grid_tile.attributes.set(TileType.TILE_ATTRIBUTE_TYPE.HIDING, tile["hiding"])
+			grid_tile.attributes.set(TileType.TILE_ATTRIBUTE_TYPE.PROTECTION, tile["protection"])
+			grid_tile.type_id = id
+			grid_tile.texture = tile["texture"]
+			grid_tile.tile_name = tile["name"]
+			strategic_tile_types.set(id, grid_tile)
 
 ## Calls the tiles Array2D's fill method with the fill func as the parameter
 func fillTiles(fill_func : Callable) -> void:
@@ -92,17 +100,17 @@ func fillTiles(fill_func : Callable) -> void:
 
 
 ## Initializes a game grid from a map resource
-static func initFromMapResource(map : GameMap) -> GameGrid:
+static func initFromMapResource(map : MapResource) -> GameGrid:
 	assert(map != null, "Map should not be null!")
 	
-	var grid = map.grid
+	var grid: Array2D = map.get_strategic_map().get_attribute_grid()
 	var game_grid = GameGrid.new(grid.width, grid.height)
 	game_grid.initTileTypesFromMapResource(map)
 	
 	var fill_func = func(x: int, y: int):
-		var grid_tile : GridTile =  GridTile.new(
+		var grid_tile : GridTile = GridTile.new(
 			game_grid.strategic_tile_types.get(
-				grid.grid[grid.width * y + x]
+				int(grid.getItem(x, y)["name"])
 			)
 		)
 		return grid_tile
@@ -140,4 +148,5 @@ func printTileTypes(to_log : bool):
 func _init(width_p : int, height_p : int):
 	width = width_p
 	height = height_p
-	tiles = Array2D.new(width_p, height_p)
+	tiles = Array2D.new()
+	tiles.init(width_p, height_p)

@@ -1,0 +1,16 @@
+[gd_scene load_steps=2 format=3 uid="uid://du03wvykgbfje"]
+
+[ext_resource type="Script" uid="uid://bxhnicvkef541" path="res://editor/editors/map_editor_refactor/user_interfaces/paint_library/library_item.gd" id="1_4a2f0"]
+
+[node name="LibraryItem" type="VBoxContainer"]
+offset_right = 64.0
+offset_bottom = 91.0
+script = ExtResource("1_4a2f0")
+
+[node name="Button" type="Button" parent="."]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+horizontal_alignment = 1
