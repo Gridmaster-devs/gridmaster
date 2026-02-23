@@ -75,7 +75,7 @@ func _get_neighbors(node : DijkstraNode) -> Array[int]:
 func _reset_nodes() -> void:
 	var reset_func = func(node : DijkstraNode):
 		node.movement_required = MAX_INT
-		node.visited = false
+		node.enqueued = false
 		node.previous = null
 		node.possible = false
 		node.has_unit = false
@@ -96,7 +96,7 @@ func _reset_nodes() -> void:
 ## Returns an array of all tiles that are possible to reach from
 ## the starting position with a set amount of movement
 func tiles_from_position(start_position : Vector2i, movement_available : int) -> Array[Vector2i]:
-	var time : int = Time.get_ticks_msec() # DEBUG
+	var time : int = Time.get_ticks_msec()
 	
 	var unvisited := DijkstraPriorityQueue.new()
 	var possible : Array[Vector2i] = [] # Possible to reach tiles
@@ -107,11 +107,15 @@ func tiles_from_position(start_position : Vector2i, movement_available : int) ->
 	start_node.movement_required = 0
 	unvisited.add_item(Vector2(0, get_index_vec(start_position)))
 	
+	var count : int = 0
+	
 	var current_vec2 : Vector2
 	var current_node : DijkstraNode
 	var neighbor_node : DijkstraNode
 	while(true):
 		# Get the unvisited node with the lowest movement required
+		
+		count += 1
 		
 		current_vec2 = unvisited.pop_first()
 		if (current_vec2 == Vector2(-1, -1)):
@@ -120,7 +124,7 @@ func tiles_from_position(start_position : Vector2i, movement_available : int) ->
 		# There is a node to process
 		else:
 			current_node = _djikstra_grid[int(current_vec2.y)]
-			current_node.visited = true
+			current_node.enqueued = true
 			
 			# If our unit has enough movement to reach this tile, there are no units on the tile yet, and no other unit plans to move onto the tile
 			if ((current_node.movement_required <= movement_available and !current_node.has_unit and !current_node.movement_target) or (current_node.position == start_position)):
@@ -133,10 +137,12 @@ func tiles_from_position(start_position : Vector2i, movement_available : int) ->
 				for index : int in neighbors:
 					neighbor_node = _djikstra_grid[index]
 					neighbor_node.update_movement_req(current_node)
-					if (neighbor_node.visited == false):
+					if (neighbor_node.enqueued == false):
+						neighbor_node.enqueued = true
 						unvisited.add_item(Vector2(neighbor_node.movement_required, get_index_vec(neighbor_node.position)))
 					
-	print("Pathfinding finished in: %s ms" % (Time.get_ticks_msec() - time))
+	print("Completed in: %s ms" % (Time.get_ticks_msec() - time))
+	print("Count: %s" % count)
 	return possible
 
 
@@ -177,7 +183,7 @@ class DijkstraNode extends RefCounted:
 	var has_unit : bool = false
 	var movement_target : bool = false
 	
-	var visited : bool = false
+	var enqueued : bool = false
 	var previous : DijkstraNode = null
 	
 	# movement required to move to the node from the beginning node
