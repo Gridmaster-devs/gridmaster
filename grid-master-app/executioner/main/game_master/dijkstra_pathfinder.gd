@@ -28,16 +28,22 @@ func initialize(game_grid : GameGrid, units : Dictionary[int, Unit]) -> void:
 
 	update_grid()
 
-
+## Gets the node in the array from a vector
 func get_node_vec(pos : Vector2i):
 	return _djikstra_grid[_grid_width * pos.y + pos.x]
 	
+
+## Gets the node in the array from coordinates
 func get_node(x : int, y : int):
 	return _djikstra_grid[_grid_width * y + x]
 
+
+## Gets the index in the array from coordinates
 func get_index(x : int, y : int):
 	return (_grid_width * y + x)
 
+
+## Gets the index in the array from a vector
 func get_index_vec(pos : Vector2i):
 	return (_grid_width * pos.y + pos.x)
 
@@ -105,15 +111,11 @@ func tiles_from_position(start_position : Vector2i, movement_available : int) ->
 	start_node.movement_required = 0
 	unvisited.add_item(Vector2(0, get_index_vec(start_position)))
 	
-	var count : int = 0
-	
 	var current_vec2 : Vector2
 	var current_node : DijkstraNode
 	var neighbor_node : DijkstraNode
 	while(true):
 		# Get the unvisited node with the lowest movement required
-		
-		count += 1
 		
 		current_vec2 = unvisited.pop_first()
 		if (current_vec2 == Vector2(-1, -1)):
@@ -194,11 +196,6 @@ class DijkstraNode extends RefCounted:
 			movement_required = prev_movement + movement
 			previous = node
 
-
-	## Returns the movement required value for the djikstra algorithm.
-	static func priority_func(node : DijkstraNode):
-		return node.movement_required
-		
 
 	func _init(position_p : Vector2i):
 		position = position_p
