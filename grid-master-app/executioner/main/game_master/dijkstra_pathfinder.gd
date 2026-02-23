@@ -96,8 +96,6 @@ func _reset_nodes() -> void:
 ## Returns an array of all tiles that are possible to reach from
 ## the starting position with a set amount of movement
 func tiles_from_position(start_position : Vector2i, movement_available : int) -> Array[Vector2i]:
-	var time : int = Time.get_ticks_msec()
-	
 	var unvisited := DijkstraPriorityQueue.new()
 	var possible : Array[Vector2i] = [] # Possible to reach tiles
 	_reset_nodes() # Reset the nodes from a previous calculation
@@ -141,8 +139,6 @@ func tiles_from_position(start_position : Vector2i, movement_available : int) ->
 						neighbor_node.enqueued = true
 						unvisited.add_item(Vector2(neighbor_node.movement_required, get_index_vec(neighbor_node.position)))
 					
-	print("Completed in: %s ms" % (Time.get_ticks_msec() - time))
-	print("Count: %s" % count)
 	return possible
 
 
