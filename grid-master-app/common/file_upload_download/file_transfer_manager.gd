@@ -34,7 +34,7 @@ func download_data(input_data : Variant, default_filename : String, filetypes : 
 		var data : PackedByteArray
 		if (resource == true):
 			var dir := DirAccess.create_temp("temp", false)
-			var path : String = dir.get_current_dir() + "res.tres"
+			var path : String = dir.get_current_dir() + default_filename
 
 			ResourceSaver.save(input_data, path)
 			data = FileAccess.get_file_as_bytes(path)
@@ -56,6 +56,7 @@ func download_data(input_data : Variant, default_filename : String, filetypes : 
 		dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE # User is prompted to save a file
 		dialog.display_mode = FileDialog.DISPLAY_LIST # Files will be shown as a list and not as thumbnails
 		dialog.add_filter(filetypes) # Filter how the file can be saved
+		dialog.current_file = default_filename
 		
 		dialog.file_selected.connect(_finish_local_download) # If the user selects a file
 		dialog.close_requested.connect(_process_done) # If the user closes the dialog window

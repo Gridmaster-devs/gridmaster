@@ -77,14 +77,12 @@ func addUnit(unit : Unit) -> void:
 func initTileTypesFromMapResource(map : MapResource) -> void:
 	var strategic_map: MapPainterRes = map.get_strategic_map()
 	var attribute_grid: Array2D = strategic_map.get_attribute_grid()
-	var added: Array[int] = []
 	for x in attribute_grid.width: 
 		for y in attribute_grid.height: 
 			var tile = attribute_grid.getItem(x, y)
-			var id = tile["id"]
+			var id: int = tile["id"]
 			if strategic_tile_types.has(id):
 				continue
-			added.append(tile[MapAttributes.STRATEGIC_TILE_ID])
 			var grid_tile : TileType = TileType.new()
 			grid_tile.attributes.set(TileType.TILE_ATTRIBUTE_TYPE.MOVEMENT, tile["movement"])
 			grid_tile.attributes.set(TileType.TILE_ATTRIBUTE_TYPE.HIDING, tile["hiding"])
@@ -98,7 +96,7 @@ func _generate_ids(map : MapResource) -> void:
 	#TODO: add ids inside tactical maps as well
 	var strategic = map.get_strategic_map().get_attribute_grid()
 	var id_map: Dictionary[String, int] = {}
-	var count = 0
+	var count: int = 0
 	for x in strategic.width:
 		for y in strategic.height:
 			var tile = strategic.getItem(x, y)
