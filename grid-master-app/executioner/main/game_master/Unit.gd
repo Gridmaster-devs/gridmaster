@@ -13,6 +13,7 @@ var movement_speed : int ## The speed of the unit NOTE: Currently using this as 
 var morale : int ## The current morale of the unit
 var grid_position : Vector2i ## The current position of the unit on the grid
 var current_action : UnitAction = null ## The action the unit is set to perform on this turn
+var team_id : int = -1
 
 
 ## Initializes the unit from a specific unit type

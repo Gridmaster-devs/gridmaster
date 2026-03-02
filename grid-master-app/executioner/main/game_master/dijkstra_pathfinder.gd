@@ -6,12 +6,36 @@ extends RefCounted
 # Largest number an int can store, acting as infinity here
 const MAX_INT : int = 9223372036854775807
 
+const FLAG_CAN_MOVE_TO_ENEMY = 1
+const FLAG_CAN_MOVE_THROUGH_FRIENDLY = 2
+
+
 var _djikstra_grid : Array[DijkstraNode] # Array of Dijkstra nodes
 var _game_grid : GameGrid # Array of tiles as in the gamestate
 var _units : Dictionary[int, Unit] # Array of units as in the gamestate
 var _grid_width : int
 var _grid_height : int
 
+# Flags
+
+# Whether tiles with enemy units are valid targets to move to
+var _can_move_to_enemy : bool = false
+
+# Whether a unit can move through friendly units (not end up on top of them, just move through)
+var _can_move_through_friendly : bool = false
+
+
+func set_flags(flags : int):
+	if (flags & FLAG_CAN_MOVE_TO_ENEMY > 0):
+		_can_move_to_enemy = true
+	else:
+		_can_move_to_enemy = false
+	
+	if (flags & FLAG_CAN_MOVE_THROUGH_FRIENDLY > 0):
+		_can_move_through_friendly = true
+	else:
+		_can_move_through_friendly = false
+	
 
 ## Initializes the Djikstra Pathfinder's grid from a game_grid.
 ## Only needs to be called once when a game is started.
@@ -84,39 +108,39 @@ func _reset_nodes() -> void:
 		node.enqueued = false
 		node.previous = null
 		node.possible = false
-		node.has_unit = false
-		node.movement_target = false
 	
 	for node : DijkstraNode in _djikstra_grid:
 		reset_func.call(node)
-		if (!_game_grid.is_empty(node.position)): node.has_unit = true
-	
-	var action : GameAction
-	for unit : Unit in _units.values():
-		action = unit.current_action
-		if action is MoveAction:
-			var pos = action.movement_target()
-			get_node_vec(pos).movement_target = true
+		node.current_unit = _game_grid.get_first_unit_on_tile(node.position)
 
 
 ## Returns an array of all tiles that are possible to reach from
 ## the starting position with a set amount of movement
-func tiles_from_position(start_position : Vector2i, movement_available : int) -> Array[Vector2i]:
+func tiles_from_position(start_position : Vector2i, movement_available : int, unit_moved : Unit) -> Array[Vector2i]:
 	var unvisited := DijkstraPriorityQueue.new()
 	var possible : Array[Vector2i] = [] # Possible to reach tiles
 	_reset_nodes() # Reset the nodes from a previous calculation
 	
+	var team_id = unit_moved.team_id
+	
+	# Checking for movement targets of units that are on the same team
+	var movement_targets : Dictionary[Vector2i, bool] = {}
+	for unit : Unit in _units.values():
+		if (unit.team_id == team_id and unit.current_action is MoveAction):
+			movement_targets.set((unit.current_action as MoveAction).movement_target(), true)
 	
 	var start_node : DijkstraNode = get_node_vec(start_position)
 	start_node.movement_required = 0
 	unvisited.add_item(Vector2(0, get_index_vec(start_position)))
 	
-	var current_vec2 : Vector2
+	var current_vec2 : Vector2 # Vector2 here stores a tile's priority and index in the array
 	var current_node : DijkstraNode
 	var neighbor_node : DijkstraNode
+	var do_not_append : bool = false
 	while(true):
-		# Get the unvisited node with the lowest movement required
+		do_not_append = false # reset
 		
+		# Get the unvisited node with the lowest movement required
 		current_vec2 = unvisited.pop_first()
 		if (current_vec2 == Vector2(-1, -1)):
 			break
@@ -126,21 +150,49 @@ func tiles_from_position(start_position : Vector2i, movement_available : int) ->
 			current_node = _djikstra_grid[int(current_vec2.y)]
 			current_node.enqueued = true
 			
-			# If our unit has enough movement to reach this tile, there are no units on the tile yet, and no other unit plans to move onto the tile
-			if ((current_node.movement_required <= movement_available and !current_node.has_unit and !current_node.movement_target) or (current_node.position == start_position)):
-				if current_node.position != start_position: # We don't want to add the start position to the possible moves
-					possible.append(current_node.position)
-					current_node.possible = true
+			# If our unit has enough movement to reach this tile
+			if (current_node.movement_required > movement_available): continue
+			
+			# Don't append nodes that a friendly unit wants to move to
+			if (movement_targets.has(current_node.position)):
+				do_not_append = true
+			
+			# Don't add the start position to the possible movement tiles
+			if (current_node.position == start_position):
+				do_not_append = true
+			
+			# If there is already a unit on the tile
+			var tile_unit : Unit = current_node.current_unit
+			if (tile_unit != null):
 				
-				var neighbors = _get_neighbors(current_node)
+				# If the unit on the tile is an allied unit
+				if (tile_unit.team_id == team_id and tile_unit != unit_moved):
+					do_not_append = true
+					if !_can_move_through_friendly: continue
 				
-				for index : int in neighbors:
-					neighbor_node = _djikstra_grid[index]
-					neighbor_node.update_movement_req(current_node)
-					if (neighbor_node.enqueued == false):
-						neighbor_node.enqueued = true
-						unvisited.add_item(Vector2(neighbor_node.movement_required, get_index_vec(neighbor_node.position)))
+				# If the unit on the tile is a hostile unit
+				if (tile_unit.team_id != team_id):
+					if !_can_move_to_enemy: continue
+			
+			# No blockers, moving forward
+			
+			# Append the current node to the possible movement tiles
+			# unless otherwise specified
+			if (do_not_append == false):
+				possible.append(current_node.position)
+				current_node.possible = true
+				
+			var neighbors = _get_neighbors(current_node)
+				
+			for index : int in neighbors:
+				neighbor_node = _djikstra_grid[index]
+				neighbor_node.update_movement_req(current_node)
+				
+				if (neighbor_node.enqueued == false):
+					neighbor_node.enqueued = true
+					unvisited.add_item(Vector2(neighbor_node.movement_required, get_index_vec(neighbor_node.position)))
 					
+	
 	return possible
 
 
@@ -178,8 +230,7 @@ class DijkstraNode extends RefCounted:
 	var position : Vector2i
 	var movement : int = 1 # movement required to move onto the node from a neighbor
 	var possible : bool = false
-	var has_unit : bool = false
-	var movement_target : bool = false
+	var current_unit : Unit = null
 	
 	var enqueued : bool = false
 	var previous : DijkstraNode = null
