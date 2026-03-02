@@ -77,14 +77,12 @@ func addUnit(unit : Unit) -> void:
 func initTileTypesFromMapResource(map : MapResource) -> void:
 	var strategic_map: MapPainterRes = map.get_strategic_map()
 	var attribute_grid: Array2D = strategic_map.get_attribute_grid()
-	var added: Array[String] = []
 	for x in attribute_grid.width: 
 		for y in attribute_grid.height: 
 			var tile = attribute_grid.getItem(x, y)
-			if added.has(tile["name"]):
+			var id: int = tile["id"]
+			if strategic_tile_types.has(id):
 				continue
-			var id = int(tile["name"])
-			added.append(tile[MapAttributes.STRATEGIC_TILE_ID])
 			var grid_tile : TileType = TileType.new()
 			grid_tile.attributes.set(TileType.TILE_ATTRIBUTE_TYPE.MOVEMENT, tile["movement"])
 			grid_tile.attributes.set(TileType.TILE_ATTRIBUTE_TYPE.HIDING, tile["hiding"])
@@ -94,6 +92,20 @@ func initTileTypesFromMapResource(map : MapResource) -> void:
 			grid_tile.tile_name = tile["name"]
 			strategic_tile_types.set(id, grid_tile)
 
+func _generate_ids(map : MapResource) -> void: 
+	#TODO: add ids inside tactical maps as well
+	var strategic = map.get_strategic_map().get_attribute_grid()
+	var id_map: Dictionary[String, int] = {}
+	var count: int = 0
+	for x in strategic.width:
+		for y in strategic.height:
+			var tile = strategic.getItem(x, y)
+			if !id_map.has(tile["name"]):
+				id_map[tile["name"]] = count
+				count += 1
+			tile["id"] = id_map[tile["name"]]
+	
+
 ## Calls the tiles Array2D's fill method with the fill func as the parameter
 func fillTiles(fill_func : Callable) -> void:
 	tiles.fill(fill_func)
@@ -102,15 +114,15 @@ func fillTiles(fill_func : Callable) -> void:
 ## Initializes a game grid from a map resource
 static func initFromMapResource(map : MapResource) -> GameGrid:
 	assert(map != null, "Map should not be null!")
-	
 	var grid: Array2D = map.get_strategic_map().get_attribute_grid()
 	var game_grid = GameGrid.new(grid.width, grid.height)
+	game_grid._generate_ids(map)
 	game_grid.initTileTypesFromMapResource(map)
 	
 	var fill_func = func(x: int, y: int):
 		var grid_tile : GridTile = GridTile.new(
 			game_grid.strategic_tile_types.get(
-				int(grid.getItem(x, y)["name"])
+				grid.getItem(x, y)["id"]
 			)
 		)
 		return grid_tile

@@ -31,13 +31,14 @@ func update_name_in_tree(new_name : String):
 func save_to_file():
 	if (unit_resource == null): return
 	save_to_resource.emit(unit_resource)
-	ftm.download_data(unit_resource, "Resource.tres", "*.tres", true)
+	var file_name = unit_resource.get_attribute("name").get_attribute_value() + ".tres"
+	ftm.download_data(unit_resource, file_name, "*.tres", true)
 	
 ## Loads a unit from file.
 ##
 ## Called when the user clicks the load button.
 func load_from_file():
-	ftm.upload_data("*.tres", true)
+	ftm.upload_data("*.tres", true) 
 
 
 ## Loads a resource

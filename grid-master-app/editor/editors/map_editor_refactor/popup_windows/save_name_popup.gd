@@ -1,11 +1,11 @@
-class_name SaveTacticalMapPopup
+class_name SaveNamePopup
 extends PopupWindow
 
 @onready var _save_button: Button = $EditorPanel/TopVBox/ScrollContainer/ContentsVBox/SaveButton
 @onready var _tact_map_name_ui: LineEdit = $EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer/LineEdit
 
 
-signal tactical_map_saved(name: String)
+signal save_confirmed(name: String)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -13,8 +13,9 @@ func _ready() -> void:
 
 
 func _init() -> void:
-	set_popup_name("save_tactical_map_popup")
+	set_popup_name("save_name_popup")
 
 
 func _on_save() -> void: 
-	tactical_map_saved.emit(_tact_map_name_ui.text)
+	save_confirmed.emit(_tact_map_name_ui.text)
+	get_tree().call_group("map_editor_popup_manager", "close_popup", self.get_popup_name())

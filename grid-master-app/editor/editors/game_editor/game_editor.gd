@@ -19,12 +19,15 @@ func save_to_file():
 	var units = editor_main.get_units()
 	var map = editor_main.getMap()
 	
+	var game_name = get_game_name()
+	if game_name == "": 
+		game_name = "game"
 	game_resource = GameDefinitionResource.new()
-	game_resource.save_name(get_game_name())
+	game_resource.save_name(game_name)
 	game_resource.save_units(units)
 	game_resource.saveMap(map)
 	
-	ftm.download_data(game_resource, "game_resource.tres", "*.tres", true)
+	ftm.download_data(game_resource, game_name + ".tres", "*.tres", true)
 
 
 func load_from_file() -> void:
