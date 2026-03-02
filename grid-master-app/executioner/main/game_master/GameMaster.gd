@@ -11,8 +11,8 @@ signal units_changed
 # be needed to prevent the game master file being enormous.
 enum UIState {LOAD_GAME, IN_GAME_DEFAULT, UNIT_MOVE}
 
-const load_game_gui : PackedScene = preload("res://executioner/main/grid_graphics/gui_scenes/load_game_gui.tscn")
-const in_game_default_gui : PackedScene = preload("res://executioner/main/grid_graphics/gui_scenes/in_game_default_gui.tscn")
+const LOAD_GAME_GUI : PackedScene = preload("res://executioner/main/grid_graphics/gui_scenes/load_game_gui.tscn")
+const IN_GAME_DEFAULT_GUI : PackedScene = preload("res://executioner/main/grid_graphics/gui_scenes/in_game_default_gui.tscn")
 
 static var GROUP_NAME : String = "GameMaster"
 static var EVENT_INPUT_FUNC_NAME : String = "receive_ui_event"
@@ -27,6 +27,7 @@ var ui_state : UIState = UIState.LOAD_GAME
 var gui_scene : GUIScene
 
 var game_state : GameState ## The state of the game
+var _pathfinder : DijkstraPathfinder ## The pathfinder for the game state
 
 # Variables for the unit movement state
 var moved_unit : Unit
@@ -67,10 +68,12 @@ func getGameName() -> String:
 ## Initializes a game state from a game definition
 func initGameStateFromGameDefinition(game_definition : GameDefinitionResource):
 	game_state = GameState.initFromGameDefinition(game_definition)
+	_pathfinder = game_state.get_pathfinder()
 	
 	# DEBUG
 	DEBUG_create_unit(0, Vector2i(0,0))
 	DEBUG_create_unit(0, Vector2i(1,0))
+	_pathfinder.set_flags(DijkstraPathfinder.FLAG_CAN_MOVE_THROUGH_FRIENDLY)
 	# DEBUG
 
 	initGraphics()
@@ -90,7 +93,7 @@ func load_game_from_file() -> void:
 func load_game_definition(game_definition : Resource):
 	assert(game_definition != null, "Invalid game definition in file!")
 	initGameStateFromGameDefinition(game_definition)
-	switch_gui_scene(in_game_default_gui, getGameName())
+	switch_gui_scene(IN_GAME_DEFAULT_GUI, getGameName())
 	ui_state = UIState.IN_GAME_DEFAULT
 
 
@@ -164,7 +167,7 @@ func _handle_event_default_in_game(event : StateMachineEvent):
 			moved_unit.current_action = null # clear the current action
 			_custom_graphics.clear_id(moved_unit.getId())
 			
-			current_possible_tiles = game_state.get_pathfinder().tiles_from_position(unit.getPosition(), unit.movement_speed)
+			current_possible_tiles = _pathfinder.tiles_from_position(unit.getPosition(), unit.movement_speed, unit)
 			movement_left = moved_unit.movement_speed
 			
 			_custom_graphics.draw_movement_tiles(current_possible_tiles, unit.getId())
@@ -223,7 +226,7 @@ func _handle_event_unit_move(event : StateMachineEvent) -> void:
 			movement_left = movement_left - game_state.get_pathfinder().movement_required_to_position(event.grid_pos)
 			
 			# Calculate the new valid movement tiles
-			current_possible_tiles = game_state.get_pathfinder().tiles_from_position(event.grid_pos, movement_left)
+			current_possible_tiles = game_state.get_pathfinder().tiles_from_position(event.grid_pos, movement_left, moved_unit)
 			
 			
 			_custom_graphics.draw_movement_path(current_path, moved_unit.getId())
@@ -334,4 +337,4 @@ func _ready() -> void:
 	_click_tracker.clicked.connect(_clicked)
 	_custom_graphics = grid_graphics.get_custom_graphics()
 	ftm.resource_uploaded.connect(load_game_definition)
-	switch_gui_scene(load_game_gui, null)
+	switch_gui_scene(LOAD_GAME_GUI, null)
