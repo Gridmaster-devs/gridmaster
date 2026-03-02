@@ -123,7 +123,7 @@ static func initFromMapResource(map : MapResource) -> GameGrid:
 		var grid_tile : GridTile = GridTile.new(
 			game_grid.strategic_tile_types.get(
 				grid.getItem(x, y)["id"]
-			)
+			), Vector2i(x, y)
 		)
 		return grid_tile
 	
@@ -141,8 +141,8 @@ func printMap(to_log : bool):
 
 ## Fills the entire map with a debug tile
 func debugFill():
-	var fill_func = func(_x : int, _y : int):
-		return GridTile.new(TileType.debugTile())
+	var fill_func = func(x : int, y : int):
+		return GridTile.new(TileType.debugTile(), Vector2i(x, y))
 	
 	fillTiles(fill_func)
 

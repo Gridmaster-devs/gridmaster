@@ -43,6 +43,12 @@ func has_stopped() -> bool:
 	
 	return true
 
+func is_dead() -> bool:
+	if hp <= 0:
+		return true
+	else:
+		return false
+
 
 # This exists solely to be a function parameter for sorting the unit array
 ## Gets a unit's speed

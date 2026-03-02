@@ -67,10 +67,10 @@ func end_turn() -> void:
 	
 	for unit : Unit in unit_array:
 		if unit.current_action != null:
-			unit.current_action.execute(self)
+			unit.current_action.execute()
 	
 	for action : PlayerAction in action_queue:
-		action.execute(self)
+		action.execute()
 	
 	turn_number += 1
 

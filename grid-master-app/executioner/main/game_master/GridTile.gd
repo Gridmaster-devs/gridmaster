@@ -7,6 +7,7 @@ extends RefCounted
 # you have to remember to remove it from both places
 var units : Dictionary[int, Unit] = {} ## Dictionary from Unit ID to the Units on the tile
 var tile_type : TileType ## Reference to the type of tile
+var position : Vector2i
 
 
 ## Returns the array of all the units on the grid tile
@@ -86,5 +87,5 @@ func _to_string():
 	return ret_string
 
 
-func _init(grid_tile_type : TileType) -> void:
+func _init(grid_tile_type : TileType, position : Vector2i) -> void:
 	tile_type = grid_tile_type

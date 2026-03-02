@@ -194,7 +194,7 @@ func _handle_event_unit_move(event : StateMachineEvent) -> void:
 			
 			# If the user clicks on the latest waypoint, accept the movement command
 			if (!movement_waypoints.is_empty() and movement_waypoints.back() == event.grid_pos):
-				moved_unit.current_action = MoveAction.new(current_path, game_state.get_client_player_id(), moved_unit)
+				moved_unit.current_action = MoveAction.new(current_path, game_state.get_client_player_id(), moved_unit, game_state)
 				_exit_unit_move()
 				return
 			
