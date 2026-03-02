@@ -223,7 +223,6 @@ func get_path_to_pos(position : Vector2i) -> Array[Vector2i]:
 		return path
 
 
-
 ## Class that represents a node in the pathfinder.
 class DijkstraNode extends RefCounted:
 	
