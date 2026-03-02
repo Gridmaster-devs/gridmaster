@@ -2,8 +2,12 @@ class_name GameState
 extends RefCounted
 ## Class that represents everything that makes up the current state of the game, ex. the units, the map, etc
 
+## The function that determines what happens when two units fight.
+## Its parameters MUST be (unit1, unit2)
+static var fight_func : Callable
 
-var client_player_id : int = 0
+var client_player_id : int = -1
+var client_player_team_id : int = -1
 
 var game_name : String
 var grid : GameGrid ## Grid that represents the map
@@ -12,6 +16,8 @@ var players : Array[Player] = [] ## All the players in the game
 var teams : Array[Team] = [] ## All the teams in the game
 var unit_types : Dictionary[int, UnitType] = {} ## All the types of units in the game
 var _pathfinder : DijkstraPathfinder ## Dijkstra pathfinder for unit pathing
+
+
 
 
 ## tracks the id to be given to the next unit that spawns

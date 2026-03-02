@@ -194,13 +194,13 @@ func _handle_event_unit_move(event : StateMachineEvent) -> void:
 			
 			# If the user clicks on the latest waypoint, accept the movement command
 			if (!movement_waypoints.is_empty() and movement_waypoints.back() == event.grid_pos):
-				moved_unit.current_action = MoveAction.new(current_path, game_state.get_client_player_id(), moved_unit.getId())
+				moved_unit.current_action = MoveAction.new(current_path, game_state.get_client_player_id(), moved_unit)
 				_exit_unit_move()
 				return
 			
 			# If the user clicked outside of the possible tiles,
 			# cancel movement
-			var path = game_state.get_pathfinder().get_path_to_pos(event.grid_pos)
+			var path = _pathfinder.get_path_to_pos(event.grid_pos)
 			if path.is_empty():
 				_exit_unit_move()
 				return
@@ -223,10 +223,10 @@ func _handle_event_unit_move(event : StateMachineEvent) -> void:
 			movement_waypoints.append(event.grid_pos) # Add the clicked tile as a waypoint
 			
 			# Calculate how much movement the unit has left
-			movement_left = movement_left - game_state.get_pathfinder().movement_required_to_position(event.grid_pos)
+			movement_left = movement_left - _pathfinder.movement_required_to_position(event.grid_pos)
 			
 			# Calculate the new valid movement tiles
-			current_possible_tiles = game_state.get_pathfinder().tiles_from_position(event.grid_pos, movement_left, moved_unit)
+			current_possible_tiles = _pathfinder.tiles_from_position(event.grid_pos, movement_left, moved_unit)
 			
 			
 			_custom_graphics.draw_movement_path(current_path, moved_unit.getId())
@@ -235,7 +235,7 @@ func _handle_event_unit_move(event : StateMachineEvent) -> void:
 		
 		
 	elif event is MouseMovedToTileEvent:
-		var path = game_state.get_pathfinder().get_path_to_pos(event.new_pos)
+		var path = _pathfinder.get_path_to_pos(event.new_pos)
 		
 		_custom_graphics.draw_waypoints(movement_waypoints, moved_unit.getId())
 		_custom_graphics.draw_movement_tiles(current_possible_tiles, moved_unit.getId())

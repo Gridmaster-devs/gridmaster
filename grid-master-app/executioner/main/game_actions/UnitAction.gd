@@ -5,4 +5,4 @@ extends GameAction
 ##
 ## Unit actions can be, for example, moving or attack with a unit
 
-var unit_id : int ## Which unit is being given the order
+var unit : Unit ## Which unit is being given the order

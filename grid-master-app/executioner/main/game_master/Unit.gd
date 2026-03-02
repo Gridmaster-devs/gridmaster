@@ -8,13 +8,15 @@ var type : UnitType
 
 var unit_id : int ## The ID of the unit
 var player_id : int ## The ID of the player who owns the unit
+var team_id : int = -1
+
 var hp : int ## The current HP of the unit
 var movement_speed : int ## The speed of the unit NOTE: Currently using this as initiative
 var morale : int ## The current morale of the unit
-var grid_position : Vector2i ## The current position of the unit on the grid
-var current_action : UnitAction = null ## The action the unit is set to perform on this turn
-var team_id : int = -1
 
+var grid_position : Vector2i ## The current position of the unit on the grid
+
+var current_action : UnitAction = null ## The action the unit is set to perform on this turn
 
 ## Initializes the unit from a specific unit type
 func initFromUnitType() -> void:
@@ -31,6 +33,15 @@ func getId() -> int:
 
 func getPosition() -> Vector2i:
 	return grid_position
+	
+
+## Returns whether the unit has stopped moving or not
+func has_stopped() -> bool:
+	if (current_action is MoveAction):
+		if (current_action.stopped == false):
+			return false
+	
+	return true
 
 
 # This exists solely to be a function parameter for sorting the unit array
