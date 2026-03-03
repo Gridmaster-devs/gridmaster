@@ -78,11 +78,11 @@ Using an alias: `alias godot="Path/to/godot.exe"`
 
 From the root of the project, in this case `grid-master-app` run
 
-`godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://test -ginclude_subdirs -gexit`
+`godot --headless -s addons/gut/gut_cmdln.gd`
 
-This runs all tests in the executioner directory at: `res://executioner/tests` including all the subdirectories and exits after running the tests. Individual test files can also be run by specifying the path i.e. `res://executioner/tests/test_example.gd`
+This runs all unit tests in `editor/tests` and `executioner/tests`
 
-Other optional flags can be found at: https://gut.readthedocs.io/en/v9.5.0/Command-Line.html 
+Optional flags can be found at: https://gut.readthedocs.io/en/v9.5.0/Command-Line.html 
 
 ### Using the GUT panel
 
