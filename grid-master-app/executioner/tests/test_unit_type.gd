@@ -1,10 +1,10 @@
 extends GutTest
 
-var unit_resource: UnitResourceDict
+var unit_resource: UnitResource
 
 # Initialize unit resource and set its attributes
 func before_each():
-	unit_resource = UnitResourceDict.new()
+	unit_resource = UnitResource.new()
 	unit_resource.set_attribute("name", "Test Unit")
 	unit_resource.set_attribute("description", "Testing unit")
 	
