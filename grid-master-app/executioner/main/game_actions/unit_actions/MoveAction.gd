@@ -18,6 +18,8 @@ static func set_flags(flags : int):
 
 var path : Array[Vector2i]
 
+var searching_next_tile : bool = false
+
 # Whether we have stopped moving
 var stopped : bool = false
 
@@ -31,17 +33,39 @@ var built_up_movement : int = 0
 var last_tile : int
 
 var swap_suggested_unit : int = -1
+var swap_movement_cost : int = 0
+var swap_distance : int = 0
+
+
 
 # Which units we have fought during this movement
 # Stored so we don't fight the same unit again
 var units_fought : Dictionary[int, bool] = {}
 
 
-## Increments the current tile.
+func stop() -> void:
+	stopped = true
+	swap_suggested_unit = -1
+
+
+## Lets the move action know we have been in a battle
 ##
-## Only to ever be called by the game state when swapping units
-func increment_current_tile(n : int):
-	current_tile += n
+## Only to be called by the fight function
+func fought(enemy_unit_id : int):
+	if (_stop_after_fighting == true):
+		stop()
+
+
+func handle_swap() -> void:
+	current_tile += swap_distance
+	built_up_movement -= swap_movement_cost
+	reset_swap()
+
+
+func reset_swap() -> void:
+	swap_distance = 0
+	swap_movement_cost = 0
+	swap_suggested_unit = -1
 
 
 ## Tries to move the unit one step forward when called
@@ -73,7 +97,7 @@ func step() -> void:
 		if (movement_req > built_up_movement): return
 		
 		# Check if there is a unit on the tile we're trying to move to
-		var unit_on_tile = next_tile.get_first_unit()
+		var unit_on_tile : Unit = next_tile.get_first_unit()
 		
 		# There is a unit on the next tile we want to move to:
 		if unit_on_tile != null:
@@ -120,12 +144,17 @@ func step() -> void:
 					
 					# We see if they've suggested a swap with us
 					if (unit_on_tile.get_swap_suggested_unit() == unit.unit_id):
+						
 						# They have
-						pass
+						swap_movement_cost = movement_req
+						swap_distance = 1 + loops
+						_game_state.swap_units(unit, unit_on_tile)
 
 					else:
 						# They haven't
-						pass
+						swap_movement_cost = movement_req
+						swap_distance = 1 + loops
+						swap_suggested_unit = unit_on_tile.unit_id
 				
 				# They're not trying to move onto our tile
 				else:
@@ -139,6 +168,7 @@ func step() -> void:
 			_game_state.move_unit(unit.getId(), path[next_tile_index])
 			current_tile = next_tile_index
 			built_up_movement -= movement_req
+			reset_swap()
 	
 
 
@@ -150,13 +180,52 @@ func movement_target() -> Vector2i:
 	return path.back()
 
 
+# This is jank and I imagine could fail easily
 func next_movement_tile() -> Vector2i:
 	if (stopped == true):
 		return path[current_tile]
 	else:
-		# This should never return anything out of bounds because a unit
-		# should always stop
-		return path[current_tile + 1]
+		searching_next_tile = true
+		
+		var tile_index = current_tile
+		while(true):
+			
+			tile_index += 1
+			
+			# Ran out of tiles, we'll return our current tile
+			if (tile_index > last_tile):
+				searching_next_tile = false
+				return path[current_tile]
+			
+			var tile = _game_state.getGameGrid().get_tile_vec(path[tile_index])
+			var tile_unit = tile.get_unit()
+			
+			# If there is no unit on the tile we try to move to it
+			if (tile_unit == null):
+				break
+			
+			# If there is a unit on the tile we will see what happens
+			else:
+				# Friendly unit
+				if (tile_unit.get_team_id() == unit.get_team_id()):
+					
+					# They are also searching with this function which means they are
+					# trying to move, so we will try to move to this tile
+					if (tile_unit.searching_next_tile()):
+						break
+					
+					# They are trying to move to our tile, so we can swap
+					elif (tile_unit.get_next_movement_tile() == unit.grid_position):
+						break
+					
+					# They have stopped or are trying to move somewhere else
+					else:
+						continue
+				
+			
+		
+		searching_next_tile = false
+		return path[tile_index]
 
 
 func _init(path_p : Array[Vector2i], p_id : int, unit_p : Unit, game_state_p : GameState):
