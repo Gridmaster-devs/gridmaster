@@ -59,18 +59,28 @@ func is_empty(pos : Vector2i) -> bool:
 # it gets wrong information
 ## Removes a unit from the start tile, and adds it to the end tile.
 ## Does NOT edit the unit's information at all.
-func move_unit(unit_id : int, start_pos : Vector2i, end_pos : Vector2i) -> void:
+func move_unit(start_pos : Vector2i, end_pos : Vector2i) -> void:
 	var start_tile = get_tile_vec(start_pos)
 	var end_tile = get_tile_vec(end_pos)
 	var unit = start_tile.get_unit()
 	
+	assert(!start_tile.is_empty(), "Trying to move a non-existent unit!")
+	assert(end_tile.is_empty(), "Trying to move a unit to a tile that is not empty!")
+	
 	start_tile.remove_unit()
 	end_tile.addUnit(unit)
+
+
+func remove_unit(grid_pos : Vector2i):
+	get_tile_vec(grid_pos).remove_unit()
+
 
 ## Adds a unit to the grid
 func addUnit(unit : Unit) -> void:
 	var pos = unit.getPosition()
-	assert(pos != null, "Unit's position cannot be null!")
+	
+	assert(get_tile_vec(unit.grid_position).is_empty(), "Trying to add a unit to a tile that is not empty!")
+	
 	getTile(pos.x, pos.y).addUnit(unit)
 
 

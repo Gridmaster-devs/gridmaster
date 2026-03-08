@@ -63,11 +63,29 @@ func move_unit(unit_id : int, new_position : Vector2i) -> void:
 	var unit = get_unit_by_id(unit_id)
 	var cur_pos = unit.getPosition()
 	unit.set_position(new_position)
-	grid.move_unit(unit_id, cur_pos, new_position)
+	grid.move_unit(cur_pos, new_position)
 
 
-func swap_units(unit1 : Unit, unit2 : Unit, tile_distance : int):
-	pass
+func swap_units(unit1 : Unit, unit2 : Unit) -> void:
+	var u1_pos = unit1.grid_position
+	var u2_pos = unit2.grid_position
+	
+	grid.remove_unit(u1_pos)
+	grid.remove_unit(u2_pos)
+	
+	unit1.grid_position = u2_pos
+	unit2.grid_position = u1_pos
+	
+	grid.addUnit(unit1)
+	grid.addUnit(unit2)
+	
+	# The units' actions have to be move actions for this function to be called
+	# so it's okay to do this
+	var unit1_ma : MoveAction = unit1.current_action as MoveAction
+	var unit2_ma : MoveAction = unit2.current_action as MoveAction
+	
+	unit1_ma.handle_swap()
+	unit2_ma.handle_swap()
 
 
 ## Ends the turn and processes all the actions that have been queued up.
@@ -104,6 +122,9 @@ static func initFromGameDefinition(game_definition : GameDefinitionResource) -> 
 	
 	game_state._pathfinder = DijkstraPathfinder.new()
 	game_state._pathfinder.initialize(game_state.grid, game_state.units)
+	
+	# TODO: Add import from game definition
+	game_args = GameArgs.DEBUG_init()
 	
 	return game_state
 

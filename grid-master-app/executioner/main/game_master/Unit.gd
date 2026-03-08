@@ -35,6 +35,10 @@ func getPosition() -> Vector2i:
 	return grid_position
 	
 
+func get_damage() -> int:
+	return type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.ATTACK)
+	
+
 ## Returns whether the unit has stopped moving or not
 func has_stopped() -> bool:
 	if (current_action is MoveAction):
@@ -73,6 +77,13 @@ func set_fought(enemy_id : int) -> void:
 		
 	else:
 		return
+
+
+func searching_next_tile() -> bool:
+	if (current_action is MoveAction):
+		return current_action.searching_next_tile
+	else:
+		return false
 
 
 func get_team_id() -> int:
