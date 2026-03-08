@@ -111,7 +111,7 @@ func _reset_nodes() -> void:
 	
 	for node : DijkstraNode in _djikstra_grid:
 		reset_func.call(node)
-		node.current_unit = _game_grid.get_first_unit_on_tile(node.position)
+		node.current_unit = _game_grid.get_unit_on_tile(node.position)
 
 
 ## Returns an array of all tiles that are possible to reach from

@@ -158,7 +158,7 @@ func _handle_event_default_in_game(event : StateMachineEvent):
 		if event.mouse_button == MOUSE_BUTTON_LEFT: # User left clicked on the grid
 			if event.grid_pos == Vector2i(-1, -1): return # The user clicked outside the map
 			
-			var unit = game_state.get_first_unit_on_tile(event.grid_pos)
+			var unit = game_state.get_unit_on_tile(event.grid_pos)
 			if unit == null: return # There is no unit on the tile
 			
 			# The user clicked on a tile in the map limits and there is a unit on the tile
