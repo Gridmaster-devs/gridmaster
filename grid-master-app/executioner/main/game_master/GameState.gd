@@ -34,7 +34,14 @@ var action_queue : Array[PlayerAction] = []
 ## Adds a unit to the game
 func addUnit(unit_type : UnitType, position : Vector2i, player_id : int) -> Unit:
 	var id = getNewUnitId()
-	var unit = Unit.new(unit_type, id, player_id, position)
+	
+	var player : Player
+	if (player_id == -1):
+		player = Player.DEBUG_new_player()
+	else:
+		player = players[player_id]
+	
+	var unit = Unit.new(unit_type, id, player, position)
 	grid.addUnit(unit)
 	units.set(id, unit)
 	return unit
@@ -166,7 +173,7 @@ static func debugInit(map_width : int, map_height : int, game_name_p : String) -
 	gs.grid.debugFill()
 	gs.game_name = game_name_p
 	return gs
-	
+
 
 ## Prints the map into a logfile
 func printMap(to_log : bool):
