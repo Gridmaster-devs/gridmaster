@@ -121,12 +121,12 @@ func tiles_from_position(start_position : Vector2i, movement_available : int, un
 	var possible : Array[Vector2i] = [] # Possible to reach tiles
 	_reset_nodes() # Reset the nodes from a previous calculation
 	
-	var team_id = unit_moved.team_id
+	var team_id = unit_moved.get_team_id()
 	
 	# Checking for movement targets of units that are on the same team
 	var movement_targets : Dictionary[Vector2i, bool] = {}
 	for unit : Unit in _units.values():
-		if (unit.team_id == team_id and unit.current_action is MoveAction):
+		if (unit.get_team_id() == team_id and unit.current_action is MoveAction):
 			movement_targets.set((unit.current_action as MoveAction).movement_target(), true)
 	
 	var start_node : DijkstraNode = get_node_vec(start_position)
@@ -166,12 +166,12 @@ func tiles_from_position(start_position : Vector2i, movement_available : int, un
 			if (tile_unit != null):
 				
 				# If the unit on the tile is an allied unit
-				if (tile_unit.team_id == team_id and tile_unit != unit_moved):
+				if (tile_unit.get_team_id() == team_id and tile_unit != unit_moved):
 					do_not_append = true
 					if !_can_move_through_friendly: continue
 				
 				# If the unit on the tile is a hostile unit
-				if (tile_unit.team_id != team_id):
+				if (tile_unit.get_team_id() != team_id):
 					if !_can_move_to_enemy: continue
 			
 			# No blockers, moving forward

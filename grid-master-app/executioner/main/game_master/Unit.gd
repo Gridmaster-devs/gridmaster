@@ -7,8 +7,8 @@ var type : UnitType
 
 
 var unit_id : int ## The ID of the unit
-var player_id : int ## The ID of the player who owns the unit
-var team_id : int = -1
+var player : Player ## The player that owns the unit
+var team : Team
 
 var hp : int ## The current HP of the unit
 var movement_speed : int ## The speed of the unit NOTE: Currently using this as initiative
@@ -50,6 +50,14 @@ func is_dead() -> bool:
 		return false
 
 
+func get_team_id() -> int:
+	return team.team_id
+
+
+func get_player_id() -> int:
+	return player.player_id
+
+
 # This exists solely to be a function parameter for sorting the unit array
 ## Gets a unit's speed
 static func unit_compare(u1 : Unit, u2 : Unit) -> bool:
@@ -60,9 +68,10 @@ func set_position(new_pos : Vector2i) -> void:
 	grid_position = new_pos
 
 
-func _init(unit_type : UnitType, unit_id_p : int, player_id_p : int, position : Vector2i) -> void:
+func _init(unit_type : UnitType, unit_id_p : int, player_p : Player, position : Vector2i) -> void:
 	grid_position = position
 	unit_id = unit_id_p
-	player_id = player_id_p
+	player = player_p
+	team = player.team
 	type = unit_type
 	initFromUnitType()
