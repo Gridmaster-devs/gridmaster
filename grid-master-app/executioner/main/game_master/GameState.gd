@@ -2,11 +2,11 @@ class_name GameState
 extends RefCounted
 ## Class that represents everything that makes up the current state of the game, ex. the units, the map, etc
 
-## The function that determines what happens when two units fight.
-## Its parameters MUST be (unit1, unit2)
-static var fight_func : Callable
 
-var client_player_id : int = -1
+# Object that contains all the game rule related functions and arguments
+static var game_args : GameArgs
+
+var client_player_id : int = -1 # 
 var client_player_team_id : int = -1
 
 var game_name : String
@@ -64,6 +64,10 @@ func move_unit(unit_id : int, new_position : Vector2i) -> void:
 	var cur_pos = unit.getPosition()
 	unit.set_position(new_position)
 	grid.move_unit(unit_id, cur_pos, new_position)
+
+
+func swap_units(unit1 : Unit, unit2 : Unit, tile_distance : int):
+	pass
 
 
 ## Ends the turn and processes all the actions that have been queued up.
@@ -148,8 +152,8 @@ func get_pathfinder() -> DijkstraPathfinder:
 
 ## Returns the first unit on the specified tile.
 ## Can return null if there are no units on the tile.
-func get_first_unit_on_tile(coords : Vector2i) -> Unit:
-	return grid.get_first_unit_on_tile(coords)
+func get_unit_on_tile(coords : Vector2i) -> Unit:
+	return grid.get_unit_on_tile(coords)
 
 
 func get_client_player_id() -> int:

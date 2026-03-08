@@ -43,11 +43,36 @@ func has_stopped() -> bool:
 	
 	return true
 
+
+func get_next_movement_tile() -> Vector2i:
+	if (current_action is MoveAction):
+		return current_action.next_movement_tile()
+	
+	else:
+		return grid_position
+
+
+func get_swap_suggested_unit() -> int:
+	if (current_action is MoveAction):
+		return current_action.swap_suggested_unit
+	
+	else:
+		return -1
+
+
 func is_dead() -> bool:
 	if hp <= 0:
 		return true
 	else:
 		return false
+
+
+func set_fought(enemy_id : int) -> void:
+	if (current_action is MoveAction):
+		current_action.units_fought.set(enemy_id, true)
+		
+	else:
+		return
 
 
 func get_team_id() -> int:

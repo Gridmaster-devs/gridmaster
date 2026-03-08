@@ -47,8 +47,8 @@ func getUnitsOnTile(x : int, y : int) -> Dictionary[int, Unit]:
 
 ## Returns the first unit on the tile.
 ## Can return null if there are no units on the tile.
-func get_first_unit_on_tile(pos : Vector2i) -> Unit:
-	return get_tile_vec(pos).get_first_unit()
+func get_unit_on_tile(pos : Vector2i) -> Unit:
+	return get_tile_vec(pos).get_unit()
 
 
 func is_empty(pos : Vector2i) -> bool:
@@ -62,9 +62,9 @@ func is_empty(pos : Vector2i) -> bool:
 func move_unit(unit_id : int, start_pos : Vector2i, end_pos : Vector2i) -> void:
 	var start_tile = get_tile_vec(start_pos)
 	var end_tile = get_tile_vec(end_pos)
-	var unit = start_tile.getUnitById(unit_id)
+	var unit = start_tile.get_unit()
 	
-	start_tile.removeUnitById(unit_id)
+	start_tile.remove_unit()
 	end_tile.addUnit(unit)
 
 ## Adds a unit to the grid
