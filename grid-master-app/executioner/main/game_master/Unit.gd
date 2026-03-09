@@ -11,7 +11,34 @@ var player : Player ## The player that owns the unit
 var team : Team
 
 var _hp : int ## The current HP of the unit
+var hp : int:
+	get: return _hp
+	set(v): return
+
 var _morale : int ## The current morale of the unit
+var morale : int:
+	get: return _morale
+	set(v): return
+
+var attack : int:
+	get: return type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.ATTACK)
+	set(v): return
+
+
+var movement_speed : int:
+	get: return type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.MOVEMENT_SPEED)
+	set(v): return
+
+
+var accuracy : int:
+	get: return type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.ACCURACY)
+	set(v): return
+
+
+var dodge : int:
+	get: return type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.DODGE)
+	set(v): return
+
 
 var grid_position : Vector2i ## The current position of the unit on the grid
 
@@ -103,12 +130,6 @@ func take_damage(damage : int):
 	# making sure we won't process actions of dead units
 	if (_hp < 0):
 		current_action = null
-
-
-# This exists solely to be a function parameter for sorting the unit array
-## Gets a unit's speed
-static func unit_compare(u1 : Unit, u2 : Unit) -> bool:
-	return u1.get_move_speed() > u2.get_move_speed()
 
 
 func set_position(new_pos : Vector2i) -> void:
