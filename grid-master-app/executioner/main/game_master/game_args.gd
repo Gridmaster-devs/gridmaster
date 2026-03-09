@@ -9,6 +9,10 @@ enum ArgType {FIGHT_FUNC, DAMAGE_FUNC, HIT_FUNC, UNIT_INITIATIVE_FUNC}
 # It does not and should not remove units from the map. That is the job
 # of the end turn function in the game master
 
+# Bunch of flags for MoveActions
+const FLAG_STOP_AFTER_FIGHTING = 1
+static var stop_after_fighting : bool = true
+
 
 ## The dictionary containing the arguments themselves
 var args : Dictionary[ArgType, Callable]
@@ -24,6 +28,14 @@ static func DEBUG_init() -> GameArgs:
 	return game_args
 
 
+static func set_move_action_flags(flags : int):
+	if (flags & FLAG_STOP_AFTER_FIGHTING > 0):
+		stop_after_fighting = true
+	else:
+		stop_after_fighting = false
+	
+	
+
 # PUT PROPER FIGHT FUNC HERE
 func _gen_default_fight_func() -> void:
 	var fight_func = func(unit1 : Unit, unit2 : Unit):
@@ -32,8 +44,6 @@ func _gen_default_fight_func() -> void:
 		
 		unit1.set_fought(unit2.unit_id)
 		unit2.set_fought(unit1.unit_id)
-		
-		print("units fought!")
 	
 	args.set(ArgType.FIGHT_FUNC, fight_func)
 

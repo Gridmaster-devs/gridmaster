@@ -5,16 +5,6 @@ extends UnitAction
 ## Path of nodes the unit is set to travel.
 ## The first item is always the starting position of the unit,
 ## and the last item is always the final position of the unit.
-const FLAG_STOP_AFTER_FIGHTING : int = 1
-
-static var _stop_after_fighting : bool = true
-
-static func set_flags(flags : int):
-	if (flags & FLAG_STOP_AFTER_FIGHTING > 0):
-		_stop_after_fighting = true
-	else:
-		_stop_after_fighting = false
-	
 
 var path : Array[Vector2i]
 
@@ -58,7 +48,7 @@ func stop() -> void:
 ## Only to be called by the fight function
 func fought(enemy_unit_id : int):
 	units_fought.set(enemy_unit_id, true)
-	if (_stop_after_fighting == true):
+	if (GameArgs.stop_after_fighting == true):
 		stop()
 
 
@@ -139,7 +129,7 @@ func step() -> void:
 					# on our current square and ends on the enemy's tile
 					
 					# Whether we stop after fighting or not
-					if (_stop_after_fighting == true):
+					if (GameArgs.stop_after_fighting == true):
 						# We do stop
 						stopped = true
 						return

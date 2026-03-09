@@ -10,8 +10,8 @@ var unit_id : int ## The ID of the unit
 var player : Player ## The player that owns the unit
 var team : Team
 
-var hp : int ## The current HP of the unit
-var morale : int ## The current morale of the unit
+var _hp : int ## The current HP of the unit
+var _morale : int ## The current morale of the unit
 
 var grid_position : Vector2i ## The current position of the unit on the grid
 
@@ -20,8 +20,8 @@ var current_action : UnitAction = null ## The action the unit is set to perform 
 ## Initializes the unit from a specific unit type
 func initFromUnitType() -> void:
 	assert(type != null, "Unit type should not be null!")
-	hp = type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.MAX_HP)
-	morale = type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.INITIAL_MORALE)
+	_hp = type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.MAX_HP)
+	_morale = type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.INITIAL_MORALE)
 
 
 ## Returns the ID of the unit
@@ -67,7 +67,7 @@ func get_swap_suggested_unit() -> int:
 
 
 func is_dead() -> bool:
-	if hp <= 0:
+	if _hp <= 0:
 		return true
 	else:
 		return false
@@ -75,7 +75,7 @@ func is_dead() -> bool:
 
 func set_fought(enemy_id : int) -> void:
 	if (current_action is MoveAction):
-		current_action.units_fought.set(enemy_id, true)
+		current_action.fought(enemy_id)
 		
 	else:
 		return
@@ -98,10 +98,10 @@ func get_player_id() -> int:
 
 func take_damage(damage : int):
 	# remove damage from health
-	hp -= damage
+	_hp -= damage
 	
 	# making sure we won't process actions of dead units
-	if (hp < 0):
+	if (_hp < 0):
 		current_action = null
 
 
