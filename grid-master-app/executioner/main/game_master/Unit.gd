@@ -96,6 +96,15 @@ func get_player_id() -> int:
 	return player.player_id
 
 
+func take_damage(damage : int):
+	# remove damage from health
+	hp -= damage
+	
+	# making sure we won't process actions of dead units
+	if (hp < 0):
+		current_action = null
+
+
 # This exists solely to be a function parameter for sorting the unit array
 ## Gets a unit's speed
 static func unit_compare(u1 : Unit, u2 : Unit) -> bool:
