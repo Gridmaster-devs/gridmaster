@@ -90,16 +90,33 @@ func swap_units(unit1 : Unit, unit2 : Unit) -> void:
 
 ## Ends the turn and processes all the actions that have been queued up.
 ## Unit actions are processed before other actions.
+#func end_turn() -> void:
+	#var unit_array = units.values()
+	#unit_array.sort_custom(Unit.unit_compare)
+	#
+	#for unit : Unit in unit_array:
+		#if unit.current_action != null:
+			#unit.current_action.execute()
+	#
+	#for action : PlayerAction in action_queue:
+		#action.execute()
+	#
+	#turn_number += 1
+
+
 func end_turn() -> void:
 	var unit_array = units.values()
-	unit_array.sort_custom(Unit.unit_compare)
+	var sort_func : Callable = game_args.args.get(GameArgs.ArgType.UNIT_INITIATIVE_FUNC)
+	sort_func.call(unit_array)
 	
-	for unit : Unit in unit_array:
-		if unit.current_action != null:
-			unit.current_action.execute()
-	
-	for action : PlayerAction in action_queue:
-		action.execute()
+	var done = false
+	while(done == false):
+		done = true
+		
+		for unit : Unit in unit_array:
+			if (unit.current_action is MoveAction and unit.has_stopped() == false):
+				done = false
+				(unit.current_action as MoveAction).step()
 	
 	turn_number += 1
 

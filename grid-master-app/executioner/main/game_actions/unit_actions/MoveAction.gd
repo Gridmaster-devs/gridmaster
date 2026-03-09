@@ -97,7 +97,7 @@ func step() -> void:
 		if (movement_req > built_up_movement): return
 		
 		# Check if there is a unit on the tile we're trying to move to
-		var unit_on_tile : Unit = next_tile.get_first_unit()
+		var unit_on_tile : Unit = next_tile.get_unit()
 		
 		# There is a unit on the next tile we want to move to:
 		if unit_on_tile != null:
