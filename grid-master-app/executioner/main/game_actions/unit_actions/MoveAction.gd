@@ -32,8 +32,13 @@ var built_up_movement : int = 0
 # What's the last tile on the path (index of path)
 var last_tile : int
 
+# What unit we would like to swap with
 var swap_suggested_unit : int = -1
+
+# How much movement the swap would cost
 var swap_movement_cost : int = 0
+
+# How many tiles forward the swap would move us
 var swap_distance : int = 0
 
 
@@ -52,6 +57,7 @@ func stop() -> void:
 ##
 ## Only to be called by the fight function
 func fought(enemy_unit_id : int):
+	units_fought.set(enemy_unit_id, true)
 	if (_stop_after_fighting == true):
 		stop()
 
@@ -125,6 +131,12 @@ func step() -> void:
 					
 					# Make sure they won't fight us again
 					unit_on_tile.set_fought(unit.unit_id)
+					
+					# TODO: Replace this with logic that moves the unit to the path
+					# of the fought unit if the enemy unit died in the fight and we didn't
+					
+					# One way to do this would be to replace the movement path with one that begins
+					# on our current square and ends on the enemy's tile
 					
 					# Whether we stop after fighting or not
 					if (_stop_after_fighting == true):

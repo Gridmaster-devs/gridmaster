@@ -19,10 +19,10 @@ var _grid_height : int
 # Flags
 
 # Whether tiles with enemy units are valid targets to move to
-var _can_move_to_enemy : bool = false
+var _can_move_to_enemy : bool = true
 
 # Whether a unit can move through friendly units (not end up on top of them, just move through)
-var _can_move_through_friendly : bool = false
+var _can_move_through_friendly : bool = true
 
 
 func set_flags(flags : int):

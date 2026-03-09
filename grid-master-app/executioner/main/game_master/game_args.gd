@@ -4,6 +4,12 @@ class_name GameArgs
 ## The types of arguments
 enum ArgType {FIGHT_FUNC, DAMAGE_FUNC, HIT_FUNC, UNIT_INITIATIVE_FUNC}
 
+# The fight function must have the signature of (unit1, unit2) -> void
+# It determines how a fight happens
+# It does not and should not remove units from the map. That is the job
+# of the end turn function in the game master
+
+
 ## The dictionary containing the arguments themselves
 var args : Dictionary[ArgType, Callable]
 
@@ -21,11 +27,13 @@ static func DEBUG_init() -> GameArgs:
 # PUT PROPER FIGHT FUNC HERE
 func _gen_default_fight_func() -> void:
 	var fight_func = func(unit1 : Unit, unit2 : Unit):
-		unit1.hp -= unit2.get_damage()
-		unit2.hp -= unit1.get_damage()
+		unit1.take_damage(unit2.get_damage())
+		unit2.take_damage(unit1.get_damage())
 		
 		unit1.set_fought(unit2.unit_id)
 		unit2.set_fought(unit1.unit_id)
+		
+		print("units fought!")
 	
 	args.set(ArgType.FIGHT_FUNC, fight_func)
 

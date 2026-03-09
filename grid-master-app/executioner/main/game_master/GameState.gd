@@ -42,6 +42,7 @@ func addUnit(unit_type : UnitType, position : Vector2i, player_id : int) -> Unit
 		player = players[player_id]
 	
 	var unit = Unit.new(unit_type, id, player, position)
+	print(unit.get_team_id())
 	grid.addUnit(unit)
 	units.set(id, unit)
 	return unit
@@ -53,6 +54,16 @@ func addUnitByTypeId(id : int, position : Vector2i, player_id : int) -> Unit:
 	var unit_type = unit_types.get(id)
 	assert(unit_type != null, "Tried to add unit with invalid type ID!")
 	return addUnit(unit_type, position, player_id)
+
+
+func add_team(team_name : String, color : Color, team_units : Array[UnitType]) -> void:
+	var team_id : int = teams.size()
+	teams.append(Team.new(team_name, team_id, color, team_units))
+
+
+func add_player(player_name : String, team_id : int, computer : bool):
+	var player_id = players.size()
+	players.append(Player.new(player_name, player_id, teams[team_id], computer))
 
 
 # NOTE: There's no cheat handling anywhere right now.
@@ -88,22 +99,13 @@ func swap_units(unit1 : Unit, unit2 : Unit) -> void:
 	unit2_ma.handle_swap()
 
 
+func remove_unit(unit : Unit) -> void:
+	grid.remove_unit(unit.grid_position)
+	units.erase(unit.unit_id)
+
+
 ## Ends the turn and processes all the actions that have been queued up.
 ## Unit actions are processed before other actions.
-#func end_turn() -> void:
-	#var unit_array = units.values()
-	#unit_array.sort_custom(Unit.unit_compare)
-	#
-	#for unit : Unit in unit_array:
-		#if unit.current_action != null:
-			#unit.current_action.execute()
-	#
-	#for action : PlayerAction in action_queue:
-		#action.execute()
-	#
-	#turn_number += 1
-
-
 func end_turn() -> void:
 	var unit_array = units.values()
 	var sort_func : Callable = game_args.args.get(GameArgs.ArgType.UNIT_INITIATIVE_FUNC)
@@ -117,6 +119,12 @@ func end_turn() -> void:
 			if (unit.current_action is MoveAction and unit.has_stopped() == false):
 				done = false
 				(unit.current_action as MoveAction).step()
+		
+		# If any units have died we remove them from the array
+		for unit : Unit in unit_array:
+			if (unit.is_dead()):
+				unit_array.erase(unit)
+				remove_unit(unit)
 	
 	turn_number += 1
 

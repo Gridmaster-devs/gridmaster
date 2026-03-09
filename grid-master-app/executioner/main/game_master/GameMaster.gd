@@ -71,9 +71,15 @@ func initGameStateFromGameDefinition(game_definition : GameDefinitionResource):
 	_pathfinder = game_state.get_pathfinder()
 	
 	# DEBUG
-	DEBUG_create_unit(0, Vector2i(0,0))
-	DEBUG_create_unit(0, Vector2i(1,0))
-	_pathfinder.set_flags(DijkstraPathfinder.FLAG_CAN_MOVE_THROUGH_FRIENDLY)
+	game_state.add_team("blu team", Color.BLUE, [])
+	game_state.add_team("red team", Color.RED, [])
+	game_state.add_player("player1", 0, false)
+	game_state.add_player("player2", 1, false)
+	
+	game_state.addUnitByTypeId(0, Vector2i(0,0), 0)
+	game_state.addUnitByTypeId(0, Vector2i(0,1), 0)
+	game_state.addUnitByTypeId(0, Vector2i(1,0), 1)
+	game_state.addUnitByTypeId(0, Vector2i(1,1), 1)
 	# DEBUG
 
 	initGraphics()
