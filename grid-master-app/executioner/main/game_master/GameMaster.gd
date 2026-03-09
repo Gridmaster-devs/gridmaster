@@ -167,8 +167,8 @@ func _handle_event_default_in_game(event : StateMachineEvent):
 			moved_unit.current_action = null # clear the current action
 			_custom_graphics.clear_id(moved_unit.getId())
 			
-			current_possible_tiles = _pathfinder.tiles_from_position(unit.getPosition(), unit.movement_speed, unit)
-			movement_left = moved_unit.movement_speed
+			current_possible_tiles = _pathfinder.tiles_from_position(unit.getPosition(), unit.get_move_speed(), unit)
+			movement_left = moved_unit.get_move_speed()
 			
 			_custom_graphics.draw_movement_tiles(current_possible_tiles, unit.getId())
 			ui_state = UIState.UNIT_MOVE

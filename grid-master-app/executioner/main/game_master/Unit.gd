@@ -11,7 +11,6 @@ var player : Player ## The player that owns the unit
 var team : Team
 
 var hp : int ## The current HP of the unit
-var movement_speed : int ## The speed of the unit NOTE: Currently using this as initiative
 var morale : int ## The current morale of the unit
 
 var grid_position : Vector2i ## The current position of the unit on the grid
@@ -23,7 +22,6 @@ func initFromUnitType() -> void:
 	assert(type != null, "Unit type should not be null!")
 	hp = type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.MAX_HP)
 	morale = type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.INITIAL_MORALE)
-	movement_speed = type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.MOVEMENT_SPEED)
 
 
 ## Returns the ID of the unit
@@ -37,6 +35,10 @@ func getPosition() -> Vector2i:
 
 func get_damage() -> int:
 	return type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.ATTACK)
+
+
+func get_move_speed() -> int:
+	return type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.MOVEMENT_SPEED)
 	
 
 ## Returns whether the unit has stopped moving or not
@@ -97,7 +99,7 @@ func get_player_id() -> int:
 # This exists solely to be a function parameter for sorting the unit array
 ## Gets a unit's speed
 static func unit_compare(u1 : Unit, u2 : Unit) -> bool:
-	return u1.movement_speed > u2.movement_speed
+	return u1.get_move_speed() > u2.get_move_speed()
 
 
 func set_position(new_pos : Vector2i) -> void:

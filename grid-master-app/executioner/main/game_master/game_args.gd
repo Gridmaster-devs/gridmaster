@@ -13,9 +13,12 @@ static func DEBUG_init() -> GameArgs:
 	var game_args : GameArgs = GameArgs.new()
 	
 	game_args._gen_default_fight_func()
+	game_args._gen_default_initiative_func()
 	
 	return game_args
-	
+
+
+# PUT PROPER FIGHT FUNC HERE
 func _gen_default_fight_func() -> void:
 	var fight_func = func(unit1 : Unit, unit2 : Unit):
 		unit1.hp -= unit2.get_damage()
@@ -31,6 +34,28 @@ func _gen_default_damage_func() -> void:
 
 func _gen_default_hit_func() -> void:
 	pass
+
+
+func _gen_default_initiative_func() -> void:
+	
+	# Dictionary for holding the luck value for each unit
+	var luck_dict : Dictionary[Unit, float] = {}
+	
+	# Creating the function used for sorting the units
+	var sort_func = func(unit1 : Unit, unit2 : Unit):
+		return unit1.get_move_speed() + luck_dict[unit1] > unit2.get_move_speed() + luck_dict[unit2]
+	
+	var initiative_func = func(units : Array[Unit]):
+		
+		# We're rolling a luck value between 0 and 1 to solve tiebreakers
+		# of units with the same initiative value
+		for unit : Unit in units:
+			luck_dict.set(unit, randf())
+		
+		units.sort_custom(sort_func)
+		
+	
+	args.set(ArgType.UNIT_INITIATIVE_FUNC, initiative_func)
 
 
 
