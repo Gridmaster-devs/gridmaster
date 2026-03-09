@@ -42,7 +42,6 @@ func addUnit(unit_type : UnitType, position : Vector2i, player_id : int) -> Unit
 		player = players[player_id]
 	
 	var unit = Unit.new(unit_type, id, player, position)
-	print(unit.get_team_id())
 	grid.addUnit(unit)
 	units.set(id, unit)
 	return unit
