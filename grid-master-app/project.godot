@@ -21,6 +21,7 @@ run/main_scene.editor="uid://nxldab0hpse0"
 
 GML="*res://common/GML.gd"
 Global="*res://common/global.gd"
+MessageDispatcher="*res://executioner/main/globals/message_dispatcher.gd"
 
 [display]
 

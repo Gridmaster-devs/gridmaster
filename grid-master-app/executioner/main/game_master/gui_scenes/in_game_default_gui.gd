@@ -3,11 +3,13 @@ extends GUIScene
 
 @onready var _game_name_label : Label = $GameNameLabel
 @onready var _end_turn_button : GUIButton = $EndTurnButton
+@onready var message_window_node: MessageWindow = $MessageWindow
 
+func _ready():
+	MessageDispatcher.message_broadcast.connect(message_window_node._on_message_broadcast)
 
 func _end_turn_button_pressed() -> void:
 	send_gm_signal(ButtonPressedEvent.new(ButtonPressedEvent.ButtonType.END_TURN))
-
 
 # Normal _init() does not work when you are instantiating
 # a scene from a file

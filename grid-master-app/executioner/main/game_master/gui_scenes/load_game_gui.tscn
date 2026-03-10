@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://cg5qorq2d7wda"]
 
-[ext_resource type="Script" uid="uid://dwgxn0qeyvutk" path="res://executioner/main/grid_graphics/gui_scenes/load_game_gui.gd" id="1_xjqdx"]
+[ext_resource type="Script" uid="uid://dwgxn0qeyvutk" path="res://executioner/main/game_master/gui_scenes/load_game_gui.gd" id="1_xjqdx"]
 [ext_resource type="PackedScene" uid="uid://b4s8ownwps16v" path="res://common/gui_elements/gui_button.tscn" id="2_8dcvq"]
 
 [node name="LoadGameGUI" type="Control"]
