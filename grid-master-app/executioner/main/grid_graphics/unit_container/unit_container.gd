@@ -12,10 +12,11 @@ func getScreenPosition() -> Vector2i:
 	return position
 
 
-func _init(internal_unit: Unit, screen_pos: Vector2) -> void:
+func initialize(internal_unit: Unit, screen_pos: Vector2) -> void:
 	unit = internal_unit
 	position = screen_pos
 	initSprite()
+
 
 func initSprite():
 	if unit.type.texture != null: 
@@ -25,6 +26,8 @@ func initSprite():
 		var tex := ImageTexture.create_from_image(img)
 		tex.set_size_override(Vector2i(GridGraphics.TILE_SIZE, GridGraphics.TILE_SIZE))
 		texture = tex
+	
+	set_instance_shader_parameter("team_color", unit.team.color)
 
 func update_screen_position(pos: Vector2i): 
 	position = pos
