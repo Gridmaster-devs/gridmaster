@@ -5,9 +5,9 @@
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_8vfp4"]
 shader = ExtResource("1_8vfp4")
-shader_parameter/team_color = Color(0.5, 0.5, 0.5, 1)
-shader_parameter/outline_thickness = 0.5
+shader_parameter/outline_thickness = 1.0
 
-[node name="UnitContainer" type="Node2D"]
+[node name="UnitContainer" type="Sprite2D"]
 material = SubResource("ShaderMaterial_8vfp4")
+instance_shader_parameters/team_color = Color(0.5, 0.5, 0.5, 1)
 script = ExtResource("2_o18l5")
