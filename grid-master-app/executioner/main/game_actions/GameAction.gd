@@ -5,5 +5,3 @@ extends RefCounted
 
 var _game_state : GameState
 var player_id : int ## The player attempting to make the action
-
-@abstract func execute()
