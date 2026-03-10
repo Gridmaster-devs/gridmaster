@@ -7,6 +7,7 @@ extends GUIScene
 
 func _ready():
 	MessageDispatcher.message_broadcast.connect(message_window_node._on_message_broadcast)
+	_end_turn_button.pressed.connect(_end_turn_button_pressed)
 
 func _end_turn_button_pressed() -> void:
 	send_gm_signal(ButtonPressedEvent.new(ButtonPressedEvent.ButtonType.END_TURN))
@@ -15,7 +16,3 @@ func _end_turn_button_pressed() -> void:
 # a scene from a file
 func initialize(game_name : Variant) -> void:
 	_game_name_label.text = game_name as String
-	
-
-func _custom_ready() -> void:
-	_end_turn_button.pressed.connect(_end_turn_button_pressed)
