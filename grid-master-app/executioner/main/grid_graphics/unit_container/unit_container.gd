@@ -1,11 +1,9 @@
-extends Node2D
 class_name UnitContainer
+extends Sprite2D
 ## Class that represents a single unit on the battlefield
 
 # object with attributes shared by all units of the same type
 var unit: Unit
-var sprite: Sprite2D
-
 
 func getUnit() -> Unit: 
 	return unit
@@ -20,16 +18,13 @@ func _init(internal_unit: Unit, screen_pos: Vector2) -> void:
 	initSprite()
 
 func initSprite():
-	sprite = Sprite2D.new()
-	add_child(sprite)
 	if unit.type.texture != null: 
-		sprite.texture = unit.type.texture
+		texture = unit.type.texture
 	else:
-		var img := Image.create(24, 24, false, Image.FORMAT_RGBA8)
-		img.fill(Color(1, 0, 0, 1))  # solid red
+		var img := preload("res://common/media/gridmaster_default_unit.png").get_image()
 		var tex := ImageTexture.create_from_image(img)
-		sprite.texture = tex
-
+		tex.set_size_override(Vector2i(GridGraphics.TILE_SIZE, GridGraphics.TILE_SIZE))
+		texture = tex
 
 func update_screen_position(pos: Vector2i): 
 	position = pos
