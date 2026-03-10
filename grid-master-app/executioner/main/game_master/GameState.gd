@@ -2,15 +2,16 @@ class_name GameState
 extends RefCounted
 ## Class that represents everything that makes up the current state of the game, ex. the units, the map, etc
 
-
-# Object that contains all the game rule related functions and arguments
-static var game_args : GameArgs
-
 var client_player_id : int = -1 # 
 var client_player_team_id : int = -1
 
 var game_name : String
-var grid : GameGrid ## Grid that represents the map
+
+var _grid : GameGrid ## Grid that represents the map
+var grid : GameGrid:
+	get: return _grid
+	set(v): return
+
 var units : Dictionary[int, Unit] = {} ## All the units in the game, NOTE: also stored in each map tile
 var players : Array[Player] = [] ## All the players in the game
 var teams : Array[Team] = [] ## All the teams in the game
@@ -107,7 +108,7 @@ func remove_unit(unit : Unit) -> void:
 ## Unit actions are processed before other actions.
 func end_turn() -> void:
 	var unit_array = units.values()
-	var sort_func : Callable = game_args.args.get(GameArgs.ArgType.UNIT_INITIATIVE_FUNC)
+	var sort_func : Callable = GameArgs.args.get(GameArgs.ArgType.UNIT_INITIATIVE_FUNC)
 	sort_func.call(unit_array)
 	
 	var done = false
@@ -142,13 +143,13 @@ static func initFromGameDefinition(game_definition : GameDefinitionResource) -> 
 	var game_state = GameState.new()
 	game_state.initUnitTypesFromResource(game_definition)
 	game_state.game_name = game_definition.game_name
-	game_state.grid = GameGrid.initFromMapResource(game_definition.loadMap())
+	game_state._grid = GameGrid.initFromMapResource(game_definition.loadMap())
 	
 	game_state._pathfinder = DijkstraPathfinder.new()
 	game_state._pathfinder.initialize(game_state.grid, game_state.units)
 	
 	# TODO: Add import from game definition
-	game_args = GameArgs.DEBUG_init()
+	GameArgs.initialize(game_state)
 	
 	return game_state
 

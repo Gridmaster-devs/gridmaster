@@ -5,9 +5,11 @@ extends UnitAction
 ## Path of nodes the unit is set to travel.
 ## The first item is always the starting position of the unit,
 ## and the last item is always the final position of the unit.
-
 var path : Array[Vector2i]
 
+# Whether we are currently searching for a next tile to travel to with the
+# next movement tile function. This variable exists to prevent infinite loops
+# in gridlocks.
 var searching_next_tile : bool = false
 
 # Whether we have stopped moving
@@ -32,12 +34,13 @@ var swap_movement_cost : int = 0
 var swap_distance : int = 0
 
 
-
 # Which units we have fought during this movement
 # Stored so we don't fight the same unit again
 var units_fought : Dictionary[int, bool] = {}
 
 
+# Stops moving and clears the swap suggest so we don't
+# accidentally swap after we have stopped moving
 func stop() -> void:
 	stopped = true
 	swap_suggested_unit = -1
@@ -52,12 +55,18 @@ func fought(enemy_unit_id : int):
 		stop()
 
 
+## Handles the internal variables when a swap happens.
+##
+## Called by the swap function in the game state
 func handle_swap() -> void:
 	current_tile += swap_distance
 	built_up_movement -= swap_movement_cost
 	reset_swap()
 
 
+## Resets all the swap variables when we move
+##
+## Called by the step function.
 func reset_swap() -> void:
 	swap_distance = 0
 	swap_movement_cost = 0
@@ -116,7 +125,7 @@ func step() -> void:
 						return
 					
 					# Fight the unit
-					var fight_func = GameState.game_args.args.get(GameArgs.ArgType.FIGHT_FUNC)
+					var fight_func = GameArgs.args.get(GameArgs.ArgType.FIGHT_FUNC)
 					fight_func.call(unit, unit_on_tile)
 					
 					# Make sure they won't fight us again
@@ -138,6 +147,11 @@ func step() -> void:
 						# We don't stop
 						return
 					
+			
+			#TODO: Proper, more sophisticated gridlock detection should be added
+			# Currently, gridlocks won't happen but sometimes units won't quite get to their
+			# final destinations if there's a unit there already, even if it's going to move away
+			# in the future. The swap detection is 
 			
 			# The unit on the tile is a friendly unit
 			else:
@@ -173,16 +187,13 @@ func step() -> void:
 			reset_swap()
 	
 
-
-func execute():
-	_game_state.move_unit(unit.getId(), path.back())
-
-
+## Returns the ultimate movement target, i.e. the last tile on our path
 func movement_target() -> Vector2i:
 	return path.back()
 
 
-# This is jank and I imagine could fail easily
+## Returns the next tile on the path we're trying to move to, which is
+## the first tile that doesn't have a stopped allied unit on it
 func next_movement_tile() -> Vector2i:
 	if (stopped == true):
 		return path[current_tile]

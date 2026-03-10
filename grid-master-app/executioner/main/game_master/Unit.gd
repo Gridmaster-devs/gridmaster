@@ -24,21 +24,25 @@ var attack : int:
 	get: return type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.ATTACK)
 	set(v): return
 
-
 var movement_speed : int:
 	get: return type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.MOVEMENT_SPEED)
 	set(v): return
-
 
 var accuracy : int:
 	get: return type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.ACCURACY)
 	set(v): return
 
-
 var dodge : int:
 	get: return type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.DODGE)
 	set(v): return
 
+var piercing : int:
+	get: return type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.ARMOR_PIERCING)
+	set(v): return
+
+var armor : int:
+	get: return type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.ARMOR)
+	set(v): return
 
 var grid_position : Vector2i ## The current position of the unit on the grid
 

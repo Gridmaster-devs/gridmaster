@@ -9,6 +9,10 @@ var unit : Unit = null ## Dictionary from Unit ID to the Units on the tile
 var tile_type : TileType ## Reference to the type of tile
 var position : Vector2i
 
+var protection : int:
+	get: return tile_type.attributes.get(TileType.TILE_ATTRIBUTE_TYPE.PROTECTION)
+	set(v): return
+
 
 ## Returns the array of all the units on the grid tile
 func get_unit() -> Unit:
