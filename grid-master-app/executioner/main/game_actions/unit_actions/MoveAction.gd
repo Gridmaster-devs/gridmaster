@@ -73,7 +73,8 @@ func reset_swap() -> void:
 	swap_suggested_unit = -1
 
 
-## Tries to move the unit one step forward when called
+## Tries to move the unit one step forward when called by the
+## game state's end turn function
 func step() -> void:
 	var loops = 0
 	# We have already stopped
