@@ -1,8 +1,11 @@
 extends Node
-## Global object that receives messages and forwards them to a message window.
+## Global object (autoload) that receives messages and emits a signal
+## that different message receivers (e.g. message_window) can attach to 
 
-signal message_broadcast
+signal message_broadcast(message)
 	
+## Use this function to send messages to any receivers that subscribe to
+## MessageDispatcher
 func broadcast_message(message: String) -> void:
 	message_broadcast.emit(message)
 
