@@ -377,7 +377,7 @@ func _paint_tile(hovered_tile: Vector2i) -> void:
 ##POPUPS
 func open_settings_popup() -> void: 
 	var settings_popup: SettingsPopup = preload("res://editor/editors/map_editor_refactor/popup_windows/settings_popup.tscn").instantiate()
-	get_tree().call_group(Global.popup_manager_group, Global.add_popup, settings_popup, settings_popup.get_popup_name())
+	settings_popup.add_to_tree()
 	settings_popup.init(_generate_settigns_dict())
 	settings_popup.saved.connect(update_settings)
 

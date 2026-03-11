@@ -136,6 +136,7 @@ func _on_teams_save() -> void:
 		var team_id = count
 		_teams.append(GameTeam.new(team_name, team_color, team_id))
 		count += 1
+	
 	#TODO: update map painter libraries with new teams
 
 

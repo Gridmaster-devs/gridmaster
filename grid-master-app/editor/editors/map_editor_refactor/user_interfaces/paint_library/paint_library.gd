@@ -62,8 +62,8 @@ func init(lib_name: String, preview_texture_id: String, item_id: String,
 #function that gets called when the new button is pressed
 #the button with a '+' 
 func _on_new_tile_button_pressed() -> void: 
-	var _new_tile_popup: NewTilePopup = preload("res://editor/editors/map_editor_refactor/popup_windows/new_tile_popup.tscn").instantiate()
-	get_tree().call_group(Global.popup_manager_group, Global.add_popup, _new_tile_popup, _new_tile_popup.get_popup_name())
+	var new_tile_popup: NewTilePopup = preload("res://editor/editors/map_editor_refactor/popup_windows/new_tile_popup.tscn").instantiate()
+	new_tile_popup.add_to_tree()
 	##INIT HAS TO BE CALLED AFTER BEING ADDED TO TREE
 	
 	var display_types: Dictionary[String, Variant]
@@ -71,8 +71,8 @@ func _on_new_tile_button_pressed() -> void:
 		display_types[key] = _overwrite_data[key]
 	for key in _addable_data:
 		display_types[key] = _addable_data[key]
-	_new_tile_popup.init(display_types, _name)
-	_new_tile_popup.new_tile_confirmed.connect(_on_new_tile_confirmed)
+	new_tile_popup.init(display_types, _name)
+	new_tile_popup.new_tile_confirmed.connect(_on_new_tile_confirmed)
 
 #clears the items on the library
 func _clear_items() -> void: 
@@ -119,7 +119,7 @@ func _button_callback(datapoint: Dictionary[String, Variant]) -> void:
 
 func _open_item_dropdown() -> void: 
 	var dropdown: DropDown = preload("res://editor/editors/map_editor_refactor/drop_down/drop_down.tscn").instantiate()
-	get_tree().call_group(Global.popup_manager_group, Global.add_popup, dropdown.get)
+	dropdown.add_to_tree()
 
 func _remove_item() -> void: 
 	if _cur_item_data.has(_item_id):
@@ -135,16 +135,12 @@ func get_layer_id() -> int:
 
 func _open_remove_confirm_popup() -> void: 
 	var confirm_popup: ConfirmPopup = preload("res://editor/editors/map_editor_refactor/popup_windows/confirm_popup.tscn").instantiate()
-	get_tree().call_group(Global.popup_manager_group, Global.add_popup, confirm_popup,  confirm_popup.get_popup_name())
-	confirm_popup.cancel.connect(_on_remove_cancel.bind(confirm_popup.get_popup_name()))
+	confirm_popup.add_to_tree()
 	confirm_popup.ok.connect(_on_remove_confirm.bind(confirm_popup.get_popup_name()))
+
 	
-func _on_remove_cancel(popup_name: String) -> void:
-	get_tree().call_group(Global.popup_manager_group, Global.close_popup, popup_name)
-	
-func _on_remove_confirm(popup_name: String) -> void:
+func _on_remove_confirm() -> void:
 	_remove_item()
-	_on_remove_cancel(popup_name)
 	
 
 func _on_new_tile_confirmed(data: Dictionary[String, Variant], lib_name: String) -> void: 

@@ -7,7 +7,6 @@ class_name ConfirmPopup
 
 #signals
 signal ok
-signal cancel
 
 
 func _init() -> void:
@@ -21,4 +20,4 @@ func _ok() -> void:
 	ok.emit()
 	
 func _cancel() -> void:
-	cancel.emit()
+	remove_from_tree()

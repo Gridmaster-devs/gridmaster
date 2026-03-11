@@ -49,6 +49,7 @@ current_tab = 0
 
 [node name="Teams" parent="PanelContainer/VBoxContainer/TabContainer" instance=ExtResource("2_ugjnl")]
 layout_mode = 2
+section_headers = Array[String](["NewTeamButton", "GridContainer", "SaveTeamsButton"])
 metadata/_tab_index = 0
 
 [node name="TopLabel" parent="PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox" index="0"]

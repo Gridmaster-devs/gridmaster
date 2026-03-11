@@ -91,10 +91,10 @@ func on_new_tile_save() -> void:
 	var data = get_tile_data()
 	if _is_valid(data):
 		new_tile_confirmed.emit(data, _lib_name)
-	get_tree().call_group(Global.popup_manager_group, Global.close_popup, self.get_popup_name())
+	remove_from_tree()
 	
 func on_new_tile_cancel() -> void: 
-	get_tree().call_group(Global.popup_manager_group, Global.add_popup, self.get_popup_name())
+	remove_from_tree()
 
 
 

@@ -5,7 +5,5 @@ extends Node
 const tile_width = 64
 const tile_height = 64
 
-
-const popup_manager_group: String = "popup_manager"
-const add_popup: String = "add_popup"
-const close_popup: String = "close_popup"
+##popup manager
+var popup_manager: PopupManager = null

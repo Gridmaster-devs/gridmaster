@@ -73,10 +73,10 @@ func get_settings_data() -> Dictionary[String, Variant]:
 		
 func on_save() -> void: 
 	saved.emit(get_settings_data())
-	get_tree().call_group(Global.popup_manager_group, Global.close_popup, get_popup_name())
+	remove_from_tree()
 
 func on_cancel() -> void: 
-	get_tree().call_group(Global.popup_manager_group, Global.close_popup, get_popup_name())
+	remove_from_tree()
 
 
 

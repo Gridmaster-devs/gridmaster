@@ -25,5 +25,11 @@ func set_popup_name(new_name: String) -> void:
 func get_popup_name() -> String: 
 	return _name
 
+func add_to_tree() -> void:
+	Global.popup_manager.add_popup(self)
+
+func remove_from_tree() -> void: 
+	Global.popup_manager.close_popup(self)
+
 
 @abstract func _init() -> void

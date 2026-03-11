@@ -6,17 +6,21 @@ var _containers: Dictionary[String, Container]
 
 func _ready() -> void:
 	self.visible = false
+	if Global.popup_manager == null:
+		Global.popup_manager = self
 
-func add_popup(node: Node, popup_name: String) -> void: 
+func add_popup(popup: PopupWindow) -> void: 
 	var new_cont: Container = preload("res://editor/editors/map_editor_refactor/popup_windows/popup_layer.tscn").instantiate()
+	var popup_name: String = popup.get_popup_name()
 	add_child(new_cont)
-	add_child(node)
-	_popups[popup_name] = node
+	add_child(popup)
+	_popups[popup_name] = popup
 	_containers[popup_name] = new_cont
 	self.visible = true
 
 
-func close_popup(popup_name: String) -> void: 
+func close_popup(popup: PopupWindow) -> void: 
+	var popup_name = popup.get_popup_name()
 	_popups[popup_name].queue_free()
 	_containers[popup_name].queue_free()
 	_popups.erase(popup_name)
