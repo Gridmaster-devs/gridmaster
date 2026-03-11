@@ -9,12 +9,20 @@ var game_resource : GameDefinitionResource
 @onready var _tab_container: TabContainer = $PanelContainer/VBoxContainer/TabContainer
 @onready var ftm : FileTransferManager = $Dialogs/FileTransferManager
 
+@onready var _teams_container: GridContainer = $PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox/GridContainer
+@onready var _new_team_button: Button = $PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox/NewTeamButton
+@onready var _save_button: Button = $PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox/SaveTeamsButton
 
-var _base_layer_id: int
-var _unit_layer_id: int
+#teams
+var _team_uis: Array[TeamUi] = []
+var _teams: Array[GameTeam] = []
+
 
 ##painting
 var _unit_painter: MapPainter = null
+var _base_layer_id: int
+var _unit_layer_id: int
+
 
 # links the editor_main object
 func link_editor_main(editor_main_p : EditorMain):
@@ -58,7 +66,7 @@ func _create_unit_painter() -> MapPainter:
 	var painter_scene = preload("res://editor/editors/map_editor_refactor/user_interfaces/map_painter.tscn")
 	var _painter: MapPainter = painter_scene.instantiate()
 	_tab_container.add_child(_painter)
-	_tab_container.set_tab_title(0, "Map")
+	_tab_container.set_tab_title(1, "Map")
 	
 	##HAS TO BE CALLED AFTER ADDED TO SCENE 
 	_painter.init_painter(10, 10)
@@ -70,13 +78,11 @@ func _create_unit_painter() -> MapPainter:
 								MapAttributes.UNIT_UNIT_LIB_ITEM_ID, _unit_layer_id, false, true)
 	return _painter
 
-
 func _reload() -> void:
 	#reload the units
 	_sync_unit_lib()
 	#reload the map
 	_sync_map()
-
 
 func _sync_map() -> void:
 	var attribute_grid = editor_main.getMap().get_strategic_map().get_attribute_grids()[0]
@@ -104,7 +110,6 @@ func _sync_unit_lib() -> void:
 func _on_visibibility_changed() -> void:
 	if visible: 
 		_reload()
-
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	ftm.resource_uploaded.connect(load_from_resource)
@@ -112,13 +117,26 @@ func _ready() -> void:
 	load_game_button.button_up.connect(load_from_file)
 	visibility_changed.connect(_on_visibibility_changed)
 	_unit_painter = _create_unit_painter()
+	
+	#teams ui
+	_new_team_button.pressed.connect(_add_new_team_ui)
+	_save_button.pressed.connect(_on_teams_save)
 
+func _add_new_team_ui() -> void: 
+	var team_ui: TeamUi = preload("res://editor/editors/game_editor/team_ui.tscn").instantiate()
+	_teams_container.add_child(team_ui)
+	_team_uis.append(team_ui)
 
-
-
-
-
-
+func _on_teams_save() -> void: 
+	_teams.clear()
+	var count = 0
+	for team_ui in _team_uis: 
+		var team_name = team_ui.get_team_name()
+		var team_color = team_ui.get_team_color()
+		var team_id = count
+		_teams.append(GameTeam.new(team_name, team_color, team_id))
+		count += 1
+	#TODO: update map painter libraries with new teams
 
 
 

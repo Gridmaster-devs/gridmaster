@@ -7,8 +7,8 @@ class_name TextureColorPicker
 
 
 ##signals
-signal save_color_picker(texture: Texture2D)
-
+signal texture_saved(texture: Texture2D)
+signal color_saved(color: Color)
 
 func _init() -> void: 
 	super.set_popup_name("texture_color_picker_popup")
@@ -17,8 +17,6 @@ func _init() -> void:
 func _ready() -> void:
 	save_button.pressed.connect(_save)
 	cancel_button.pressed.connect(_cancel)
-	
-
 
 
 func _get_texture() -> Texture2D: 
@@ -28,7 +26,8 @@ func _get_texture() -> Texture2D:
 	return ImageTexture.create_from_image(img)
 
 func _save() -> void: 
-	save_color_picker.emit(_get_texture())
+	texture_saved.emit(_get_texture())
+	color_saved.emit(color_picker.color)
 	get_tree().call_group(Global.popup_manager_group, Global.close_popup, self.get_popup_name())
 	
 func _cancel() -> void: 
