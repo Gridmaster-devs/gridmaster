@@ -2,11 +2,11 @@
 
 [ext_resource type="Script" uid="uid://cb4towuvrfhsk" path="res://editor/editors/map_editor_refactor/user_interfaces/map_painter.gd" id="1_v37v7"]
 [ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="2_gp3mo"]
-[ext_resource type="Script" uid="uid://pfgcd2tk24gn" path="res://editor/scripts/map_editor_scripts/other/sub_viewport_script.gd" id="3_xpio1"]
+[ext_resource type="Script" uid="uid://pfgcd2tk24gn" path="res://editor/editors/map_editor_refactor/user_interfaces/sub_viewport_script.gd" id="3_xpio1"]
 [ext_resource type="Texture2D" uid="uid://dp1ky8epuaiv" path="res://editor/sprites/map_editor_sprites/grid_invis_highlight.png" id="4_w07yu"]
 [ext_resource type="Texture2D" uid="uid://doqe1u6vume5c" path="res://editor/sprites/map_editor_sprites/grid_invis.png" id="5_f6bkk"]
 [ext_resource type="Texture2D" uid="uid://cy4pdp1xl7ssw" path="res://editor/sprites/map_editor_sprites/grid_invis_highlight_pink.png" id="6_442k7"]
-[ext_resource type="Script" uid="uid://6g2o1upyh5q4" path="res://editor/scripts/map_editor_scripts/other/map_camera_script.gd" id="8_38i74"]
+[ext_resource type="Script" uid="uid://6g2o1upyh5q4" path="res://editor/editors/map_editor_refactor/user_interfaces/map_camera_script.gd" id="8_38i74"]
 [ext_resource type="Script" uid="uid://bvqyndxvu4lnc" path="res://editor/editors/map_editor_refactor/user_interfaces/background_tile_map.gd" id="8_xpio1"]
 [ext_resource type="Script" uid="uid://ckmni16vo0e1p" path="res://editor/editors/map_editor_refactor/user_interfaces/tile_descriptor.gd" id="9_gp3mo"]
 [ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://editor/themes/editor-theme.tres" id="11_w07yu"]

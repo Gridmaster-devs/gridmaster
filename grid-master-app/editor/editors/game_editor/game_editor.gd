@@ -3,11 +3,16 @@ extends Control
 
 var editor_main : EditorMain
 var game_resource : GameDefinitionResource
-@onready var game_name_line : LineEdit = $"PanelContainer/VBoxContainer/Game name"
-@onready var save_game_button : Button = $"PanelContainer/VBoxContainer/Save game"
-@onready var load_game_button : Button = $"PanelContainer/VBoxContainer/Load game"
+@onready var game_name_line : LineEdit = $"PanelContainer/VBoxContainer/HBoxContainer/Game name"
+@onready var save_game_button : Button = $"PanelContainer/VBoxContainer/HBoxContainer/Save game"
+@onready var load_game_button : Button = $"PanelContainer/VBoxContainer/HBoxContainer/Load game"
+@onready var _contents_container: VBoxContainer = $PanelContainer/VBoxContainer
 @onready var ftm : FileTransferManager = $Dialogs/FileTransferManager
 
+
+
+##painting
+var _unit_painter: MapPainter = null
 
 # links the editor_main object
 func link_editor_main(editor_main_p : EditorMain):
@@ -47,6 +52,49 @@ func get_game_name() -> String:
 func set_game_name(name_p : String):
 	game_name_line.text = name_p
 	
+func _create_unit_painter() -> MapPainter: 
+	var painter_scene = preload("res://editor/editors/map_editor_refactor/user_interfaces/map_painter.tscn")
+	var _painter: MapPainter = painter_scene.instantiate()
+	_contents_container.add_child(_painter)
+	
+	##HAS TO BE CALLED AFTER ADDED TO SCENE 
+	_painter.init_painter(MapAttributes.UNIT_TEXTURE_ID, MapAttributes.UNIT_TILE_ID, 10, 10)
+	_painter.add_library(MapAttributes.UNIT_UNIT_LIB_NAME, MapAttributes.UNIT_UNIT_LIB_OVERWRITE, 
+								MapAttributes.UNIT_UNIT_LIB_ADD, 
+								MapAttributes.UNIT_UNIT_LIB_TEXTURE_ID, 
+								MapAttributes.UNIT_UNIT_LIB_ITEM_ID, true)
+	return _painter
+
+
+func _reload() -> void:
+	#reload the units
+	_sync_unit_lib()
+	#reload the map
+	_sync_map()
+
+
+func _sync_map() -> void:
+	var attribute_grid = editor_main.getMap().get_strategic_map().get_attribute_grid()
+	var exclude: Array[String] = [MapAttributes.UNIT_UNIT_LIB_ITEM_ID]
+	_unit_painter.sync_attribute_grid(attribute_grid, exclude)
+
+func _sync_unit_lib() -> void: 
+	var units = editor_main.get_units()
+	var data: Array = []
+	for unit in units: 
+		var unit_name: String = unit.get_attribute("name").attribute_value
+		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
+		img.fill(Color.from_rgba8(255, 0, 0, 255))  
+		var unit_texture: Texture2D = ImageTexture.create_from_image(img)
+		var datapoint: Dictionary[String, Variant] = {
+			MapAttributes.UNIT_UNIT_LIB_ITEM_ID: unit_name,
+		 	MapAttributes.UNIT_UNIT_LIB_TEXTURE_ID: unit_texture}
+		data.append(datapoint)
+	_unit_painter.sync_library(data, MapAttributes.UNIT_UNIT_LIB_NAME)
+
+func _on_visibibility_changed() -> void:
+	if visible: 
+		_reload()
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -54,3 +102,22 @@ func _ready() -> void:
 	
 	save_game_button.button_up.connect(save_to_file)
 	load_game_button.button_up.connect(load_from_file)
+	visibility_changed.connect(_on_visibibility_changed)
+	_unit_painter = _create_unit_painter()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#

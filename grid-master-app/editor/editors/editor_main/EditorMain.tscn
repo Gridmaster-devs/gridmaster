@@ -20,13 +20,10 @@ current_tab = 0
 layout_mode = 2
 metadata/_tab_index = 0
 
-[node name="Map editor" type="Control" parent="TabContainer"]
+[node name="MapEditor" parent="TabContainer" instance=ExtResource("3_mnkt7")]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 1
-
-[node name="MapEditor" parent="TabContainer/Map editor" instance=ExtResource("3_mnkt7")]
-layout_mode = 1
 
 [node name="Game Editor" parent="TabContainer" instance=ExtResource("3_fi5xj")]
 visible = false

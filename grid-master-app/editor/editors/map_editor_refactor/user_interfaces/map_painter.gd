@@ -1,8 +1,7 @@
 class_name MapPainter
-extends Node
+extends Control
 
 @onready var _content_vbox: VBoxContainer = $HBoxContainer/RightPanel/TopVBox/ScrollContainer/ContentsVBox
-@onready var _tile_grid: TileMapLayer = $HBoxContainer/SubViewControl/SubViewportContainer/SubViewport/TileGrid
 @onready var _background_grid: BackgroundTileMap = $HBoxContainer/SubViewControl/SubViewportContainer/SubViewport/BackgroundGrid
 @onready var _sub_viewport: SubViewport = $HBoxContainer/SubViewControl/SubViewportContainer/SubViewport
 @onready var _sub_view_container: SubViewportContainer = $HBoxContainer/SubViewControl/SubViewportContainer
@@ -20,14 +19,7 @@ enum InputState {
 
 
 ##GENERAL DATA
-#Grid of each tiles attribute list (its a dictionary for each tile) 
-#Most important data in the map painter
-#this array contains the whole map 
-#(the whole map in executioner could be loaded just based on this 
-#(and knowledge the of what each attribute is))
-var _attribute_grid: Array2D = Array2D.new()
-#settings, only contains width and height for now, could contain more later?
-#or could be removed? 
+var layers: Array[MapLayer]
 
 ##PAINT LIBRARY DATA
 #maps each library name to an array of Dictionary[String, Variant]
@@ -66,7 +58,9 @@ var _overwrite_attribute_list: Dictionary[String, Variant]
 var _addable_attribute_list: Dictionary[String, Variant]
 #state variable for m1 being pressed while painting
 var _dragging = false
-
+#when drag painting, tracks the previously painted tile, 
+#so the same tile wont be painted twice in a row
+var _dragging_previous: Vector2i = Vector2i(-1, -1)
 
 ##Ready function and UI signal connections
 # Called when the node enters the scene tree for the first time.
@@ -122,23 +116,19 @@ func on_lib_item_pressed(addable: Dictionary[String, Variant],
 		_background_grid.regenerate(_get_width(), _get_height())
 	if highlight:
 		#highlight freshly
-		#TODO: in the future this function should probably also take in addable
-		#it should probably check if the tiles contain the stuff being added! 
-		_highlight_with_attributes(overwrite)
+		_highlight_with_attributes(addable, overwrite)
 
-func on_lib_item_removed(lib_name: String, item_id: String, item_id_value: Variant) -> void:
+func remove_lib_item(lib_name: String, item_id: String, item_id_value: Variant) -> void:
 	if _lib_items_data.has(lib_name): 
 		var lib_items = _lib_items_data[lib_name]
 		for item in lib_items:
 			if item is Dictionary:
 				if item.has(item_id) and item[item_id] == item_id_value: 
 					#remove the matching tiles from the map
-
 					_remove_attributes(item, item_id, item_id_value)
 					#remove the item from library
 					lib_items.erase(item)
 					_paint_libraries[lib_name].initialize_lib_items(lib_items)
-	
 
 ##State incrementing / decremeneting functions
 #adds a new source to tileMapLayer
@@ -161,7 +151,7 @@ func add_new_lib_item(data: Dictionary[String, Variant], lib_name: String):
 	#if the new item doesn't have the unique identifier we return out
 	if !data.has(item_id):
 		return
-	if !_lib_item_exists(lib_name, item_id, data[item_id]):
+	if !_dict_array_has_item(_lib_items_data[lib_name], item_id, data[item_id]):
 		_lib_items_data[lib_name].append(data)
 		_paint_libraries[lib_name].initialize_lib_items(_lib_items_data[lib_name])
 
@@ -179,10 +169,11 @@ func add_library(lib_name: String, overwrite_data: Dictionary[String, Variant],
 	_paint_libraries[lib_name] = (_tile_library)
 	#connect library signals
 	_tile_library.lib_item_pressed.connect(on_lib_item_pressed)
-	_tile_library.lib_item_removed.connect(on_lib_item_removed)
+	_tile_library.lib_item_removed.connect(remove_lib_item)
 	#as map painter contains the items for the libs, 
 	#set the array of items of this lib to an empty one (basically init it) 
 	_lib_items_data[lib_name] = []
+
 
 ##IMPORT / EXPORT
 ##AND STATE UPDATING FUNCTIONS (for loading and reloading the state of the map painter) 
@@ -243,7 +234,7 @@ func _update_attribute_grid(width: int, height: int) -> void:
 	for x in min(_attribute_grid.width, width): 
 		for y in min(_attribute_grid.height, height):
 			new_attribute_grid.setItem(x, y, _attribute_grid.getItem(x, y))
-	_attribute_grid = new_attribute_grid	
+	_attribute_grid = new_attribute_grid
 
 #totally clears the attribute grid and initializes it with new dimensions
 func _reset_attribute_grid(width: int, height: int) -> void: 
@@ -265,10 +256,9 @@ func update_settings(settings: Dictionary[String, Variant]) -> void:
 		new_height = settings["height"]
 	update_grids(new_width, new_height)
 
-#clears the TileMapLayer
-#then for each item in _attribute_grid checks if it has a tile texture
-#if so, sets the tile in TileMapLayer to that texture 
-#if the source for the texture doesnt exist yet, it will add it
+#updates tile map layer based on attribute grid
+#clears and sets textures again
+#will add new source ids if missign textures 
 func _update_tile_map() -> void: 
 	_tile_grid.clear()
 	for x in _attribute_grid.width: 
@@ -284,6 +274,40 @@ func _update_libraries() -> void:
 	for lib_name in _paint_libraries.keys(): 
 		_paint_libraries[lib_name].initialize_lib_items(_lib_items_data[lib_name])
 
+#reloads a library completely from external data
+func sync_library(data: Array, lib_name: String) -> void:
+	#if lib doesnt exist we cant do anything
+	if !_paint_libraries.has(lib_name):
+		return
+	var item_id = _paint_libraries[lib_name].get_item_id()
+	#check if the incoming data contains has every lib item that exits already
+	#remove lib item also removes the attributes from the grid
+	for item in _lib_items_data[lib_name]: 
+		if !_dict_array_has_item(data, item_id, item[item_id]):
+			remove_lib_item(lib_name, item_id, item[item_id])
+	#we will add every item to the library
+	#keep in mind that "add_new_lib_item" does nothing if the item already exists in the lib
+	for item in data:
+		add_new_lib_item(item, lib_name)
+	_update_tile_map()
+
+#copies another attribute_grid, preserves "exclude" and doesnt overwrite them
+func sync_attribute_grid(data: Array2D, exclude: Array[String]) -> void: 
+	#copy the "exclude" key value pairs from _attribute_grid to new_grid
+	var new_grid = data.duplicate_deep()
+	for x in min(_attribute_grid.width, new_grid.width):
+		for y in min(_attribute_grid.height, new_grid.height):
+			if new_grid.getItem(x, y) is not Dictionary:
+				var empty_dict: Dictionary[String, Variant] = {}
+				new_grid.setItem(x, y, empty_dict)
+			var tile = _attribute_grid.getItem(x, y)
+			var new_tile = new_grid.getItem(x, y)
+			for key in exclude: 
+				if tile.has(key):
+					new_tile[key] = tile[key]
+	_attribute_grid = new_grid
+	update_grids(_attribute_grid.width, _attribute_grid.height)
+
 
 ##DYNAMIC flow functions
 #simple function to change current input state
@@ -296,11 +320,13 @@ func _change_state(new_state: InputState) -> void:
 
 #highlights every tile in background grid 
 #whose attribute lists have the equal keys and values
-func _highlight_with_attributes(data: Dictionary[String, Variant]) -> void: 
+func _highlight_with_attributes(addable: Dictionary[String, Variant], 
+								overwrite: Dictionary[String, Variant]) -> void: 
 	for x in _attribute_grid.width:
 		for y in _attribute_grid.height: 
-			if _has_all_keys_and_values(data, _attribute_grid.getItem(x, y)):
-				_background_grid.set_cell(Vector2i(x, y), _paint_highlight_value, _PAINT_TILE_ATLAS_CORD)
+			if (_has_all_keys_and_values(overwrite, _attribute_grid.getItem(x, y)) and 
+				_has_all_keys_and_values(addable, _attribute_grid.getItem(x, y))):
+					_background_grid.set_cell(Vector2i(x, y), _paint_highlight_value, _PAINT_TILE_ATLAS_CORD)
 
 
 ##INPUT FUNCTIONS
@@ -330,16 +356,21 @@ func _handle_paint_input(event: InputEvent) -> void:
 					_erase_tile(hovered_tile)
 				elif _input_state == InputState.PAINT:
 					_paint_tile(hovered_tile)
+				_dragging_previous = hovered_tile
 				_dragging = true
 		else:
 			_dragging = false
+			_dragging_previous = Vector2i(-1, -1)
 	elif _dragging and event is InputEventMouseMotion: 
 			var hovered_tile = _get_hovered_tile()
+			if _dragging_previous == hovered_tile:
+				return
 			if(_is_in_bounds(hovered_tile)):
 				if _input_state == InputState.ERASE:
 					_erase_tile(hovered_tile)
 				elif _input_state == InputState.PAINT:
 					_paint_tile(hovered_tile)
+				_dragging_previous = hovered_tile
 
 #handles the interact input state
 #will update the _tile_descriptor ui element on the right panel 
@@ -366,7 +397,9 @@ func _paint_tile(hovered_tile: Vector2i) -> void:
 	for key in _overwrite_attribute_list: 
 		_attribute_grid.getItem(hovered_tile.x, hovered_tile.y)[key] = _overwrite_attribute_list[key]
 	for key in _addable_attribute_list: 
-		var addable_value = _addable_attribute_list
+		var addable_value = _addable_attribute_list[key]
+		if !_attribute_grid.getItem(hovered_tile.x, hovered_tile.y).has(key):
+			_attribute_grid.getItem(hovered_tile.x, hovered_tile.y)[key] = []
 		var grid_value = _attribute_grid.getItem(hovered_tile.x, hovered_tile.y)[key]
 		if grid_value is Array:
 			grid_value.append(addable_value)
@@ -386,7 +419,7 @@ func open_settings_popup() -> void:
 
 #popup manager callback, returns true if map painter is active
 func is_active() -> bool: 
-	return self.visible
+	return is_visible_in_tree() and visible
 
 
 ##utility functions: 
@@ -404,23 +437,30 @@ func _remove_tiles(tile_id_value: Variant) -> void:
 
 #removes every attribute from a tile that is in data
 #only removes from tiles that match item_id with item_id_value
+#DONT LOOK HERE TODO: refactor this function to be more clear
 func _remove_attributes(data: Dictionary[String, Variant], item_id: String, item_id_value: Variant) -> void: 
 	for x in _get_width():
 		for y in _get_height():
 			var tile_attributes = _attribute_grid.getItem(x, y)
 			if tile_attributes is Dictionary:
 				#if the tile is identified as the tile type in question
-				if tile_attributes.has(item_id) and tile_attributes[item_id] == item_id_value:
-					#remove every key that exists in the data from the tile
-					for key in data.keys(): 
-						if tile_attributes.has(key):
-							if data[key] == tile_attributes[key]:
-								tile_attributes.erase(key)
+				if (tile_attributes.has(item_id) and 
+					(tile_attributes[item_id] is Array and tile_attributes[item_id].has(item_id_value) or 
+					tile_attributes[item_id] is not Array and tile_attributes[item_id] == item_id_value)):
+						#remove every key that exists in the data from the tile
+						for key in data.keys(): 
+							if tile_attributes.has(key):
+								var tile_val = tile_attributes[key]
+								if tile_val is Array: 
+									while tile_val.has(data[key]):
+										tile_val.erase(data[key])
+								elif data[key] == tile_val:
+									tile_attributes.erase(key)
 	_update_tile_map()
 
 #checks if a library already has an item with the specific id 
-func _lib_item_exists(lib_name: String, item_id: String, id_value: Variant) -> bool: 
-	for item in _lib_items_data[lib_name]:
+func _dict_array_has_item(data: Array, item_id: String, id_value: Variant) -> bool: 
+	for item in data:
 		if item is Dictionary:
 			if item.has(item_id) and item[item_id] == id_value:
 				return true
@@ -468,7 +508,10 @@ func _get_texture_average_color(tex: Texture2D) -> Color:
 func _has_all_keys_and_values(inner: Dictionary, outer: Dictionary) -> bool: 
 	if outer.has_all(inner.keys()):
 		for key in inner.keys(): 
-			if inner[key] != outer[key]:
+			if outer[key] is Array: 
+				if !outer[key].has(inner[key]):
+					return false
+			elif inner[key] != outer[key]:
 				return false
 		return true
 	else:
@@ -501,6 +544,9 @@ func get_map_as_thumbnail() -> Texture2D:
 				var tile_tex_avr_color = _get_texture_average_color(tile_tex)
 				thumbnail_img.set_pixel(grid_x, grid_y, tile_tex_avr_color)
 	return ImageTexture.create_from_image(thumbnail_img)
+
+
+
 
 
 

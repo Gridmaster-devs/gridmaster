@@ -1,4 +1,4 @@
-extends Node
+extends Control
 class_name MapEditor
 
 
@@ -44,7 +44,7 @@ func create_tactical_painter() -> MapPainter:
 	_painter.add_library(MapAttributes.TACTICAL_TILE_LIB_NAME, MapAttributes.TACTICAL_TILE_LIB_OVERWRITE, 
 								MapAttributes.TACTICAL_TILE_LIB_ADD, 
 								MapAttributes.TACTICAL_TILE_LIB_TEXTURE_ID, 
-								MapAttributes.TACTICAL_TILE_LIB_ITEM_ID)
+								MapAttributes.TACTICAL_TILE_LIB_ITEM_ID, true)
 	return _painter
 
 #creates the strategic painter for the editor
@@ -59,7 +59,7 @@ func create_strategic_painter() -> MapPainter:
 	_painter.add_library(MapAttributes.STRATEGIC_TILE_LIB_NAME, MapAttributes.STRATEGIC_TILE_LIB_OVERWRITE, 
 								MapAttributes.STRATEGIC_TILE_LIB_ADD, 
 								MapAttributes.STRATEGIC_TILE_LIB_TEXTURE_ID, 
-								MapAttributes.STRATEGIC_TILE_LIB_ITEM_ID)
+								MapAttributes.STRATEGIC_TILE_LIB_ITEM_ID, true)
 	_painter.add_library(MapAttributes.STRATEGIC_TACTICAL_LIB_NAME, MapAttributes.STRATEGIC_TACTICAL_LIB_OVERWRITE,
 								MapAttributes.STRATEGIC_TACTICAL_LIB_ADD, 
 								MapAttributes.STRATEGIC_TACTICAL_LIB_TEXTURE_ID, 
@@ -116,7 +116,7 @@ func _on_tactical_map_saved(map_name: String) -> void:
 #required function for popup manager
 #it will call this and check if it is active
 func is_active() -> bool:
-	return self.visible
+	return is_visible_in_tree() and visible
 
 #saves the map by calling fmt
 func _save_map(map_name: String):

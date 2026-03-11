@@ -25,15 +25,24 @@ layout_mode = 2
 
 [node name="Game name" type="LineEdit" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
 placeholder_text = "Game name"
 
-[node name="Save game" type="Button" parent="PanelContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
+
+[node name="Save game" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "Save game"
 
-[node name="Load game" type="Button" parent="PanelContainer/VBoxContainer"]
+[node name="Load game" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Load game"
+
+[node name="TabContainer" type="TabContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
 
 [node name="Dialogs" type="Control" parent="."]
 anchors_preset = 0
