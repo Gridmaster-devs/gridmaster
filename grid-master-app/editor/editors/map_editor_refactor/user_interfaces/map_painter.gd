@@ -166,6 +166,7 @@ func add_library(lib_name: String, overwrite_data: Dictionary[String, Variant],
 	#connect library signals
 	_tile_library.lib_item_pressed.connect(on_lib_item_pressed)
 	_tile_library.lib_item_removed.connect(remove_lib_item)
+	_tile_library.lib_item_added.connect(add_new_lib_item)
 	#as map painter contains the items for the libs, 
 	#set the array of items of this lib to an empty one (basically init it) 
 	_lib_items_data[lib_name] = []
@@ -376,8 +377,9 @@ func _paint_tile(hovered_tile: Vector2i) -> void:
 ##POPUPS
 func open_settings_popup() -> void: 
 	var settings_popup: SettingsPopup = preload("res://editor/editors/map_editor_refactor/popup_windows/settings_popup.tscn").instantiate()
-	get_tree().call_group("map_painter_popup_manager", "add_new_popup", settings_popup, settings_popup.get_popup_name())
+	get_tree().call_group(Global.popup_manager_group, Global.add_popup, settings_popup, settings_popup.get_popup_name())
 	settings_popup.init(_generate_settigns_dict())
+	settings_popup.saved.connect(update_settings)
 
 #popup manager callback, returns true if map painter is active
 func is_active() -> bool: 

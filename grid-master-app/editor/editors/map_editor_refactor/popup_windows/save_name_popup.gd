@@ -18,4 +18,4 @@ func _init() -> void:
 
 func _on_save() -> void: 
 	save_confirmed.emit(_tact_map_name_ui.text)
-	get_tree().call_group("map_editor_popup_manager", "close_popup", self.get_popup_name())
+	get_tree().call_group(Global.popup_manager_group, Global.close_popup, self.get_popup_name())

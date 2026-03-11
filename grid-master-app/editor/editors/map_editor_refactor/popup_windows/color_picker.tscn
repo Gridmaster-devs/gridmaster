@@ -15,6 +15,7 @@ script = ExtResource("1_c0omh")
 
 [node name="EditorPanel" parent="." instance=ExtResource("1_1ajdr")]
 layout_mode = 1
+section_headers = Array[String](["ColorPicker", "SaveButton", "CancelButton"])
 
 [node name="ColorPicker" type="ColorPicker" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
 layout_mode = 2

@@ -1,0 +1,35 @@
+[gd_scene load_steps=3 format=3 uid="uid://bnp0vw5qopohh"]
+
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="1_wk6yx"]
+[ext_resource type="PackedScene" uid="uid://duy7bm2yir3f1" path="res://editor/editors/common/editor_panel/PanelItem.tscn" id="2_5j0j3"]
+
+[node name="TeamUi" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="EditorPanel" parent="." instance=ExtResource("1_wk6yx")]
+layout_mode = 0
+anchors_preset = 0
+
+[node name="TopLabel" parent="EditorPanel/TopVBox" index="0"]
+text = ""
+
+[node name="Name" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="0" instance=ExtResource("2_5j0j3")]
+layout_mode = 2
+text = "Name"
+
+[node name="Label" type="Label" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Name"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Name"
+
+[node name="LineEdit" type="LineEdit" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Name"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[editable path="EditorPanel"]
+[editable path="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Name"]

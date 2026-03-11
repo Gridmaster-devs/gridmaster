@@ -43,6 +43,7 @@ text = "Load game"
 
 [node name="TabContainer" type="TabContainer" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
+size_flags_vertical = 3
 
 [node name="Dialogs" type="Control" parent="."]
 anchors_preset = 0

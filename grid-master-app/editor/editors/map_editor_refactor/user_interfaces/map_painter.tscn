@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://bkfi6pml23hic"]
+[gd_scene load_steps=15 format=3 uid="uid://bkfi6pml23hic"]
 
 [ext_resource type="Script" uid="uid://cb4towuvrfhsk" path="res://editor/editors/map_editor_refactor/user_interfaces/map_painter.gd" id="1_v37v7"]
 [ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="2_gp3mo"]
@@ -10,7 +10,6 @@
 [ext_resource type="Script" uid="uid://bvqyndxvu4lnc" path="res://editor/editors/map_editor_refactor/user_interfaces/background_tile_map.gd" id="8_xpio1"]
 [ext_resource type="Script" uid="uid://ckmni16vo0e1p" path="res://editor/editors/map_editor_refactor/user_interfaces/tile_descriptor.gd" id="9_gp3mo"]
 [ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://editor/themes/editor-theme.tres" id="11_w07yu"]
-[ext_resource type="Script" uid="uid://cf8qu7xklg80w" path="res://editor/editors/map_editor_refactor/map_painter_popup_manager.gd" id="12_w07yu"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_pglyl"]
 texture = ExtResource("4_w07yu")
@@ -132,16 +131,6 @@ text = "  Current Tile Description"
 [node name="TileDescriptor" type="VBoxContainer" parent="HBoxContainer/RightPanel/TopVBox/ScrollContainer/ContentsVBox/TileDescriptorContainer"]
 layout_mode = 2
 script = ExtResource("9_gp3mo")
-
-[node name="PopupManager" type="Container" parent="."]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-script = ExtResource("12_w07yu")
 
 [editable path="HBoxContainer/LeftPanel"]
 [editable path="HBoxContainer/RightPanel"]

@@ -46,6 +46,10 @@ folder_colors={
 
 main_scene.executioner=NodePath("")
 
+[global_group]
+
+popup_manager=""
+
 [rendering]
 
 environment/defaults/default_clear_color=Color(0.28851813, 0.28851795, 0.28851798, 1)

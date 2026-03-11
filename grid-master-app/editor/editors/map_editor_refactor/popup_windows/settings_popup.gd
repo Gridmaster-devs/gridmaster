@@ -9,6 +9,7 @@ class_name SettingsPopup
 var _tiledata_ui_map: Dictionary[String, Node]
 var _settings_types: Dictionary[String, Variant]
 
+signal saved(data: Dictionary[String, Variant])
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -71,8 +72,24 @@ func get_settings_data() -> Dictionary[String, Variant]:
 	return out_dict
 		
 func on_save() -> void: 
-	get_tree().call_group("map_painter_popup_manager", "settings_confirmed", get_settings_data())
-	get_tree().call_group("map_painter_popup_manager", "close_popup", get_popup_name())
+	saved.emit(get_settings_data())
+	get_tree().call_group(Global.popup_manager_group, Global.close_popup, get_popup_name())
 
 func on_cancel() -> void: 
-	get_tree().call_group("map_painter_popup_manager", "close_popup", get_popup_name())
+	get_tree().call_group(Global.popup_manager_group, Global.close_popup, get_popup_name())
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#

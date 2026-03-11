@@ -6,7 +6,7 @@ var game_resource : GameDefinitionResource
 @onready var game_name_line : LineEdit = $"PanelContainer/VBoxContainer/Game name"
 @onready var save_game_button : Button = $"PanelContainer/VBoxContainer/HBoxContainer/Save game"
 @onready var load_game_button : Button = $"PanelContainer/VBoxContainer/HBoxContainer/Load game"
-@onready var _contents_container: VBoxContainer = $PanelContainer/VBoxContainer
+@onready var _tab_container: TabContainer = $PanelContainer/VBoxContainer/TabContainer
 @onready var ftm : FileTransferManager = $Dialogs/FileTransferManager
 
 
@@ -57,7 +57,8 @@ func set_game_name(name_p : String):
 func _create_unit_painter() -> MapPainter: 
 	var painter_scene = preload("res://editor/editors/map_editor_refactor/user_interfaces/map_painter.tscn")
 	var _painter: MapPainter = painter_scene.instantiate()
-	_contents_container.add_child(_painter)
+	_tab_container.add_child(_painter)
+	_tab_container.set_tab_title(0, "Map")
 	
 	##HAS TO BE CALLED AFTER ADDED TO SCENE 
 	_painter.init_painter(10, 10)

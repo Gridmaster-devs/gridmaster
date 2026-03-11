@@ -22,5 +22,5 @@ func get_texture() -> Texture2D:
 
 func _open_color_picker() -> void: 
 	var color_picker = preload("res://editor/editors/map_editor_refactor/popup_windows/color_picker.tscn").instantiate()
-	get_tree().call_group("map_painter_popup_manager", "add_new_popup", color_picker, color_picker.get_popup_name())
+	get_tree().call_group(Global.popup_manager_group, Global.add_popup, color_picker, color_picker.get_popup_name())
 	color_picker.save_color_picker.connect(_on_color_picker_save)

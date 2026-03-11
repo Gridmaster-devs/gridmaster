@@ -29,10 +29,10 @@ func _get_texture() -> Texture2D:
 
 func _save() -> void: 
 	save_color_picker.emit(_get_texture())
-	get_tree().call_group("map_painter_popup_manager", "close_popup", self.get_popup_name())
+	get_tree().call_group(Global.popup_manager_group, Global.close_popup, self.get_popup_name())
 	
 func _cancel() -> void: 
-	get_tree().call_group("map_painter_popup_manager", "close_popup", self.get_popup_name())
+	get_tree().call_group(Global.popup_manager_group, Global.close_popup, self.get_popup_name())
 	
 	
 	

@@ -115,10 +115,6 @@ func _on_tactical_map_saved(map_name: String) -> void:
 	_strategic_painter.add_new_lib_item(data, MapAttributes.STRATEGIC_TACTICAL_LIB_NAME)
 	_change_map_mode()
 
-#required function for popup manager
-#it will call this and check if it is active
-func is_active() -> bool:
-	return is_visible_in_tree() and visible
 
 #saves the map by calling fmt
 func _save_map(map_name: String):

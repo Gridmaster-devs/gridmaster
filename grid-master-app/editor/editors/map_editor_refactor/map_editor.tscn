@@ -1,8 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://gy3engmvk7a8"]
+[gd_scene load_steps=4 format=3 uid="uid://gy3engmvk7a8"]
 
 [ext_resource type="Script" uid="uid://dyj4dtsehwxpc" path="res://editor/editors/map_editor_refactor/map_editor.gd" id="1_3hb3i"]
 [ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="2_njdbt"]
-[ext_resource type="Script" uid="uid://b0owsn75bffl6" path="res://editor/editors/map_editor_refactor/map_editor_popup_manager.gd" id="3_75wrm"]
 [ext_resource type="PackedScene" uid="uid://cehdpht6a7iw8" path="res://common/file_upload_download/file_transfer_manager.tscn" id="3_pmcsd"]
 
 [node name="MapEditor" type="Control"]
@@ -51,15 +50,5 @@ text = "STRATEGIC"
 [node name="Dialogs" type="Node" parent="."]
 
 [node name="FileTransferManager" parent="Dialogs" instance=ExtResource("3_pmcsd")]
-
-[node name="PopupManager" type="Container" parent="."]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-script = ExtResource("3_75wrm")
 
 [editable path="MainContainer/TopBar"]
