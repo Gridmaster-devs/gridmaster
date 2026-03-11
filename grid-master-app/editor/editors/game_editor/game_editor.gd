@@ -66,7 +66,7 @@ func _create_unit_painter() -> MapPainter:
 	_painter.add_library(MapAttributes.UNIT_UNIT_LIB_NAME, MapAttributes.UNIT_UNIT_LIB_OVERWRITE, 
 								MapAttributes.UNIT_UNIT_LIB_ADD, 
 								MapAttributes.UNIT_UNIT_LIB_TEXTURE_ID,
-								MapAttributes.UNIT_UNIT_LIB_ITEM_ID, _unit_layer_id, true)
+								MapAttributes.UNIT_UNIT_LIB_ITEM_ID, _unit_layer_id, false, true)
 	return _painter
 
 
@@ -107,7 +107,6 @@ func _on_visibibility_changed() -> void:
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	ftm.resource_uploaded.connect(load_from_resource)
-	
 	save_game_button.button_up.connect(save_to_file)
 	load_game_button.button_up.connect(load_from_file)
 	visibility_changed.connect(_on_visibibility_changed)

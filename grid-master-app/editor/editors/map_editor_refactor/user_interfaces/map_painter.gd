@@ -154,13 +154,13 @@ func add_new_lib_item(data: Dictionary[String, Variant], lib_name: String):
 #adds a new library to the map painter (look up PaintLibrary)
 func add_library(lib_name: String, overwrite_data: Dictionary[String, Variant], 
 				addable_data: Dictionary[String, Variant], preview_texture_id: String, name_id: String, layer_id: int,
-				highlight: bool = false, lib_new_button_callback: Callable = Callable()) -> void: 
+				new_button: bool = false, highlight: bool = false, lib_new_button_callback: Callable = Callable()) -> void: 
 	var _tile_library: PaintLibrary = preload("res://editor/editors/map_editor_refactor/user_interfaces/paint_library/paint_library.tscn").instantiate()
 	_content_vbox.add_child(_tile_library)
 	##CAN USE AFTER ADDED TO TREE
 	#init the library
 	_tile_library.init(lib_name, preview_texture_id, name_id, 
-						overwrite_data, addable_data, layer_id, highlight, lib_new_button_callback)
+						overwrite_data, addable_data, layer_id, new_button, highlight, lib_new_button_callback)
 	#add the library to the library map, so we can refrence it later
 	_paint_libraries[lib_name] = (_tile_library)
 	#connect library signals

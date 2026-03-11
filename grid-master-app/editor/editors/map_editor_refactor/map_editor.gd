@@ -45,7 +45,7 @@ func create_tactical_painter() -> MapPainter:
 	_painter.add_library(MapAttributes.TACTICAL_TILE_LIB_NAME, MapAttributes.TACTICAL_TILE_LIB_OVERWRITE, 
 								MapAttributes.TACTICAL_TILE_LIB_ADD, 
 								MapAttributes.TACTICAL_TILE_LIB_TEXTURE_ID, 
-								MapAttributes.TACTICAL_TILE_LIB_ITEM_ID, base_layer_id, true)
+								MapAttributes.TACTICAL_TILE_LIB_ITEM_ID, base_layer_id, true, true)
 	return _painter
 
 #creates the strategic painter for the editor
@@ -61,11 +61,11 @@ func create_strategic_painter() -> MapPainter:
 	_painter.add_library(MapAttributes.STRATEGIC_TILE_LIB_NAME, MapAttributes.STRATEGIC_TILE_LIB_OVERWRITE, 
 								MapAttributes.STRATEGIC_TILE_LIB_ADD, 
 								MapAttributes.STRATEGIC_TILE_LIB_TEXTURE_ID, 
-								MapAttributes.STRATEGIC_TILE_LIB_ITEM_ID, base_layer_id, true)
+								MapAttributes.STRATEGIC_TILE_LIB_ITEM_ID, base_layer_id, true, true)
 	_painter.add_library(MapAttributes.STRATEGIC_TACTICAL_LIB_NAME, MapAttributes.STRATEGIC_TACTICAL_LIB_OVERWRITE,
 								MapAttributes.STRATEGIC_TACTICAL_LIB_ADD, 
 								MapAttributes.STRATEGIC_TACTICAL_LIB_TEXTURE_ID, 
-								MapAttributes.STRATEGIC_TACTICAL_LIB_ITEM_ID, base_layer_id,
+								MapAttributes.STRATEGIC_TACTICAL_LIB_ITEM_ID, base_layer_id, true,
 								true, _change_map_mode)
 	return _painter
 

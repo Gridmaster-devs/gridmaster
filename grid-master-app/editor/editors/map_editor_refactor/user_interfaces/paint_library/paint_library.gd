@@ -2,7 +2,8 @@ extends Node
 class_name PaintLibrary
 
 
-@onready var _new_button = $ButtonsContainer/VBoxContainer/NewButton
+@onready var _new_button: Button = $ButtonsContainer/VBoxContainer/NewButton
+@onready var _new_button_container: VBoxContainer = $ButtonsContainer/VBoxContainer
 @onready var _buttons_container = $ButtonsContainer
 @onready var _name_ui = $LibName
 @onready var _remove_button = $HBoxContainer/Remove
@@ -33,8 +34,11 @@ var _cur_item_data: Dictionary
 
 
 func init(lib_name: String, preview_texture_id: String, item_id: String,
-				overwrite_data: Dictionary[String, Variant], addable_data: Dictionary[String, Variant], layer_id: int,
-				highlight: bool = false, new_button_callback: Callable = Callable()) -> void: 
+				overwrite_data: Dictionary[String, Variant], addable_data: Dictionary[String, Variant], 
+				layer_id: int, new_button: bool = false, highlight: bool = false, 
+				new_button_callback: Callable = Callable()) -> void: 
+	if !new_button: 
+		_new_button_container.visible = false
 	_highlight = highlight
 	_name = lib_name
 	_preview_texture_id = preview_texture_id
