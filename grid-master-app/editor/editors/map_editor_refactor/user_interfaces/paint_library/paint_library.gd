@@ -9,9 +9,9 @@ class_name PaintLibrary
 
 ##signals
 signal lib_item_pressed(addable: Dictionary[String, Variant], 
-							overwrite: Dictionary[String, Variant], highlight: bool)
+							overwrite: Dictionary[String, Variant], highlight: bool, layer_id: int)
 
-signal lib_item_removed(lib_name: String, item_id: String, item_id_value: Variant)
+signal lib_item_removed(lib_name: String, item_id: String, item_id_value: Variant, layer_id: int)
 
 ##variables
 var _overwrite_data: Dictionary[String, Variant]
@@ -25,13 +25,15 @@ var _name: String
 
 var _highlight: bool
 
+var _layer_id: int
+
 #tracking which item is active
 var _cur_item_data: Dictionary
 
 
 
 func init(lib_name: String, preview_texture_id: String, item_id: String,
-				overwrite_data: Dictionary[String, Variant], addable_data: Dictionary[String, Variant], 
+				overwrite_data: Dictionary[String, Variant], addable_data: Dictionary[String, Variant], layer_id: int,
 				highlight: bool = false, new_button_callback: Callable = Callable()) -> void: 
 	_highlight = highlight
 	_name = lib_name
@@ -39,6 +41,7 @@ func init(lib_name: String, preview_texture_id: String, item_id: String,
 	_item_id = item_id
 	_overwrite_data = overwrite_data
 	_addable_data = addable_data
+	_layer_id = layer_id
 	
 	#Ui
 	_name_ui.text = " " + _name
@@ -103,7 +106,7 @@ func _button_callback(datapoint: Dictionary[String, Variant]) -> void:
 	if !_overwrite_data.is_empty():
 		for key in _overwrite_data:
 			overwrite[key] = datapoint[key]
-	lib_item_pressed.emit(addable, overwrite, highlight)
+	lib_item_pressed.emit(addable, overwrite, highlight, _layer_id)
 	
 
 
@@ -113,14 +116,15 @@ func _open_item_dropdown() -> void:
 
 func _remove_item() -> void: 
 	if _cur_item_data.has(_item_id):
-		lib_item_removed.emit(_name, _item_id, _cur_item_data[_item_id])
+		lib_item_removed.emit(_name, _item_id, _cur_item_data[_item_id], _layer_id)
 
 
 ##getters / setters
 func get_item_id() -> String: 
 	return _item_id
 
-
+func get_layer_id() -> int: 
+	return _layer_id
 
 func _open_remove_confirm_popup() -> void: 
 	var confirm_popup: ConfirmPopup = preload("res://editor/editors/map_editor_refactor/popup_windows/confirm_popup.tscn").instantiate()

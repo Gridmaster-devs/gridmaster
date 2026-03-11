@@ -40,11 +40,12 @@ func create_tactical_painter() -> MapPainter:
 	_main_container.add_child(_painter)
 	
 	##HAS TO BE CALLED AFTER ADDED TO SCENE 
-	_painter.init_painter(MapAttributes.TACTICAL_TEXTURE_ID, MapAttributes.TACTICAL_TILE_ID, 10, 10)
+	_painter.init_painter(10, 10)
+	var base_layer_id = _painter.add_layer(MapAttributes.TACTICAL_TEXTURE_ID, MapAttributes.TACTICAL_TILE_ID)
 	_painter.add_library(MapAttributes.TACTICAL_TILE_LIB_NAME, MapAttributes.TACTICAL_TILE_LIB_OVERWRITE, 
 								MapAttributes.TACTICAL_TILE_LIB_ADD, 
 								MapAttributes.TACTICAL_TILE_LIB_TEXTURE_ID, 
-								MapAttributes.TACTICAL_TILE_LIB_ITEM_ID, true)
+								MapAttributes.TACTICAL_TILE_LIB_ITEM_ID, base_layer_id, true)
 	return _painter
 
 #creates the strategic painter for the editor
@@ -55,15 +56,16 @@ func create_strategic_painter() -> MapPainter:
 	_main_container.add_child(_painter)
 	
 	##HAS TO BE CALLED AFTER ADDED TO SCENE 
-	_painter.init_painter(MapAttributes.STRATEGIC_TEXTURE_ID, MapAttributes.STRATEGIC_TILE_ID, 10, 10)
+	_painter.init_painter(10, 10)
+	var base_layer_id = _painter.add_layer(MapAttributes.STRATEGIC_TEXTURE_ID, MapAttributes.STRATEGIC_TILE_ID)
 	_painter.add_library(MapAttributes.STRATEGIC_TILE_LIB_NAME, MapAttributes.STRATEGIC_TILE_LIB_OVERWRITE, 
 								MapAttributes.STRATEGIC_TILE_LIB_ADD, 
 								MapAttributes.STRATEGIC_TILE_LIB_TEXTURE_ID, 
-								MapAttributes.STRATEGIC_TILE_LIB_ITEM_ID, true)
+								MapAttributes.STRATEGIC_TILE_LIB_ITEM_ID, base_layer_id, true)
 	_painter.add_library(MapAttributes.STRATEGIC_TACTICAL_LIB_NAME, MapAttributes.STRATEGIC_TACTICAL_LIB_OVERWRITE,
 								MapAttributes.STRATEGIC_TACTICAL_LIB_ADD, 
 								MapAttributes.STRATEGIC_TACTICAL_LIB_TEXTURE_ID, 
-								MapAttributes.STRATEGIC_TACTICAL_LIB_ITEM_ID, 
+								MapAttributes.STRATEGIC_TACTICAL_LIB_ITEM_ID, base_layer_id,
 								true, _change_map_mode)
 	return _painter
 

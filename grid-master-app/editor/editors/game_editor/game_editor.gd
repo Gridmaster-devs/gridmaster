@@ -10,6 +10,8 @@ var game_resource : GameDefinitionResource
 @onready var ftm : FileTransferManager = $Dialogs/FileTransferManager
 
 
+var _base_layer_id: int
+var _unit_layer_id: int
 
 ##painting
 var _unit_painter: MapPainter = null
@@ -58,11 +60,13 @@ func _create_unit_painter() -> MapPainter:
 	_contents_container.add_child(_painter)
 	
 	##HAS TO BE CALLED AFTER ADDED TO SCENE 
-	_painter.init_painter(MapAttributes.UNIT_TEXTURE_ID, MapAttributes.UNIT_TILE_ID, 10, 10)
+	_painter.init_painter(10, 10)
+	_base_layer_id = _painter.add_layer(MapAttributes.STRATEGIC_TEXTURE_ID, MapAttributes.STRATEGIC_TILE_ID)
+	_unit_layer_id = _painter.add_layer(MapAttributes.UNIT_TEXTURE_ID, MapAttributes.UNIT_TILE_ID)
 	_painter.add_library(MapAttributes.UNIT_UNIT_LIB_NAME, MapAttributes.UNIT_UNIT_LIB_OVERWRITE, 
 								MapAttributes.UNIT_UNIT_LIB_ADD, 
-								MapAttributes.UNIT_UNIT_LIB_TEXTURE_ID, 
-								MapAttributes.UNIT_UNIT_LIB_ITEM_ID, true)
+								MapAttributes.UNIT_UNIT_LIB_TEXTURE_ID,
+								MapAttributes.UNIT_UNIT_LIB_ITEM_ID, _unit_layer_id, true)
 	return _painter
 
 
@@ -74,9 +78,8 @@ func _reload() -> void:
 
 
 func _sync_map() -> void:
-	var attribute_grid = editor_main.getMap().get_strategic_map().get_attribute_grid()
-	var exclude: Array[String] = [MapAttributes.UNIT_UNIT_LIB_ITEM_ID]
-	_unit_painter.sync_attribute_grid(attribute_grid, exclude)
+	var attribute_grid = editor_main.getMap().get_strategic_map().get_attribute_grids()[0]
+	_unit_painter.reload_layer(attribute_grid, _base_layer_id)
 
 func _sync_unit_lib() -> void: 
 	var units = editor_main.get_units()
@@ -84,7 +87,11 @@ func _sync_unit_lib() -> void:
 	for unit in units: 
 		var unit_name: String = unit.get_attribute("name").attribute_value
 		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
-		img.fill(Color.from_rgba8(255, 0, 0, 255))  
+		img.fill(Color.from_rgba8(0, 0, 0, 0))  
+		for x in range(64): 
+			for y in range(64):
+				if x > 16 and x <= 48 and y > 16 and y <= 48: 
+					img.set_pixel(x, y, Color.from_rgba8(255, 0, 0, 255))
 		var unit_texture: Texture2D = ImageTexture.create_from_image(img)
 		var datapoint: Dictionary[String, Variant] = {
 			MapAttributes.UNIT_UNIT_LIB_ITEM_ID: unit_name,
