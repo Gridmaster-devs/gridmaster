@@ -80,6 +80,8 @@ func initGameStateFromGameDefinition(game_definition : GameDefinitionResource):
 	game_state.addUnitByTypeId(0, Vector2i(0,1), 0)
 	game_state.addUnitByTypeId(0, Vector2i(1,0), 1)
 	game_state.addUnitByTypeId(0, Vector2i(1,1), 1)
+	
+	game_state.client_player_id = 0
 	# DEBUG
 
 	initGraphics()
@@ -166,6 +168,9 @@ func _handle_event_default_in_game(event : StateMachineEvent):
 			
 			var unit = game_state.get_unit_on_tile(event.grid_pos)
 			if unit == null: return # There is no unit on the tile
+			
+			# The unit doesn't belong to the current player
+			if unit.get_player_id() != game_state.client_player_id: return
 			
 			# The user clicked on a tile in the map limits and there is a unit on the tile
 			

@@ -34,10 +34,13 @@ func addUnit(unit_p : Unit) -> void:
 	unit = unit_p
 
 
+## Returns true if there is no unit on the tile and false
+## if there is
 func is_empty() -> bool:
 	return (unit == null)
 
 
+## Removes the unit on the tile from the tile if there is one
 func remove_unit() -> void:
 	unit = null
 

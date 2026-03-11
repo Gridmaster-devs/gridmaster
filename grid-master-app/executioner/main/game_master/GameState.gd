@@ -2,8 +2,7 @@ class_name GameState
 extends RefCounted
 ## Class that represents everything that makes up the current state of the game, ex. the units, the map, etc
 
-var client_player_id : int = -1 # 
-var client_player_team_id : int = -1
+var client_player_id : int = -1
 
 var game_name : String
 
@@ -17,8 +16,6 @@ var players : Array[Player] = [] ## All the players in the game
 var teams : Array[Team] = [] ## All the teams in the game
 var unit_types : Dictionary[int, UnitType] = {} ## All the types of units in the game
 var _pathfinder : DijkstraPathfinder ## Dijkstra pathfinder for unit pathing
-
-
 
 
 ## tracks the id to be given to the next unit that spawns
