@@ -123,6 +123,10 @@ func end_turn() -> void:
 				unit_array.erase(unit)
 				remove_unit(unit)
 	
+	# Clear actions
+	for unit : Unit in unit_array:
+		unit.current_action = null
+	
 	turn_number += 1
 
 
