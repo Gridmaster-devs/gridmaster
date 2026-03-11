@@ -3,7 +3,7 @@ extends Control
 
 var editor_main : EditorMain
 var game_resource : GameDefinitionResource
-@onready var game_name_line : LineEdit = $"PanelContainer/VBoxContainer/HBoxContainer/Game name"
+@onready var game_name_line : LineEdit = $"PanelContainer/VBoxContainer/Game name"
 @onready var save_game_button : Button = $"PanelContainer/VBoxContainer/HBoxContainer/Save game"
 @onready var load_game_button : Button = $"PanelContainer/VBoxContainer/HBoxContainer/Load game"
 @onready var _contents_container: VBoxContainer = $PanelContainer/VBoxContainer
@@ -80,6 +80,7 @@ func _reload() -> void:
 func _sync_map() -> void:
 	var attribute_grid = editor_main.getMap().get_strategic_map().get_attribute_grids()[0]
 	_unit_painter.reload_layer(attribute_grid, _base_layer_id)
+	_unit_painter.resize(attribute_grid.width, attribute_grid.height)
 
 func _sync_unit_lib() -> void: 
 	var units = editor_main.get_units()

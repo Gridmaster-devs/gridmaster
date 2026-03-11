@@ -177,6 +177,12 @@ func reset(width, height) -> void:
 	_width = width
 	_height = height
 
+func resize(width, height) -> void: 
+	for layer in layers:
+		layer.update_grids(width, height)
+	_width = width
+	_height = height
+	_background_grid.regenerate(width, height)
 
 ##IMPORT / EXPORT
 ##AND STATE UPDATING FUNCTIONS (for loading and reloading the state of the map painter) 
