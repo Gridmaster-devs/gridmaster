@@ -1,5 +1,19 @@
 services:
+  builder:
+    volumes:
+      - type: bind
+        source: .
+        target: /project
+      - type: bind
+        source: ./grid-master-app/build
+        target: /build
+    build:
+      context: .
+      dockerfile: build.Dockerfile
+
   editors:
+    depends_on:
+      - "builder"
     build: 
       context: .
       dockerfile: editors.prod.Dockerfile
@@ -7,6 +21,8 @@ services:
       - 8080:80
 
   client:
+    depends_on:
+      - "builder"
     build: 
       context: .
       dockerfile: client.Dockerfile
