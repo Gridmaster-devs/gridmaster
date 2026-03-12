@@ -8,15 +8,11 @@
 
 config_version=5
 
-[animation]
-
-compatibility/default_parent_skeleton_in_mesh_instance_3d=true
-
 [application]
 
 config/name="GridMasterApp"
 run/main_scene="uid://nxldab0hpse0"
-config/features=PackedStringArray("4.6", "Forward Plus")
+config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
 run/main_scene.executioner="uid://cpsdnpca0xb06"
 run/main_scene.editor="uid://nxldab0hpse0"
