@@ -35,6 +35,7 @@ var _tile_size : int = GridGraphics.TILE_SIZE
 # Textures for the graphics
 var movement_target : ImageTexture = ImageTexture.create_from_image(preload("res://executioner/media/movement_target_128.png").get_image())
 var movement_waypoint : ImageTexture = ImageTexture.create_from_image(preload("res://executioner/media/movement_waypoint_128.png").get_image())
+var last_waypoint : ImageTexture = ImageTexture.create_from_image(preload("res://executioner/media/last_waypoint_128.png").get_image())
 var selected_tile : ImageTexture = ImageTexture.create_from_image(preload("res://executioner/media/selected_tile_128.png").get_image())
 
 
@@ -61,8 +62,15 @@ func draw_movement_tiles(tiles : Array[Vector2i], id : int):
 ## Draws waypoints at specific positions
 func draw_waypoints(positions : Array[Vector2i], id : int):
 	var draw_func = func():
-		for pos in positions:
-			draw_texture(movement_waypoint, pos * GridGraphics.TILE_SIZE)
+		
+		if positions.size() == 0: return
+		
+		if (positions.size() >= 2):
+			for pos in range(0, positions.size() - 1):
+				draw_texture(movement_waypoint, positions[pos] * GridGraphics.TILE_SIZE)
+		
+		draw_texture(last_waypoint, positions.back() * GridGraphics.TILE_SIZE)
+		
 	
 	add_draw_command(draw_func, id, MOVEMENT_WAYPOINT_PRIORITY)
 
@@ -128,6 +136,7 @@ func _draw() -> void:
 func _ready() -> void:
 	movement_target.set_size_override(Vector2(_tile_size, _tile_size))
 	movement_waypoint.set_size_override(Vector2(_tile_size, _tile_size))
+	last_waypoint.set_size_override(Vector2(_tile_size, _tile_size))
 	selected_tile.set_size_override(Vector2(_tile_size, _tile_size))
 
 
