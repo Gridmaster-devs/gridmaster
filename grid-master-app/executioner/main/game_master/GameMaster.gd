@@ -109,6 +109,29 @@ func load_game_definition(game_definition : Resource):
 	MessageDispatcher.broadcast_message("Game \"%s\" loaded." % game_state.getGameName()) 
 
 
+var client_peer = WebSocketMultiplayerPeer.new()
+
+func connect_to_server():
+	print("Attempting to connect to server...")
+	var err = client_peer.create_client("ws://127.0.0.1:55555")
+	if err == OK:
+		multiplayer.multiplayer_peer = client_peer
+		multiplayer.connected_to_server.connect(_on_connected_to_server)
+		multiplayer.connection_failed.connect(_on_connection_failed)
+		multiplayer.server_disconnected.connect(_on_server_disconnected)
+	else:
+		printerr("Failed to create client peer. Error code: %d" % err)
+
+func _on_connected_to_server():
+	print("Successfully connected to the server!")
+
+func _on_connection_failed():
+	printerr("Connection to the server failed.")
+
+func _on_server_disconnected():
+	print("Disconnected from the server.")
+
+
 ## Prints the map into a log file
 func printMap() -> void:
 	if (game_state != null):
@@ -162,6 +185,8 @@ func _handle_event_load_game(event : StateMachineEvent):
 		var button_press := event as ButtonPressedEvent
 		if button_press.button_type == ButtonPressedEvent.ButtonType.LOAD_GAME:
 			load_game_from_file()
+		elif button_press.button_type == ButtonPressedEvent.ButtonType.CONNECT_TO_SERVER:
+			connect_to_server()
 
 
 ## Default handler for in-game
