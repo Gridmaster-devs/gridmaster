@@ -17,4 +17,4 @@ func resize(new_size : Vector2) -> void:
 
 # For confused future developers, look up how event propagation works in Godot in the docs
 func _unhandled_input(event: InputEvent) -> void:
-	get_tree().scene_tree.call_group(GameMaster.GROUP_NAME, GameMaster.RAW_INPUT_FUNC_NAME, event)
+	get_tree().call_group(GameMaster.GROUP_NAME, GameMaster.RAW_INPUT_FUNC_NAME, event)
