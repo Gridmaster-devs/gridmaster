@@ -39,7 +39,7 @@ var last_waypoint : ImageTexture = ImageTexture.create_from_image(preload("res:/
 var selected_tile : ImageTexture = ImageTexture.create_from_image(preload("res://executioner/media/selected_tile_128.png").get_image())
 
 
-## Draws the tile cursor at a specific position
+## Draws the tile cursor at a specific position and clears the old one
 func draw_tile_cursor(pos : Vector2i):
 	if (pos == Vector2i(-1, -1)): return
 	

@@ -5,8 +5,8 @@ extends RefCounted
 
 var tiles : Array2D ## all the tiles on the map
 var strategic_tile_types : Dictionary[int, TileType] ## Maps tile type IDs to the tile types
-var width : int
-var height : int
+var width : int ## The width of the grid
+var height : int ## The height of the grid
 
 
 func getWidth() -> int:
