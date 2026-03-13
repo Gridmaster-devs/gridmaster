@@ -114,7 +114,6 @@ func _gen_default_fight_func() -> void:
 				
 			
 			if unit2.is_dead():
-				print("Defending unit died")
 				break
 			
 			# If unit 2 hits unit 1
@@ -124,14 +123,10 @@ func _gen_default_fight_func() -> void:
 				unit1.take_damage(damage_func.call(unit2, unit1))
 			
 			if unit1.is_dead():
-				print("Attacking unit died")
 				break
 		
 		unit1.set_fought(unit2.unit_id)
 		unit2.set_fought(unit1.unit_id)
-		
-		print("Attacking unit took %s damage" % (u1hp - unit1.hp))
-		print("Defending unit took %s damage" % (u2hp - unit2.hp))
 	
 	args.set(ArgType.FIGHT_FUNC, fight_func)
 

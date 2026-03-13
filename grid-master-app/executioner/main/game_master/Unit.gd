@@ -151,8 +151,11 @@ func take_damage(damage : int):
 	# remove damage from health
 	_hp -= damage
 	
+	print("Unit %s with id %s from team %s took %s damage" % [type.unit_name, unit_id, team.team_name, damage])
+	
 	# making sure we won't process actions of dead units
-	if (_hp < 0):
+	if (_hp <= 0):
+		print("Unit %s with id %s from team %s died" % [type.unit_name, unit_id, team.team_name])
 		current_action = null
 
 
