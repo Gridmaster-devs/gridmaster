@@ -56,11 +56,17 @@ func addUnitByTypeId(id : int, position : Vector2i, player_id : int) -> Unit:
 	return addUnit(unit_type, position, player_id)
 
 
+## Adds a team to the game.
+##
+## The team's id is simply the index of the team in the teams array
 func add_team(team_name : String, color : Color, team_units : Array[UnitType]) -> void:
 	var team_id : int = teams.size()
 	teams.append(Team.new(team_name, team_id, color, team_units))
 
 
+## Adds a player to the game.
+##
+## The player's id is simply the index of the player in the players array
 func add_player(player_name : String, team_id : int, computer : bool):
 	var player_id = players.size()
 	players.append(Player.new(player_name, player_id, teams[team_id], computer))
@@ -114,10 +120,13 @@ func end_turn() -> void:
 	var sort_func : Callable = GameArgs.args.get(GameArgs.ArgType.UNIT_INITIATIVE_FUNC)
 	sort_func.call(unit_array)
 	
+	# Looping through the move actions until every unit has stopped
+	# (reached their destination, or gotten stopped by a fight or something else)
 	var done = false
 	while(done == false):
 		done = true
 		
+		# Advance one step in each MoveAction
 		for unit : Unit in unit_array:
 			if (unit.current_action is MoveAction and unit.has_stopped() == false):
 				done = false

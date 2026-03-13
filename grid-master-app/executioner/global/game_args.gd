@@ -97,6 +97,7 @@ func set_pathfinding_flags(flags : int):
 		_can_move_through_friendly = false
 
 
+
 # -----
 # FUNCTION GENERATORS
 # -----
