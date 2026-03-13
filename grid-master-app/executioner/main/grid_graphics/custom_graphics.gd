@@ -59,7 +59,8 @@ func draw_movement_tiles(tiles : Array[Vector2i], id : int):
 	add_draw_command(draw_func, id, MOVEMENT_TILE_PRIORTIY)
 
 
-## Draws waypoints at specific positions
+## Draws waypoints at specific positions with the last one
+## being the special last waypoint
 func draw_waypoints(positions : Array[Vector2i], id : int):
 	var draw_func = func():
 		

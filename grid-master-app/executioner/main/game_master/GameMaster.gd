@@ -30,11 +30,11 @@ var game_state : GameState ## The state of the game
 var _pathfinder : DijkstraPathfinder ## The pathfinder for the game state
 
 # Variables for the unit movement state
-var moved_unit : Unit
-var movement_waypoints : Array[Vector2i] = []
-var current_possible_tiles : Array[Vector2i] = []
-var current_path : Array[Vector2i] = []
-var movement_left : int
+var moved_unit : Unit # Which unit is being moved
+var movement_waypoints : Array[Vector2i] = [] # The user-defined waypoints for the path
+var current_possible_tiles : Array[Vector2i] = [] # Which tiles the unit can move to right now
+var current_path : Array[Vector2i] = [] # The cumulative path of the unit
+var movement_left : int # How many points of movement the unit still has left
 
 
 # This is ONLY for drawing the map and the units!!

@@ -5,12 +5,22 @@ extends RefCounted
 #TODO: Eventually we'll have to add which units the team has access to and other stuff
 
 var team_name : String ## The name of the team
-var team_id : int
+
+## The numerical id of the team (currently just the index of the the team
+## in the team array in the gamestate
+var team_id : int 
+
+## The color of the team. Used in, for example, unit outlines.
 var color : Color
+
+# This will determine what types of units the team can produce throughout the game
+## An array of unit types available to the team
 var units : Array[UnitType]
+
 
 static func DEBUG_new_team() -> Team:
 	return Team.new("Debug team", -1, Color(1,1,1), [])
+
 
 func _init(team_name_p : String, team_id_p : int, color_p : Color, units_p : Array[UnitType]) -> void:
 	team_name = team_name_p

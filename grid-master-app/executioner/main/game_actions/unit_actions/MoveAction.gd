@@ -149,10 +149,11 @@ func step() -> void:
 						return
 					
 			
-			#TODO: Proper, more sophisticated gridlock detection should be added
-			# Currently, gridlocks won't happen but sometimes units won't quite get to their
+			# TODO: Proper, more sophisticated gridlock detection should be added
+			# Currently, gridlocks and infinite loops won't happen, but sometimes units won't quite get to their
 			# final destinations if there's a unit there already, even if it's going to move away
-			# in the future. The swap detection is 
+			# in the future. The swap system is the blueprint for how this should work, but just
+			# generalized to an arbitrary number of units.
 			
 			# The unit on the tile is a friendly unit
 			else:

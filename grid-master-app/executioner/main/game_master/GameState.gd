@@ -2,6 +2,9 @@ class_name GameState
 extends RefCounted
 ## Class that represents everything that makes up the current state of the game, ex. the units, the map, etc
 
+# This should maybe be in the gamemaster if the gamestate is supposed to be practically
+# identical between clients
+## The player ID of the player currently playing on this instance of the game
 var client_player_id : int = -1
 
 var game_name : String
@@ -74,6 +77,8 @@ func move_unit(unit_id : int, new_position : Vector2i) -> void:
 	grid.move_unit(cur_pos, new_position)
 
 
+## Swaps the positions of two units. Currently only called
+## by the step function in MoveAction
 func swap_units(unit1 : Unit, unit2 : Unit) -> void:
 	var u1_pos = unit1.grid_position
 	var u2_pos = unit2.grid_position
@@ -96,6 +101,7 @@ func swap_units(unit1 : Unit, unit2 : Unit) -> void:
 	unit2_ma.handle_swap()
 
 
+## Removes a unit from the map and the game
 func remove_unit(unit : Unit) -> void:
 	grid.remove_unit(unit.grid_position)
 	units.erase(unit.unit_id)
@@ -197,8 +203,8 @@ func get_pathfinder() -> DijkstraPathfinder:
 	return _pathfinder
 
 
-## Returns the first unit on the specified tile.
-## Can return null if there are no units on the tile.
+## Returns the unit on the specified tile.
+## Can return null if there is no unit on the tile.
 func get_unit_on_tile(coords : Vector2i) -> Unit:
 	return grid.get_unit_on_tile(coords)
 
