@@ -1,9 +1,6 @@
 extends Node
 ## Object that represents the rule arguments given at game creation
 
-## The types of arguments
-enum ArgType {FIGHT_FUNC, DAMAGE_FUNC, HIT_FUNC, UNIT_INITIATIVE_FUNC}
-
 # The fight function must have the signature (unit1, unit2) -> void
 # It determines how a fight happens and executes it
 # It does not and should not remove units from the map. That is the job
@@ -18,9 +15,9 @@ enum ArgType {FIGHT_FUNC, DAMAGE_FUNC, HIT_FUNC, UNIT_INITIATIVE_FUNC}
 # The unit initiative function must have the signature (unit_array) -> void.
 # It takes in an array of units and sorts them according to some criteria
 
+## The types of arguments
+enum ArgType {FIGHT_FUNC, DAMAGE_FUNC, HIT_FUNC, UNIT_INITIATIVE_FUNC}
 
-## The types of non-function arguments, usually floats, ints, or booleans
-enum ArgVarType {PERCENT_RANGE, COMBAT_ROUNDS}
 
 # Percent range is what the accuracy, dodge change, etc. values are defined up to.
 #
@@ -30,18 +27,12 @@ enum ArgVarType {PERCENT_RANGE, COMBAT_ROUNDS}
 # Combat rounds is how many rounds there are in combat, i.e.
 # how many times each unit has a go at taking a shot at the other
 
-
-# Bunch of flags for MoveActions
-
-## Whether the units should stop their movement after fighting. Default: true.
-var stop_after_fighting : bool = true
-const FLAG_STOP_AFTER_FIGHTING = 1
-
+## The types of non-function arguments, usually floats, ints, or booleans
+enum ArgVarType {PERCENT_RANGE, COMBAT_ROUNDS}
 
 # This is required for some of the functions
 # Ex. the fight function might need to know what tile the unit is standing on
 var _game_state : GameState
-
 
 ## The dictionary containing the function arguments themselves
 var args : Dictionary[ArgType, Callable]
@@ -50,31 +41,66 @@ var args : Dictionary[ArgType, Callable]
 var arg_vars : Dictionary[ArgVarType, Variant]
 
 
-# This is necessary because _init() does not work with autoloaded objects
-## Initializes the GameArgs object.
-func initialize(gs : GameState) -> void:
-	_game_state = gs
-	
-	arg_vars.set(ArgVarType.PERCENT_RANGE, 100)
-	
-	# TODO: This should be set in the game definition
-	arg_vars.set(ArgVarType.COMBAT_ROUNDS, 4)
-	
-	# This should be replaced with reading arguments from the game definition
-	# and then generating the appopriate function
-	_gen_default_fight_func()
-	_gen_default_initiative_func()
-	_gen_default_hit_func()
-	_gen_default_damage_func()
+
+# -----
+# FLAGS
+# -----
+
+
+
+# MoveAction flags
+
+## Whether the units should stop their movement after fighting. Default: true.
+var stop_after_fighting : bool:
+	get: return _stop_after_fighting
+
+var _stop_after_fighting : bool = true
+const MA_STOP_AFTER_FIGHTING = 1
 
 
 ## Sets the flags for the move action
 func set_move_action_flags(flags : int):
-	if (flags & FLAG_STOP_AFTER_FIGHTING > 0):
-		stop_after_fighting = true
+	if (flags & MA_STOP_AFTER_FIGHTING > 0):
+		_stop_after_fighting = true
 	else:
-		stop_after_fighting = false
+		_stop_after_fighting = false
+
+
+# Pathfinding flags
+
+## Whether tiles with enemy units are valid targets to move to
+var can_move_to_enemy : bool:
+	get: return _can_move_to_enemy
+
+var _can_move_to_enemy : bool = true
+const PF_CAN_MOVE_TO_ENEMY = 1
+
+
+## Whether a unit can move through friendly units (not end up on top of them, just move through)
+var can_move_through_friendly : bool:
+	get: return _can_move_through_friendly
+
+var _can_move_through_friendly : bool = true
+const PF_CAN_MOVE_THROUGH_FRIENDLY = 2
+
+
+## Sets the flags for the dijkstra pathfinder
+func set_pathfinding_flags(flags : int):
+	if (flags & PF_CAN_MOVE_TO_ENEMY > 0):
+		_can_move_to_enemy = true
+	else:
+		_can_move_to_enemy = false
 	
+	if (flags & PF_CAN_MOVE_THROUGH_FRIENDLY > 0):
+		_can_move_through_friendly = true
+	else:
+		_can_move_through_friendly = false
+
+
+# -----
+# FUNCTION GENERATORS
+# -----
+
 
 ## Gives a random number between 0 and PERCENT RANGE (inclusive)
 func rand_range_val() -> int:
@@ -89,9 +115,6 @@ func rand_range_val() -> int:
 func _gen_default_fight_func() -> void:
 	var fight_func = func(unit1 : Unit, unit2 : Unit):
 		if (unit1.is_dead() or unit2.is_dead()): return
-		
-		var u1hp = unit1.hp
-		var u2hp = unit2.hp
 		
 		var pr = arg_vars.get(ArgVarType.PERCENT_RANGE)
 		var hit_func : Callable = args.get(ArgType.HIT_FUNC)
@@ -186,3 +209,26 @@ func _gen_default_initiative_func() -> void:
 	
 	args.set(ArgType.UNIT_INITIATIVE_FUNC, initiative_func)
 	
+
+
+# -----
+# INIT AND GODOT PREDEFINED
+# -----
+
+
+# This is necessary because _init() does not work with autoloaded objects
+## Initializes the GameArgs object.
+func initialize(gs : GameState) -> void:
+	_game_state = gs
+	
+	arg_vars.set(ArgVarType.PERCENT_RANGE, 100)
+	
+	# TODO: This should be set in the game definition
+	arg_vars.set(ArgVarType.COMBAT_ROUNDS, 4)
+	
+	# This should be replaced with reading arguments from the game definition
+	# and then generating the appopriate function
+	_gen_default_fight_func()
+	_gen_default_initiative_func()
+	_gen_default_hit_func()
+	_gen_default_damage_func()
