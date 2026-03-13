@@ -15,7 +15,7 @@ var color : Color
 
 # This will determine what types of units the team can produce throughout the game
 ## An array of unit types available to the team
-var units : Array[UnitType]
+var unit_types : Array[UnitType]
 
 
 static func DEBUG_new_team() -> Team:
@@ -26,4 +26,4 @@ func _init(team_name_p : String, team_id_p : int, color_p : Color, units_p : Arr
 	team_name = team_name_p
 	team_id = team_id_p
 	color = color_p
-	units = units_p
+	unit_types = units_p

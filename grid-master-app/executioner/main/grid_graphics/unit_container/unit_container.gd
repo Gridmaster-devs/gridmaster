@@ -5,7 +5,6 @@ extends Sprite2D
 # object with attributes shared by all units of the same type
 var unit: Unit
 
-
 func getUnit() -> Unit: 
 	return unit
 
