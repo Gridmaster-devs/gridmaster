@@ -129,9 +129,6 @@ func step() -> void:
 					var fight_func = GameArgs.args.get(GameArgs.ArgType.FIGHT_FUNC)
 					fight_func.call(unit, unit_on_tile)
 					
-					# Make sure they won't fight us again
-					unit_on_tile.set_fought(unit.unit_id)
-					
 					# TODO: Replace this with logic that moves the unit to the path
 					# of the fought unit if the enemy unit died in the fight and we didn't
 					
