@@ -6,36 +6,12 @@ extends RefCounted
 # Largest number an int can store, acting as infinity here
 const MAX_INT : int = 9223372036854775807
 
-const FLAG_CAN_MOVE_TO_ENEMY = 1
-const FLAG_CAN_MOVE_THROUGH_FRIENDLY = 2
-
-
 var _djikstra_grid : Array[DijkstraNode] # Array of Dijkstra nodes
 var _game_grid : GameGrid # Array of tiles as in the gamestate
 var _units : Dictionary[int, Unit] # Array of units as in the gamestate
 var _grid_width : int
 var _grid_height : int
 
-# Flags
-
-# Whether tiles with enemy units are valid targets to move to
-var _can_move_to_enemy : bool = true
-
-# Whether a unit can move through friendly units (not end up on top of them, just move through)
-var _can_move_through_friendly : bool = true
-
-
-func set_flags(flags : int):
-	if (flags & FLAG_CAN_MOVE_TO_ENEMY > 0):
-		_can_move_to_enemy = true
-	else:
-		_can_move_to_enemy = false
-	
-	if (flags & FLAG_CAN_MOVE_THROUGH_FRIENDLY > 0):
-		_can_move_through_friendly = true
-	else:
-		_can_move_through_friendly = false
-	
 
 ## Initializes the Djikstra Pathfinder's grid from a game_grid.
 ## Only needs to be called once when a game is started.
@@ -168,11 +144,11 @@ func tiles_from_position(start_position : Vector2i, movement_available : int, un
 				# If the unit on the tile is an allied unit
 				if (tile_unit.get_team_id() == team_id and tile_unit != unit_moved):
 					do_not_append = true
-					if !_can_move_through_friendly: continue
+					if !GameArgs.can_move_through_friendly: continue
 				
 				# If the unit on the tile is a hostile unit
 				if (tile_unit.get_team_id() != team_id):
-					if !_can_move_to_enemy: continue
+					if !GameArgs.can_move_to_enemy: continue
 			
 			# No blockers, moving forward
 			
