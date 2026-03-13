@@ -196,6 +196,12 @@ func tiles_from_position(start_position : Vector2i, movement_available : int, un
 	return possible
 
 
+## Returns how much movement it would take to get to the
+## specified position from the start position that was given when
+## tiles_from_position was called.
+##
+## Returns the maximum value for an int if the tile is unreachable, and calling this function
+## without calling tiles_from_position may lead to undefined behavior.
 func movement_required_to_position(pos : Vector2i):
 	var tile : DijkstraNode = get_node_vec(pos)
 	return tile.movement_required
@@ -226,13 +232,13 @@ func get_path_to_pos(position : Vector2i) -> Array[Vector2i]:
 ## Class that represents a node in the pathfinder.
 class DijkstraNode extends RefCounted:
 	
-	var position : Vector2i
-	var movement : int = 1 # movement required to move onto the node from a neighbor
-	var possible : bool = false
-	var current_unit : Unit = null
+	var position : Vector2i # The position of the tile on the game grid
+	var movement : int = 1 # The movement required to move onto the node from a neighbor
+	var possible : bool = false # Whether the tile is possible to reach or not
+	var current_unit : Unit = null # The unit currently on the tile if there is one
 	
-	var enqueued : bool = false
-	var previous : DijkstraNode = null
+	var enqueued : bool = false # Whether the node has been added to the priority queue already
+	var previous : DijkstraNode = null # The previous node on the fastest path to this node from the start
 	
 	# movement required to move to the node from the beginning node
 	var movement_required : int = MAX_INT 
@@ -253,6 +259,20 @@ class DijkstraNode extends RefCounted:
 
 class DijkstraPriorityQueue extends RefCounted:
 	## Simple priority queue implementation
+	
+	
+	# NOTE: Note for future developers,
+	# If you need to squeeze more performance out of this, you could change this
+	# so that the elements are stored and sorted in a reverse order in the array
+	# so that the highest priority (lowest priority value) element is at the back of the array instad of the front,
+	# because popping the last element is significantly cheaper than popping the first element.
+	# You can do this by flipping the sign of the priority value of each node.
+	
+	# You could also use a different, more optimized data structure.
+	
+	# Ultimately if you need tons more performance this will probably have to be written in another
+	# faster language
+
 
 	# Highest priority (lowest priority value) is always the last element
 	# in the array. The array is always sorted.

@@ -7,7 +7,7 @@ extends RefCounted
 # you have to remember to remove it from both places
 var unit : Unit = null ## Dictionary from Unit ID to the Units on the tile
 var tile_type : TileType ## Reference to the type of tile
-var position : Vector2i
+var position : Vector2i ## Position of the tile on the map, currently unused
 
 var protection : int:
 	get: return tile_type.attributes.get(TileType.TILE_ATTRIBUTE_TYPE.PROTECTION)

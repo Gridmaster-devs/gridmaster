@@ -18,29 +18,40 @@ enum ArgType {FIGHT_FUNC, DAMAGE_FUNC, HIT_FUNC, UNIT_INITIATIVE_FUNC}
 # The unit initiative function must have the signature (unit_array) -> void.
 # It takes in an array of units and sorts them according to some criteria
 
+
+## The types of non-function arguments, usually floats, ints, or booleans
 enum ArgVarType {PERCENT_RANGE, COMBAT_ROUNDS}
 
-## What the accuracy, dodge change, etc. are defined up to.
-##
-## Ex. with the value 100, 50 dodge means 50% dodge chance, but
-## with the value 1000, 50 dodge chance means 5% dodge chance.
+# Percent range is what the accuracy, dodge change, etc. values are defined up to.
+#
+# Ex. with the value 100, 50 dodge means 50% dodge chance, but
+# with the value 1000, 50 dodge chance means 5% dodge chance.
+
+# Combat rounds is how many rounds there are in combat, i.e.
+# how many times each unit has a go at taking a shot at the other
+
 
 # Bunch of flags for MoveActions
-const FLAG_STOP_AFTER_FIGHTING = 1
+
+## Whether the units should stop their movement after fighting. Default: true.
 var stop_after_fighting : bool = true
+const FLAG_STOP_AFTER_FIGHTING = 1
+
 
 # This is required for some of the functions
 # Ex. the fight function might need to know what tile the unit is standing on
 var _game_state : GameState
 
 
-## The dictionary containing the arguments themselves
+## The dictionary containing the function arguments themselves
 var args : Dictionary[ArgType, Callable]
 
+## The dictionary containing the non-function arguments
 var arg_vars : Dictionary[ArgVarType, Variant]
 
-#TODO: Properly add all the different functions
 
+# This is necessary because _init() does not work with autoloaded objects
+## Initializes the GameArgs object.
 func initialize(gs : GameState) -> void:
 	_game_state = gs
 	
@@ -55,8 +66,7 @@ func initialize(gs : GameState) -> void:
 	_gen_default_initiative_func()
 	_gen_default_hit_func()
 	_gen_default_damage_func()
-	
-	
+
 
 ## Sets the flags for the move action
 func set_move_action_flags(flags : int):

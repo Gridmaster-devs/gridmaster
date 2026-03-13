@@ -5,19 +5,25 @@ extends Sprite2D
 # object with attributes shared by all units of the same type
 var unit: Unit
 
+
 func getUnit() -> Unit: 
 	return unit
+
 
 func getScreenPosition() -> Vector2i:
 	return position
 
 
+# This is required because _init() does not work when instantiating an instance
+# of a scene in Godot
+## Initalizes the instance of the class
 func initialize(internal_unit: Unit, screen_pos: Vector2) -> void:
 	unit = internal_unit
 	position = screen_pos
 	initSprite()
 
 
+## Initalizes the sprite and the outline shader
 func initSprite():
 	if unit.type.texture != null: 
 		texture = unit.type.texture
@@ -28,6 +34,7 @@ func initSprite():
 		texture = tex
 	
 	set_instance_shader_parameter("team_color", unit.team.color)
+
 
 func update_screen_position(pos: Vector2i): 
 	position = pos

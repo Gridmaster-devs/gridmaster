@@ -72,7 +72,7 @@ func get_move_speed() -> int:
 	return type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.MOVEMENT_SPEED)
 	
 
-## Returns whether the unit has stopped moving or not
+## Returns whether the unit has stopped moving for this turn or not
 func has_stopped() -> bool:
 	if (current_action is MoveAction):
 		if (current_action.stopped == false):
@@ -81,6 +81,11 @@ func has_stopped() -> bool:
 	return true
 
 
+## Returns the next tile the unit wants to move to.
+##
+## The next movement tile is not necessarily the next tile on the path if,
+## for instance, there's a friendly unit on the next tile, in which the unit
+## will try to skip over it
 func get_next_movement_tile() -> Vector2i:
 	if (current_action is MoveAction):
 		return current_action.next_movement_tile()
@@ -88,6 +93,12 @@ func get_next_movement_tile() -> Vector2i:
 	else:
 		return grid_position
 
+
+## If the unit is moving, it returns the unit id of the unit that this unit wants to swap with.
+##
+## Swapping is a form of gridlock prevention, with the implementation found in the step
+## function of the MoveAction. If the unit is not moving or is not trying to swap with anyone,
+## returns -1.
 
 func get_swap_suggested_unit() -> int:
 	if (current_action is MoveAction):
@@ -104,6 +115,9 @@ func is_dead() -> bool:
 		return false
 
 
+## Called by the fight function when the unit has been in a battle to let it
+## know it has been in a battle. This might cause the unit to stop, for example,
+## if the "stop after fighting" flag has been set.
 func set_fought(enemy_id : int) -> void:
 	if (current_action is MoveAction):
 		current_action.fought(enemy_id)
@@ -112,6 +126,10 @@ func set_fought(enemy_id : int) -> void:
 		return
 
 
+## Returns true if the unit is currently in the middle of
+## executing the next_movement_tile function.
+##
+## This exists as a form of gridlock prevention.
 func searching_next_tile() -> bool:
 	if (current_action is MoveAction):
 		return current_action.searching_next_tile
@@ -127,6 +145,8 @@ func get_player_id() -> int:
 	return player.player_id
 
 
+# In the future units can maybe have special behavior when they take damage
+## Called to signal the unit to take damage
 func take_damage(damage : int):
 	# remove damage from health
 	_hp -= damage
