@@ -246,8 +246,6 @@ func next_movement_tile() -> Vector2i:
 					else:
 						continue
 				
-			
-		
 		searching_next_tile = false
 		return path[tile_index]
 
