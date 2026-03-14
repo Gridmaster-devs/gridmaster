@@ -11,8 +11,8 @@ signal units_changed
 # be needed to prevent the game master file being enormous.
 enum UIState {LOAD_GAME, IN_GAME_DEFAULT, UNIT_MOVE}
 
-const LOAD_GAME_GUI : PackedScene = preload("res://executioner/main/grid_graphics/gui_scenes/load_game_gui.tscn")
-const IN_GAME_DEFAULT_GUI : PackedScene = preload("res://executioner/main/grid_graphics/gui_scenes/in_game_default_gui.tscn")
+const LOAD_GAME_GUI : PackedScene = preload("res://executioner/main/game_master/gui_scenes/load_game_gui.tscn")
+const IN_GAME_DEFAULT_GUI : PackedScene = preload("res://executioner/main/game_master/gui_scenes/in_game_default_gui.tscn")
 
 static var GROUP_NAME : String = "GameMaster"
 static var EVENT_INPUT_FUNC_NAME : String = "receive_ui_event"
@@ -103,6 +103,8 @@ func load_game_definition(game_definition : Resource):
 	initGameStateFromGameDefinition(game_definition)
 	switch_gui_scene(IN_GAME_DEFAULT_GUI, getGameName())
 	ui_state = UIState.IN_GAME_DEFAULT
+	
+	MessageDispatcher.broadcast_message("Game \" {game_name} \" loaded ".format({"game_name": game_state.getGameName()})) 
 
 
 ## Prints the map into a log file

@@ -8,7 +8,7 @@ func _load_game_button_pressed():
 	send_gm_signal(ButtonPressedEvent.new(ButtonPressedEvent.ButtonType.LOAD_GAME))
 
 
-func _custom_ready() -> void:
+func _ready() -> void:
 	_load_game_button.pressed.connect(_load_game_button_pressed)
 
 
