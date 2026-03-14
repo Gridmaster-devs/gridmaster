@@ -135,14 +135,26 @@ func step() -> void:
 					# One way to do this would be to replace the movement path with one that begins
 					# on our current square and ends on the enemy's tile
 					
-					# Whether we stop after fighting or not
+					# If we stop after fighting
 					if (GameArgs.stop_after_fighting == true):
-						# We do stop
-						stopped = true
-						return
+						
+						# The unit we just fought has died so we move onto their tile and stop there
+						if (unit_on_tile.is_dead()):
+							# New path is just our current tile and the tile the enemy was standing on
+							path = [path[current_tile], path[current_tile + 1]]
+							current_tile = 0
+							last_tile = 1
+							stopped = false # This is here because the fight func sets stopped
+							
+							return
+						
+						# The unit we fought didn't die so we just stop
+						else:
+							stopped = true
+							return
 					
+					# If we don't stop after fighting
 					else:
-						# We don't stop
 						return
 					
 			
