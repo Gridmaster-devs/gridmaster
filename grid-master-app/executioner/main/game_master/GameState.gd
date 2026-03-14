@@ -129,7 +129,6 @@ func end_turn() -> void:
 		# Advance one step in each MoveAction
 		for unit : Unit in unit_array:
 			if (unit.current_action is MoveAction and unit.has_stopped() == false):
-				print("Unit %s stepped" % unit.unit_id)
 				done = false
 				(unit.current_action as MoveAction).step()
 		
@@ -141,16 +140,16 @@ func end_turn() -> void:
 			if (unit.is_dead()):
 				units_to_be_removed.append(unit)
 		
+		# NOTE: Possible to improve efficiency by using indices of the units in the
+		# unit array so that it doesn't have to search for the position each time
 		for unit in units_to_be_removed:
-			units.erase(unit.unit_id)
+			unit_array.erase(unit)
 			remove_unit(unit)
-
 	
 	# Clear actions
 	for unit : Unit in unit_array:
 		unit.current_action = null
 		
-	print(units)
 	
 	turn_number += 1
 

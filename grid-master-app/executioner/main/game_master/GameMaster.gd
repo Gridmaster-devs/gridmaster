@@ -171,6 +171,7 @@ func _handle_event_default_in_game(event : StateMachineEvent):
 			var unit = game_state.get_unit_on_tile(event.grid_pos)
 			if unit == null: return # There is no unit on the tile
 			
+			
 			# The unit doesn't belong to the current player
 			if unit.get_player_id() != game_state.client_player_id: return
 			
