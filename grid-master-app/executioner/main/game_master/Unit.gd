@@ -10,6 +10,9 @@ var unit_id : int ## The ID of the unit
 var player : Player ## The player that owns the unit
 var team : Team
 
+var team_name : String:
+	get: return team.team_name
+
 var _hp : int ## The current HP of the unit
 var hp : int:
 	get: return _hp
@@ -151,11 +154,8 @@ func take_damage(damage : int):
 	# remove damage from health
 	_hp -= damage
 	
-	print("Unit %s with id %s from team %s took %s damage" % [type.unit_name, unit_id, team.team_name, damage])
-	
 	# making sure we won't process actions of dead units
 	if (_hp <= 0):
-		print("Unit %s with id %s from team %s died" % [type.unit_name, unit_id, team.team_name])
 		current_action = null
 
 

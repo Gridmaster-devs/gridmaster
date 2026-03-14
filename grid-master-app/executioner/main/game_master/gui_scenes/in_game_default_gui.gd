@@ -6,7 +6,6 @@ extends GUIScene
 @onready var message_window_node: MessageWindow = $MessageWindow
 
 func _ready():
-	MessageDispatcher.message_broadcast.connect(message_window_node._on_message_broadcast)
 	_end_turn_button.pressed.connect(_end_turn_button_pressed)
 
 func _end_turn_button_pressed() -> void:

@@ -117,6 +117,9 @@ func _gen_default_fight_func() -> void:
 	var fight_func = func(unit1 : Unit, unit2 : Unit):
 		if (unit1.is_dead() or unit2.is_dead()): return
 		
+		var u1_start_hp = unit1.hp
+		var u2_start_hp = unit2.hp
+		
 		var pr = arg_vars.get(ArgVarType.PERCENT_RANGE)
 		var hit_func : Callable = args.get(ArgType.HIT_FUNC)
 		var damage_func : Callable = args.get(ArgType.DAMAGE_FUNC)
@@ -151,6 +154,9 @@ func _gen_default_fight_func() -> void:
 		
 		unit1.set_fought(unit2.unit_id)
 		unit2.set_fought(unit1.unit_id)
+		
+		MessageDispatcher.broadcast_message("[Unit %s : %s] attacked [Unit %s : %s], dealing %s damage and taking %s damage." % [unit1.unit_id, unit1.team_name, unit2.unit_id, unit2.team_name, (u2_start_hp - unit2.hp), (u1_start_hp - unit1.hp)])
+		
 	
 	args.set(ArgType.FIGHT_FUNC, fight_func)
 

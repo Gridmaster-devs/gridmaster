@@ -8,10 +8,11 @@ var MAX_MESSAGES = 10
 
 var message_queue: Array[Label]
 
-var message_container
+@onready var message_container = $ScrollContainer/MarginContainer/MessageContainer
+var label_scene : PackedScene = preload("res://executioner/main/game_master/gui_scenes/gui_elements/message_window/message.tscn")
 
 func _ready() -> void:
-	message_container = get_node("ScrollContainer/VBoxContainer")
+	MessageDispatcher.message_broadcast.connect(_on_message_broadcast)
 	
 ## callback for attaching to a message_broadcast signal. When a signal
 ## is emitted, it calls the internal functions to place the message
@@ -20,10 +21,12 @@ func _on_message_broadcast(message: String) -> void:
 	_enqueue_message(message)
 	
 func _enqueue_message(message: String) -> void:
-	var label = Label.new()
+	var label : Label = label_scene.instantiate()
 	label.text = message
+	
 	if message_queue.size() == MAX_MESSAGES:
 		_dequeue_message()
+		
 	message_queue.push_back(label)
 	message_container.add_child(label)
 	

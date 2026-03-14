@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://crctrtjg6y7vu"]
+[gd_scene load_steps=5 format=3 uid="uid://crctrtjg6y7vu"]
 
 [ext_resource type="Script" uid="uid://bn1llmqgxwm5i" path="res://executioner/main/game_master/gui_scenes/in_game_default_gui.gd" id="1_fu532"]
 [ext_resource type="PackedScene" uid="uid://b4s8ownwps16v" path="res://common/gui_elements/gui_button.tscn" id="2_arvn5"]
-[ext_resource type="PackedScene" uid="uid://cc3il70fx6jf8" path="res://executioner/main/game_master/gui_scenes/message_window.tscn" id="3_5vj1k"]
+[ext_resource type="PackedScene" uid="uid://cc3il70fx6jf8" path="res://executioner/main/game_master/gui_scenes/gui_elements/message_window/message_window.tscn" id="3_5vj1k"]
+[ext_resource type="Theme" uid="uid://duaj511mmakqr" path="res://executioner/main/game_master/gui_scenes/gui_elements/message_window/messagewindow_theme.tres" id="4_1hlxx"]
 
 [node name="InGameDefaultGUI" type="Node"]
 script = ExtResource("1_fu532")
@@ -30,6 +31,9 @@ text = "End turn"
 [node name="MessageWindow" parent="." instance=ExtResource("3_5vj1k")]
 anchors_preset = 2
 anchor_right = 0.0
-offset_top = -229.0
-offset_right = 358.0
+offset_left = 10.0
+offset_top = -274.0
+offset_right = 524.0
+offset_bottom = -10.0
 grow_horizontal = 1
+theme = ExtResource("4_1hlxx")

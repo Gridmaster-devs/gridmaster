@@ -104,7 +104,7 @@ func load_game_definition(game_definition : Resource):
 	switch_gui_scene(IN_GAME_DEFAULT_GUI, getGameName())
 	ui_state = UIState.IN_GAME_DEFAULT
 	
-	MessageDispatcher.broadcast_message("Game \" {game_name} \" loaded ".format({"game_name": game_state.getGameName()})) 
+	MessageDispatcher.broadcast_message("Game \"%s\" loaded." % game_state.getGameName()) 
 
 
 ## Prints the map into a log file
