@@ -40,9 +40,9 @@ func setTileType(x : int, y : int, tile_type : TileType) -> void:
 	getTile(x, y).setTileType(tile_type)
 
 
-## Returns the units that are on the specified tile
-func getUnitsOnTile(x : int, y : int) -> Dictionary[int, Unit]:
-	return getTile(x, y).getUnits()
+## Returns the unit on the specified tile
+func getUnitOnTile(x : int, y : int) -> Unit:
+	return getTile(x, y).get_unit()
 
 
 ## Returns the first unit on the tile.
