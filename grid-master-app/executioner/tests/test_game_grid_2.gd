@@ -14,7 +14,7 @@ func test_initialization():
 
 func test_filling_init():
 	var fill_func = func(_x, _y):
-			return GridTile.new(TileType.new())
+			return GridTile.new(TileType.new(), Vector2i(_x, _y))
 	game_grid.fillTiles(fill_func)
 	
 	for i in range(width):
@@ -31,7 +31,7 @@ func test_tile_access_and_modification():
 	tile_type.tile_name = "TestTile"
 	
 	var fill_func = func(_x, _y):
-		return GridTile.new(TileType.new())
+		return GridTile.new(TileType.new(), Vector2i(_x, _y))
 	game_grid.fillTiles(fill_func)
 	
 	# Assign the test tile type to the 
@@ -42,7 +42,7 @@ func test_tile_access_and_modification():
 func test_unit_management():
 	# Setup grid with tiles
 	var fill_func = func(_x, _y):
-		return GridTile.new(TileType.new())
+		return GridTile.new(TileType.new(), Vector2i(_x, _y))
 	game_grid.fillTiles(fill_func)
 	
 	# Create dependencies for Unit
@@ -54,14 +54,15 @@ func test_unit_management():
 	unit_type.attributes = attributes
 	
 	var unit_pos = Vector2i(1, 1)
-	var unit = Unit.new(unit_type, 1, 1, unit_pos)
+	var team: Team = Team.new("Test team", 1, Color(0, 0, 0), [])
+	var player: Player = Player.new("Test player", 1, team, false)
+	var unit = Unit.new(unit_type, 1, player, unit_pos)
 	
 	game_grid.addUnit(unit)
 	
-	var units_on_tile = game_grid.getUnitsOnTile(1, 1)
-	assert_true(units_on_tile.size() > 0, "Should have units on tile")
-	# Assuming getUnitsOnTile returns Dictionary[int, Unit] per GameGrid.gd signature
-	assert_has(units_on_tile, unit.getId(), "Recently added unit should be in the returned units")
+	var unit_on_tile = game_grid.getUnitOnTile(1, 1)
+	# Chech taht the unit is added to the tile
+	assert_eq(unit_on_tile, unit, "Recently added unit should be in the returned units")
 
 #func test_init_from_map_resource():
 	## Create a mock map
