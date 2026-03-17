@@ -134,9 +134,9 @@ func get_layer_id() -> int:
 	return _layer_id
 
 func _open_remove_confirm_popup() -> void: 
-	var confirm_popup: ConfirmPopup = preload("res://editor/editors/map_editor_refactor/popup_windows/confirm_popup.tscn").instantiate()
+	var confirm_popup: ConfirmPopup = preload("res://common/popups/confirm_popup.tscn").instantiate()
 	confirm_popup.add_to_tree()
-	confirm_popup.ok.connect(_on_remove_confirm.bind(confirm_popup.get_popup_name()))
+	confirm_popup.ok.connect(_on_remove_confirm)
 
 	
 func _on_remove_confirm() -> void:

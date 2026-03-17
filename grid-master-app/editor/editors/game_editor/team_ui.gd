@@ -13,7 +13,7 @@ func _ready() -> void:
 
 
 func _open_color_picker() -> void:
-	var color_picker_popup: TextureColorPicker = preload("res://editor/editors/map_editor_refactor/popup_windows/color_picker.tscn").instantiate()
+	var color_picker_popup: TextureColorPicker = preload("res://common/popups/color_picker.tscn").instantiate()
 	color_picker_popup.add_to_tree()
 	color_picker_popup.color_saved.connect(_on_color_picker_color)
 	color_picker_popup.texture_saved.connect(_on_color_picker_texture)

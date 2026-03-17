@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://rm27rb7okfxv" path="res://editor/editors/game_editor/game_editor.gd" id="1_rp7ar"]
 [ext_resource type="PackedScene" uid="uid://cehdpht6a7iw8" path="res://common/file_upload_download/file_transfer_manager.tscn" id="2_n3gfw"]
 [ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="2_ugjnl"]
-[ext_resource type="Script" uid="uid://of14uemmvsm2" path="res://common/popup_manager.gd" id="4_8anuq"]
+[ext_resource type="Script" uid="uid://of14uemmvsm2" path="res://common/popups/popup_manager.gd" id="4_8anuq"]
 
 [node name="Game Editor" type="Control"]
 layout_mode = 3

@@ -15,6 +15,7 @@ signal saved(data: Dictionary[String, Variant])
 func _ready() -> void:
 	_save_button.pressed.connect(on_save)
 	_cancel_button.pressed.connect(on_cancel)
+	center()
 
 func _init() -> void: 
 	super.set_popup_name("settings_popup")

@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://dbe7c8w8dw4un"]
 
-[ext_resource type="Script" uid="uid://cfmp02mhd6ujy" path="res://editor/editors/map_editor_refactor/popup_windows/confirm_popup.gd" id="1_0r6nu"]
+[ext_resource type="Script" uid="uid://cfmp02mhd6ujy" path="res://common/popups/confirm_popup.gd" id="1_0r6nu"]
 [ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="2_736r4"]
 
 [node name="ConfirmPopup" type="Control"]

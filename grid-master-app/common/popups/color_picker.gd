@@ -17,6 +17,7 @@ func _init() -> void:
 func _ready() -> void:
 	save_button.pressed.connect(_save)
 	cancel_button.pressed.connect(_cancel)
+	center()
 
 
 func _get_texture() -> Texture2D: 

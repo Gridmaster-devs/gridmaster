@@ -32,6 +32,7 @@ func _create_line_edit() -> LineEdit:
 func _ready() -> void: 
 	_save_button.pressed.connect(on_new_tile_save)
 	_cancel_button.pressed.connect(on_new_tile_cancel)
+	center()
 
 func init(tile_attribute_types: Dictionary[String, Variant], lib_name: String) -> void: 
 	_tile_attribute_types = tile_attribute_types

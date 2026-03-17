@@ -33,3 +33,6 @@ func remove_from_tree() -> void:
 
 
 @abstract func _init() -> void
+
+func center() -> void:
+	position = (get_viewport_rect().size - size) / 2

@@ -13,10 +13,14 @@ var game_resource : GameDefinitionResource
 @onready var _new_team_button: Button = $PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox/NewTeamButton
 @onready var _save_button: Button = $PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox/SaveTeamsButton
 
+
+
 #teams
 var _team_uis: Array[TeamUi] = []
 var _teams: Array[GameTeam] = []
 
+#units
+@export var unit_outline_thickeness: int = 3
 
 ##painting
 var _unit_painter: MapPainter = null
@@ -72,10 +76,6 @@ func _create_unit_painter() -> MapPainter:
 	_painter.init_painter(10, 10)
 	_base_layer_id = _painter.add_layer(MapAttributes.STRATEGIC_TEXTURE_ID, MapAttributes.STRATEGIC_TILE_ID)
 	_unit_layer_id = _painter.add_layer(MapAttributes.UNIT_TEXTURE_ID, MapAttributes.UNIT_TILE_ID)
-	_painter.add_library(MapAttributes.UNIT_UNIT_LIB_NAME, MapAttributes.UNIT_UNIT_LIB_OVERWRITE, 
-								MapAttributes.UNIT_UNIT_LIB_ADD, 
-								MapAttributes.UNIT_UNIT_LIB_TEXTURE_ID,
-								MapAttributes.UNIT_UNIT_LIB_ITEM_ID, _unit_layer_id, false, true)
 	return _painter
 
 func _reload() -> void:
@@ -88,24 +88,10 @@ func _sync_map() -> void:
 	var attribute_grid = editor_main.getMap().get_strategic_map().get_attribute_grids()[0]
 	_unit_painter.reload_layer(attribute_grid, _base_layer_id)
 	_unit_painter.resize(attribute_grid.width, attribute_grid.height)
+	
 
 func _sync_unit_lib() -> void: 
-	var units = editor_main.get_units()
-	var data: Array = []
-	for unit in units: 
-		var unit_name: String = unit.get_attribute("name").attribute_value
-		var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
-		img.fill(Color.from_rgba8(0, 0, 0, 0))  
-		for x in range(64): 
-			for y in range(64):
-				if x > 16 and x <= 48 and y > 16 and y <= 48: 
-					img.set_pixel(x, y, Color.from_rgba8(255, 0, 0, 255))
-		var unit_texture: Texture2D = ImageTexture.create_from_image(img)
-		var datapoint: Dictionary[String, Variant] = {
-			MapAttributes.UNIT_UNIT_LIB_ITEM_ID: unit_name,
-		 	MapAttributes.UNIT_UNIT_LIB_TEXTURE_ID: unit_texture}
-		data.append(datapoint)
-	_unit_painter.sync_library(data, MapAttributes.UNIT_UNIT_LIB_NAME)
+	_sync_team_libraries()
 
 func _on_visibibility_changed() -> void:
 	if visible: 
@@ -136,15 +122,82 @@ func _on_teams_save() -> void:
 		var team_id = count
 		_teams.append(GameTeam.new(team_name, team_color, team_id))
 		count += 1
+	_sync_team_libraries()
+
+func _sync_team_libraries() -> void: 
+	var lib_names = _unit_painter.get_library_names()
+	var new_lib_names: Array = []
+	for team in _teams:
+		var lib_name = team.get_name()
+		if lib_names.has(lib_name):
+			_unit_painter.sync_library(_generate_team_lib_data(team), lib_name)
+		else: 
+			_unit_painter.add_library(lib_name, MapAttributes.UNIT_UNIT_LIB_OVERWRITE, MapAttributes.UNIT_UNIT_LIB_ADD,
+									MapAttributes.UNIT_UNIT_LIB_TEXTURE_ID,
+									MapAttributes.UNIT_UNIT_LIB_ITEM_ID, _unit_layer_id, false, true)
+			_unit_painter.sync_library(_generate_team_lib_data(team), lib_name)
+		new_lib_names.append(lib_name)
+	#remove libs that are in the painter but not in teams
+	for lib_name in lib_names: 
+		if !new_lib_names.has(lib_name):
+			_unit_painter.remove_library(lib_name)
+
+##UTIL
+func _generate_team_lib_data(team: GameTeam) -> Array: 
+	var data: Array = []
+	for unit in editor_main.get_units():
+		var unit_name: String = unit.get_attribute("name").attribute_value
+		var unit_texture: Texture2D = _generate_colored_unit_texture(team.get_color(), _generate_default_unit_texture())
+		var datapoint: Dictionary[String, Variant] = {
+			MapAttributes.UNIT_UNIT_LIB_ITEM_ID: unit_name,
+		 	MapAttributes.UNIT_UNIT_LIB_TEXTURE_ID: unit_texture,
+			MapAttributes.UNIT_TEAM_ID: team.get_name()}
+		data.append(datapoint)
+	return data
+
+
+func _generate_colored_unit_texture(color: Color, unit: Texture2D, alpha_threshold: float = 0.5) -> Texture2D:
+	var img = unit.get_image().duplicate(true)
+	var width = img.get_width()
+	var height = img.get_height()
 	
-	#TODO: update map painter libraries with new teams
+	# duplicate the original for neighbor checks
+	var original = img.duplicate(true)
+	
+	for x in range(width):
+		for y in range(height):
+			var p = original.get_pixel(x, y)
+			if p.a < alpha_threshold and _has_opaque_neighbor(original, Vector2i(x, y), alpha_threshold):
+				img.set_pixel(x, y, color)
+	
+	return ImageTexture.create_from_image(img)
 
 
+func _has_opaque_neighbor(img: Image, pos: Vector2i, alpha_threshold: float) -> bool:
+	var width = img.get_width()
+	var height = img.get_height()
+	
+	for dx in range(-unit_outline_thickeness, unit_outline_thickeness + 1):
+		for dy in range(-unit_outline_thickeness, unit_outline_thickeness + 1):
+			if dx == 0 and dy == 0:
+				continue  # skip the center pixel
+			var nx = pos.x + dx
+			var ny = pos.y + dy
+			if nx < 0 or nx >= width or ny < 0 or ny >= height:
+				continue
+			var np = img.get_pixel(nx, ny)
+			if np.a >= alpha_threshold:
+				return true
+	return false
 
 
-
-
-
-
+func _generate_default_unit_texture() -> Texture2D:
+	var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
+	img.fill(Color.from_rgba8(0, 0, 0, 0))  
+	for x in range(64): 
+		for y in range(64):
+			if x > 16 and x <= 48 and y > 16 and y <= 48: 
+				img.set_pixel(x, y, Color.from_rgba8(255, 0, 0, 255))
+	return ImageTexture.create_from_image(img)
 
 #

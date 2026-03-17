@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://bqs4k3okhrf58"]
 
 [ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="1_1ajdr"]
-[ext_resource type="Script" uid="uid://bse74ngkqr4nn" path="res://editor/editors/map_editor_refactor/popup_windows/color_picker.gd" id="1_c0omh"]
+[ext_resource type="Script" uid="uid://bse74ngkqr4nn" path="res://common/popups/color_picker.gd" id="1_c0omh"]
 
 [node name="ColorPicker" type="Control"]
 layout_mode = 3

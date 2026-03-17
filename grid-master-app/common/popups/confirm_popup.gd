@@ -15,9 +15,11 @@ func _init() -> void:
 func _ready() -> void:
 	_ok_button.pressed.connect(_ok)
 	_cancel_button.pressed.connect(_cancel)
+	center()
 	
 func _ok() -> void:
 	ok.emit()
+	remove_from_tree()
 	
 func _cancel() -> void:
 	remove_from_tree()

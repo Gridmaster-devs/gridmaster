@@ -137,14 +137,39 @@ func remove_attributes(data: Dictionary[String, Variant], item_id: String, item_
 					(tile_attributes[item_id] is Array and tile_attributes[item_id].has(item_id_value) or 
 					tile_attributes[item_id] is not Array and tile_attributes[item_id] == item_id_value)):
 						#remove every key that exists in the data from the tile
-						for key in data.keys(): 
-							if tile_attributes.has(key):
-								var tile_val = tile_attributes[key]
-								if tile_val is Array: 
-									while tile_val.has(data[key]):
-										tile_val.erase(data[key])
-								elif data[key] == tile_val:
-									tile_attributes.erase(key)
+					for key in data:
+						if not tile_attributes.has(key):
+							continue
+						var val = tile_attributes[key]
+						var remove_val = data[key]
+						if val is Array:
+							val = val.filter(func(v): return v != remove_val)
+							if val.is_empty():
+								tile_attributes.erase(key)
+							else:
+								tile_attributes[key] = val
+						elif val == remove_val:
+							tile_attributes.erase(key)
+	update_tile_map()
+
+func sync_attributes(data: Dictionary[String, Variant], item_id: String, item_id_value: Variant) -> void: 
+	for x in get_width():
+		for y in get_height():
+			var tile_attributes = _attribute_grid.getItem(x, y)
+			if tile_attributes is Dictionary:
+				#if the tile is identified as the tile type in question
+				if (tile_attributes.has(item_id) and 
+					(tile_attributes[item_id] is Array and tile_attributes[item_id].has(item_id_value) or 
+					tile_attributes[item_id] is not Array and tile_attributes[item_id] == item_id_value)):
+						for key in data:
+							var tile_val = tile_attributes[key]
+							if tile_val is Dictionary: 
+								tile_val = data[key]
+							#TODO: a way to detect the previous addable
+							elif tile_val is Array: 
+								if !tile_val.has(data[key]):
+									tile_val.append(data[key])
+									
 	update_tile_map()
 
 #if ERASE -> changes the hovered tile source id to -1 so it becomes blank

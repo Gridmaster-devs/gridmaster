@@ -23,8 +23,9 @@ var layers: Array[MapLayer]
 
 ##PAINT LIBRARY DATA
 #maps each library name to an array of Dictionary[String, Variant]
-#each entry in the array is a library item (a button) 
-#each dictionary defines the values of that lib item (the values it will set when used) 
+#Maps library names to an array of it items
+#Arrays are arrays of dictionaries 
+#each dictionary has its librarys defined overwrite and addable key value pairs
 var _lib_items_data: Dictionary[String, Array] = {}
 #Maps libraries with their names
 var _paint_libraries: Dictionary[String, PaintLibrary]
@@ -123,6 +124,13 @@ func on_lib_item_pressed(addable: Dictionary[String, Variant],
 		#highlight freshly
 		_highlight_with_attributes(addable, overwrite, layer_id)
 
+func sync_lib_item(lib_name: String, item_id: String, item_id_value: Variant, layer_id: int) -> void: 
+	if _lib_items_data.has(lib_name): 
+		var lib_items = _lib_items_data[lib_name]
+		var item_indx = lib_items.find_custom(
+			(func(item): return item is Dictionary and item.has(item_id) and item[item_id] == item_id_value)) 
+		layers[layer_id].sync_attributes(lib_items[item_indx], item_id, item_id_value)
+
 func remove_lib_item(lib_name: String, item_id: String, item_id_value: Variant, layer_id: int) -> void:
 	if _lib_items_data.has(lib_name): 
 		var lib_items = _lib_items_data[lib_name]
@@ -135,7 +143,9 @@ func remove_lib_item(lib_name: String, item_id: String, item_id_value: Variant, 
 					lib_items.erase(item)
 					_paint_libraries[lib_name].initialize_lib_items(lib_items)
 
+
 ##State incrementing / decremeneting functions
+##A lot of these are called from outside the class
 #adds a new library item to a specific library
 func add_new_lib_item(data: Dictionary[String, Variant], lib_name: String):
 	if !_paint_libraries.has(lib_name):
@@ -171,12 +181,46 @@ func add_library(lib_name: String, overwrite_data: Dictionary[String, Variant],
 	#set the array of items of this lib to an empty one (basically init it) 
 	_lib_items_data[lib_name] = []
 
+#function to remove a library
+func remove_library(lib_name: String) -> void: 
+	var item_id = _paint_libraries[lib_name].get_item_id()
+	var layer_id = _paint_libraries[lib_name].get_layer_id()
+	#remove every lib_item
+	for lib_item in _lib_items_data[lib_name]:
+		var item_id_value = lib_item[item_id]
+		remove_lib_item(lib_name, item_id, item_id_value, layer_id)
+	#remove the lib
+	_content_vbox.remove_child(_paint_libraries[lib_name])
+	_paint_libraries.erase(lib_name)
+
+#reloads a library completely from external data
+func sync_library(data: Array, lib_name: String) -> void:
+	#if lib doesnt exist we cant do anything
+	if !_paint_libraries.has(lib_name):
+		return
+	var item_id = _paint_libraries[lib_name].get_item_id()
+	var layer_id =_paint_libraries[lib_name].get_layer_id()
+	#remove items that dont exist in data
+	#modify items that exist in both -> also modify the map
+	for item in _lib_items_data[lib_name]: 
+		if !_dict_array_has_item(data, item_id, item[item_id]):
+			remove_lib_item(lib_name, item_id, item[item_id], layer_id)
+		else: 
+			sync_lib_item(lib_name, item_id, item[item_id], layer_id)
+			
+	#we will add every item to the library
+	#keep in mind that "add_new_lib_item" does nothing if the item already exists in the lib
+	for item in data:
+		add_new_lib_item(item, lib_name)
+	for layer in layers:
+		layer.update_tile_map()
 
 func reset(width, height) -> void: 
 	for layer in layers:
 		layer.reset_grids(width, height)
 	_width = width
 	_height = height
+	_background_grid.regenerate(width, height)
 
 func resize(width, height) -> void: 
 	for layer in layers:
@@ -184,6 +228,15 @@ func resize(width, height) -> void:
 	_width = width
 	_height = height
 	_background_grid.regenerate(width, height)
+
+#reloads a layer absed on an attribute grid
+func reload_layer(attribute_grid: Array2D, layer_id: int) -> void: 
+	if layer_id >= layers.size():
+		print("trying to reload a nonexistent layer")
+		return
+	layers[layer_id].reset_from_data(attribute_grid)
+
+
 
 ##IMPORT / EXPORT
 ##AND STATE UPDATING FUNCTIONS (for loading and reloading the state of the map painter) 
@@ -233,12 +286,13 @@ func export_as_resource() -> MapPainterRes:
 	res.init(_width, _height, attribute_grids, _lib_items_data)
 	return res
 
-
-func reload_layer(attribute_grid: Array2D, layer_id: int) -> void: 
-	if layer_id >= layers.size():
-		print("trying to reload a nonexistent layer")
-		return
-	layers[layer_id].reset_from_data(attribute_grid)
+##DYNAMIC flow functions
+#simple function to change current input state
+func _change_state(new_state: InputState) -> void:
+	_input_state = new_state
+	if new_state != InputState.PAINT && _highlight:
+		_highlight = false
+		_background_grid.regenerate(_width, _height)
 
 
 #callback from settings popup (called from popup manager) 
@@ -256,35 +310,6 @@ func update_settings(settings: Dictionary[String, Variant]) -> void:
 func _update_libraries() -> void: 
 	for lib_name in _paint_libraries.keys(): 
 		_paint_libraries[lib_name].initialize_lib_items(_lib_items_data[lib_name])
-
-#reloads a library completely from external data
-func sync_library(data: Array, lib_name: String) -> void:
-	#if lib doesnt exist we cant do anything
-	if !_paint_libraries.has(lib_name):
-		return
-	var item_id = _paint_libraries[lib_name].get_item_id()
-	var layer_id =_paint_libraries[lib_name].get_layer_id()
-	#check if the incoming data contains every lib item that exits already
-	#remove lib item also removes the attributes from the grid
-	for item in _lib_items_data[lib_name]: 
-		if !_dict_array_has_item(data, item_id, item[item_id]):
-			remove_lib_item(lib_name, item_id, item[item_id], layer_id)
-	#we will add every item to the library
-	#keep in mind that "add_new_lib_item" does nothing if the item already exists in the lib
-	for item in data:
-		add_new_lib_item(item, lib_name)
-	for layer in layers:
-		layer.update_tile_map()
-
-
-##DYNAMIC flow functions
-#simple function to change current input state
-func _change_state(new_state: InputState) -> void:
-	_input_state = new_state
-	if new_state != InputState.PAINT && _highlight:
-		_highlight = false
-		_background_grid.regenerate(_width, _height)
-
 
 #highlights every tile in background grid 
 #whose attribute lists have the equal keys and values
@@ -468,6 +493,9 @@ func get_map_as_thumbnail() -> Texture2D:
 				thumbnail_img.set_pixel(grid_x, grid_y, tile_tex_avr_color)
 	return ImageTexture.create_from_image(thumbnail_img)
 
+
+func get_library_names() -> Array: 
+	return _paint_libraries.keys()
 
 
 

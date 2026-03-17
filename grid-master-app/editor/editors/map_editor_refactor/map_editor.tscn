@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://dyj4dtsehwxpc" path="res://editor/editors/map_editor_refactor/map_editor.gd" id="1_3hb3i"]
 [ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="2_njdbt"]
 [ext_resource type="PackedScene" uid="uid://cehdpht6a7iw8" path="res://common/file_upload_download/file_transfer_manager.tscn" id="3_pmcsd"]
-[ext_resource type="Script" uid="uid://of14uemmvsm2" path="res://common/popup_manager.gd" id="4_pmcsd"]
+[ext_resource type="Script" uid="uid://of14uemmvsm2" path="res://common/popups/popup_manager.gd" id="4_pmcsd"]
 
 [node name="MapEditor" type="Control"]
 layout_mode = 3

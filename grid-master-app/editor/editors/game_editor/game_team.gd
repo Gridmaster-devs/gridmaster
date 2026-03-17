@@ -11,3 +11,14 @@ func _init(name: String, color: Color, id: int) -> void:
 	_name = name
 	_color = color
 	_id = id
+
+
+
+func get_name() -> String: 
+	return _name
+
+func get_color() -> Color: 
+	return _color
+
+func get_id() -> int:
+	return _id

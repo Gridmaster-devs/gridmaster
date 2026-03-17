@@ -6,8 +6,7 @@ var _containers: Dictionary[String, Container]
 
 func _ready() -> void:
 	self.visible = false
-	if Global.popup_manager == null:
-		Global.popup_manager = self
+	Global.popup_manager = self
 
 func add_popup(popup: PopupWindow) -> void: 
 	var new_cont: Container = preload("res://editor/editors/map_editor_refactor/popup_windows/popup_layer.tscn").instantiate()
