@@ -130,7 +130,7 @@ func tiles_from_position(start_position : Vector2i, movement_available : int, un
 			if (current_node.movement_required > movement_available): continue
 			
 			# Don't append nodes that a friendly unit wants to move to
-			if (movement_targets.has(current_node.position)):
+			if (!GameArgs.movement_target_overlap_allowed and movement_targets.has(current_node.position)):
 				do_not_append = true
 			
 			# Don't add the start position to the possible movement tiles
@@ -143,7 +143,7 @@ func tiles_from_position(start_position : Vector2i, movement_available : int, un
 				
 				# If the unit on the tile is an allied unit
 				if (tile_unit.get_team_id() == team_id and tile_unit != unit_moved):
-					do_not_append = true
+					if !GameArgs.can_target_friendly: do_not_append = true
 					if !GameArgs.can_move_through_friendly: continue
 				
 				# If the unit on the tile is a hostile unit
