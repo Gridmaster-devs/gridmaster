@@ -68,6 +68,7 @@ func set_move_action_flags(flags : int):
 
 # Pathfinding flags
 
+# This is kind of useless right now
 ## Whether tiles with enemy units are valid targets to move to
 var can_move_to_enemy : bool:
 	get: return _can_move_to_enemy
@@ -76,7 +77,8 @@ var _can_move_to_enemy : bool = true
 const PF_CAN_MOVE_TO_ENEMY = 1
 
 
-## Whether a unit can move through friendly units (not end up on top of them, just move through)
+# This is kind of useless right now
+## Whether a unit can pathfind through friendly units (not end up on top of them, just move through)
 var can_move_through_friendly : bool:
 	get: return _can_move_through_friendly
 
@@ -84,7 +86,23 @@ var _can_move_through_friendly : bool = true
 const PF_CAN_MOVE_THROUGH_FRIENDLY = 2
 
 
-## Sets the flags for the dijkstra pathfinder
+## Whether friendly units are valid movement targets
+var can_target_friendly : bool:
+	get: return _can_target_friendly
+
+var _can_target_friendly : bool = true
+const PF_CAN_TARGET_FRIENDLY = 4
+
+
+## Whether you can overlap movement targets of friendly units
+var movement_target_overlap_allowed : bool:
+	get: return _movement_target_overlap_allowed
+
+var _movement_target_overlap_allowed : bool = true
+const PF_MOVEMENT_TARGET_OVERLAP_ALLOWED = 8
+
+
+## Sets the flags for pathfinding
 func set_pathfinding_flags(flags : int):
 	if (flags & PF_CAN_MOVE_TO_ENEMY > 0):
 		_can_move_to_enemy = true
@@ -95,6 +113,16 @@ func set_pathfinding_flags(flags : int):
 		_can_move_through_friendly = true
 	else:
 		_can_move_through_friendly = false
+	
+	if (flags & PF_CAN_TARGET_FRIENDLY > 0):
+		_can_target_friendly = true
+	else:
+		_can_target_friendly = false
+	
+	if (flags & PF_MOVEMENT_TARGET_OVERLAP_ALLOWED > 0):
+		_movement_target_overlap_allowed = true
+	else:
+		_movement_target_overlap_allowed = false
 
 
 
