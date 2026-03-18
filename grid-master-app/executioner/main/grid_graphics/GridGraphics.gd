@@ -94,10 +94,10 @@ func getUnits():
 		if (units != null):
 			clearUnits()
 			for unit : Unit in units:
-				#var unit_container = UnitContainer.new(unit, gridToScreen(unit.getPosition()))
 				var unit_container : UnitContainer = UNIT_CONTAINER.instantiate()
-				unit_container.initialize(unit, gridToScreen(unit.getPosition()))
 				addNewUnitContainer(unit_container)
+				unit_container.initialize(unit, gridToScreen(unit.getPosition()))
+				
 
 
 ## Adds a new unit container to the active units array
