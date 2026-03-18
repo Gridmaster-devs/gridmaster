@@ -125,6 +125,24 @@ func set_pathfinding_flags(flags : int):
 		_movement_target_overlap_allowed = false
 
 
+# Graphics flags
+
+# Whether the unit ids are drawn on top of the units or not
+var no_unit_numbers : bool:
+	get: return _no_unit_numbers
+
+var _no_unit_numbers : bool = false
+const GR_NO_UNIT_NUMBERS = 1
+
+
+## Sets the flags for graphics
+func set_graphics_flags(flags : int):
+	if (flags & GR_NO_UNIT_NUMBERS > 0):
+		_no_unit_numbers = true
+	else:
+		_no_unit_numbers = false
+
+
 
 # -----
 # FUNCTION GENERATORS
