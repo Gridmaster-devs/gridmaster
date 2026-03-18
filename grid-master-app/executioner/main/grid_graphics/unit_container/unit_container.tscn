@@ -22,7 +22,6 @@ mouse_filter = 2
 theme_override_colors/default_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 7
-text = "test"
 autowrap_mode = 1
 horizontal_alignment = 1
 vertical_alignment = 1

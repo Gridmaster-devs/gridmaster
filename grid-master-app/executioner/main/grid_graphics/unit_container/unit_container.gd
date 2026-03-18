@@ -34,7 +34,8 @@ func initSprite():
 		texture = tex
 	
 	set_instance_shader_parameter("team_color", unit.team.color)
-	unit_id_label.text = String.num_int64(unit.unit_id)
+	if (GameArgs.no_unit_numbers == false):
+		unit_id_label.text = String.num_int64(unit.unit_id)
 
 
 func update_screen_position(pos: Vector2i): 
