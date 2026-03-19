@@ -157,7 +157,7 @@ func add_new_lib_item(data: Dictionary[String, Variant], lib_name: String):
 	#if the new item doesn't have the unique identifier we return out
 	if !data.has(item_id):
 		return
-	if !_dict_array_has_item(_lib_items_data[lib_name], item_id, data[item_id]):
+	if _find_dictionary_item(_lib_items_data[lib_name], item_id, data[item_id]) == -1:
 		_lib_items_data[lib_name].append(data)
 		_paint_libraries[lib_name].initialize_lib_items(_lib_items_data[lib_name])
 
@@ -202,18 +202,23 @@ func sync_library(data: Array, lib_name: String) -> void:
 	var layer_id =_paint_libraries[lib_name].get_layer_id()
 	#remove items that dont exist in data
 	#modify items that exist in both -> also modify the map
-	for item in _lib_items_data[lib_name]: 
-		if !_dict_array_has_item(data, item_id, item[item_id]):
+	for item_indx in _lib_items_data[lib_name].size(): 
+		var item = _lib_items_data[lib_name][item_indx]
+		var data_item_indx = _find_dictionary_item(data, item_id, item[item_id])
+		if data_item_indx == -1:
 			remove_lib_item(lib_name, item_id, item[item_id], layer_id)
 		else: 
-			sync_lib_item(lib_name, item_id, item[item_id], layer_id)
-			
+			layers[layer_id].sync_attributes(data[data_item_indx], item_id, item[item_id])
+			_lib_items_data[lib_name][item_indx] = data[data_item_indx]
+			#sync_lib_item(lib_name, item_id, item[item_id], layer_id)
+	#set the lib data to new! 
 	#we will add every item to the library
 	#keep in mind that "add_new_lib_item" does nothing if the item already exists in the lib
 	for item in data:
 		add_new_lib_item(item, lib_name)
 	for layer in layers:
 		layer.update_tile_map()
+	_update_libraries()
 
 func reset(width, height) -> void: 
 	for layer in layers:
@@ -236,6 +241,11 @@ func reload_layer(attribute_grid: Array2D, layer_id: int) -> void:
 		return
 	layers[layer_id].reset_from_data(attribute_grid)
 
+func get_layer(layer_id: int) -> Array2D: 
+	if layer_id >= layers.size():
+		print("trying to get a nonexistent layer")
+		return
+	return layers[layer_id].get_attribute_grid()
 
 
 ##IMPORT / EXPORT
@@ -413,12 +423,14 @@ func is_active() -> bool:
 
 ##utility functions: 
 #checks if a library already has an item with the specific id 
-func _dict_array_has_item(data: Array, item_id: String, id_value: Variant) -> bool: 
+func _find_dictionary_item(data: Array, item_id: String, id_value: Variant) -> int: 
+	var count = 0
 	for item in data:
 		if item is Dictionary:
 			if item.has(item_id) and item[item_id] == id_value:
-				return true
-	return false
+				return count
+		count +=1
+	return -1
 
 func _generate_settigns_dict() -> Dictionary[String, Variant]:
 	return {"width": _width, "height": _height}

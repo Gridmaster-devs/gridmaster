@@ -162,13 +162,12 @@ func sync_attributes(data: Dictionary[String, Variant], item_id: String, item_id
 					(tile_attributes[item_id] is Array and tile_attributes[item_id].has(item_id_value) or 
 					tile_attributes[item_id] is not Array and tile_attributes[item_id] == item_id_value)):
 						for key in data:
-							var tile_val = tile_attributes[key]
-							if tile_val is Dictionary: 
-								tile_val = data[key]
-							#TODO: a way to detect the previous addable
-							elif tile_val is Array: 
-								if !tile_val.has(data[key]):
-									tile_val.append(data[key])
+							if tile_attributes[key] is Array: 
+								if !tile_attributes[key].has(data[key]):
+									tile_attributes[key].append(data[key])
+							else:
+								tile_attributes[key] = data[key]
+
 									
 	update_tile_map()
 

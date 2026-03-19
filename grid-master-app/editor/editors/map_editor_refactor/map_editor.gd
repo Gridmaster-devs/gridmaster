@@ -146,4 +146,8 @@ func get_map_as_resource() -> MapResource:
 	res.init(_strategic_painter.export_as_resource(), _tactical_maps)
 	return res
 
+func get_map_layer() -> Array2D: 
+	return _strategic_painter.get_layer(0)
+
+
 ###

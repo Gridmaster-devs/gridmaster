@@ -14,7 +14,6 @@ var game_resource : GameDefinitionResource
 @onready var _save_button: Button = $PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox/SaveTeamsButton
 
 
-
 #teams
 var _team_uis: Array[TeamUi] = []
 var _teams: Array[GameTeam] = []
@@ -45,9 +44,15 @@ func save_to_file():
 	game_resource.save_name(game_name)
 	game_resource.save_units(units)
 	game_resource.saveMap(map)
-	
+	game_resource.save_unit_layer(_unit_painter.get_layer(_unit_layer_id))
+	game_resource.save_team_uis(_get_team_uis_res())
 	ftm.download_data(game_resource, game_name + ".tres", "*.tres", true)
 
+func _get_team_uis_res() -> Array[TeamUiRes]: 
+	var out: Array[TeamUiRes] = []
+	for team_ui in _team_uis: 
+		out.append(team_ui.export())
+	return out
 
 func load_from_file() -> void:
 	ftm.upload_data("*.tres", true)
@@ -57,12 +62,18 @@ func load_from_resource(resource : GameDefinitionResource):
 	set_game_name(resource.game_name)
 	editor_main.set_units(resource.load_units())
 	editor_main.setMap(resource.loadMap())
+	_unit_painter.reload_layer(resource.load_unit_layer(), _unit_layer_id)
+	#teams
+	_clear_teams()
+	for team_ui_res in resource.load_team_uis():
+		_add_new_team_ui().import(team_ui_res)
+	_on_teams_save()
+	_reload()
 
 
 func get_game_name() -> String:
 	return game_name_line.text
-	
-	
+
 func set_game_name(name_p : String):
 	game_name_line.text = name_p
 	
@@ -79,8 +90,10 @@ func _create_unit_painter() -> MapPainter:
 	return _painter
 
 func _reload() -> void:
+	#sync team uis
+	_sync_team_uis()
 	#reload the units
-	_sync_unit_lib()
+	_sync_team_libraries()
 	#reload the map
 	_sync_map()
 
@@ -88,10 +101,6 @@ func _sync_map() -> void:
 	var attribute_grid = editor_main.getMap().get_strategic_map().get_attribute_grids()[0]
 	_unit_painter.reload_layer(attribute_grid, _base_layer_id)
 	_unit_painter.resize(attribute_grid.width, attribute_grid.height)
-	
-
-func _sync_unit_lib() -> void: 
-	_sync_team_libraries()
 
 func _on_visibibility_changed() -> void:
 	if visible: 
@@ -108,10 +117,12 @@ func _ready() -> void:
 	_new_team_button.pressed.connect(_add_new_team_ui)
 	_save_button.pressed.connect(_on_teams_save)
 
-func _add_new_team_ui() -> void: 
+func _add_new_team_ui() -> TeamUi: 
 	var team_ui: TeamUi = preload("res://editor/editors/game_editor/team_ui.tscn").instantiate()
 	_teams_container.add_child(team_ui)
+	team_ui.init_units(_get_team_names())
 	_team_uis.append(team_ui)
+	return team_ui
 
 func _on_teams_save() -> void: 
 	_teams.clear()
@@ -119,10 +130,19 @@ func _on_teams_save() -> void:
 	for team_ui in _team_uis: 
 		var team_name = team_ui.get_team_name()
 		var team_color = team_ui.get_team_color()
+		var team_units = team_ui.get_team_units()
 		var team_id = count
-		_teams.append(GameTeam.new(team_name, team_color, team_id))
+		_teams.append(GameTeam.new(team_name, team_color, team_id, team_units))
 		count += 1
 	_sync_team_libraries()
+
+func _sync_team_uis() -> void: 
+	var arr: Array = []
+	for unit in editor_main.get_units():
+		var unit_name: String = unit.get_attribute("name").attribute_value
+		arr.append(unit_name)
+	for team_ui in _team_uis:
+		team_ui.sync_units(arr)
 
 func _sync_team_libraries() -> void: 
 	var lib_names = _unit_painter.get_library_names()
@@ -142,11 +162,20 @@ func _sync_team_libraries() -> void:
 		if !new_lib_names.has(lib_name):
 			_unit_painter.remove_library(lib_name)
 
+func _clear_teams() -> void: 
+	_teams.clear()
+	for team_ui in _team_uis: 
+		_teams_container.remove_child(team_ui)
+	_team_uis.clear()
+
 ##UTIL
 func _generate_team_lib_data(team: GameTeam) -> Array: 
 	var data: Array = []
+	var team_units = team.get_units()
 	for unit in editor_main.get_units():
 		var unit_name: String = unit.get_attribute("name").attribute_value
+		if !team_units.has(unit_name):
+			continue
 		var unit_texture: Texture2D = _generate_colored_unit_texture(team.get_color(), _generate_default_unit_texture())
 		var datapoint: Dictionary[String, Variant] = {
 			MapAttributes.UNIT_UNIT_LIB_ITEM_ID: unit_name,
@@ -155,6 +184,12 @@ func _generate_team_lib_data(team: GameTeam) -> Array:
 		data.append(datapoint)
 	return data
 
+func _get_team_names() -> Array:
+	var data: Array = []
+	for unit in editor_main.get_units():
+		var unit_name: String = unit.get_attribute("name").attribute_value
+		data.append(unit_name)
+	return data
 
 func _generate_colored_unit_texture(color: Color, unit: Texture2D, alpha_threshold: float = 0.5) -> Texture2D:
 	var img = unit.get_image().duplicate(true)
