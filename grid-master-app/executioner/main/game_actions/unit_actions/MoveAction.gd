@@ -108,8 +108,23 @@ func step() -> void:
 		# There is a unit on the next tile we want to move to:
 		if unit_on_tile != null:
 			
-			# the unit on the tile is an enemy unit
+			# the unit on the tile is not a friendly unit
 			if (unit_on_tile.get_team_id() != unit.get_team_id()):
+				
+				# The unit on the tile is neutral
+				if (unit_on_tile.get_team_id() == -1):
+					
+					# Can't capture a unit we're not next to
+					if (loops > 0):
+						stopped = true
+						return
+					
+					# We're next to it so we capture it
+					else:
+						unit_on_tile.capture(unit.player)
+						MessageDispatcher.broadcast_message("[Unit %s : %s] captured [Unit %s]" % [unit.unit_id, unit.team_name, unit_on_tile.unit_id])
+						return
+				
 				
 				# We've already fought the unit on the tile
 				# so we'll try to move past it

@@ -14,9 +14,12 @@ var grid : GameGrid:
 	get: return _grid
 	set(v): return
 
+var teams_index = 0
+var players_index = 0
+
 var units : Dictionary[int, Unit] = {} ## All the units in the game, NOTE: also stored in each map tile
-var players : Array[Player] = [] ## All the players in the game
-var teams : Array[Team] = [] ## All the teams in the game
+var players : Dictionary[int, Player] = {-1 : Player.NEUTRAL_PLAYER} ## All the players in the game
+var teams : Dictionary[int, Team] = {-1 : Team.NEUTRAL_TEAM} ## All the teams in the game
 var unit_types : Dictionary[int, UnitType] = {} ## All the types of units in the game
 var _pathfinder : DijkstraPathfinder ## Dijkstra pathfinder for unit pathing
 
@@ -32,15 +35,13 @@ var turn_number : int = 0 ## What turn it is
 var action_queue : Array[PlayerAction] = []
 
 
-## Adds a unit to the game
+## Adds a unit to the game.
+##
+## Adding a unit with the player id of -1 makes it a neutral unit
 func addUnit(unit_type : UnitType, position : Vector2i, player_id : int) -> Unit:
 	var id = getNewUnitId()
 	
-	var player : Player
-	if (player_id == -1):
-		player = Player.DEBUG_new_player()
-	else:
-		player = players[player_id]
+	var player : Player = players.get(player_id)
 	
 	var unit = Unit.new(unit_type, id, player, position)
 	grid.addUnit(unit)
@@ -48,8 +49,8 @@ func addUnit(unit_type : UnitType, position : Vector2i, player_id : int) -> Unit
 	return unit
 	
 
-## Adds a unit by unit type id
-## will fail if there is no unit type corresponding to the id
+## Adds a unit by unit type id.
+## Will fail if there is no unit type corresponding to the id.
 func addUnitByTypeId(id : int, position : Vector2i, player_id : int) -> Unit:
 	var unit_type = unit_types.get(id)
 	assert(unit_type != null, "Tried to add unit with invalid type ID!")
@@ -57,19 +58,17 @@ func addUnitByTypeId(id : int, position : Vector2i, player_id : int) -> Unit:
 
 
 ## Adds a team to the game.
-##
-## The team's id is simply the index of the team in the teams array
-func add_team(team_name : String, color : Color, team_units : Array[UnitType]) -> void:
-	var team_id : int = teams.size()
-	teams.append(Team.new(team_name, team_id, color, team_units))
+func add_team(team_name : String, color : Color, team_units : Array[UnitType]) -> int:
+	var team_id : int = get_new_team_id()
+	teams.set(team_id, Team.new(team_name, team_id, color, team_units))
+	return team_id
 
 
 ## Adds a player to the game.
-##
-## The player's id is simply the index of the player in the players array
-func add_player(player_name : String, team_id : int, computer : bool):
-	var player_id = players.size()
-	players.append(Player.new(player_name, player_id, teams[team_id], computer))
+func add_player(player_name : String, team_id : int, computer : bool) -> int:
+	var player_id = get_new_player_id()
+	players.set(player_id, Player.new(player_name, player_id, teams.get(team_id), computer))
+	return player_id
 
 
 # NOTE: There's no cheat handling anywhere right now.
@@ -201,6 +200,16 @@ func getUnits() -> Array[Unit]:
 func getNewUnitId() -> int:
 	unit_id_count += 1
 	return unit_id_count
+
+
+func get_new_team_id() -> int:
+	teams_index += 1
+	return teams_index
+
+
+func get_new_player_id() -> int:
+	players_index += 1
+	return players_index
 
 
 ## gets the game grid width
