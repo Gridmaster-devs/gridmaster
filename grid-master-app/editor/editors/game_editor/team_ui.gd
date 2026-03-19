@@ -46,7 +46,6 @@ func sync_units(units: Array) -> void:
 			
 	_sync_uis()
 
-
 func _open_color_picker() -> void:
 	var color_picker_popup: TextureColorPicker = preload("res://common/popups/color_picker.tscn").instantiate()
 	color_picker_popup.add_to_tree()
@@ -95,9 +94,6 @@ func import(res: TeamUiRes) -> void:
 	_team_name_ui.text = res.get_team_name()
 	init_units(_team_checked_dictionary.keys())
 	_sync_uis()
-
-
-
 
 func _sync_uis() -> void: 
 	#color

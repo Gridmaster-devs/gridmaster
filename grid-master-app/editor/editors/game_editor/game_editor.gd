@@ -139,7 +139,9 @@ func _on_teams_save() -> void:
 func _sync_team_uis() -> void: 
 	var arr: Array = []
 	for unit in editor_main.get_units():
-		var unit_name: String = unit.get_attribute("name").attribute_value
+		var unit_name = unit.get_attribute_value("name")
+		if unit_name == null: 
+			continue
 		arr.append(unit_name)
 	for team_ui in _team_uis:
 		team_ui.sync_units(arr)
@@ -173,10 +175,13 @@ func _generate_team_lib_data(team: GameTeam) -> Array:
 	var data: Array = []
 	var team_units = team.get_units()
 	for unit in editor_main.get_units():
-		var unit_name: String = unit.get_attribute("name").attribute_value
+		var unit_name: String = unit.get_attribute_value("name")
+		var unit_texture_img: Texture2D = unit.get_attribute_value("texture")
+		if unit_name == null or unit_texture_img == null: 
+			continue
 		if !team_units.has(unit_name):
 			continue
-		var unit_texture: Texture2D = _generate_colored_unit_texture(team.get_color(), _generate_default_unit_texture())
+		var unit_texture: Texture2D = _generate_colored_unit_texture(team.get_color(), unit_texture_img)
 		var datapoint: Dictionary[String, Variant] = {
 			MapAttributes.UNIT_UNIT_LIB_ITEM_ID: unit_name,
 		 	MapAttributes.UNIT_UNIT_LIB_TEXTURE_ID: unit_texture,
