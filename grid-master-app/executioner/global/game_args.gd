@@ -68,7 +68,8 @@ func set_move_action_flags(flags : int):
 
 # Pathfinding flags
 
-# This is kind of useless right now
+# With the current MoveAction, this doesn't do much. If at some point we add
+# a mode where units can't fight each other, this will become useful again.
 ## Whether tiles with enemy units are valid targets to move to
 var can_move_to_enemy : bool:
 	get: return _can_move_to_enemy
@@ -77,7 +78,8 @@ var _can_move_to_enemy : bool = true
 const PF_CAN_MOVE_TO_ENEMY = 1
 
 
-# This is kind of useless right now
+# This isn't very useful until someone implements this flag
+# affecting unit movement in the MoveAction
 ## Whether a unit can pathfind through friendly units (not end up on top of them, just move through)
 var can_move_through_friendly : bool:
 	get: return _can_move_through_friendly
