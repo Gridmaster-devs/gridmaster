@@ -14,8 +14,9 @@ var grid : GameGrid:
 	get: return _grid
 	set(v): return
 
-var teams_index = 0
-var players_index = 0
+# These are used for generating team and player ids
+var teams_index = 0 # Count for how many teams there are
+var players_index = 0 # Count for how many players there are
 
 var units : Dictionary[int, Unit] = {} ## All the units in the game, NOTE: also stored in each map tile
 var players : Dictionary[int, Player] = {-1 : Player.NEUTRAL_PLAYER} ## All the players in the game
