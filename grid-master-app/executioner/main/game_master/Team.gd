@@ -4,6 +4,8 @@ extends RefCounted
 
 #TODO: Eventually we'll have to add which units the team has access to and other stuff
 
+static var NEUTRAL_TEAM = Team.new("Neutral", -1, Color(0.3, 0.3, 0.3), [])
+
 var team_name : String ## The name of the team
 
 ## The numerical id of the team (currently just the index of the the team

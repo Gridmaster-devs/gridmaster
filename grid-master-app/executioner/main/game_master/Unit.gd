@@ -7,8 +7,14 @@ var type : UnitType
 
 
 var unit_id : int ## The ID of the unit
+
 var player : Player ## The player that owns the unit
-var team : Team
+var team : Team:
+	get:
+		if (player != null):
+			return player.team
+		else:
+			return null
 
 var team_name : String:
 	get: return team.team_name
@@ -159,6 +165,10 @@ func take_damage(damage : int):
 		current_action = null
 
 
+func capture(capturing_player : Player):
+	player = capturing_player
+
+
 func set_position(new_pos : Vector2i) -> void:
 	grid_position = new_pos
 
@@ -167,6 +177,5 @@ func _init(unit_type : UnitType, unit_id_p : int, player_p : Player, position : 
 	grid_position = position
 	unit_id = unit_id_p
 	player = player_p
-	team = player.team
 	type = unit_type
 	initFromUnitType()
