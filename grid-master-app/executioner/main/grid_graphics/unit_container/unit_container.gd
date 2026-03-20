@@ -27,6 +27,7 @@ func initialize(internal_unit: Unit, screen_pos: Vector2) -> void:
 func initSprite():
 	if unit.type.texture != null: 
 		texture = unit.type.texture
+		texture.set_size_override(Vector2i(GridGraphics.TILE_SIZE, GridGraphics.TILE_SIZE))
 	else:
 		var img := preload("res://common/media/gridmaster_default_unit.png").get_image()
 		var tex := ImageTexture.create_from_image(img)

@@ -48,7 +48,6 @@ func addUnit(unit_type : UnitType, position : Vector2i, player_id : int) -> Unit
 	grid.addUnit(unit)
 	units.set(id, unit)
 	return unit
-	
 
 ## Adds a unit by unit type id.
 ## Will fail if there is no unit type corresponding to the id.
@@ -155,24 +154,62 @@ func end_turn() -> void:
 
 
 ## Initializes the unit types from a game definition
-func initUnitTypesFromResource(game_definition : GameDefinitionResource) -> void:
+func initUnitTypesFromResource(game_definition : GameDefinitionResource, 
+								unit_name_type_dict: Dictionary[String, int]) -> void:
 	var gd_units : Array[UnitResource] = game_definition.load_units()
 	var type_count : int = 0
 	for unit in gd_units:
-		unit_types.set(type_count, UnitType.initFromUnitResource(unit, type_count))
+		var cur_unit_type = UnitType.initFromUnitResource(unit, type_count)
+		unit_types.set(type_count, cur_unit_type)
+		unit_name_type_dict[ cur_unit_type.unit_name] = type_count
 		type_count += 1
+		
 
 
 ## Initializes and returns a game state object from a game definition
 static func initFromGameDefinition(game_definition : GameDefinitionResource) -> GameState:
+	var unit_name_type_dict: Dictionary[String, int] = {}
 	var game_state = GameState.new()
-	game_state.initUnitTypesFromResource(game_definition)
+	game_state.initUnitTypesFromResource(game_definition, unit_name_type_dict)
 	game_state.game_name = game_definition.game_name
 	game_state._grid = GameGrid.initFromMapResource(game_definition.loadMap())
 	
 	game_state._pathfinder = DijkstraPathfinder.new()
 	game_state._pathfinder.initialize(game_state.grid, game_state.units)
 	
+	var game_def_teams = game_definition.team_uis
+	var client_player_added: bool = false
+	
+	var player_team_name_dict: Dictionary[String, int] = {}
+	#teams and players
+	for team in game_def_teams: 
+		var team_name = team.get_team_name()
+		var unit_names: Dictionary[String, bool] = team.get_units()
+		var team_units: Array[UnitType] = []
+		for unit_name in unit_names.keys(): 
+			if unit_names[unit_name]:
+				var cur_unit_type_id = unit_name_type_dict[unit_name]
+				team_units.append(game_state.unit_types[cur_unit_type_id])
+		var team_id = game_state.add_team(team_name, team.get_team_color(), team_units)
+		if !client_player_added: 
+			var p_id = game_state.add_player(team_name, team_id, false)
+			game_state.client_player_id = p_id
+			player_team_name_dict[team_name] = p_id
+			client_player_added = true
+		else: 
+			player_team_name_dict[team_name] = game_state.add_player(team_name, team_id, true)
+			
+	
+	#units on the map
+	var unit_layer = game_definition.unit_layer
+	for x in unit_layer.width:
+		for y in unit_layer.height:
+			var cur_attributes = unit_layer.getItem(x, y)
+			if cur_attributes.has(MapAttributes.UNIT_UNIT_LIB_ITEM_ID) and cur_attributes.has(MapAttributes.UNIT_TEAM_ID):
+				var unit_name = cur_attributes[MapAttributes.UNIT_UNIT_LIB_ITEM_ID]
+				var team_name = cur_attributes[MapAttributes.UNIT_TEAM_ID]
+				game_state.addUnitByTypeId(unit_name_type_dict[unit_name], Vector2i(x, y), player_team_name_dict[team_name])
+
 	# TODO: Add import from game definition
 	GameArgs.initialize(game_state)
 	

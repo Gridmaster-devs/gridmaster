@@ -83,9 +83,10 @@ static func initFromUnitResource(unit_resource : UnitResource, unit_type_id : in
 	var resource_attributes = unit_resource.getAttributes()
 	unit_type.unit_name = unit_resource.get_attribute_value("name")
 	unit_type.description = unit_resource.get_attribute_value("description")
+	unit_type.texture = unit_resource.get_attribute_value("texture")
 	
 	for key in resource_attributes.keys():
-		if (key == "name" or key == "description"):
+		if (key == "name" or key == "description" or key == "texture"):
 			continue
 			
 		var value = unit_resource.get_attribute_value(key)
