@@ -11,8 +11,8 @@ signal units_changed
 # be needed to prevent the game master file being enormous.
 enum UIState {LOAD_GAME, IN_GAME_DEFAULT, UNIT_MOVE}
 
-const load_game_gui : PackedScene = preload("res://executioner/main/grid_graphics/gui_scenes/load_game_gui.tscn")
-const in_game_default_gui : PackedScene = preload("res://executioner/main/grid_graphics/gui_scenes/in_game_default_gui.tscn")
+const LOAD_GAME_GUI : PackedScene = preload("res://executioner/main/game_master/gui_scenes/load_game_gui.tscn")
+const IN_GAME_DEFAULT_GUI : PackedScene = preload("res://executioner/main/game_master/gui_scenes/in_game_default_gui.tscn")
 
 static var GROUP_NAME : String = "GameMaster"
 static var EVENT_INPUT_FUNC_NAME : String = "receive_ui_event"
@@ -27,13 +27,14 @@ var ui_state : UIState = UIState.LOAD_GAME
 var gui_scene : GUIScene
 
 var game_state : GameState ## The state of the game
+var _pathfinder : DijkstraPathfinder ## The pathfinder for the game state
 
 # Variables for the unit movement state
-var moved_unit : Unit
-var movement_waypoints : Array[Vector2i] = []
-var current_possible_tiles : Array[Vector2i] = []
-var current_path : Array[Vector2i] = []
-var movement_left : int
+var moved_unit : Unit # Which unit is being moved
+var movement_waypoints : Array[Vector2i] = [] # The user-defined waypoints for the path
+var current_possible_tiles : Array[Vector2i] = [] # Which tiles the unit can move to right now
+var current_path : Array[Vector2i] = [] # The cumulative path of the unit
+var movement_left : int # How many points of movement the unit still has left
 
 
 # This is ONLY for drawing the map and the units!!
@@ -67,10 +68,22 @@ func getGameName() -> String:
 ## Initializes a game state from a game definition
 func initGameStateFromGameDefinition(game_definition : GameDefinitionResource):
 	game_state = GameState.initFromGameDefinition(game_definition)
+	_pathfinder = game_state.get_pathfinder()
 	
 	# DEBUG
-	DEBUG_create_unit(0, Vector2i(0,0))
-	DEBUG_create_unit(0, Vector2i(1,0))
+	var blu_id = game_state.add_team("blu team", Color.BLUE, [])
+	var red_id = game_state.add_team("red team", Color.RED, [])
+	var p1_id = game_state.add_player("player1", blu_id, false)
+	var p2_id = game_state.add_player("player2", red_id, false)
+	
+	game_state.addUnitByTypeId(0, Vector2i(0,0), p1_id)
+	game_state.addUnitByTypeId(0, Vector2i(0,1), p1_id)
+	game_state.addUnitByTypeId(0, Vector2i(1,0), p2_id)
+	game_state.addUnitByTypeId(0, Vector2i(1,1), p2_id)
+	
+	game_state.addUnitByTypeId(0, Vector2i(2,2), -1)
+	
+	game_state.client_player_id = blu_id
 	# DEBUG
 
 	initGraphics()
@@ -90,8 +103,10 @@ func load_game_from_file() -> void:
 func load_game_definition(game_definition : Resource):
 	assert(game_definition != null, "Invalid game definition in file!")
 	initGameStateFromGameDefinition(game_definition)
-	switch_gui_scene(in_game_default_gui, getGameName())
+	switch_gui_scene(IN_GAME_DEFAULT_GUI, getGameName())
 	ui_state = UIState.IN_GAME_DEFAULT
+	
+	MessageDispatcher.broadcast_message("Game \"%s\" loaded." % game_state.getGameName()) 
 
 
 ## Prints the map into a log file
@@ -155,8 +170,12 @@ func _handle_event_default_in_game(event : StateMachineEvent):
 		if event.mouse_button == MOUSE_BUTTON_LEFT: # User left clicked on the grid
 			if event.grid_pos == Vector2i(-1, -1): return # The user clicked outside the map
 			
-			var unit = game_state.get_first_unit_on_tile(event.grid_pos)
+			var unit = game_state.get_unit_on_tile(event.grid_pos)
 			if unit == null: return # There is no unit on the tile
+			
+			
+			# The unit doesn't belong to the current player
+			if unit.get_player_id() != game_state.client_player_id: return
 			
 			# The user clicked on a tile in the map limits and there is a unit on the tile
 			
@@ -164,8 +183,8 @@ func _handle_event_default_in_game(event : StateMachineEvent):
 			moved_unit.current_action = null # clear the current action
 			_custom_graphics.clear_id(moved_unit.getId())
 			
-			current_possible_tiles = game_state.get_pathfinder().tiles_from_position(unit.getPosition(), unit.movement_speed)
-			movement_left = moved_unit.movement_speed
+			current_possible_tiles = _pathfinder.tiles_from_position(unit.getPosition(), unit.get_move_speed(), unit)
+			movement_left = moved_unit.get_move_speed()
 			
 			_custom_graphics.draw_movement_tiles(current_possible_tiles, unit.getId())
 			ui_state = UIState.UNIT_MOVE
@@ -191,13 +210,13 @@ func _handle_event_unit_move(event : StateMachineEvent) -> void:
 			
 			# If the user clicks on the latest waypoint, accept the movement command
 			if (!movement_waypoints.is_empty() and movement_waypoints.back() == event.grid_pos):
-				moved_unit.current_action = MoveAction.new(current_path, game_state.get_client_player_id(), moved_unit.getId())
+				moved_unit.current_action = MoveAction.new(current_path, game_state.get_client_player_id(), moved_unit, game_state)
 				_exit_unit_move()
 				return
 			
 			# If the user clicked outside of the possible tiles,
 			# cancel movement
-			var path = game_state.get_pathfinder().get_path_to_pos(event.grid_pos)
+			var path = _pathfinder.get_path_to_pos(event.grid_pos)
 			if path.is_empty():
 				_exit_unit_move()
 				return
@@ -220,10 +239,10 @@ func _handle_event_unit_move(event : StateMachineEvent) -> void:
 			movement_waypoints.append(event.grid_pos) # Add the clicked tile as a waypoint
 			
 			# Calculate how much movement the unit has left
-			movement_left = movement_left - game_state.get_pathfinder().movement_required_to_position(event.grid_pos)
+			movement_left = movement_left - _pathfinder.movement_required_to_position(event.grid_pos)
 			
 			# Calculate the new valid movement tiles
-			current_possible_tiles = game_state.get_pathfinder().tiles_from_position(event.grid_pos, movement_left)
+			current_possible_tiles = _pathfinder.tiles_from_position(event.grid_pos, movement_left, moved_unit)
 			
 			
 			_custom_graphics.draw_movement_path(current_path, moved_unit.getId())
@@ -232,7 +251,7 @@ func _handle_event_unit_move(event : StateMachineEvent) -> void:
 		
 		
 	elif event is MouseMovedToTileEvent:
-		var path = game_state.get_pathfinder().get_path_to_pos(event.new_pos)
+		var path = _pathfinder.get_path_to_pos(event.new_pos)
 		
 		_custom_graphics.draw_waypoints(movement_waypoints, moved_unit.getId())
 		_custom_graphics.draw_movement_tiles(current_possible_tiles, moved_unit.getId())
@@ -334,4 +353,4 @@ func _ready() -> void:
 	_click_tracker.clicked.connect(_clicked)
 	_custom_graphics = grid_graphics.get_custom_graphics()
 	ftm.resource_uploaded.connect(load_game_definition)
-	switch_gui_scene(load_game_gui, null)
+	switch_gui_scene(LOAD_GAME_GUI, null)

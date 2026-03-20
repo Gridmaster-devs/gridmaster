@@ -1,0 +1,38 @@
+[gd_scene load_steps=3 format=3 uid="uid://cc3il70fx6jf8"]
+
+[ext_resource type="Theme" uid="uid://duaj511mmakqr" path="res://executioner/main/game_master/gui_scenes/gui_elements/message_window/messagewindow_theme.tres" id="1_cgf4i"]
+[ext_resource type="Script" uid="uid://bc5s640klxoso" path="res://executioner/main/game_master/gui_scenes/gui_elements/message_window/message_window.gd" id="1_ohpgo"]
+
+[node name="MessageWindow" type="FoldableContainer"]
+clip_children = 2
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = -209.0
+offset_right = 470.0
+offset_bottom = -10.0
+grow_vertical = 0
+size_flags_horizontal = 4
+theme = ExtResource("1_cgf4i")
+title = "Messages"
+title_position = 1
+script = ExtResource("1_ohpgo")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="MessageContainer" type="VBoxContainer" parent="ScrollContainer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 5

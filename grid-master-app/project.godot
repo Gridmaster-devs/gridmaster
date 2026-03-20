@@ -21,6 +21,8 @@ run/main_scene.editor="uid://nxldab0hpse0"
 
 GML="*res://common/GML.gd"
 Global="*res://common/global.gd"
+GameArgs="*res://executioner/global/game_args.gd"
+MessageDispatcher="*res://executioner/global/message_dispatcher.gd"
 
 [display]
 
@@ -33,6 +35,10 @@ window/stretch/mode="canvas_items"
 
 movie_writer/movie_file="E:/Godot/videos/test.avi"
 movie_writer/fps=30
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gut/plugin.cfg")
 
 [file_customization]
 

@@ -1,0 +1,27 @@
+[gd_scene load_steps=4 format=3 uid="uid://wxkoyi4rp2lg"]
+
+[ext_resource type="Shader" uid="uid://g454f0etm386" path="res://executioner/main/grid_graphics/unit_container/unit_container.gdshader" id="1_8vfp4"]
+[ext_resource type="Script" uid="uid://cxeh0ds46m807" path="res://executioner/main/grid_graphics/unit_container/unit_container.gd" id="2_o18l5"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8vfp4"]
+shader = ExtResource("1_8vfp4")
+shader_parameter/outline_thickness = 2
+
+[node name="UnitContainer" type="Sprite2D"]
+texture_filter = 3
+material = SubResource("ShaderMaterial_8vfp4")
+instance_shader_parameters/team_color = Color(0.5, 0.5, 0.5, 1)
+script = ExtResource("2_o18l5")
+
+[node name="UnitIDLabel" type="RichTextLabel" parent="."]
+offset_left = -32.0
+offset_top = -32.0
+offset_right = 32.0
+offset_bottom = 32.0
+mouse_filter = 2
+theme_override_colors/default_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 7
+autowrap_mode = 1
+horizontal_alignment = 1
+vertical_alignment = 1

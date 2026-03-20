@@ -10,23 +10,14 @@ const TILE_SIZE = 64
 const GROUP_NAME : StringName = "GridGraphics"
 const EVENT_INPUT_FUNC_NAME : StringName = "handle_input"
 
-## What state the grid graphics object is in
-# DEFAULT: Only the selected tile hover graphic is drawn
-# UNIT_MOVE: Selected tile and the path from the last waypoint to the cursor is drawn
-enum GraphicsState {DEFAULT, UNIT_MOVE}
+const UNIT_CONTAINER : PackedScene = preload("res://executioner/main/grid_graphics/unit_container/unit_container.tscn")
+
 
 @onready var ui_map_grid = $"SubViewportContainer/Grid Graphics Viewport/TileGrid"
 @onready var background_grid = $"SubViewportContainer/Grid Graphics Viewport/BackgroundGrid"
 @onready var grid_graphics_viewport = $"SubViewportContainer/Grid Graphics Viewport"
 @onready var tile_grid : TileMapLayer = $"SubViewportContainer/Grid Graphics Viewport/TileGrid"
 @onready var custom_graphics : CustomGraphics = $"SubViewportContainer/Grid Graphics Viewport/CustomGraphics"
-
-
-var graphics_state : GraphicsState = GraphicsState.DEFAULT
-
-# Variables for UNIT_MOVE
-var possible_movement_tiles : Array[Vector2i]
-var moved_unit_pos : Vector2i
 
 
 var game_master : GameMaster # NOTE: Might be unnecessary when using groups
@@ -103,8 +94,10 @@ func getUnits():
 		if (units != null):
 			clearUnits()
 			for unit : Unit in units:
-				var unit_container = UnitContainer.new(unit, gridToScreen(unit.getPosition()))
+				var unit_container : UnitContainer = UNIT_CONTAINER.instantiate()
 				addNewUnitContainer(unit_container)
+				unit_container.initialize(unit, gridToScreen(unit.getPosition()))
+				
 
 
 ## Adds a new unit container to the active units array

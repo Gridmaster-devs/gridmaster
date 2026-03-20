@@ -2,14 +2,25 @@ class_name GameState
 extends RefCounted
 ## Class that represents everything that makes up the current state of the game, ex. the units, the map, etc
 
-
-var client_player_id : int = 0
+# This should maybe be in the gamemaster if the gamestate is supposed to be practically
+# identical between clients
+## The player ID of the player currently playing on this instance of the game
+var client_player_id : int = -1
 
 var game_name : String
-var grid : GameGrid ## Grid that represents the map
+
+var _grid : GameGrid ## Grid that represents the map
+var grid : GameGrid:
+	get: return _grid
+	set(v): return
+
+# These are used for generating team and player ids
+var teams_index = 0 # Count for how many teams there are
+var players_index = 0 # Count for how many players there are
+
 var units : Dictionary[int, Unit] = {} ## All the units in the game, NOTE: also stored in each map tile
-var players : Array[Player] = [] ## All the players in the game
-var teams : Array[Team] = [] ## All the teams in the game
+var players : Dictionary[int, Player] = {-1 : Player.NEUTRAL_PLAYER} ## All the players in the game
+var teams : Dictionary[int, Team] = {-1 : Team.NEUTRAL_TEAM} ## All the teams in the game
 var unit_types : Dictionary[int, UnitType] = {} ## All the types of units in the game
 var _pathfinder : DijkstraPathfinder ## Dijkstra pathfinder for unit pathing
 
@@ -25,21 +36,40 @@ var turn_number : int = 0 ## What turn it is
 var action_queue : Array[PlayerAction] = []
 
 
-## Adds a unit to the game
+## Adds a unit to the game.
+##
+## Adding a unit with the player id of -1 makes it a neutral unit
 func addUnit(unit_type : UnitType, position : Vector2i, player_id : int) -> Unit:
 	var id = getNewUnitId()
-	var unit = Unit.new(unit_type, id, player_id, position)
+	
+	var player : Player = players.get(player_id)
+	
+	var unit = Unit.new(unit_type, id, player, position)
 	grid.addUnit(unit)
 	units.set(id, unit)
 	return unit
 	
 
-## Adds a unit by unit type id
-## will fail if there is no unit type corresponding to the id
+## Adds a unit by unit type id.
+## Will fail if there is no unit type corresponding to the id.
 func addUnitByTypeId(id : int, position : Vector2i, player_id : int) -> Unit:
 	var unit_type = unit_types.get(id)
 	assert(unit_type != null, "Tried to add unit with invalid type ID!")
 	return addUnit(unit_type, position, player_id)
+
+
+## Adds a team to the game.
+func add_team(team_name : String, color : Color, team_units : Array[UnitType]) -> int:
+	var team_id : int = get_new_team_id()
+	teams.set(team_id, Team.new(team_name, team_id, color, team_units))
+	return team_id
+
+
+## Adds a player to the game.
+func add_player(player_name : String, team_id : int, computer : bool) -> int:
+	var player_id = get_new_player_id()
+	players.set(player_id, Player.new(player_name, player_id, teams.get(team_id), computer))
+	return player_id
 
 
 # NOTE: There's no cheat handling anywhere right now.
@@ -50,21 +80,76 @@ func move_unit(unit_id : int, new_position : Vector2i) -> void:
 	var unit = get_unit_by_id(unit_id)
 	var cur_pos = unit.getPosition()
 	unit.set_position(new_position)
-	grid.move_unit(unit_id, cur_pos, new_position)
+	grid.move_unit(cur_pos, new_position)
+
+
+## Swaps the positions of two units. Currently only called
+## by the step function in MoveAction
+func swap_units(unit1 : Unit, unit2 : Unit) -> void:
+	var u1_pos = unit1.grid_position
+	var u2_pos = unit2.grid_position
+	
+	grid.remove_unit(u1_pos)
+	grid.remove_unit(u2_pos)
+	
+	unit1.grid_position = u2_pos
+	unit2.grid_position = u1_pos
+	
+	grid.addUnit(unit1)
+	grid.addUnit(unit2)
+	
+	# The units' actions have to be move actions for this function to be called
+	# so it's okay to do this
+	var unit1_ma : MoveAction = unit1.current_action as MoveAction
+	var unit2_ma : MoveAction = unit2.current_action as MoveAction
+	
+	unit1_ma.handle_swap()
+	unit2_ma.handle_swap()
+
+
+## Removes a unit from the map and the game
+func remove_unit(unit : Unit) -> void:
+	grid.remove_unit(unit.grid_position)
+	units.erase(unit.unit_id)
 
 
 ## Ends the turn and processes all the actions that have been queued up.
 ## Unit actions are processed before other actions.
 func end_turn() -> void:
 	var unit_array = units.values()
-	unit_array.sort_custom(Unit.unit_compare)
+	var sort_func : Callable = GameArgs.args.get(GameArgs.ArgType.UNIT_INITIATIVE_FUNC)
+	sort_func.call(unit_array)
 	
+	# Looping through the move actions until every unit has stopped
+	# (reached their destination, or gotten stopped by a fight or something else)
+	var done = false
+	while(done == false):
+		done = true
+		
+		# Advance one step in each MoveAction
+		for unit : Unit in unit_array:
+			if (unit.current_action is MoveAction and unit.has_stopped() == false):
+				done = false
+				(unit.current_action as MoveAction).step()
+		
+		var units_to_be_removed : Array[Unit] = []
+		
+		# If any units have died we remove them from the array
+		# We can't erase units while iterating over the array or it will break
+		for unit : Unit in unit_array:
+			if (unit.is_dead()):
+				units_to_be_removed.append(unit)
+		
+		# NOTE: Possible to improve efficiency by using indices of the units in the
+		# unit array so that it doesn't have to search for the position each time
+		for unit in units_to_be_removed:
+			unit_array.erase(unit)
+			remove_unit(unit)
+	
+	# Clear actions
 	for unit : Unit in unit_array:
-		if unit.current_action != null:
-			unit.current_action.execute(self)
-	
-	for action : PlayerAction in action_queue:
-		action.execute(self)
+		unit.current_action = null
+		
 	
 	turn_number += 1
 
@@ -83,10 +168,13 @@ static func initFromGameDefinition(game_definition : GameDefinitionResource) -> 
 	var game_state = GameState.new()
 	game_state.initUnitTypesFromResource(game_definition)
 	game_state.game_name = game_definition.game_name
-	game_state.grid = GameGrid.initFromMapResource(game_definition.loadMap())
+	game_state._grid = GameGrid.initFromMapResource(game_definition.loadMap())
 	
 	game_state._pathfinder = DijkstraPathfinder.new()
 	game_state._pathfinder.initialize(game_state.grid, game_state.units)
+	
+	# TODO: Add import from game definition
+	GameArgs.initialize(game_state)
 	
 	return game_state
 
@@ -115,6 +203,16 @@ func getNewUnitId() -> int:
 	return unit_id_count
 
 
+func get_new_team_id() -> int:
+	teams_index += 1
+	return teams_index
+
+
+func get_new_player_id() -> int:
+	players_index += 1
+	return players_index
+
+
 ## gets the game grid width
 func getGridWidth() -> int: 
 	return grid.getHeight()
@@ -133,10 +231,10 @@ func get_pathfinder() -> DijkstraPathfinder:
 	return _pathfinder
 
 
-## Returns the first unit on the specified tile.
-## Can return null if there are no units on the tile.
-func get_first_unit_on_tile(coords : Vector2i) -> Unit:
-	return grid.get_first_unit_on_tile(coords)
+## Returns the unit on the specified tile.
+## Can return null if there is no unit on the tile.
+func get_unit_on_tile(coords : Vector2i) -> Unit:
+	return grid.get_unit_on_tile(coords)
 
 
 func get_client_player_id() -> int:
@@ -160,7 +258,7 @@ static func debugInit(map_width : int, map_height : int, game_name_p : String) -
 	gs.grid.debugFill()
 	gs.game_name = game_name_p
 	return gs
-	
+
 
 ## Prints the map into a logfile
 func printMap(to_log : bool):

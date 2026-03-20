@@ -58,11 +58,14 @@ script = ExtResource("1_4cchx")
 
 [node name="CustomGraphics" parent="SubViewportContainer/Grid Graphics Viewport" instance=ExtResource("3_1wvow")]
 z_index = 1
+texture_filter = 3
 
 [node name="TileGrid" type="TileMapLayer" parent="SubViewportContainer/Grid Graphics Viewport"]
+texture_filter = 3
 tile_set = SubResource("TileSet_3wctu")
 
 [node name="BackgroundGrid" type="TileMapLayer" parent="SubViewportContainer/Grid Graphics Viewport"]
+texture_filter = 2
 tile_set = SubResource("TileSet_lnlci")
 script = ExtResource("5_30r7l")
 

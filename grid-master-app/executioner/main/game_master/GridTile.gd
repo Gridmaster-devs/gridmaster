@@ -5,13 +5,18 @@ extends RefCounted
 
 # NOTE: Units are stored in both the grid tile and the game state object,
 # you have to remember to remove it from both places
-var units : Dictionary[int, Unit] = {} ## Dictionary from Unit ID to the Units on the tile
+var unit : Unit = null ## Dictionary from Unit ID to the Units on the tile
 var tile_type : TileType ## Reference to the type of tile
+var position : Vector2i ## Position of the tile on the map, currently unused
+
+var protection : int:
+	get: return tile_type.attributes.get(TileType.TILE_ATTRIBUTE_TYPE.PROTECTION)
+	set(v): return
 
 
 ## Returns the array of all the units on the grid tile
-func getUnits() -> Dictionary[int, Unit]:
-	return units
+func get_unit() -> Unit:
+	return unit
 
 
 ## Returns the type of the grid tile
@@ -24,38 +29,20 @@ func setTileType(type : TileType) -> void:
 	tile_type = type
 
 
-## Returns the unit with the corresponding ID
-## Returns null if no such unit exists
-func getUnitById(unit_id : int) -> Variant:
-	return units.get(unit_id)
-
-
 ## Adds the unit to the unit array
-func addUnit(unit : Unit) -> void:
-	units.set(unit.getId(), unit)
+func addUnit(unit_p : Unit) -> void:
+	unit = unit_p
 
 
-func get_first_unit() -> Unit:
-	if (units.values().is_empty()):
-		return null
-	else:
-		return units.values().front()
-
-
+## Returns true if there is no unit on the tile and false
+## if there is
 func is_empty() -> bool:
-	if units.values().is_empty():
-		return true
-	else:
-		return false
+	return (unit == null)
 
 
-## Removes the unit from the tile
-##
-## This does not necessarily mean killing the unit, this happens
-## when the unit moves
-func removeUnitById(unit_id : int) -> void:
-	var success : bool = units.erase(unit_id)
-	assert(success == true, "Trying to remove unit that isn't there!")
+## Removes the unit on the tile from the tile if there is one
+func remove_unit() -> void:
+	unit = null
 
 
 func _to_string():
@@ -68,12 +55,6 @@ func _to_string():
 		ret_string += (tile_type.tile_name)
 	
 	ret_string += (" | ")
-	var unit : Unit
-	
-	if units.values().is_empty():
-		unit = null
-	else:
-		unit = units.values().front()
 	
 	ret_string += ("Unit: ")
 	if (unit == null):
@@ -86,5 +67,6 @@ func _to_string():
 	return ret_string
 
 
-func _init(grid_tile_type : TileType) -> void:
+func _init(grid_tile_type : TileType, position_p : Vector2i) -> void:
 	tile_type = grid_tile_type
+	position = position_p

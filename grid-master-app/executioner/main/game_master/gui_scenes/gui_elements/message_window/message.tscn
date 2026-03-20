@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://wj0wc6mmd6up"]
+
+[ext_resource type="Theme" uid="uid://duaj511mmakqr" path="res://executioner/main/game_master/gui_scenes/gui_elements/message_window/messagewindow_theme.tres" id="1_d5dey"]
+
+[node name="Message" type="Label"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_d5dey")
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 3

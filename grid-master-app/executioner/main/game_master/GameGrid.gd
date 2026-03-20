@@ -5,8 +5,8 @@ extends RefCounted
 
 var tiles : Array2D ## all the tiles on the map
 var strategic_tile_types : Dictionary[int, TileType] ## Maps tile type IDs to the tile types
-var width : int
-var height : int
+var width : int ## The width of the grid
+var height : int ## The height of the grid
 
 
 func getWidth() -> int:
@@ -40,15 +40,15 @@ func setTileType(x : int, y : int, tile_type : TileType) -> void:
 	getTile(x, y).setTileType(tile_type)
 
 
-## Returns the units that are on the specified tile
-func getUnitsOnTile(x : int, y : int) -> Dictionary[int, Unit]:
-	return getTile(x, y).getUnits()
+## Returns the unit on the specified tile
+func getUnitOnTile(x : int, y : int) -> Unit:
+	return getTile(x, y).get_unit()
 
 
 ## Returns the first unit on the tile.
 ## Can return null if there are no units on the tile.
-func get_first_unit_on_tile(pos : Vector2i) -> Unit:
-	return get_tile_vec(pos).get_first_unit()
+func get_unit_on_tile(pos : Vector2i) -> Unit:
+	return get_tile_vec(pos).get_unit()
 
 
 func is_empty(pos : Vector2i) -> bool:
@@ -59,18 +59,28 @@ func is_empty(pos : Vector2i) -> bool:
 # it gets wrong information
 ## Removes a unit from the start tile, and adds it to the end tile.
 ## Does NOT edit the unit's information at all.
-func move_unit(unit_id : int, start_pos : Vector2i, end_pos : Vector2i) -> void:
+func move_unit(start_pos : Vector2i, end_pos : Vector2i) -> void:
 	var start_tile = get_tile_vec(start_pos)
 	var end_tile = get_tile_vec(end_pos)
-	var unit = start_tile.getUnitById(unit_id)
+	var unit = start_tile.get_unit()
 	
-	start_tile.removeUnitById(unit_id)
+	assert(!start_tile.is_empty(), "Trying to move a non-existent unit!")
+	assert(end_tile.is_empty(), "Trying to move a unit to a tile that is not empty!")
+	
+	start_tile.remove_unit()
 	end_tile.addUnit(unit)
+
+
+func remove_unit(grid_pos : Vector2i):
+	get_tile_vec(grid_pos).remove_unit()
+
 
 ## Adds a unit to the grid
 func addUnit(unit : Unit) -> void:
 	var pos = unit.getPosition()
-	assert(pos != null, "Unit's position cannot be null!")
+	
+	assert(get_tile_vec(unit.grid_position).is_empty(), "Trying to add a unit to a tile that is not empty!")
+	
 	getTile(pos.x, pos.y).addUnit(unit)
 
 
@@ -123,7 +133,7 @@ static func initFromMapResource(map : MapResource) -> GameGrid:
 		var grid_tile : GridTile = GridTile.new(
 			game_grid.strategic_tile_types.get(
 				grid.getItem(x, y)["id"]
-			)
+			), Vector2i(x, y)
 		)
 		return grid_tile
 	
@@ -141,8 +151,8 @@ func printMap(to_log : bool):
 
 ## Fills the entire map with a debug tile
 func debugFill():
-	var fill_func = func(_x : int, _y : int):
-		return GridTile.new(TileType.debugTile())
+	var fill_func = func(x : int, y : int):
+		return GridTile.new(TileType.debugTile(), Vector2i(x, y))
 	
 	fillTiles(fill_func)
 
