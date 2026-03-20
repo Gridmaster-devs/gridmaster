@@ -41,7 +41,7 @@ func _init_ui(settings_types: Dictionary[String, Variant]) -> void:
 		##checks what type of attribute the current value in the dictionary is
 		##and approriately creates a matching ui element
 		if value is int or value is float or value is String:
-			tile_attribute_value_ui = _create_line_edit()
+			tile_attribute_value_ui = _create_line_edit(str(value))
 		else: 
 			continue
 		_tiledata_ui_map[key] = tile_attribute_value_ui
@@ -52,9 +52,9 @@ func _init_ui(settings_types: Dictionary[String, Variant]) -> void:
 
 ##private helper functions to create a simple ui elements
 ##used when making the tile description ui
-func _create_line_edit() -> LineEdit: 
+func _create_line_edit(placeholder: String = "") -> LineEdit: 
 		var line_edit = LineEdit.new()
-		line_edit.placeholder_text = ""
+		line_edit.text = placeholder
 		line_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		return line_edit
 		

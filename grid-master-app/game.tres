@@ -2454,6 +2454,7 @@ height = 20
 [sub_resource type="Resource" id="Resource_im2k2"]
 script = ExtResource("2_e0s5y")
 _attribute_grids = Array[ExtResource("1_ya346")]([SubResource("Resource_tkty8")])
+_map_name = "Example map name"
 _lib_items_data = Dictionary[String, Array]({
 "Strategic Tile Library": [Dictionary[String, Variant]({
 "hiding": 1,

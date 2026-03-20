@@ -114,6 +114,20 @@ script = ExtResource("8_xpio1")
 anchor_mode = 0
 script = ExtResource("8_38i74")
 
+[node name="MapName" type="Label" parent="HBoxContainer/SubViewControl"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -138.0
+offset_top = -23.0
+offset_right = -23.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "Unnamed map"
+
 [node name="RightPanel" parent="HBoxContainer" instance=ExtResource("2_gp3mo")]
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
