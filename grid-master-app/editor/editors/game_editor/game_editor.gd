@@ -31,7 +31,6 @@ var _unit_layer_id: int
 func link_editor_main(editor_main_p : EditorMain):
 	editor_main = editor_main_p
 
-
 # called by pressing the save button
 func save_to_file():
 	var units = editor_main.get_units()
@@ -70,7 +69,6 @@ func load_from_resource(resource : GameDefinitionResource):
 	_reload_teams()
 	_reload()
 
-
 func get_game_name() -> String:
 	return game_name_line.text
 
@@ -87,6 +85,7 @@ func _create_unit_painter() -> MapPainter:
 	_painter.init_painter(10, 10)
 	_base_layer_id = _painter.add_layer(MapAttributes.STRATEGIC_TEXTURE_ID, MapAttributes.STRATEGIC_TILE_ID)
 	_unit_layer_id = _painter.add_layer(MapAttributes.UNIT_TEXTURE_ID, MapAttributes.UNIT_TILE_ID)
+	_painter.set_active_layer(_unit_layer_id)
 	return _painter
 
 func _reload() -> void:
@@ -98,8 +97,6 @@ func _reload() -> void:
 	_sync_team_libraries()
 	#reload the map in map painter
 	_sync_map()
-
-
 
 func _sync_map() -> void:
 	var attribute_grid = editor_main.getMap().get_strategic_map().get_attribute_grids()[0]
@@ -116,7 +113,6 @@ func _sync_team_uis() -> void:
 		arr.append(unit_name)
 	for team_ui in _team_uis:
 		team_ui.sync_units(arr)
-
 
 #sync libraries in map painter based on "_teams" 
 #in both -> sync_library() 
@@ -174,8 +170,6 @@ func _reload_teams() -> void:
 		_teams.append(GameTeam.new(team_name, team_color, team_id, team_units))
 		count += 1
 	_sync_team_libraries()
-
-
 
 func _clear_teams() -> void: 
 	_teams.clear()

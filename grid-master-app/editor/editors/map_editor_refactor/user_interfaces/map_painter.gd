@@ -488,6 +488,9 @@ func _has_all_keys_and_values(inner: Dictionary, outer: Dictionary) -> bool:
 	else:
 		return false
 
+func set_active_layer(layer_id: int) -> void: 
+	if layer_id < layers.size():
+		_active_layer = layer_id
 
 ##GETTERS / SETTERS
 #TODO: maybe merge layer attributegrids

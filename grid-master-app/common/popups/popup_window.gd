@@ -31,7 +31,7 @@ func add_to_tree() -> void:
 func remove_from_tree() -> void: 
 	Global.popup_manager.close_popup(self)
 
-
+#CALL SET_POPUP_NAME() when extending
 @abstract func _init() -> void
 
 func center() -> void:

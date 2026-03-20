@@ -79,7 +79,8 @@ func _handle_file(path: String) -> void:
 	var err = img.load(path)
 	if err != OK:
 		return
-	_unit_image_cont.texture = _get_opaqued(img)
+	img.resize(Global.tile_width, Global.tile_height)
+	_unit_image_cont.texture = ImageTexture.create_from_image(img)
 
 func _get_default_img() -> Texture2D: 
 	var img = Image.new()

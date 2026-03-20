@@ -89,8 +89,7 @@ func _change_map_mode() -> void:
 func _open_save_popup() -> void: 
 	var save_popup: SaveNamePopup = preload("res://editor/editors/map_editor_refactor/popup_windows/save_name_popup.tscn").instantiate()
 	save_popup.save_confirmed.connect(_on_save_popup_confirmed)
-	get_tree().call_group("map_editor_popup_manager", "add_new_popup", 
-							save_popup, save_popup.get_popup_name())
+	save_popup.add_to_tree()
 	
 
 #when save_tactical_popup is finished with a named tactical map
@@ -129,7 +128,7 @@ func _load_map() -> void:
 	_ftm.upload_data("*.tres", true)
 
 #function that is conected to "resource uploaded" signal in fmt
-func load_map_from_resource(res : Resource) -> void:
+func load_map_from_resource(res : MapResource) -> void:
 	if res is not MapResource:
 		print("Resource was not a map resource on load")
 		return

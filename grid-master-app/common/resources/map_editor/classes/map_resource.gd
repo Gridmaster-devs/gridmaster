@@ -10,7 +10,7 @@ func init(strategic_map: MapPainterRes, tactical_maps: Dictionary[String, MapPai
 	_tactical_maps = tactical_maps
 
 func get_strategic_map() -> MapPainterRes:
-	return _strategic_map
+	return _strategic_map.duplicate(true)
 
 func get_tactical_maps() -> Dictionary[String, MapPainterRes]:
-	return _tactical_maps
+	return _tactical_maps.duplicate(true)
