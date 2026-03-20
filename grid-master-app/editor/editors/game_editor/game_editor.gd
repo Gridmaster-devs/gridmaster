@@ -67,7 +67,7 @@ func load_from_resource(resource : GameDefinitionResource):
 	_clear_teams()
 	for team_ui_res in resource.load_team_uis():
 		_add_new_team_ui().import(team_ui_res)
-	_on_teams_save()
+	_reload_teams()
 	_reload()
 
 
@@ -90,17 +90,55 @@ func _create_unit_painter() -> MapPainter:
 	return _painter
 
 func _reload() -> void:
-	#sync team uis
+	#sync team uis in game editor teams tab
 	_sync_team_uis()
-	#reload the units
+	#reload teams
+	_reload_teams()
+	#reload the unit libs in map painter
 	_sync_team_libraries()
-	#reload the map
+	#reload the map in map painter
 	_sync_map()
+
+
 
 func _sync_map() -> void:
 	var attribute_grid = editor_main.getMap().get_strategic_map().get_attribute_grids()[0]
 	_unit_painter.reload_layer(attribute_grid, _base_layer_id)
 	_unit_painter.resize(attribute_grid.width, attribute_grid.height)
+
+#update team_uis based on unit editor units
+func _sync_team_uis() -> void: 
+	var arr: Array = []
+	for unit in editor_main.get_units():
+		var unit_name = unit.get_attribute_value("name")
+		if unit_name == null: 
+			continue
+		arr.append(unit_name)
+	for team_ui in _team_uis:
+		team_ui.sync_units(arr)
+
+
+#sync libraries in map painter based on "_teams" 
+#in both -> sync_library() 
+#only in _teams -> add_library()
+#only in map painter -> remove_library() 
+func _sync_team_libraries() -> void: 
+	var lib_names = _unit_painter.get_library_names()
+	var new_lib_names: Array = []
+	for team in _teams:
+		var team_name = team.get_name()
+		if lib_names.has(team_name):
+			_unit_painter.sync_library(_generate_team_lib_data(team), team_name)
+		else: 
+			_unit_painter.add_library(team_name, MapAttributes.UNIT_UNIT_LIB_OVERWRITE, MapAttributes.UNIT_UNIT_LIB_ADD,
+									MapAttributes.UNIT_UNIT_LIB_TEXTURE_ID,
+									MapAttributes.UNIT_UNIT_LIB_ITEM_ID, _unit_layer_id, false, true)
+			_unit_painter.sync_library(_generate_team_lib_data(team), team_name)
+		new_lib_names.append(team_name)
+	#remove libs that are in the painter but not in teams
+	for team_name in lib_names: 
+		if !new_lib_names.has(team_name):
+			_unit_painter.remove_library(team_name)
 
 func _on_visibibility_changed() -> void:
 	if visible: 
@@ -115,7 +153,7 @@ func _ready() -> void:
 	
 	#teams ui
 	_new_team_button.pressed.connect(_add_new_team_ui)
-	_save_button.pressed.connect(_on_teams_save)
+	_save_button.pressed.connect(_reload_teams)
 
 func _add_new_team_ui() -> TeamUi: 
 	var team_ui: TeamUi = preload("res://editor/editors/game_editor/team_ui.tscn").instantiate()
@@ -124,7 +162,8 @@ func _add_new_team_ui() -> TeamUi:
 	_team_uis.append(team_ui)
 	return team_ui
 
-func _on_teams_save() -> void: 
+#update _teams based on team ui
+func _reload_teams() -> void: 
 	_teams.clear()
 	var count = 0
 	for team_ui in _team_uis: 
@@ -136,33 +175,7 @@ func _on_teams_save() -> void:
 		count += 1
 	_sync_team_libraries()
 
-func _sync_team_uis() -> void: 
-	var arr: Array = []
-	for unit in editor_main.get_units():
-		var unit_name = unit.get_attribute_value("name")
-		if unit_name == null: 
-			continue
-		arr.append(unit_name)
-	for team_ui in _team_uis:
-		team_ui.sync_units(arr)
 
-func _sync_team_libraries() -> void: 
-	var lib_names = _unit_painter.get_library_names()
-	var new_lib_names: Array = []
-	for team in _teams:
-		var lib_name = team.get_name()
-		if lib_names.has(lib_name):
-			_unit_painter.sync_library(_generate_team_lib_data(team), lib_name)
-		else: 
-			_unit_painter.add_library(lib_name, MapAttributes.UNIT_UNIT_LIB_OVERWRITE, MapAttributes.UNIT_UNIT_LIB_ADD,
-									MapAttributes.UNIT_UNIT_LIB_TEXTURE_ID,
-									MapAttributes.UNIT_UNIT_LIB_ITEM_ID, _unit_layer_id, false, true)
-			_unit_painter.sync_library(_generate_team_lib_data(team), lib_name)
-		new_lib_names.append(lib_name)
-	#remove libs that are in the painter but not in teams
-	for lib_name in lib_names: 
-		if !new_lib_names.has(lib_name):
-			_unit_painter.remove_library(lib_name)
 
 func _clear_teams() -> void: 
 	_teams.clear()

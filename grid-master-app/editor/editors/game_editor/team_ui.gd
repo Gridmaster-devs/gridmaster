@@ -6,6 +6,7 @@ class_name TeamUi
 @onready var _team_color_rect: TextureRect = $EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer/TeamColor
 @onready var _team_name_ui: LineEdit = $EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Name/TeamName
 @onready var _content_vbox: VBoxContainer = $EditorPanel/TopVBox/ScrollContainer/ContentsVBox
+
 var _color: Color
 
 var _team_checked_dictionary: Dictionary[String, bool] = {}

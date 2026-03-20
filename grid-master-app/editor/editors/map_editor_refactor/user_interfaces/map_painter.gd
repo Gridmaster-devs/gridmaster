@@ -194,23 +194,29 @@ func remove_library(lib_name: String) -> void:
 	_paint_libraries.erase(lib_name)
 
 #reloads a library completely from external data
+#item in: 
+#only in data -> add
+#only in library -> remove_lib_item()
+#in both -> sync_attributes()
 func sync_library(data: Array, lib_name: String) -> void:
 	#if lib doesnt exist we cant do anything
 	if !_paint_libraries.has(lib_name):
 		return
 	var item_id = _paint_libraries[lib_name].get_item_id()
 	var layer_id =_paint_libraries[lib_name].get_layer_id()
-	#remove items that dont exist in data
-	#modify items that exist in both -> also modify the map
+	
+	var to_be_removed: Array = []
 	for item_indx in _lib_items_data[lib_name].size(): 
 		var item = _lib_items_data[lib_name][item_indx]
 		var data_item_indx = _find_dictionary_item(data, item_id, item[item_id])
 		if data_item_indx == -1:
-			remove_lib_item(lib_name, item_id, item[item_id], layer_id)
+			to_be_removed.append(item)
 		else: 
 			layers[layer_id].sync_attributes(data[data_item_indx], item_id, item[item_id])
 			_lib_items_data[lib_name][item_indx] = data[data_item_indx]
 			#sync_lib_item(lib_name, item_id, item[item_id], layer_id)
+	for item in to_be_removed: 
+		remove_lib_item(lib_name, item_id, item[item_id], layer_id)
 	#set the lib data to new! 
 	#we will add every item to the library
 	#keep in mind that "add_new_lib_item" does nothing if the item already exists in the lib

@@ -60,14 +60,14 @@ text = ""
 layout_mode = 2
 text = "NEW TEAM"
 
-[node name="GridContainer" type="GridContainer" parent="PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox" index="1"]
+[node name="SaveTeamsButton" type="Button" parent="PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox" index="1"]
+layout_mode = 2
+text = "SAVE"
+
+[node name="GridContainer" type="GridContainer" parent="PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox" index="2"]
 layout_mode = 2
 size_flags_vertical = 3
 columns = 8
-
-[node name="SaveTeamsButton" type="Button" parent="PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox" index="2"]
-layout_mode = 2
-text = "SAVE"
 
 [node name="Dialogs" type="Control" parent="."]
 anchors_preset = 0
