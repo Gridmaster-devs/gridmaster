@@ -32,11 +32,27 @@ func update(tile_attribute_types: Dictionary[String, Variant]) -> void:
 		elif value is Texture2D:
 			tile_attribute_value_ui = _create_texture_rect()
 			tile_attribute_value_ui.texture = value
-			
+		elif value is Array: 
+			tile_attribute_value_ui = _create_line_edit()
+			tile_attribute_value_ui.text = _array_to_string(value)
 		tile_attribute_hbox.add_child(tile_attribute_name_ui)
 		tile_attribute_hbox.add_child(tile_attribute_value_ui)
 		self.add_child(tile_attribute_hbox)
 		
+
+func _array_to_string(data: Array) -> String: 
+	var counts: Dictionary[Variant, int]
+	for item in data: 
+		counts[item] = data.count(item)
+	var out: String = ""
+	var count = 0
+	for key in counts: 
+		if count != 0: 
+			out += ", "
+		out += str(key) + " x" + str(counts[key]) 
+		count += 1
+	return out
+
 
 func _create_line_edit() -> LineEdit: 
 		var line_edit = LineEdit.new()

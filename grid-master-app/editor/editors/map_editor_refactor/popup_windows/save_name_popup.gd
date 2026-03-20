@@ -10,6 +10,7 @@ signal save_confirmed(name: String)
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	_save_button.pressed.connect(_on_save)
+	center()
 
 
 func _init() -> void:
@@ -18,4 +19,4 @@ func _init() -> void:
 
 func _on_save() -> void: 
 	save_confirmed.emit(_tact_map_name_ui.text)
-	get_tree().call_group("map_editor_popup_manager", "close_popup", self.get_popup_name())
+	remove_from_tree()

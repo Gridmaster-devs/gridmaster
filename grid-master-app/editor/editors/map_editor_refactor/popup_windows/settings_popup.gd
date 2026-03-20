@@ -9,11 +9,13 @@ class_name SettingsPopup
 var _tiledata_ui_map: Dictionary[String, Node]
 var _settings_types: Dictionary[String, Variant]
 
+signal saved(data: Dictionary[String, Variant])
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	_save_button.pressed.connect(on_save)
 	_cancel_button.pressed.connect(on_cancel)
+	center()
 
 func _init() -> void: 
 	super.set_popup_name("settings_popup")
@@ -39,7 +41,7 @@ func _init_ui(settings_types: Dictionary[String, Variant]) -> void:
 		##checks what type of attribute the current value in the dictionary is
 		##and approriately creates a matching ui element
 		if value is int or value is float or value is String:
-			tile_attribute_value_ui = _create_line_edit()
+			tile_attribute_value_ui = _create_line_edit(str(value))
 		else: 
 			continue
 		_tiledata_ui_map[key] = tile_attribute_value_ui
@@ -50,9 +52,9 @@ func _init_ui(settings_types: Dictionary[String, Variant]) -> void:
 
 ##private helper functions to create a simple ui elements
 ##used when making the tile description ui
-func _create_line_edit() -> LineEdit: 
+func _create_line_edit(placeholder: String = "") -> LineEdit: 
 		var line_edit = LineEdit.new()
-		line_edit.placeholder_text = ""
+		line_edit.text = placeholder
 		line_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		return line_edit
 		
@@ -71,8 +73,24 @@ func get_settings_data() -> Dictionary[String, Variant]:
 	return out_dict
 		
 func on_save() -> void: 
-	get_tree().call_group("map_painter_popup_manager", "settings_confirmed", get_settings_data())
-	get_tree().call_group("map_painter_popup_manager", "close_popup", get_popup_name())
+	saved.emit(get_settings_data())
+	remove_from_tree()
 
 func on_cancel() -> void: 
-	get_tree().call_group("map_painter_popup_manager", "close_popup", get_popup_name())
+	remove_from_tree()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#

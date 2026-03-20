@@ -1,14 +1,15 @@
-[gd_scene format=3 uid="uid://nxldab0hpse0"]
+[gd_scene load_steps=6 format=3 uid="uid://nxldab0hpse0"]
 
 [ext_resource type="Script" uid="uid://1gwvpfoqpqr4" path="res://editor/editors/editor_main/editor_main.gd" id="1_yiakk"]
 [ext_resource type="PackedScene" uid="uid://d1mgyle0o8kx3" path="res://editor/editors/unit_editor/UnitEditor.tscn" id="2_fi5xj"]
 [ext_resource type="PackedScene" uid="uid://bo7oe8477f30h" path="res://editor/editors/game_editor/GameEditor.tscn" id="3_fi5xj"]
 [ext_resource type="PackedScene" uid="uid://gy3engmvk7a8" path="res://editor/editors/map_editor_refactor/map_editor.tscn" id="3_mnkt7"]
+[ext_resource type="Script" uid="uid://of14uemmvsm2" path="res://common/popups/popup_manager.gd" id="5_euyav"]
 
-[node name="EditorMain" type="Node" unique_id=1262440972]
+[node name="EditorMain" type="Node"]
 script = ExtResource("1_yiakk")
 
-[node name="TabContainer" type="TabContainer" parent="." unique_id=991704330]
+[node name="TabContainer" type="TabContainer" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -16,19 +17,26 @@ grow_horizontal = 2
 grow_vertical = 2
 current_tab = 0
 
-[node name="Unit editor" parent="TabContainer" unique_id=149992753 instance=ExtResource("2_fi5xj")]
+[node name="Unit editor" parent="TabContainer" instance=ExtResource("2_fi5xj")]
 layout_mode = 2
 metadata/_tab_index = 0
 
-[node name="Map editor" type="Control" parent="TabContainer" unique_id=1149348535]
+[node name="MapEditor" parent="TabContainer" instance=ExtResource("3_mnkt7")]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 1
 
-[node name="MapEditor" parent="TabContainer/Map editor" unique_id=945995220 instance=ExtResource("3_mnkt7")]
-layout_mode = 1
-
-[node name="Game Editor" parent="TabContainer" unique_id=2136514177 instance=ExtResource("3_fi5xj")]
+[node name="Game Editor" parent="TabContainer" instance=ExtResource("3_fi5xj")]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 2
+
+[node name="PopupManager" type="Container" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("5_euyav")

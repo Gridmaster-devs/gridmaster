@@ -1,4 +1,4 @@
-extends Node
+extends Control
 class_name MapEditor
 
 
@@ -40,11 +40,12 @@ func create_tactical_painter() -> MapPainter:
 	_main_container.add_child(_painter)
 	
 	##HAS TO BE CALLED AFTER ADDED TO SCENE 
-	_painter.init_painter(MapAttributes.TACTICAL_TEXTURE_ID, MapAttributes.TACTICAL_TILE_ID, 10, 10)
+	_painter.init_painter(10, 10)
+	var base_layer_id = _painter.add_layer(MapAttributes.TACTICAL_TEXTURE_ID, MapAttributes.TACTICAL_TILE_ID)
 	_painter.add_library(MapAttributes.TACTICAL_TILE_LIB_NAME, MapAttributes.TACTICAL_TILE_LIB_OVERWRITE, 
 								MapAttributes.TACTICAL_TILE_LIB_ADD, 
 								MapAttributes.TACTICAL_TILE_LIB_TEXTURE_ID, 
-								MapAttributes.TACTICAL_TILE_LIB_ITEM_ID)
+								MapAttributes.TACTICAL_TILE_LIB_ITEM_ID, base_layer_id, true, true)
 	return _painter
 
 #creates the strategic painter for the editor
@@ -55,15 +56,16 @@ func create_strategic_painter() -> MapPainter:
 	_main_container.add_child(_painter)
 	
 	##HAS TO BE CALLED AFTER ADDED TO SCENE 
-	_painter.init_painter(MapAttributes.STRATEGIC_TEXTURE_ID, MapAttributes.STRATEGIC_TILE_ID, 10, 10)
+	_painter.init_painter(10, 10)
+	var base_layer_id = _painter.add_layer(MapAttributes.STRATEGIC_TEXTURE_ID, MapAttributes.STRATEGIC_TILE_ID)
 	_painter.add_library(MapAttributes.STRATEGIC_TILE_LIB_NAME, MapAttributes.STRATEGIC_TILE_LIB_OVERWRITE, 
 								MapAttributes.STRATEGIC_TILE_LIB_ADD, 
 								MapAttributes.STRATEGIC_TILE_LIB_TEXTURE_ID, 
-								MapAttributes.STRATEGIC_TILE_LIB_ITEM_ID)
+								MapAttributes.STRATEGIC_TILE_LIB_ITEM_ID, base_layer_id, true, true)
 	_painter.add_library(MapAttributes.STRATEGIC_TACTICAL_LIB_NAME, MapAttributes.STRATEGIC_TACTICAL_LIB_OVERWRITE,
 								MapAttributes.STRATEGIC_TACTICAL_LIB_ADD, 
 								MapAttributes.STRATEGIC_TACTICAL_LIB_TEXTURE_ID, 
-								MapAttributes.STRATEGIC_TACTICAL_LIB_ITEM_ID, 
+								MapAttributes.STRATEGIC_TACTICAL_LIB_ITEM_ID, base_layer_id, true,
 								true, _change_map_mode)
 	return _painter
 
@@ -87,8 +89,7 @@ func _change_map_mode() -> void:
 func _open_save_popup() -> void: 
 	var save_popup: SaveNamePopup = preload("res://editor/editors/map_editor_refactor/popup_windows/save_name_popup.tscn").instantiate()
 	save_popup.save_confirmed.connect(_on_save_popup_confirmed)
-	get_tree().call_group("map_editor_popup_manager", "add_new_popup", 
-							save_popup, save_popup.get_popup_name())
+	save_popup.add_to_tree()
 	
 
 #when save_tactical_popup is finished with a named tactical map
@@ -104,7 +105,7 @@ func _on_strategic_map_saved(map_name: String) -> void:
 func _on_tactical_map_saved(map_name: String) -> void:
 	_tactical_maps[map_name] = _tactical_painter.export_as_resource()
 	var thumbnail = _tactical_painter.get_map_as_thumbnail()
-	_tactical_painter.reset_grids(10, 10)
+	_tactical_painter.reset(10, 10)
 	var data: Dictionary[String, Variant] = {
 			MapAttributes.STRATEGIC_TACTICAL_LIB_ITEM_ID: String(), 
 			MapAttributes.STRATEGIC_TACTICAL_LIB_TEXTURE_ID: Texture2D.new()}
@@ -113,15 +114,12 @@ func _on_tactical_map_saved(map_name: String) -> void:
 	_strategic_painter.add_new_lib_item(data, MapAttributes.STRATEGIC_TACTICAL_LIB_NAME)
 	_change_map_mode()
 
-#required function for popup manager
-#it will call this and check if it is active
-func is_active() -> bool:
-	return self.visible
 
 #saves the map by calling fmt
 func _save_map(map_name: String):
 	if map_name == "":
 		map_name = "game_map"
+	_strategic_painter.set_map_name(map_name)
 	var res: MapResource = MapResource.new()
 	res.init(_strategic_painter.export_as_resource(), _tactical_maps)
 	_ftm.download_data(res, map_name + ".tres", "*.tres", true)
@@ -131,7 +129,7 @@ func _load_map() -> void:
 	_ftm.upload_data("*.tres", true)
 
 #function that is conected to "resource uploaded" signal in fmt
-func load_map_from_resource(res : Resource) -> void:
+func load_map_from_resource(res : MapResource) -> void:
 	if res is not MapResource:
 		print("Resource was not a map resource on load")
 		return
@@ -147,5 +145,9 @@ func get_map_as_resource() -> MapResource:
 	var res: MapResource = MapResource.new()
 	res.init(_strategic_painter.export_as_resource(), _tactical_maps)
 	return res
+
+func get_map_layer() -> Array2D: 
+	return _strategic_painter.get_layer(0)
+
 
 ###

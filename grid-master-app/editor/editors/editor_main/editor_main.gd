@@ -3,7 +3,7 @@ extends Node
 
 @onready var unit_editor : UnitEditor = $"TabContainer/Unit editor"
 @onready var game_editor : GameEditor = $"TabContainer/Game Editor"
-@onready var map_editor : MapEditor = $"TabContainer/Map editor/MapEditor"
+@onready var map_editor : MapEditor =  $TabContainer/MapEditor
 
 
 # gets the units from the unit editor
@@ -29,5 +29,5 @@ func setMap(map_p : MapResource):
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	unit_editor.link_editor_main(self)
-	game_editor.link_editor_main(self)
+	game_editor.link_editor_main(self) 
 	# TODO: ADD MAP EDITOR LINK

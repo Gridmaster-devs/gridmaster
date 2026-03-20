@@ -1,7 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://bo7oe8477f30h"]
+[gd_scene load_steps=5 format=3 uid="uid://bo7oe8477f30h"]
 
 [ext_resource type="Script" uid="uid://rm27rb7okfxv" path="res://editor/editors/game_editor/game_editor.gd" id="1_rp7ar"]
 [ext_resource type="PackedScene" uid="uid://cehdpht6a7iw8" path="res://common/file_upload_download/file_transfer_manager.tscn" id="2_n3gfw"]
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="2_ugjnl"]
+[ext_resource type="Script" uid="uid://of14uemmvsm2" path="res://common/popups/popup_manager.gd" id="4_8anuq"]
 
 [node name="Game Editor" type="Control"]
 layout_mode = 3
@@ -25,15 +27,47 @@ layout_mode = 2
 
 [node name="Game name" type="LineEdit" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
 placeholder_text = "Game name"
 
-[node name="Save game" type="Button" parent="PanelContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
+
+[node name="Save game" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "Save game"
 
-[node name="Load game" type="Button" parent="PanelContainer/VBoxContainer"]
+[node name="Load game" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Load game"
+
+[node name="TabContainer" type="TabContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+current_tab = 0
+
+[node name="Teams" parent="PanelContainer/VBoxContainer/TabContainer" instance=ExtResource("2_ugjnl")]
+layout_mode = 2
+section_headers = Array[String](["NewTeamButton", "SaveTeamsButton", "GridContainer"])
+metadata/_tab_index = 0
+
+[node name="TopLabel" parent="PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox" index="0"]
+text = ""
+
+[node name="NewTeamButton" type="Button" parent="PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox" index="0"]
+layout_mode = 2
+text = "NEW TEAM"
+
+[node name="SaveTeamsButton" type="Button" parent="PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox" index="1"]
+layout_mode = 2
+text = "SAVE"
+
+[node name="GridContainer" type="GridContainer" parent="PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox" index="2"]
+layout_mode = 2
+size_flags_vertical = 3
+columns = 8
 
 [node name="Dialogs" type="Control" parent="."]
 anchors_preset = 0
@@ -41,3 +75,16 @@ offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="FileTransferManager" parent="Dialogs" instance=ExtResource("2_n3gfw")]
+
+[node name="PopupManager" type="Container" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("4_8anuq")
+
+[editable path="PanelContainer/VBoxContainer/TabContainer/Teams"]

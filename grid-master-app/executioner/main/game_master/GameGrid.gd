@@ -84,9 +84,7 @@ func addUnit(unit : Unit) -> void:
 	getTile(pos.x, pos.y).addUnit(unit)
 
 
-func initTileTypesFromMapResource(map : MapResource) -> void:
-	var strategic_map: MapPainterRes = map.get_strategic_map()
-	var attribute_grid: Array2D = strategic_map.get_attribute_grid()
+func initTileTypesFromMapResource(attribute_grid: Array2D) -> void:
 	for x in attribute_grid.width: 
 		for y in attribute_grid.height: 
 			var tile = attribute_grid.getItem(x, y)
@@ -102,9 +100,8 @@ func initTileTypesFromMapResource(map : MapResource) -> void:
 			grid_tile.tile_name = tile["name"]
 			strategic_tile_types.set(id, grid_tile)
 
-func _generate_ids(map : MapResource) -> void: 
+func _generate_ids(strategic: Array2D) -> Array2D: 
 	#TODO: add ids inside tactical maps as well
-	var strategic = map.get_strategic_map().get_attribute_grid()
 	var id_map: Dictionary[String, int] = {}
 	var count: int = 0
 	for x in strategic.width:
@@ -114,6 +111,7 @@ func _generate_ids(map : MapResource) -> void:
 				id_map[tile["name"]] = count
 				count += 1
 			tile["id"] = id_map[tile["name"]]
+	return strategic
 	
 
 ## Calls the tiles Array2D's fill method with the fill func as the parameter
@@ -124,10 +122,10 @@ func fillTiles(fill_func : Callable) -> void:
 ## Initializes a game grid from a map resource
 static func initFromMapResource(map : MapResource) -> GameGrid:
 	assert(map != null, "Map should not be null!")
-	var grid: Array2D = map.get_strategic_map().get_attribute_grid()
+	var grid: Array2D = map.get_strategic_map().get_attribute_grids()[0]
 	var game_grid = GameGrid.new(grid.width, grid.height)
-	game_grid._generate_ids(map)
-	game_grid.initTileTypesFromMapResource(map)
+	grid = game_grid._generate_ids(grid)
+	game_grid.initTileTypesFromMapResource(grid)
 	
 	var fill_func = func(x: int, y: int):
 		var grid_tile : GridTile = GridTile.new(

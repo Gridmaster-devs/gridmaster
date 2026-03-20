@@ -69,21 +69,21 @@ func getGameName() -> String:
 func initGameStateFromGameDefinition(game_definition : GameDefinitionResource):
 	game_state = GameState.initFromGameDefinition(game_definition)
 	_pathfinder = game_state.get_pathfinder()
-	
+	#INIT UNITS
 	# DEBUG
-	var blu_id = game_state.add_team("blu team", Color.BLUE, [])
-	var red_id = game_state.add_team("red team", Color.RED, [])
-	var p1_id = game_state.add_player("player1", blu_id, false)
-	var p2_id = game_state.add_player("player2", red_id, false)
+	#var blu_id = game_state.add_team("blu team", Color.BLUE, [])
+	#var red_id = game_state.add_team("red team", Color.RED, [])
+	#var p1_id = game_state.add_player("player1", blu_id, false)
+	#var p2_id = game_state.add_player("player2", red_id, false)
 	
-	game_state.addUnitByTypeId(0, Vector2i(0,0), p1_id)
-	game_state.addUnitByTypeId(0, Vector2i(0,1), p1_id)
-	game_state.addUnitByTypeId(0, Vector2i(1,0), p2_id)
-	game_state.addUnitByTypeId(0, Vector2i(1,1), p2_id)
+	#game_state.addUnitByTypeId(0, Vector2i(0,0), p1_id)
+	#game_state.addUnitByTypeId(0, Vector2i(0,1), p1_id)
+	#game_state.addUnitByTypeId(0, Vector2i(1,0), p2_id)
+	#game_state.addUnitByTypeId(0, Vector2i(1,1), p2_id)
 	
-	game_state.addUnitByTypeId(0, Vector2i(2,2), -1)
+	#game_state.addUnitByTypeId(0, Vector2i(2,2), -1)
 	
-	game_state.client_player_id = blu_id
+	#game_state.client_player_id = blu_id
 	# DEBUG
 
 	initGraphics()

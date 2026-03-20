@@ -1,0 +1,32 @@
+[gd_scene load_steps=3 format=3 uid="uid://bqs4k3okhrf58"]
+
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="1_1ajdr"]
+[ext_resource type="Script" uid="uid://bse74ngkqr4nn" path="res://common/popups/color_picker.gd" id="1_c0omh"]
+
+[node name="ColorPicker" type="Control"]
+layout_mode = 3
+anchor_right = 0.22600001
+anchor_bottom = 0.781
+offset_right = -0.9200134
+offset_bottom = -0.4800415
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_c0omh")
+
+[node name="EditorPanel" parent="." instance=ExtResource("1_1ajdr")]
+layout_mode = 1
+section_headers = Array[String](["ColorPicker", "SaveButton", "CancelButton"])
+
+[node name="ColorPicker" type="ColorPicker" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SaveButton" type="Button" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="1"]
+layout_mode = 2
+text = "save"
+
+[node name="CancelButton" type="Button" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="2"]
+layout_mode = 2
+text = "Cancel"
+
+[editable path="EditorPanel"]

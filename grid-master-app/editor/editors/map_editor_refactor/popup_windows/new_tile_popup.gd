@@ -8,6 +8,8 @@ class_name NewTilePopup
 @onready var _save_button: Button = $EditorPanel/TopVBox/ScrollContainer/ContentsVBox/SaveButton
 @onready var _cancel_button: Button = $EditorPanel/TopVBox/ScrollContainer/ContentsVBox/CancelButton
 
+signal new_tile_confirmed(data: Dictionary[String, Variant], _lib_name: String)
+
 
 var _lib_name: String = "unknown"
 
@@ -30,6 +32,7 @@ func _create_line_edit() -> LineEdit:
 func _ready() -> void: 
 	_save_button.pressed.connect(on_new_tile_save)
 	_cancel_button.pressed.connect(on_new_tile_cancel)
+	center()
 
 func init(tile_attribute_types: Dictionary[String, Variant], lib_name: String) -> void: 
 	_tile_attribute_types = tile_attribute_types
@@ -88,11 +91,11 @@ func get_tile_data() -> Dictionary[String, Variant]:
 func on_new_tile_save() -> void: 
 	var data = get_tile_data()
 	if _is_valid(data):
-		get_tree().call_group("map_painter_popup_manager", "new_tile_confirmed", data, _lib_name)
-	get_tree().call_group("map_painter_popup_manager", "close_popup", self.get_popup_name())
+		new_tile_confirmed.emit(data, _lib_name)
+	remove_from_tree()
 	
 func on_new_tile_cancel() -> void: 
-	get_tree().call_group("map_painter_popup_manager", "close_popup", self.get_popup_name())
+	remove_from_tree()
 
 
 
