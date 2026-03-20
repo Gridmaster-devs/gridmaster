@@ -10,6 +10,7 @@ extends Control
 @onready var _interact_button: Button = $HBoxContainer/LeftPanel/TopVBox/ScrollContainer/ContentsVBox/VBoxContainer/InteractButton
 @onready var _tile_descriptor: TileDescriptor = $HBoxContainer/RightPanel/TopVBox/ScrollContainer/ContentsVBox/TileDescriptorContainer/TileDescriptor
 @onready var _settings_button: Button = $HBoxContainer/LeftPanel/TopVBox/ScrollContainer/ContentsVBox/SSLVbox/SettingsButton
+@onready var _map_name_label: Label = $HBoxContainer/SubViewControl/MapName
 
 enum InputState {
 	INTERACT,
@@ -20,6 +21,7 @@ enum InputState {
 
 ##GENERAL DATA
 var layers: Array[MapLayer]
+var _map_name: String = "Unnamed map"
 
 ##PAINT LIBRARY DATA
 #maps each library name to an array of Dictionary[String, Variant]
@@ -282,6 +284,9 @@ func import_from_resource(res: MapPainterRes) -> void:
 	
 	_background_grid.regenerate(_width, _height)
 
+	##map name
+	set_map_name(res.get_map_name())
+
 #exports the map as a resource "MapPainterRes"
 #this export will be only readable by the same type of MapPainter that exported it
 func export(path: String) -> void: 
@@ -289,7 +294,7 @@ func export(path: String) -> void:
 	var attribute_grids: Array[Array2D]
 	for layer in layers:
 		attribute_grids.append(layer.get_attribute_grid())
-	res.init(_width, _height, attribute_grids, _lib_items_data)
+	res.init(_width, _height, attribute_grids, _lib_items_data, _map_name)
 	var err = ResourceSaver.save(res, path)
 	if err != OK:
 		print("error", err)
@@ -299,7 +304,7 @@ func export_as_resource() -> MapPainterRes:
 	var attribute_grids: Array[Array2D]
 	for layer in layers:
 		attribute_grids.append(layer.get_attribute_grid())
-	res.init(_width, _height, attribute_grids, _lib_items_data)
+	res.init(_width, _height, attribute_grids, _lib_items_data, _map_name)
 	return res
 
 ##DYNAMIC flow functions
@@ -318,6 +323,9 @@ func update_settings(settings: Dictionary[String, Variant]) -> void:
 		_width = settings["width"]
 	if settings.has("height"):
 		_height = settings["height"]
+	if settings.has("map_name"):
+		_map_name = settings["map_name"]
+		_map_name_label.text = _map_name
 	for layer in layers:
 		layer.update_grids(_width, _height)
 	_background_grid.regenerate(_width, _height)
@@ -439,7 +447,7 @@ func _find_dictionary_item(data: Array, item_id: String, id_value: Variant) -> i
 	return -1
 
 func _generate_settigns_dict() -> Dictionary[String, Variant]:
-	return {"width": _width, "height": _height}
+	return {"width": _width, "height": _height, "map_name": _map_name}
 #checks if the cursor is not in the paint area 
 func _mouse_on_map() -> bool: 
 	if get_viewport().gui_get_hovered_control() != _sub_view_container: 
@@ -518,7 +526,10 @@ func get_map_as_thumbnail() -> Texture2D:
 func get_library_names() -> Array: 
 	return _paint_libraries.keys()
 
-
+func set_map_name(map_name: String) -> void: 
+	_map_name = map_name
+	_map_name_label.text = map_name
+	print("map name set to: " + map_name)
 
 
 

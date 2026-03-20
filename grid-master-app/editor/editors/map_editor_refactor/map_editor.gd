@@ -105,7 +105,7 @@ func _on_strategic_map_saved(map_name: String) -> void:
 func _on_tactical_map_saved(map_name: String) -> void:
 	_tactical_maps[map_name] = _tactical_painter.export_as_resource()
 	var thumbnail = _tactical_painter.get_map_as_thumbnail()
-	_tactical_painter.reset_grids(10, 10)
+	_tactical_painter.reset(10, 10)
 	var data: Dictionary[String, Variant] = {
 			MapAttributes.STRATEGIC_TACTICAL_LIB_ITEM_ID: String(), 
 			MapAttributes.STRATEGIC_TACTICAL_LIB_TEXTURE_ID: Texture2D.new()}
@@ -119,6 +119,7 @@ func _on_tactical_map_saved(map_name: String) -> void:
 func _save_map(map_name: String):
 	if map_name == "":
 		map_name = "game_map"
+	_strategic_painter.set_map_name(map_name)
 	var res: MapResource = MapResource.new()
 	res.init(_strategic_painter.export_as_resource(), _tactical_maps)
 	_ftm.download_data(res, map_name + ".tres", "*.tres", true)

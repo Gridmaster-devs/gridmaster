@@ -102,6 +102,7 @@ func _sync_map() -> void:
 	var attribute_grid = editor_main.getMap().get_strategic_map().get_attribute_grids()[0]
 	_unit_painter.reload_layer(attribute_grid, _base_layer_id)
 	_unit_painter.resize(attribute_grid.width, attribute_grid.height)
+	_unit_painter.set_map_name(editor_main.getMap().get_strategic_map().get_map_name())
 
 #update team_uis based on unit editor units
 func _sync_team_uis() -> void: 
