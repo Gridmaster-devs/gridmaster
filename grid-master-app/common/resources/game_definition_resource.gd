@@ -7,11 +7,18 @@ extends Resource
 @export var unit_layer: Array2D
 @export var team_uis: Array[TeamUiRes]
 @export var player_uis: Array[PlayerUiRes]
+@export var game_rules: Dictionary[String, Variant]
 
 func save_units(unit_array : Array[UnitResource]):
 	if (unit_array != null):
 		units.clear()
 		units = unit_array.duplicate_deep()
+
+func save_rules(rules: Dictionary[String, Variant]) -> void: 
+	game_rules = rules
+
+func load_rules() -> Dictionary[String, Variant]:
+	return game_rules
 
 func load_units() -> Array[UnitResource]:
 	return units.duplicate_deep()

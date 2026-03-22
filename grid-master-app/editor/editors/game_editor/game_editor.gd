@@ -9,10 +9,18 @@ var game_resource : GameDefinitionResource
 @onready var _tab_container: TabContainer = $PanelContainer/VBoxContainer/TabContainer
 @onready var ftm : FileTransferManager = $Dialogs/FileTransferManager
 
+@onready var _unit_painter: MapPainter = $PanelContainer/VBoxContainer/TabContainer/Map
+@onready var _game_rules: GameRules = $PanelContainer/VBoxContainer/TabContainer/GameRules
+
 @onready var _teams_container: GridContainer = $PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox/TeamsVbox/GridContainer
 @onready var _new_team_button: Button = $PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox/TeamsVbox/NewTeamButton
 @onready var _new_player_button: Button = $PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox/PlayersVbox/NewPlayerButton
 @onready var _players_container: GridContainer = $PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox/PlayersVbox/GridContainer
+
+#constants
+const TEAMS_TAB_ID = 0
+const GAME_RULES_TAB_ID = 1
+const MAP_TAB_ID = 2
 
 #teams / players
 var _team_uis: Array[TeamUi] = []
@@ -24,7 +32,6 @@ var _players: Array[GamePlayer] = []
 @export var unit_outline_thickeness: int = 3
 
 #painting
-var _unit_painter: MapPainter = null
 var _base_layer_id: int
 var _unit_layer_id: int
 
@@ -35,7 +42,7 @@ func _ready() -> void:
 	save_game_button.button_up.connect(save_to_file)
 	load_game_button.button_up.connect(load_from_file)
 	visibility_changed.connect(_on_visibibility_changed)
-	_unit_painter = _create_unit_painter()
+	_init_unit_painter()
 	
 	#teams ui
 	_new_team_button.pressed.connect(_add_new_team)
@@ -210,9 +217,10 @@ func _on_player_name_changed(new_player_name: String, sender: PlayerUi) -> void:
 	_players[indx].set_name(new_player_name)
 
 func _on_tab_changed(tab_id: int) -> void: 
-	#teams tab
-	if tab_id == 1:
+	
+	if tab_id == TEAMS_TAB_ID:
 		_sync_team_libraries()
+
 
 ##IMPORT / EXPORT 
 # called by pressing the save button
@@ -230,6 +238,7 @@ func save_to_file():
 	game_resource.save_unit_layer(_unit_painter.get_layer(_unit_layer_id))
 	game_resource.save_team_uis(_get_team_uis_res())
 	game_resource.save_player_uis(_get_player_uis_res())
+	game_resource.save_rules(_game_rules.get_rules())
 	ftm.download_data(game_resource, game_name + ".tres", "*.tres", true)
 
 func load_from_file() -> void:
@@ -240,6 +249,7 @@ func load_from_resource(resource : GameDefinitionResource):
 	editor_main.set_units(resource.load_units())
 	editor_main.setMap(resource.loadMap())
 	_unit_painter.reload_layer(resource.load_unit_layer(), _unit_layer_id)
+	_game_rules.import(resource.load_rules())
 	#teams
 	_clear_teams()
 	for team_ui_res in resource.load_team_uis():
@@ -249,18 +259,11 @@ func load_from_resource(resource : GameDefinitionResource):
 		_add_new_player().import(player_ui_res)
 	_reload()
 
-func _create_unit_painter() -> MapPainter: 
-	var painter_scene = preload("res://editor/editors/map_editor_refactor/user_interfaces/map_painter.tscn")
-	var _painter: MapPainter = painter_scene.instantiate()
-	_tab_container.add_child(_painter)
-	_tab_container.set_tab_title(1, "Map")
-	
-	##HAS TO BE CALLED AFTER ADDED TO SCENE 
-	_painter.init_painter(10, 10)
-	_base_layer_id = _painter.add_layer(MapAttributes.STRATEGIC_TEXTURE_ID, MapAttributes.STRATEGIC_TILE_ID)
-	_unit_layer_id = _painter.add_layer(MapAttributes.UNIT_TEXTURE_ID, MapAttributes.UNIT_TILE_ID)
-	_painter.set_active_layer(_unit_layer_id)
-	return _painter
+func _init_unit_painter() -> void: 
+	_unit_painter.init_painter(10, 10)
+	_base_layer_id = _unit_painter.add_layer(MapAttributes.STRATEGIC_TEXTURE_ID, MapAttributes.STRATEGIC_TILE_ID)
+	_unit_layer_id = _unit_painter.add_layer(MapAttributes.UNIT_TEXTURE_ID, MapAttributes.UNIT_TILE_ID)
+	_unit_painter.set_active_layer(_unit_layer_id)
 
 
 ##Setters / Getters

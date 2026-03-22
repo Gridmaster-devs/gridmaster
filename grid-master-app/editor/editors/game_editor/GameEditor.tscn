@@ -1,9 +1,11 @@
-[gd_scene load_steps=5 format=3 uid="uid://bo7oe8477f30h"]
+[gd_scene load_steps=7 format=3 uid="uid://bo7oe8477f30h"]
 
 [ext_resource type="Script" uid="uid://rm27rb7okfxv" path="res://editor/editors/game_editor/game_editor.gd" id="1_rp7ar"]
 [ext_resource type="PackedScene" uid="uid://cehdpht6a7iw8" path="res://common/file_upload_download/file_transfer_manager.tscn" id="2_n3gfw"]
 [ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="2_ugjnl"]
+[ext_resource type="PackedScene" uid="uid://bvqcmq6jvs2j1" path="res://editor/editors/game_editor/game_rules.tscn" id="3_b25p5"]
 [ext_resource type="Script" uid="uid://of14uemmvsm2" path="res://common/popups/popup_manager.gd" id="4_8anuq"]
+[ext_resource type="PackedScene" uid="uid://bkfi6pml23hic" path="res://editor/editors/map_editor_refactor/user_interfaces/map_painter.tscn" id="4_k5c85"]
 
 [node name="Game Editor" type="Control"]
 layout_mode = 3
@@ -50,7 +52,7 @@ current_tab = 0
 
 [node name="Teams" parent="PanelContainer/VBoxContainer/TabContainer" instance=ExtResource("2_ugjnl")]
 layout_mode = 2
-section_headers = Array[String](["NewTeamButton", "SaveTeamsButton", "GridContainer"])
+section_headers = Array[String](["TeamsVbox", "PlayersVbox"])
 metadata/_tab_index = 0
 
 [node name="TopLabel" parent="PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox" index="0"]
@@ -81,6 +83,16 @@ text = "New Player"
 layout_mode = 2
 size_flags_vertical = 3
 columns = 8
+
+[node name="GameRules" parent="PanelContainer/VBoxContainer/TabContainer" instance=ExtResource("3_b25p5")]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="Map" parent="PanelContainer/VBoxContainer/TabContainer" instance=ExtResource("4_k5c85")]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
 
 [node name="Dialogs" type="Control" parent="."]
 anchors_preset = 0
