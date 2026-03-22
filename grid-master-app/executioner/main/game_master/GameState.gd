@@ -177,10 +177,13 @@ static func initFromGameDefinition(game_definition : GameDefinitionResource) -> 
 	game_state._pathfinder = DijkstraPathfinder.new()
 	game_state._pathfinder.initialize(game_state.grid, game_state.units)
 	
-	var game_def_teams = game_definition.team_uis
-	var client_player_added: bool = false
+	var game_def_teams: Array[TeamUiRes] = game_definition.team_uis
+	var game_def_players: Array[PlayerUiRes] = game_definition.player_uis
 	
-	var player_team_name_dict: Dictionary[String, int] = {}
+	
+	var team_id_dict: Dictionary[String, int] = {}
+	
+	var player_name_id_dict: Dictionary[String, int] = {}
 	#teams and players
 	for team in game_def_teams: 
 		var team_name = team.get_team_name()
@@ -191,24 +194,38 @@ static func initFromGameDefinition(game_definition : GameDefinitionResource) -> 
 				var cur_unit_type_id = unit_name_type_dict[unit_name]
 				team_units.append(game_state.unit_types[cur_unit_type_id])
 		var team_id = game_state.add_team(team_name, team.get_team_color(), team_units)
+		team_id_dict[team_name] = team_id
+	
+	var client_player_added: bool = false
+	for player in game_def_players: 
+		var player_team = null
+		var ptdict = player.get_teams()
+		var player_name = player.get_player_name()
+		#get the team of the player
+		for t_name in ptdict.keys():
+			if ptdict[t_name]:
+				player_team = t_name
+		if player_team == null:
+			continue
+		#add the player 
+		var p_id = game_state.add_player(player_name, team_id_dict[player_team], false)
+		player_name_id_dict[player_name] = p_id
+		#add the client player as the first one
 		if !client_player_added: 
-			var p_id = game_state.add_player(team_name, team_id, false)
 			game_state.client_player_id = p_id
-			player_team_name_dict[team_name] = p_id
 			client_player_added = true
-		else: 
-			player_team_name_dict[team_name] = game_state.add_player(team_name, team_id, true)
-			
 	
 	#units on the map
 	var unit_layer = game_definition.unit_layer
 	for x in unit_layer.width:
 		for y in unit_layer.height:
 			var cur_attributes = unit_layer.getItem(x, y)
-			if cur_attributes.has(MapAttributes.UNIT_UNIT_LIB_ITEM_ID) and cur_attributes.has(MapAttributes.UNIT_TEAM_ID):
+			if (cur_attributes.has(MapAttributes.UNIT_UNIT_LIB_ITEM_ID) and 
+				cur_attributes.has(MapAttributes.UNIT_TEAM_ID) and 
+				cur_attributes.has(MapAttributes.UNIT_PLAYER_ID)):
 				var unit_name = cur_attributes[MapAttributes.UNIT_UNIT_LIB_ITEM_ID]
-				var team_name = cur_attributes[MapAttributes.UNIT_TEAM_ID]
-				game_state.addUnitByTypeId(unit_name_type_dict[unit_name], Vector2i(x, y), player_team_name_dict[team_name])
+				var player_name = cur_attributes[MapAttributes.UNIT_PLAYER_ID]
+				game_state.addUnitByTypeId(unit_name_type_dict[unit_name], Vector2i(x, y), player_name_id_dict[player_name])
 
 	# TODO: Add import from game definition
 	GameArgs.initialize(game_state, game_definition.game_rules)

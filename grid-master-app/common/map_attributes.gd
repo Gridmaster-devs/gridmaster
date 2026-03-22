@@ -66,14 +66,17 @@ static var TACTICAL_TILE_LIB_OVERWRITE: Dictionary[String, Variant] = {
 const UNIT_TILE_ID: String = "name"
 const UNIT_TEXTURE_ID: String = "unit_texture"
 const UNIT_TEAM_ID: String = "team"
+const UNIT_PLAYER_ID: String = "player"
 
 
 const UNIT_UNIT_LIB_ITEM_ID: String = "unit"
 const UNIT_UNIT_LIB_TEXTURE_ID: String = "unit_texture"
 
+
 static var UNIT_UNIT_LIB_ADD: Dictionary[String, Variant] = {}
 
-static var UNIT_UNIT_LIB_OVERWRITE: Dictionary[String, Variant] = {"unit": String(), "unit_texture": Texture2D, "team": String(), "player": String()}
+static var UNIT_UNIT_LIB_OVERWRITE: Dictionary[String, Variant] = {"unit": String(), "unit_texture": Texture2D, 
+																	"team": String(), UNIT_PLAYER_ID: String()}
 
 
 

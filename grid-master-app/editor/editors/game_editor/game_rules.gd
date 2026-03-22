@@ -12,15 +12,19 @@ signal rules_changed(rules: Dictionary[String, Variant])
 
 func _ready() -> void: 
 	#combat speed
-	_combat_speed_ui.text_changed.connect(_rule_changed.bind("combat_rounds"))
+	_combat_speed_ui.text_changed.connect(_integer_rule_changed.bind("combat_rounds"))
 	_rule_uis["combat_rounds"] = _combat_speed_ui
 
 
-#signal response
-func _rule_changed(rule_value: Variant, rule: String) -> void:
-	_rules[rule] = rule_value
-	rules_changed.emit(_rules)
 
+##signal response
+func _rule_changed(rule_value: Variant, rule_id: String) -> void:
+	_rules[rule_id] = rule_value
+	rules_changed.emit(_rules)
+	
+func _integer_rule_changed(raw_rule_value: String, rule_id: String) -> void: 
+	_rules[rule_id] = int(raw_rule_value)
+	rules_changed.emit(_rules)
 
 func get_rules() -> Dictionary[String, Variant]: 
 	return _rules
