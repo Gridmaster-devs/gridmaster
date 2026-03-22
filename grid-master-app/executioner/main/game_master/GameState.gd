@@ -211,7 +211,7 @@ static func initFromGameDefinition(game_definition : GameDefinitionResource) -> 
 				game_state.addUnitByTypeId(unit_name_type_dict[unit_name], Vector2i(x, y), player_team_name_dict[team_name])
 
 	# TODO: Add import from game definition
-	GameArgs.initialize(game_state)
+	GameArgs.initialize(game_state, game_definition.game_rules)
 	
 	return game_state
 

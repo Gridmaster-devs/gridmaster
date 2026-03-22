@@ -5380,5 +5380,6 @@ unit_layer = SubResource("Resource_ds3xa")
 team_uis = Array[ExtResource("5_ht0mk")]([SubResource("Resource_peorh"), SubResource("Resource_pvegd"), SubResource("Resource_1gngj")])
 player_uis = Array[ExtResource("4_15h0m")]([SubResource("Resource_m1lds"), SubResource("Resource_ys45c"), SubResource("Resource_6vvdd")])
 game_rules = Dictionary[String, Variant]({
+"combat_rounds": "10",
 "combat_speed": "15"
 })

@@ -28,7 +28,7 @@ text = "Combat speed"
 [node name="Label" type="Label" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Combat speed"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Combat speed"
+text = "combat rounds"
 
 [node name="LineEdit" type="LineEdit" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Combat speed"]
 layout_mode = 2
