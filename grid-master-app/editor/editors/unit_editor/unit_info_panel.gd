@@ -83,9 +83,8 @@ func _handle_file(path: String) -> void:
 	_unit_image_cont.texture = ImageTexture.create_from_image(img)
 
 func _get_default_img() -> Texture2D: 
-	var img = Image.new()
-	var err = img.load("res://editor/editors/unit_editor/placeholder.jpg")
-	if err != OK:
+	var img: Image = preload("res://editor/editors/unit_editor/placeholder.jpg")
+	if not img or img.get_size() == Vector2i.ZERO:
 		var backup_img = Image.create_empty(Global.tile_width, Global.tile_height, false, Image.FORMAT_RGBA8)
 		backup_img.fill(Color(0.822, 0.001, 0.871, 1.0))
 		img = backup_img

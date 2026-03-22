@@ -56,15 +56,28 @@ metadata/_tab_index = 0
 [node name="TopLabel" parent="PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox" index="0"]
 text = ""
 
-[node name="NewTeamButton" type="Button" parent="PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox" index="0"]
+[node name="TeamsVbox" type="VBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox" index="0"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="NewTeamButton" type="Button" parent="PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox/TeamsVbox"]
 layout_mode = 2
 text = "NEW TEAM"
 
-[node name="SaveTeamsButton" type="Button" parent="PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox" index="1"]
+[node name="GridContainer" type="GridContainer" parent="PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox/TeamsVbox"]
 layout_mode = 2
-text = "SAVE"
+size_flags_vertical = 3
+columns = 8
 
-[node name="GridContainer" type="GridContainer" parent="PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox" index="2"]
+[node name="PlayersVbox" type="VBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox" index="1"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="NewPlayerButton" type="Button" parent="PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox/PlayersVbox"]
+layout_mode = 2
+text = "New Player"
+
+[node name="GridContainer" type="GridContainer" parent="PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox/PlayersVbox"]
 layout_mode = 2
 size_flags_vertical = 3
 columns = 8

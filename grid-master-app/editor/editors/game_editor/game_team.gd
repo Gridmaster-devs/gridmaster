@@ -14,7 +14,17 @@ func _init(name: String, color: Color, id: int, units: Array) -> void:
 	_id = id
 	_units = units
 
+func add_unit(unit_name: String) -> void: 
+	_units.append(unit_name)
+	
+func remove_unit(unit_name: String) -> void: 
+	_units.erase(unit_name)
 
+func set_name(new_name: String) -> void:
+	_name = new_name
+
+func set_color(new_color: Color) -> void:
+	_color = new_color
 
 func get_name() -> String: 
 	return _name

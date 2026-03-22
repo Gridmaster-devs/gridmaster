@@ -9,116 +9,66 @@ var game_resource : GameDefinitionResource
 @onready var _tab_container: TabContainer = $PanelContainer/VBoxContainer/TabContainer
 @onready var ftm : FileTransferManager = $Dialogs/FileTransferManager
 
-@onready var _teams_container: GridContainer = $PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox/GridContainer
-@onready var _new_team_button: Button = $PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox/NewTeamButton
-@onready var _save_button: Button = $PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox/SaveTeamsButton
+@onready var _teams_container: GridContainer = $PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox/TeamsVbox/GridContainer
+@onready var _new_team_button: Button = $PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox/TeamsVbox/NewTeamButton
+@onready var _new_player_button: Button = $PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox/PlayersVbox/NewPlayerButton
+@onready var _players_container: GridContainer = $PanelContainer/VBoxContainer/TabContainer/Teams/TopVBox/ScrollContainer/ContentsVBox/PlayersVbox/GridContainer
 
-
-#teams
+#teams / players
 var _team_uis: Array[TeamUi] = []
 var _teams: Array[GameTeam] = []
+var _player_uis: Array[PlayerUi] = []
+var _players: Array[GamePlayer] = []
 
 #units
 @export var unit_outline_thickeness: int = 3
 
-##painting
+#painting
 var _unit_painter: MapPainter = null
 var _base_layer_id: int
 var _unit_layer_id: int
 
 
+##State functions
+func _ready() -> void:
+	ftm.resource_uploaded.connect(load_from_resource)
+	save_game_button.button_up.connect(save_to_file)
+	load_game_button.button_up.connect(load_from_file)
+	visibility_changed.connect(_on_visibibility_changed)
+	_unit_painter = _create_unit_painter()
+	
+	#teams ui
+	_new_team_button.pressed.connect(_add_new_team)
+	#player ui
+	_new_player_button.pressed.connect(_add_new_player)
+	
+	#tab container
+	_tab_container.tab_changed.connect(_on_tab_changed)
+
 # links the editor_main object
 func link_editor_main(editor_main_p : EditorMain):
 	editor_main = editor_main_p
 
-# called by pressing the save button
-func save_to_file():
-	var units = editor_main.get_units()
-	var map = editor_main.getMap()
-	
-	var game_name = get_game_name()
-	if game_name == "": 
-		game_name = "game"
-	game_resource = GameDefinitionResource.new()
-	game_resource.save_name(game_name)
-	game_resource.save_units(units)
-	game_resource.saveMap(map)
-	game_resource.save_unit_layer(_unit_painter.get_layer(_unit_layer_id))
-	game_resource.save_team_uis(_get_team_uis_res())
-	ftm.download_data(game_resource, game_name + ".tres", "*.tres", true)
-
-func _get_team_uis_res() -> Array[TeamUiRes]: 
-	var out: Array[TeamUiRes] = []
-	for team_ui in _team_uis: 
-		out.append(team_ui.export())
-	return out
-
-func load_from_file() -> void:
-	ftm.upload_data("*.tres", true)
-
-# called by load_from_file
-func load_from_resource(resource : GameDefinitionResource):
-	set_game_name(resource.game_name)
-	editor_main.set_units(resource.load_units())
-	editor_main.setMap(resource.loadMap())
-	_unit_painter.reload_layer(resource.load_unit_layer(), _unit_layer_id)
-	#teams
-	_clear_teams()
-	for team_ui_res in resource.load_team_uis():
-		_add_new_team_ui().import(team_ui_res)
-	_reload_teams()
-	_reload()
-
-func get_game_name() -> String:
-	return game_name_line.text
-
-func set_game_name(name_p : String):
-	game_name_line.text = name_p
-	
-func _create_unit_painter() -> MapPainter: 
-	var painter_scene = preload("res://editor/editors/map_editor_refactor/user_interfaces/map_painter.tscn")
-	var _painter: MapPainter = painter_scene.instantiate()
-	_tab_container.add_child(_painter)
-	_tab_container.set_tab_title(1, "Map")
-	
-	##HAS TO BE CALLED AFTER ADDED TO SCENE 
-	_painter.init_painter(10, 10)
-	_base_layer_id = _painter.add_layer(MapAttributes.STRATEGIC_TEXTURE_ID, MapAttributes.STRATEGIC_TILE_ID)
-	_unit_layer_id = _painter.add_layer(MapAttributes.UNIT_TEXTURE_ID, MapAttributes.UNIT_TILE_ID)
-	_painter.set_active_layer(_unit_layer_id)
-	return _painter
-
 func _reload() -> void:
 	#sync team uis in game editor teams tab
-	_sync_team_uis()
-	#reload teams
-	_reload_teams()
+	_sync_ui()
 	#reload the unit libs in map painter
 	_sync_team_libraries()
 	#reload the map in map painter
 	_sync_map()
 
+func _sync_ui() -> void: 
+	_sync_team_uis()
+	_sync_player_uis()
+
+#update map based on map editor
 func _sync_map() -> void:
 	var attribute_grid = editor_main.getMap().get_strategic_map().get_attribute_grids()[0]
 	_unit_painter.reload_layer(attribute_grid, _base_layer_id)
 	_unit_painter.resize(attribute_grid.width, attribute_grid.height)
 	_unit_painter.set_map_name(editor_main.getMap().get_strategic_map().get_map_name())
 
-#update team_uis based on unit editor units
-func _sync_team_uis() -> void: 
-	var arr: Array = []
-	for unit in editor_main.get_units():
-		var unit_name = unit.get_attribute_value("name")
-		if unit_name == null: 
-			continue
-		arr.append(unit_name)
-	for team_ui in _team_uis:
-		team_ui.sync_units(arr)
-
-#sync libraries in map painter based on "_teams" 
-#in both -> sync_library() 
-#only in _teams -> add_library()
-#only in map painter -> remove_library() 
+#sync libraries in map painter based on _teams
 func _sync_team_libraries() -> void: 
 	var lib_names = _unit_painter.get_library_names()
 	var new_lib_names: Array = []
@@ -137,40 +87,22 @@ func _sync_team_libraries() -> void:
 		if !new_lib_names.has(team_name):
 			_unit_painter.remove_library(team_name)
 
-func _on_visibibility_changed() -> void:
-	if visible: 
-		_reload()
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	ftm.resource_uploaded.connect(load_from_resource)
-	save_game_button.button_up.connect(save_to_file)
-	load_game_button.button_up.connect(load_from_file)
-	visibility_changed.connect(_on_visibibility_changed)
-	_unit_painter = _create_unit_painter()
-	
-	#teams ui
-	_new_team_button.pressed.connect(_add_new_team_ui)
-	_save_button.pressed.connect(_reload_teams)
-
-func _add_new_team_ui() -> TeamUi: 
+#teams#
+func _add_new_team() -> TeamUi: 
+	#add team ui
 	var team_ui: TeamUi = preload("res://editor/editors/game_editor/team_ui.tscn").instantiate()
 	_teams_container.add_child(team_ui)
-	team_ui.init_units(_get_team_names())
+	team_ui.init_units(_get_unit_names())
+	#team signals
+	team_ui.unit_added.connect(_on_team_unit_added.bind(team_ui))
+	team_ui.unit_removed.connect(_on_team_unit_removed.bind(team_ui))
+	team_ui.name_changed.connect(_on_team_name_changed.bind(team_ui))
 	_team_uis.append(team_ui)
+	#add GameTeam
+	var new_team: GameTeam = GameTeam.new("", Color.RED, _teams.size(), [])
+	_teams.append(new_team)
+	_sync_player_uis()
 	return team_ui
-
-#update _teams based on team ui
-func _reload_teams() -> void: 
-	_teams.clear()
-	var count = 0
-	for team_ui in _team_uis: 
-		var team_name = team_ui.get_team_name()
-		var team_color = team_ui.get_team_color()
-		var team_units = team_ui.get_team_units()
-		var team_id = count
-		_teams.append(GameTeam.new(team_name, team_color, team_id, team_units))
-		count += 1
-	_sync_team_libraries()
 
 func _clear_teams() -> void: 
 	_teams.clear()
@@ -178,7 +110,150 @@ func _clear_teams() -> void:
 		_teams_container.remove_child(team_ui)
 	_team_uis.clear()
 
-##UTIL
+
+#update team_uis based on unit editor units
+func _sync_team_uis() -> void: 
+	#load units from unit editor
+	var arr: Array = []
+	for unit in editor_main.get_units():
+		var unit_name = unit.get_attribute_value("name")
+		if unit_name == null: 
+			continue
+		arr.append(unit_name)
+	#sync units
+	for team_ui in _team_uis:
+		team_ui.sync_units(arr)
+
+#players#
+func _add_new_player() -> void: 
+	var team_names: Array = []
+	for team in _teams:
+		team_names.append(team.get_name())
+	var new_player_ui: PlayerUi = preload("res://editor/editors/game_editor/player_ui.tscn").instantiate()
+	_players_container.add_child(new_player_ui)
+	new_player_ui.init_teams(team_names)
+	_player_uis.append(new_player_ui)
+	#signals
+	new_player_ui.team_selected.connect(_on_player_team_changed.bind(new_player_ui))
+	new_player_ui.name_changed.connect(_on_player_name_changed.bind(new_player_ui))
+	var new_player: GamePlayer = GamePlayer.new("", _players.size(), null)
+	_players.append(new_player)
+
+#update player uis based on _teams
+func _sync_player_uis() -> void: 
+	var team_names: Array = []
+	for team in _teams:
+		team_names.append(team.get_name())
+	for player_ui in _player_uis: 
+		player_ui.sync_teams(team_names)
+
+##Signal response
+func _on_visibibility_changed() -> void:
+	if visible: 
+		_reload()
+
+func _on_team_unit_added(unit_name: String, sender: TeamUi) -> void: 
+	var indx = _team_uis.find(sender)
+	if indx == -1 or indx >= _teams.size():
+		print("untracked team's signal catched")
+		return
+	_teams[indx].add_unit(unit_name)
+
+func _on_team_unit_removed(unit_name: String, sender: TeamUi) -> void: 
+	var indx = _team_uis.find(sender)
+	if indx == -1 or indx >= _teams.size():
+		print("untracked team's signal catched")
+		return
+	_teams[indx].remove_unit(unit_name)
+
+func _on_team_name_changed(new_team_name: String, sender: TeamUi) -> void: 
+	var indx = _team_uis.find(sender)
+	if indx == -1 or indx >= _teams.size():
+		print("untracked team's signal catched")
+		return
+	_teams[indx].set_name(new_team_name)
+	_sync_player_uis()
+
+func _on_player_team_changed(team_name: String, sender: PlayerUi) -> void: 
+	var indx = _player_uis.find(sender)
+	if indx == -1 or indx >= _players.size():
+		print("untracked player's signal catched")
+		return
+	for team in _teams: 
+		if team.get_name() == team_name:
+			_players[indx].set_team(team)
+
+func _on_player_name_changed(new_player_name: String, sender: PlayerUi) -> void: 
+	var indx = _player_uis.find(sender)
+	if indx == -1 or indx >= _players.size():
+		print("untracked player's signal catched")
+		return
+	_players[indx].set_name(new_player_name)
+
+func _on_tab_changed(tab_id: int) -> void: 
+	#teams tab
+	if tab_id == 1:
+		_sync_team_libraries()
+##IMPORT / EXPORT 
+# called by pressing the save button
+func save_to_file():
+	var units = editor_main.get_units()
+	var map = editor_main.getMap()
+	
+	var game_name = get_game_name()
+	if game_name == "": 
+		game_name = "game"
+	game_resource = GameDefinitionResource.new()
+	game_resource.save_name(game_name)
+	game_resource.save_units(units)
+	game_resource.saveMap(map)
+	game_resource.save_unit_layer(_unit_painter.get_layer(_unit_layer_id))
+	game_resource.save_team_uis(_get_team_uis_res())
+	ftm.download_data(game_resource, game_name + ".tres", "*.tres", true)
+
+func load_from_file() -> void:
+	ftm.upload_data("*.tres", true)
+
+func load_from_resource(resource : GameDefinitionResource):
+	set_game_name(resource.game_name)
+	editor_main.set_units(resource.load_units())
+	editor_main.setMap(resource.loadMap())
+	_unit_painter.reload_layer(resource.load_unit_layer(), _unit_layer_id)
+	#teams
+	_clear_teams()
+	for team_ui_res in resource.load_team_uis():
+		_add_new_team().import(team_ui_res)
+	_reload()
+
+func _create_unit_painter() -> MapPainter: 
+	var painter_scene = preload("res://editor/editors/map_editor_refactor/user_interfaces/map_painter.tscn")
+	var _painter: MapPainter = painter_scene.instantiate()
+	_tab_container.add_child(_painter)
+	_tab_container.set_tab_title(1, "Map")
+	
+	##HAS TO BE CALLED AFTER ADDED TO SCENE 
+	_painter.init_painter(10, 10)
+	_base_layer_id = _painter.add_layer(MapAttributes.STRATEGIC_TEXTURE_ID, MapAttributes.STRATEGIC_TILE_ID)
+	_unit_layer_id = _painter.add_layer(MapAttributes.UNIT_TEXTURE_ID, MapAttributes.UNIT_TILE_ID)
+	_painter.set_active_layer(_unit_layer_id)
+	return _painter
+
+
+##Setters / Getters
+func get_game_name() -> String:
+	return game_name_line.text
+
+func set_game_name(name_p : String):
+	game_name_line.text = name_p
+	
+func _get_team_uis_res() -> Array[TeamUiRes]: 
+	var out: Array[TeamUiRes] = []
+	for team_ui in _team_uis: 
+		out.append(team_ui.export())
+	return out
+
+
+##Utility functions
 func _generate_team_lib_data(team: GameTeam) -> Array: 
 	var data: Array = []
 	var team_units = team.get_units()
@@ -197,7 +272,7 @@ func _generate_team_lib_data(team: GameTeam) -> Array:
 		data.append(datapoint)
 	return data
 
-func _get_team_names() -> Array:
+func _get_unit_names() -> Array:
 	var data: Array = []
 	for unit in editor_main.get_units():
 		var unit_name: String = unit.get_attribute("name").attribute_value
@@ -220,7 +295,6 @@ func _generate_colored_unit_texture(color: Color, unit: Texture2D, alpha_thresho
 	
 	return ImageTexture.create_from_image(img)
 
-
 func _has_opaque_neighbor(img: Image, pos: Vector2i, alpha_threshold: float) -> bool:
 	var width = img.get_width()
 	var height = img.get_height()
@@ -237,7 +311,6 @@ func _has_opaque_neighbor(img: Image, pos: Vector2i, alpha_threshold: float) -> 
 			if np.a >= alpha_threshold:
 				return true
 	return false
-
 
 func _generate_default_unit_texture() -> Texture2D:
 	var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
