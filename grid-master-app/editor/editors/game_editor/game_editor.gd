@@ -164,7 +164,8 @@ func _add_new_player() -> PlayerUi:
 	new_player_ui.init_teams(team_names)
 	_player_uis.append(new_player_ui)
 	#signals
-	new_player_ui.team_selected.connect(_on_player_team_changed.bind(new_player_ui))
+	new_player_ui.team_selected.connect(_on_player_team_selected.bind(new_player_ui))
+	new_player_ui.team_unselected.connect(_on_player_team_unselected.bind(new_player_ui))
 	new_player_ui.name_changed.connect(_on_player_name_changed.bind(new_player_ui))
 	var new_player: GamePlayer = GamePlayer.new("", _players.size(), null)
 	_players.append(new_player)
@@ -226,7 +227,7 @@ func _on_team_units_changed(new_units: Array, sender: TeamUi) -> void:
 	_teams[indx].set_units(new_units)
 
 #player#
-func _on_player_team_changed(team_name: String, sender: PlayerUi) -> void: 
+func _on_player_team_selected(team_name: String, sender: PlayerUi) -> void: 
 	var indx = _player_uis.find(sender)
 	if indx == -1 or indx >= _players.size():
 		print("untracked player's signal catched")
@@ -235,6 +236,13 @@ func _on_player_team_changed(team_name: String, sender: PlayerUi) -> void:
 		if team.get_name() == team_name:
 			_players[indx].set_team(team)
 
+func _on_player_team_unselected(team_name: String, sender: PlayerUi) -> void: 
+	var indx = _player_uis.find(sender)
+	if indx == -1 or indx >= _players.size():
+		print("untracked player's signal catched")
+		return
+	if _players[indx].get_team() != null and _players[indx].get_team().get_name() == team_name:
+		_players[indx].set_team(null)
 func _on_player_name_changed(new_player_name: String, sender: PlayerUi) -> void: 
 	var indx = _player_uis.find(sender)
 	if indx == -1 or indx >= _players.size():

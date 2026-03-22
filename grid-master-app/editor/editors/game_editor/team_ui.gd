@@ -63,6 +63,7 @@ func _sync_ui() -> void:
 		_content_vbox.add_child(new_unit_ui)
 		#signals
 		new_unit_ui.box_checked.connect(_unit_checked.bind(unit_name))
+		new_unit_ui.box_unchecked.connect(_unit_unchecked.bind(unit_name))
 		#set name and state
 		new_unit_ui.set_label_text(unit_name)
 		if _units[unit_name]:

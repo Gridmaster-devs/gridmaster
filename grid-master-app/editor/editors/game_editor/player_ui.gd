@@ -10,7 +10,8 @@ var _teams: Dictionary[String, bool] = {}
 var _team_uis: Dictionary[String, LabelCheckbox] = {}
 
 ##signals
-signal team_selected(unit: String)
+signal team_unselected(team_name: String)
+signal team_selected(team_name: String)
 signal name_changed(new_name: String)
 
 ##State functions
@@ -53,6 +54,7 @@ func _sync_ui() -> void:
 		_teams_vbox.add_child(new_team_ui)
 		#signals
 		new_team_ui.box_checked.connect(_team_checked.bind(team_name))
+		new_team_ui.box_unchecked.connect(_team_unchecked.bind(team_name))
 		#set name and state
 		new_team_ui.set_label_text(team_name)
 		if _teams[team_name]:
@@ -73,6 +75,12 @@ func _team_checked(team_name: String) -> void:
 	_teams[team_name] = true
 	_sync_ui_states()
 	team_selected.emit(team_name)
+
+func _team_unchecked(team_name: String) -> void: 
+	_teams[team_name] = false
+	_sync_ui_states()
+	team_unselected.emit(team_name)
+
 
 func _on_name_changed(new_name: String) -> void:
 	name_changed.emit(new_name)
