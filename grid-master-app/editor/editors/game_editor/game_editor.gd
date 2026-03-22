@@ -100,13 +100,16 @@ func _sync_player_libraries() -> void:
 	var new_lib_names: Array = []
 	for player in _players:
 		var player_name = player.get_name()
+		var player_lib_data = _generate_player_lib_data(player)
+		if player_lib_data.is_empty():
+			continue
 		if lib_names.has(player_name):
-			_unit_painter.sync_library(_generate_player_lib_data(player), player_name)
+			_unit_painter.sync_library(player_lib_data, player_name)
 		else: 
 			_unit_painter.add_library(player_name, MapAttributes.UNIT_UNIT_LIB_OVERWRITE, MapAttributes.UNIT_UNIT_LIB_ADD,
 									MapAttributes.UNIT_UNIT_LIB_TEXTURE_ID,
 									MapAttributes.UNIT_UNIT_LIB_ITEM_ID, _unit_layer_id, false, true)
-			_unit_painter.sync_library(_generate_player_lib_data(player), player_name)
+			_unit_painter.sync_library(player_lib_data, player_name)
 		new_lib_names.append(player_name)
 	#remove libs that are in the painter but not in teams
 	for player_name in lib_names: 
@@ -175,10 +178,15 @@ func _sync_player_uis() -> void:
 	for player_ui in _player_uis: 
 		player_ui.sync_teams(team_names)
 
+func _set_default_state() -> void: 
+	_unit_painter.set_to_default_state()
+
 ##Signal response
 func _on_visibibility_changed() -> void:
 	if visible: 
 		_reload()
+	else:
+		_set_default_state()
 
 #team#
 func _on_team_unit_added(unit_name: String, sender: TeamUi) -> void: 
@@ -323,6 +331,8 @@ func _generate_team_lib_data(team: GameTeam) -> Array:
 
 func _generate_player_lib_data(player: GamePlayer) -> Array: 
 	var team = player.get_team()
+	if team == null: 
+		return []
 	var out = _generate_team_lib_data(team)
 	for datapoint in out: 
 		datapoint["player"] = player.get_name()

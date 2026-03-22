@@ -308,6 +308,9 @@ func export_as_resource() -> MapPainterRes:
 	return res
 
 ##DYNAMIC flow functions
+func set_to_default_state() -> void: 
+	_change_state(InputState.INTERACT)
+
 #simple function to change current input state
 func _change_state(new_state: InputState) -> void:
 	_input_state = new_state
