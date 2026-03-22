@@ -135,6 +135,12 @@ func _add_new_team() -> TeamUi:
 	_sync_player_uis()
 	return team_ui
 
+func _clear_players() -> void: 
+	_players.clear()
+	for player_ui in _player_uis:
+		_players_container.remove_child(player_ui)
+	_player_uis.clear()
+
 func _clear_teams() -> void: 
 	_teams.clear()
 	for team_ui in _team_uis: 
@@ -288,6 +294,7 @@ func load_from_resource(resource : GameDefinitionResource):
 	for team_ui_res in resource.load_team_uis():
 		_add_new_team().import(team_ui_res)
 	#players
+	_clear_players()
 	for player_ui_res in resource.load_player_uis():
 		_add_new_player().import(player_ui_res)
 	_reload()
