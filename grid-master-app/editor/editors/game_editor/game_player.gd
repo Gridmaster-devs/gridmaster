@@ -12,6 +12,8 @@ func _init(name: String, id: int, team: GameTeam) -> void:
 	_id = id
 	_team = team
 
+func get_team() -> GameTeam: 
+	return _team
 
 func set_team(new_team: GameTeam) -> void: 
 	_team = new_team

@@ -60,7 +60,7 @@ func _reload() -> void:
 	#sync team uis in game editor teams tab
 	_sync_ui()
 	#reload the unit libs in map painter
-	_sync_team_libraries()
+	_sync_player_libraries()
 	#reload the map in map painter
 	_sync_map()
 	
@@ -94,6 +94,24 @@ func _sync_team_libraries() -> void:
 	for team_name in lib_names: 
 		if !new_lib_names.has(team_name):
 			_unit_painter.remove_library(team_name)
+
+func _sync_player_libraries() -> void: 
+	var lib_names = _unit_painter.get_library_names()
+	var new_lib_names: Array = []
+	for player in _players:
+		var player_name = player.get_name()
+		if lib_names.has(player_name):
+			_unit_painter.sync_library(_generate_player_lib_data(player), player_name)
+		else: 
+			_unit_painter.add_library(player_name, MapAttributes.UNIT_UNIT_LIB_OVERWRITE, MapAttributes.UNIT_UNIT_LIB_ADD,
+									MapAttributes.UNIT_UNIT_LIB_TEXTURE_ID,
+									MapAttributes.UNIT_UNIT_LIB_ITEM_ID, _unit_layer_id, false, true)
+			_unit_painter.sync_library(_generate_player_lib_data(player), player_name)
+		new_lib_names.append(player_name)
+	#remove libs that are in the painter but not in teams
+	for player_name in lib_names: 
+		if !new_lib_names.has(player_name):
+			_unit_painter.remove_library(player_name)
 
 #teams#
 func _add_new_team() -> TeamUi: 
@@ -217,9 +235,8 @@ func _on_player_name_changed(new_player_name: String, sender: PlayerUi) -> void:
 	_players[indx].set_name(new_player_name)
 
 func _on_tab_changed(tab_id: int) -> void: 
-	
-	if tab_id == TEAMS_TAB_ID:
-		_sync_team_libraries()
+	if tab_id == MAP_TAB_ID:
+		_sync_player_libraries()
 
 
 ##IMPORT / EXPORT 
@@ -285,7 +302,6 @@ func _get_player_uis_res() -> Array[PlayerUiRes]:
 		out.append(player_ui.export())
 	return out
 
-
 ##Utility functions
 func _generate_team_lib_data(team: GameTeam) -> Array: 
 	var data: Array = []
@@ -304,6 +320,14 @@ func _generate_team_lib_data(team: GameTeam) -> Array:
 			MapAttributes.UNIT_TEAM_ID: team.get_name()}
 		data.append(datapoint)
 	return data
+
+func _generate_player_lib_data(player: GamePlayer) -> Array: 
+	var team = player.get_team()
+	var out = _generate_team_lib_data(team)
+	for datapoint in out: 
+		datapoint["player"] = player.get_name()
+	return out
+
 
 func _get_unit_names() -> Array:
 	var data: Array = []

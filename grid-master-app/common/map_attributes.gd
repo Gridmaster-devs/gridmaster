@@ -73,7 +73,7 @@ const UNIT_UNIT_LIB_TEXTURE_ID: String = "unit_texture"
 
 static var UNIT_UNIT_LIB_ADD: Dictionary[String, Variant] = {}
 
-static var UNIT_UNIT_LIB_OVERWRITE: Dictionary[String, Variant] = {"unit": String(), "unit_texture": Texture2D, "team": String()}
+static var UNIT_UNIT_LIB_OVERWRITE: Dictionary[String, Variant] = {"unit": String(), "unit_texture": Texture2D, "team": String(), "player": String()}
 
 
 
