@@ -14,6 +14,9 @@ func _init(name: String, color: Color, id: int, units: Array) -> void:
 	_id = id
 	_units = units
 
+func set_units(new_units: Array) -> void:
+	_units = new_units
+
 func add_unit(unit_name: String) -> void: 
 	_units.append(unit_name)
 	

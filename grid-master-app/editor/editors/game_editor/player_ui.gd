@@ -31,6 +31,9 @@ func sync_teams(teams: Array) -> void:
 
 func reload_teams(teams: Dictionary) -> void:
 	_teams = teams
+	for team in _teams.keys():
+		if _teams[team]:
+			team_selected.emit(team)
 	_sync_ui()
 
 func init_teams(teams: Array) -> void: 
@@ -78,6 +81,8 @@ func _on_name_changed(new_name: String) -> void:
 func import(res: PlayerUiRes) -> void: 
 	reload_teams(res.get_teams())
 	_player_name_ui.text = res.get_player_name()
+	name_changed.emit(res.get_player_name())
+	
 
 func export() -> PlayerUiRes: 
 	var res = PlayerUiRes.new()

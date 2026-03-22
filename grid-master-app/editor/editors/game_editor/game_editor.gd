@@ -56,6 +56,7 @@ func _reload() -> void:
 	_sync_team_libraries()
 	#reload the map in map painter
 	_sync_map()
+	
 
 func _sync_ui() -> void: 
 	_sync_team_uis()
@@ -97,6 +98,8 @@ func _add_new_team() -> TeamUi:
 	team_ui.unit_added.connect(_on_team_unit_added.bind(team_ui))
 	team_ui.unit_removed.connect(_on_team_unit_removed.bind(team_ui))
 	team_ui.name_changed.connect(_on_team_name_changed.bind(team_ui))
+	team_ui.color_changed.connect(_on_team_color_changed.bind(team_ui))
+	team_ui.units_changed.connect(_on_team_units_changed.bind(team_ui))
 	_team_uis.append(team_ui)
 	#add GameTeam
 	var new_team: GameTeam = GameTeam.new("", Color.RED, _teams.size(), [])
@@ -109,7 +112,6 @@ func _clear_teams() -> void:
 	for team_ui in _team_uis: 
 		_teams_container.remove_child(team_ui)
 	_team_uis.clear()
-
 
 #update team_uis based on unit editor units
 func _sync_team_uis() -> void: 
@@ -125,7 +127,7 @@ func _sync_team_uis() -> void:
 		team_ui.sync_units(arr)
 
 #players#
-func _add_new_player() -> void: 
+func _add_new_player() -> PlayerUi: 
 	var team_names: Array = []
 	for team in _teams:
 		team_names.append(team.get_name())
@@ -138,6 +140,7 @@ func _add_new_player() -> void:
 	new_player_ui.name_changed.connect(_on_player_name_changed.bind(new_player_ui))
 	var new_player: GamePlayer = GamePlayer.new("", _players.size(), null)
 	_players.append(new_player)
+	return new_player_ui
 
 #update player uis based on _teams
 func _sync_player_uis() -> void: 
@@ -152,6 +155,7 @@ func _on_visibibility_changed() -> void:
 	if visible: 
 		_reload()
 
+#team#
 func _on_team_unit_added(unit_name: String, sender: TeamUi) -> void: 
 	var indx = _team_uis.find(sender)
 	if indx == -1 or indx >= _teams.size():
@@ -174,6 +178,21 @@ func _on_team_name_changed(new_team_name: String, sender: TeamUi) -> void:
 	_teams[indx].set_name(new_team_name)
 	_sync_player_uis()
 
+func _on_team_color_changed(new_team_color: Color, sender: TeamUi) -> void: 
+	var indx = _team_uis.find(sender)
+	if indx == -1 or indx >= _teams.size():
+		print("untracked team's signal catched")
+		return
+	_teams[indx].set_color(new_team_color)
+
+func _on_team_units_changed(new_units: Array, sender: TeamUi) -> void: 
+	var indx = _team_uis.find(sender)
+	if indx == -1 or indx >= _teams.size():
+		print("untracked team's signal catched")
+		return
+	_teams[indx].set_units(new_units)
+
+#player#
 func _on_player_team_changed(team_name: String, sender: PlayerUi) -> void: 
 	var indx = _player_uis.find(sender)
 	if indx == -1 or indx >= _players.size():
@@ -194,6 +213,7 @@ func _on_tab_changed(tab_id: int) -> void:
 	#teams tab
 	if tab_id == 1:
 		_sync_team_libraries()
+
 ##IMPORT / EXPORT 
 # called by pressing the save button
 func save_to_file():
@@ -209,6 +229,7 @@ func save_to_file():
 	game_resource.saveMap(map)
 	game_resource.save_unit_layer(_unit_painter.get_layer(_unit_layer_id))
 	game_resource.save_team_uis(_get_team_uis_res())
+	game_resource.save_player_uis(_get_player_uis_res())
 	ftm.download_data(game_resource, game_name + ".tres", "*.tres", true)
 
 func load_from_file() -> void:
@@ -223,6 +244,9 @@ func load_from_resource(resource : GameDefinitionResource):
 	_clear_teams()
 	for team_ui_res in resource.load_team_uis():
 		_add_new_team().import(team_ui_res)
+	#players
+	for player_ui_res in resource.load_player_uis():
+		_add_new_player().import(player_ui_res)
 	_reload()
 
 func _create_unit_painter() -> MapPainter: 
@@ -250,6 +274,12 @@ func _get_team_uis_res() -> Array[TeamUiRes]:
 	var out: Array[TeamUiRes] = []
 	for team_ui in _team_uis: 
 		out.append(team_ui.export())
+	return out
+
+func _get_player_uis_res() -> Array[PlayerUiRes]:
+	var out: Array[PlayerUiRes] = []
+	for player_ui in _player_uis: 
+		out.append(player_ui.export())
 	return out
 
 

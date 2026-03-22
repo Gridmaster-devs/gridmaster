@@ -19,6 +19,9 @@ signal unit_removed(unit: String)
 signal name_changed(new_name: String)
 signal color_changed(new_color: Color)
 
+signal units_changed(units: Array)
+
+
 ##State functions
 func _ready() -> void:
 	_color_button.pressed.connect(_open_color_picker)
@@ -101,6 +104,10 @@ func import(res: TeamUiRes) -> void:
 	_units = res.get_units()
 	_color = res.get_team_color()
 	_team_name_ui.text = res.get_team_name()
+	
+	name_changed.emit(res.get_team_name())
+	color_changed.emit(_color)
+	units_changed.emit(get_team_units())
 	_sync_ui()
 
 
