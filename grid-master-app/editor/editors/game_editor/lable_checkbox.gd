@@ -1,4 +1,4 @@
-class_name TeamUnitType
+class_name LabelCheckbox
 extends Control
 
 
@@ -14,8 +14,8 @@ func _ready() -> void:
 
 
 
-func set_unit_name(unit_name: String) -> void: 
-	_label.text = unit_name
+func set_label_text(text: String) -> void: 
+	_label.text = text
 
 
 func _on_checkbox_toggle(toggle_on: bool) -> void: 

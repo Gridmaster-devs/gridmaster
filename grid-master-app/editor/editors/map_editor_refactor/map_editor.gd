@@ -138,7 +138,8 @@ func load_map_from_resource(res : MapResource) -> void:
 	if !_tactical_maps.is_empty():
 		var first_key = _tactical_maps.keys()[0]
 		_tactical_painter.import_from_resource(_tactical_maps[first_key])
-		_tactical_painter.reset_grids(10, 10)
+	else:
+		_tactical_painter.reset(10, 10)
 
 #returns the map as a resource while preserving data
 func get_map_as_resource() -> MapResource: 

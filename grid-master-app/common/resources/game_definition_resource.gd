@@ -6,11 +6,19 @@ extends Resource
 @export var map : MapResource
 @export var unit_layer: Array2D
 @export var team_uis: Array[TeamUiRes]
+@export var player_uis: Array[PlayerUiRes]
+@export var game_rules: Dictionary[String, Variant]
 
 func save_units(unit_array : Array[UnitResource]):
 	if (unit_array != null):
 		units.clear()
 		units = unit_array.duplicate_deep()
+
+func save_rules(rules: Dictionary[String, Variant]) -> void: 
+	game_rules = rules
+
+func load_rules() -> Dictionary[String, Variant]:
+	return game_rules
 
 func load_units() -> Array[UnitResource]:
 	return units.duplicate_deep()
@@ -24,13 +32,18 @@ func save_unit_layer(ulayer: Array2D) -> void:
 func save_team_uis(uis: Array[TeamUiRes]) -> void:
 	team_uis = uis
 
+func save_player_uis(uis: Array[PlayerUiRes]) -> void: 
+	player_uis = uis
+
 func load_team_uis() -> Array[TeamUiRes]: 
 	return team_uis.duplicate(true)
+
+func load_player_uis() -> Array[PlayerUiRes]:
+	return player_uis
 
 func save_name(name_p : String):
 	if name_p != null:
 		game_name = name_p
-		
 
 func load_name() -> String:
 	if game_name != null:
@@ -39,13 +52,10 @@ func load_name() -> String:
 		game_name = ""
 		return game_name
 
-
 func saveMap(map_p : MapResource):
 	if (map_p == null): return
 	
 	map = map_p
-
-
 
 
 func loadMap() -> MapResource:

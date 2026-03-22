@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://dv3oi8xt1xvbf"]
 
-[ext_resource type="Script" uid="uid://uns031tdvnmk" path="res://editor/editors/game_editor/team_unit_type.gd" id="1_cdhcs"]
+[ext_resource type="Script" uid="uid://uns031tdvnmk" path="res://editor/editors/game_editor/lable_checkbox.gd" id="1_6aytv"]
 
 [node name="Control" type="Control"]
 custom_minimum_size = Vector2(0, 30)
@@ -10,7 +10,7 @@ anchor_bottom = 0.041
 offset_right = -0.64001465
 offset_bottom = -0.2800026
 size_flags_horizontal = 3
-script = ExtResource("1_cdhcs")
+script = ExtResource("1_6aytv")
 
 [node name="TeamUnitType" type="Panel" parent="."]
 layout_mode = 1

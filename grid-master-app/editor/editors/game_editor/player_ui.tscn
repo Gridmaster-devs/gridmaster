@@ -1,0 +1,38 @@
+[gd_scene load_steps=3 format=3 uid="uid://7p12fbwxt5ie"]
+
+[ext_resource type="Script" uid="uid://b3365td05v7jv" path="res://editor/editors/game_editor/player_ui.gd" id="1_h1s4b"]
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="2_gsp5n"]
+
+[node name="PlayerUi" type="Control"]
+layout_mode = 3
+anchor_right = 0.143
+anchor_bottom = 0.3
+offset_right = 0.44000244
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_h1s4b")
+
+[node name="EditorPanel" parent="." instance=ExtResource("2_gsp5n")]
+layout_mode = 1
+
+[node name="TopLabel" parent="EditorPanel/TopVBox" index="0"]
+text = ""
+
+[node name="HBoxContainer" type="HBoxContainer" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer"]
+layout_mode = 2
+text = "Name: "
+
+[node name="LineEdit" type="LineEdit" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TeamsVbox" type="VBoxContainer" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="1"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[editable path="EditorPanel"]

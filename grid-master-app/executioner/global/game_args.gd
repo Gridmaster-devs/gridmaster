@@ -273,13 +273,13 @@ func _gen_default_initiative_func() -> void:
 
 # This is necessary because _init() does not work with autoloaded objects
 ## Initializes the GameArgs object.
-func initialize(gs : GameState) -> void:
+func initialize(gs : GameState, game_rules: Dictionary[String, Variant]) -> void:
 	_game_state = gs
 	
 	arg_vars.set(ArgVarType.PERCENT_RANGE, 100)
 	
 	# TODO: This should be set in the game definition
-	arg_vars.set(ArgVarType.COMBAT_ROUNDS, 4)
+	arg_vars.set(ArgVarType.COMBAT_ROUNDS, game_rules.get("combat_rounds", 4))
 	
 	# This should be replaced with reading arguments from the game definition
 	# and then generating the appopriate function
