@@ -111,8 +111,12 @@ func load_game_definition(game_definition : Resource):
 
 var client_peer = WebSocketMultiplayerPeer.new()
 
+func _set_load_game_status(text: String):
+	if gui_scene is LoadGameGUI:
+		gui_scene.set_connection_status(text)
+
 func connect_to_server():
-	print("Attempting to connect to server...")
+	_set_load_game_status("Attempting to connect to server...")
 	var err = client_peer.create_client("ws://127.0.0.1:55555")
 	if err == OK:
 		multiplayer.multiplayer_peer = client_peer
@@ -120,16 +124,16 @@ func connect_to_server():
 		multiplayer.connection_failed.connect(_on_connection_failed)
 		multiplayer.server_disconnected.connect(_on_server_disconnected)
 	else:
-		printerr("Failed to create client peer. Error code: %d" % err)
+		_set_load_game_status("Failed to create client peer. Error code: %d" % err)
 
 func _on_connected_to_server():
-	print("Successfully connected to the server!")
+	_set_load_game_status("Successfully connected to the server!")
 
 func _on_connection_failed():
-	printerr("Connection to the server failed.")
+	_set_load_game_status("Connection to the server failed.")
 
 func _on_server_disconnected():
-	print("Disconnected from the server.")
+	_set_load_game_status("Disconnected from the server.")
 
 
 ## Prints the map into a log file

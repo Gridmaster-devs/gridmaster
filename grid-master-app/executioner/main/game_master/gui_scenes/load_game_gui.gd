@@ -3,6 +3,11 @@ extends GUIScene
 
 @onready var _load_game_button : Button = $LoadGameButton
 @onready var _connect_server_button : Button = $ConnectServerButton
+@onready var _connection_status_label : Label = $ConnectionStatusLabel
+
+func set_connection_status(status_text: String):
+	if _connection_status_label:
+		_connection_status_label.text = status_text
 
 
 func _load_game_button_pressed():
