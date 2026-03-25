@@ -30,7 +30,12 @@ func start_server():
 func _ready():
 	multiplayer.peer_connected.connect(_peer_connected)
 	multiplayer.peer_disconnected.connect(_peer_disconnected)
+	Global.game_file_requested.connect(_on_game_file_requested)
 	start_server()
+
+func _on_game_file_requested(peer_id: int):
+	print("Peer %d requested game file. Sending..." % peer_id)
+	Global.receive_game_file.rpc_id(peer_id, "res://game_cats_dogs.tres")
 
 ## Fired when a peer connects to the server
 func _peer_connected(id):

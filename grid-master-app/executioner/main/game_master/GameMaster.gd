@@ -128,6 +128,8 @@ func connect_to_server():
 
 func _on_connected_to_server():
 	_set_load_game_status("Successfully connected to the server!")
+	_set_load_game_status("Loading game..")
+	Global.request_game_file.rpc_id(SERVER_PEER_ID)
 
 func _on_connection_failed():
 	_set_load_game_status("Connection to the server failed.")
@@ -374,6 +376,14 @@ func DEBUG_create_unit(unit_type_id : int, position : Vector2i) -> void:
 
 
 
+func _on_game_file_received(file_path: String):
+	print("Received game file from server: ", file_path)
+	var game_def = load(file_path)
+	if game_def:
+		load_game_definition(game_def)
+	else:
+		_set_load_game_status("Failed to load game file!")
+
 # GODOT PREDEFINED FUNCTIONS
 
 # Called when the node enters the scene tree for the first time.
@@ -382,4 +392,5 @@ func _ready() -> void:
 	_click_tracker.clicked.connect(_clicked)
 	_custom_graphics = grid_graphics.get_custom_graphics()
 	ftm.resource_uploaded.connect(load_game_definition)
+	Global.game_file_received.connect(_on_game_file_received)
 	switch_gui_scene(LOAD_GAME_GUI, null)
