@@ -129,7 +129,7 @@ func connect_to_server():
 func _on_connected_to_server():
 	_set_load_game_status("Successfully connected to the server!")
 	_set_load_game_status("Loading game..")
-	Global.request_game_file.rpc_id(SERVER_PEER_ID)
+	Global.request_game_file.rpc_id(Global.SERVER_PEER_ID)
 
 func _on_connection_failed():
 	_set_load_game_status("Connection to the server failed.")
