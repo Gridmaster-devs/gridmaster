@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://cpsdnpca0xb06"]
+[gd_scene load_steps=5 format=3 uid="uid://cpsdnpca0xb06"]
 
 [ext_resource type="Script" uid="uid://bqg42x551mvyw" path="res://executioner/main/game_master/GameMaster.gd" id="1_8ixyn"]
+[ext_resource type="Script" uid="uid://of14uemmvsm2" path="res://common/popups/popup_manager.gd" id="2_ccu5x"]
 [ext_resource type="PackedScene" uid="uid://col1qb3vuji1l" path="res://executioner/main/grid_graphics/GridGraphics.tscn" id="2_ol8qj"]
 [ext_resource type="PackedScene" uid="uid://cehdpht6a7iw8" path="res://common/file_upload_download/file_transfer_manager.tscn" id="3_61xsh"]
 
@@ -8,6 +9,15 @@
 script = ExtResource("1_8ixyn")
 
 [node name="Grid Graphics" parent="." groups=["GridGraphics"] instance=ExtResource("2_ol8qj")]
+
+[node name="Container" type="Container" parent="Grid Graphics"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_ccu5x")
 
 [node name="Dialogs" type="Node" parent="."]
 
