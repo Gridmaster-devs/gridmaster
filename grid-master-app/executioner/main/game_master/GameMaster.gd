@@ -37,6 +37,8 @@ var current_path : Array[Vector2i] = [] # The cumulative path of the unit
 var movement_left : int # How many points of movement the unit still has left
 
 
+var _unit_information_popup: UnitInformationPopup = null
+
 # This is ONLY for drawing the map and the units!!
 # Only the game master should EVER modify the game state
 ## Returns the game grid if the game state is initialized
@@ -184,9 +186,11 @@ func _handle_event_default_in_game(event : StateMachineEvent):
 			_custom_graphics.clear_id(moved_unit.getId())
 			
 			#TEMPORARY#
-			var unit_info_popup: UnitInformationPopup = preload("res://executioner/main/game_master/gui_scenes/gui_elements/unit_information/unit_information_popup.tscn").instantiate()
-			unit_info_popup.add_to_tree()
-			unit_info_popup.set_unit_info(unit)
+			if _unit_information_popup != null: 
+				_unit_information_popup.remove_from_tree()
+			_unit_information_popup = preload("res://executioner/main/game_master/gui_scenes/gui_elements/unit_information/unit_information_popup.tscn").instantiate()
+			_unit_information_popup.add_to_tree()
+			_unit_information_popup.set_unit_info(unit)
 			#TEMPORARY#
 			
 			current_possible_tiles = _pathfinder.tiles_from_position(unit.getPosition(), unit.get_move_speed(), unit)
@@ -209,6 +213,7 @@ func _handle_event_unit_move(event : StateMachineEvent) -> void:
 		# Right click cancels moving a unit
 		if event.mouse_button == MOUSE_BUTTON_RIGHT:
 			_exit_unit_move()
+
 		
 		# Left click cancels moving a unit if the user clicks outside
 		# the possible tiles
@@ -281,6 +286,8 @@ func _handle_event_unit_move(event : StateMachineEvent) -> void:
 
 
 func _exit_unit_move() -> void:
+	#TODO: 
+	_unit_information_popup.remove_from_tree()
 	_custom_graphics.clear_id(moved_unit.getId())
 	
 	# If the movement action was confirmed, draw the small path for the unit
