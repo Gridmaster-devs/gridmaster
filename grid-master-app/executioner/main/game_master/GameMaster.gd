@@ -109,6 +109,35 @@ func load_game_definition(game_definition : Resource):
 	MessageDispatcher.broadcast_message("Game \"%s\" loaded." % game_state.getGameName()) 
 
 
+var client_peer = WebSocketMultiplayerPeer.new()
+
+func _set_load_game_status(text: String):
+	if gui_scene is LoadGameGUI:
+		gui_scene.set_connection_status(text)
+
+func connect_to_server():
+	_set_load_game_status("Attempting to connect to server...")
+	var err = client_peer.create_client("ws://127.0.0.1:55555")
+	if err == OK:
+		multiplayer.multiplayer_peer = client_peer
+		multiplayer.connected_to_server.connect(_on_connected_to_server)
+		multiplayer.connection_failed.connect(_on_connection_failed)
+		multiplayer.server_disconnected.connect(_on_server_disconnected)
+	else:
+		_set_load_game_status("Failed to create client peer. Error code: %d" % err)
+
+func _on_connected_to_server():
+	_set_load_game_status("Successfully connected to the server!")
+	_set_load_game_status("Loading game..")
+	Global.request_game_file.rpc_id(SERVER_PEER_ID)
+
+func _on_connection_failed():
+	_set_load_game_status("Connection to the server failed.")
+
+func _on_server_disconnected():
+	_set_load_game_status("Disconnected from the server.")
+
+
 ## Prints the map into a log file
 func printMap() -> void:
 	if (game_state != null):
@@ -162,6 +191,8 @@ func _handle_event_load_game(event : StateMachineEvent):
 		var button_press := event as ButtonPressedEvent
 		if button_press.button_type == ButtonPressedEvent.ButtonType.LOAD_GAME:
 			load_game_from_file()
+		elif button_press.button_type == ButtonPressedEvent.ButtonType.CONNECT_TO_SERVER:
+			connect_to_server()
 
 
 ## Default handler for in-game
@@ -345,6 +376,14 @@ func DEBUG_create_unit(unit_type_id : int, position : Vector2i) -> void:
 
 
 
+func _on_game_file_received(file_path: String):
+	print("Received game file from server: ", file_path)
+	var game_def = load(file_path)
+	if game_def:
+		load_game_definition(game_def)
+	else:
+		_set_load_game_status("Failed to load game file!")
+
 # GODOT PREDEFINED FUNCTIONS
 
 # Called when the node enters the scene tree for the first time.
@@ -353,4 +392,5 @@ func _ready() -> void:
 	_click_tracker.clicked.connect(_clicked)
 	_custom_graphics = grid_graphics.get_custom_graphics()
 	ftm.resource_uploaded.connect(load_game_definition)
+	Global.game_file_received.connect(_on_game_file_received)
 	switch_gui_scene(LOAD_GAME_GUI, null)

@@ -4,6 +4,6 @@ services:
       context: .
       dockerfile: build-client.Dockerfile
     volumes:
-      - ./build:/usr/src/app/build¨
+      - ./build:/usr/src/app/build
     tty: true
     stdin_open: true
