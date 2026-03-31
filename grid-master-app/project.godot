@@ -23,6 +23,7 @@ GML="*res://common/GML.gd"
 Global="*res://common/global.gd"
 GameArgs="*res://executioner/global/game_args.gd"
 MessageDispatcher="*res://executioner/global/message_dispatcher.gd"
+Networking="*res://executioner/global/networking.gd"
 
 [display]
 
