@@ -11,10 +11,12 @@ func set_connection_status(status_text: String):
 
 
 func _load_game_button_pressed():
+	Global.game_type = Global.GameType.SINGLEPLAYER
 	send_gm_signal(ButtonPressedEvent.new(ButtonPressedEvent.ButtonType.LOAD_GAME))
 
 
 func _connect_server_button_pressed():
+	Global.game_type = Global.GameType.MULTIPLAYER
 	send_gm_signal(ButtonPressedEvent.new(ButtonPressedEvent.ButtonType.CONNECT_TO_SERVER))
 
 
@@ -25,4 +27,3 @@ func _ready() -> void:
 
 func initialize(_args : Variant) -> void:
 	pass
-

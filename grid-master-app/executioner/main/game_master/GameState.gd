@@ -23,6 +23,11 @@ func addUnit(unit_type : UnitType, position : Vector2i, player : Player) -> Unit
 	_units.set(id, unit)
 	return unit
 
+## This should be called only when updating game state object
+## with updated unit information received from the server.
+func addUnitWithId(unit_type: UnitType, position : Vector2i, player_p: Player, unit_id_p: int) -> void:
+	var unit = Unit.new(unit_type, unit_id_p, player_p, position)
+	_units.set(unit_id_p, unit)
 
 # NOTE: There's no cheat handling anywhere right now.
 # An opposing player could currently technically make their units have unlimited
@@ -58,7 +63,6 @@ func remove_unit(unit : Unit) -> void:
 func increment_turn_number() -> void:
 	_turn_number += 1
 
-
 func deep_copy() -> GameState:
 	var new_units: Dictionary[int, Unit] = {}
 	
@@ -70,6 +74,7 @@ func deep_copy() -> GameState:
 	
 	return new_state
 
+
 # ---
 # GETTERS AND SETTERS
 # ---
@@ -78,6 +83,8 @@ func deep_copy() -> GameState:
 func getUnits() -> Array[Unit]:
 	return _units.values()
 
+func clearUnits() -> void:
+	_units = {}
 
 ## Gets a unit id for a new unit
 func getNewUnitId() -> int:

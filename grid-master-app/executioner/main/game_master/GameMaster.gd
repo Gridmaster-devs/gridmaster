@@ -49,49 +49,22 @@ func _ready() -> void:
 	_custom_graphics = grid_graphics.get_custom_graphics()
 	ftm.resource_uploaded.connect(load_game_definition)
 	Global.game_file_received.connect(_on_game_file_received)
+	## Network functionality
+	# TODO: If this causes issues, separate network vs. local signals
+	Global.turn_ended.connect(_on_turn_ended)
+	Global.game_state_received.connect(_on_game_state_received)
 	switch_gui_scene(LOAD_GAME_GUI, null)
-
-
 
 # ---
 # INFO LOCAL (TO THIS CLIENT) METHODS
 # ---
-
-## This is ONLY for drawing the map and the units!!
-## Only the game master should EVER modify the game state
-### Returns the game grid if the game state is initialized
-#func getGameGrid() -> Variant:
-	#if game_state == null:
-		#return null
-	#else:
-		#return game_definition.getGameGrid()
-#
-#
-## This is ONLY for drawing the map and the units!!
-## Only the game master should EVER modify the game state
-### Returns the units in the game if the game state is initialized
-#func getUnits() -> Variant:
-	#if game_state == null:
-		#return null
-	#else:
-		#return game_state.getUnits()
-#
-#
-### gets the game name
-#func getGameName() -> String:
-	#if game_state != null:
-		#return game_definition.game_name
-	#else:
-		#return ""
 
 # TODO consider moving to GameDataManager?
 ## Initializes game state, game definition and pathfinder objects and assigns them to the respective member variables.
 ## Also initializes graphics.
 ## NOTE that the game definition object initialized here ([GameDefinition]) is a distinct type and concept from [GameDefinitionResource].
 func initFromGameDefinition(game_definition_resource : GameDefinitionResource) -> void:
-	
-	# Initialize new game data objects
-	
+	## Initialize new game data objects
 	var unit_name_type_dict: Dictionary[String, int] = {}
 	var new_game_state = GameState.new({}, 0, 0)
 	var new_game_definition = GameDefinition.new()
@@ -163,6 +136,31 @@ func initFromGameDefinition(game_definition_resource : GameDefinitionResource) -
 	
 	#initialize graphics
 	initGraphics()
+
+func end_network_game_turn() -> void:
+	_custom_graphics.clear()
+
+	var game_state = data_manager.get_game_state()
+
+	# Compile locally assigned actions into the queue for server to process
+	var outgoing_actions: Array = []
+	for unit in game_state.units.values():
+		if unit.get_player_id() == game_state.client_player_id and unit.current_action != null:
+			var action = unit.current_action
+			if action is MoveAction:
+				outgoing_actions.append({
+					"type": "MoveAction",
+					"path": action.path,
+					"player_id": action.player_id,
+					"unit_id": action.unit.getId()
+				})
+			# TODO: Implement other actions as well in addition to the MoveAction..
+
+	print("[Client] Packing end_turn actions. Checked %d units. Found %d valid actions for player %d." % [game_state.units.size(), outgoing_actions.size(), game_state.client_player_id])
+
+	Global.end_peer_turn.rpc_id(Global.SERVER_PEER_ID, multiplayer.get_unique_id(), outgoing_actions)
+
+	print("[Client] Turn ended, waiting for server...")
 
 ## Ends the turn and processes all the actions that have been queued up.
 ## Unit actions are processed before other actions.
@@ -280,6 +278,13 @@ func end_turn_local() -> void:
 	data_manager.replace_game_state(process_end_turn_local_builder())
 	units_changed.emit()
 
+func end_turn() -> void:
+	if Global.game_type == Global.GameType.SINGLEPLAYER:
+		end_turn_local()
+	elif Global.game_type == Global.GameType.MULTIPLAYER:
+		end_network_game_turn()
+	else:
+		GML.log("Unknown game type (%s)!" % Global.game_type, GML.LogLevel.FATAL)
 
 # ---
 # INFO MULTIPLAYER METHODS
@@ -293,6 +298,7 @@ func _set_load_game_status(text: String):
 
 func connect_to_server():
 	_set_load_game_status("Attempting to connect to server...")
+	# FIXME: Hardcoded server IP address and port
 	var err = client_peer.create_client("ws://127.0.0.1:55555")
 	if err == OK:
 		multiplayer.multiplayer_peer = client_peer
@@ -312,8 +318,8 @@ func _on_connection_failed():
 
 func _on_server_disconnected():
 	_set_load_game_status("Disconnected from the server.")
-	
-	
+
+
 # ---
 # INFO STATE MACHINE FUNCTIONS
 # ---
@@ -375,7 +381,7 @@ func _handle_event_default_in_game(event : StateMachineEvent):
 	
 	elif event is ButtonPressedEvent:
 		if event.button_type == ButtonPressedEvent.ButtonType.END_TURN:
-			end_turn_local()
+			end_turn()
 
 
 ## Handler for when the user has clicked on a unit and is moving it
@@ -453,8 +459,10 @@ func _handle_event_unit_move(event : StateMachineEvent) -> void:
 	
 	elif event is ButtonPressedEvent:
 		if event.button_type == ButtonPressedEvent.ButtonType.END_TURN:
+			if not movement_waypoints.is_empty():
+				moved_unit.current_action = MoveAction.new(current_path, data_manager.get_client_attributes().client_player_id, moved_unit, data_manager)
 			_exit_unit_move()
-			end_turn_local()
+			end_turn()
 		
 
 
@@ -553,3 +561,43 @@ func _on_game_file_received(file_path: String):
 		load_game_definition(game_def)
 	else:
 		_set_load_game_status("Failed to load game file!")
+
+func _on_game_state_received(state_update: Dictionary):
+	_apply_state_update(state_update)
+	switch_gui_scene(IN_GAME_DEFAULT_GUI, data_manager.get_game_name())
+
+func _on_turn_ended(state_update: Dictionary):
+	_apply_state_update(state_update)
+
+func _apply_state_update(state_update: Dictionary) -> void:
+	# Create units from the dictionary
+	var game_state = data_manager.get_game_state()
+	if game_state != null:
+		game_state.increment_turn_number()
+
+		var alive_unit_ids = []
+		for u_state in state_update["units"]:
+			alive_unit_ids.append(u_state["id"])
+
+		var dead_units = []
+		for unit in game_state.units.values():
+			if not alive_unit_ids.has(unit.getId()):
+				dead_units.append(unit)
+
+		for unit in dead_units:
+			game_state.remove_unit(unit)
+
+		for u_state in state_update["units"]:
+			var unit_id = u_state["id"]
+			var unit = game_state.get_unit_by_id(unit_id)
+			if unit != null:
+				if unit.grid_position != u_state["position"]:
+					game_state.move_unit(unit.getId(), u_state["position"])
+				if u_state.has("hp"):
+					unit._hp = u_state["hp"]
+				unit.current_action = null
+
+		units_changed.emit()
+		# NOTE: most likely redundant call. Left since there is small possibility
+		#		that some functions might change it in between calls to this function?
+		ui_state = UIState.IN_GAME_DEFAULT
