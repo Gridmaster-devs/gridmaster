@@ -115,6 +115,22 @@ func remove_unit(unit : Unit) -> void:
 ## Ends the turn and processes all the actions that have been queued up.
 ## Unit actions are processed before other actions.
 func end_turn() -> void:
+	# Serialize unit actions to dictionaries for RPC
+	var serialized_actions: Array[Dictionary] = []
+	for unit in units.values():
+		if unit.current_action != null:
+			var action = unit.current_action
+			if action is MoveAction:
+				serialized_actions.append({
+					"type": "move",
+					"unit_id": unit.unit_id,
+					"player_id": action.player_id,
+					"path": action.path.duplicate()
+				})
+	
+	# Send to server
+	Networking.send_turn_actions(serialized_actions)
+
 	var unit_array = units.values()
 	var sort_func : Callable = GameArgs.args.get(GameArgs.ArgType.UNIT_INITIATIVE_FUNC)
 	sort_func.call(unit_array)

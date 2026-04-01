@@ -31,11 +31,20 @@ func _ready():
 	multiplayer.peer_connected.connect(_peer_connected)
 	multiplayer.peer_disconnected.connect(_peer_disconnected)
 	Networking.game_file_requested.connect(_on_game_file_requested)
+	Networking.turn_actions_received.connect(_on_turn_actions_received)
 	start_server()
 
 func _on_game_file_requested(peer_id: int):
 	print("Peer %d requested game file. Sending..." % peer_id)
 	Networking.receive_game_file.rpc_id(peer_id, "res://game_cats_dogs.tres")
+
+func _on_turn_actions_received(peer_id: int, actions: Array):
+	print("Server processing %d actions from peer %d" % [actions.size(), peer_id])
+	for action in actions:
+		if action is Dictionary:
+			print("  %s: unit %d, path %s" % [action.get("type", "unknown"), action.get("unit_id", -1), action.get("path", [])])
+		else:
+			print("  Action: ", action)
 
 ## Fired when a peer connects to the server
 func _peer_connected(id):
@@ -60,4 +69,3 @@ func _peer_disconnected(id):
 	if players.has(id):
 		players.erase(id)
 	print("Disconnected %d" % id)
-
