@@ -27,6 +27,8 @@ var ui_state : UIState = UIState.LOAD_GAME
 var gui_scene : GUIScene
 
 var game_state : GameState ## The state of the game
+var game_definition: GameDefinition
+var client_attributes: ClientAttributes
 var _pathfinder : DijkstraPathfinder ## The pathfinder for the game state
 
 # Variables for the unit movement state
@@ -36,6 +38,22 @@ var current_possible_tiles : Array[Vector2i] = [] # Which tiles the unit can mov
 var current_path : Array[Vector2i] = [] # The cumulative path of the unit
 var movement_left : int # How many points of movement the unit still has left
 
+# ---
+# INFO OVERRIDDEN GODOT VIRTUAL METHODS
+# ---
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	grid_graphics.linkGameMaster(self)
+	_click_tracker.clicked.connect(_clicked)
+	_custom_graphics = grid_graphics.get_custom_graphics()
+	ftm.resource_uploaded.connect(load_game_definition)
+	Global.game_file_received.connect(_on_game_file_received)
+	switch_gui_scene(LOAD_GAME_GUI, null)
+
+# ---
+# INFO LOCAL (TO THIS CLIENT) METHODS
+# ---
 
 # This is ONLY for drawing the map and the units!!
 # Only the game master should EVER modify the game state
@@ -60,15 +78,14 @@ func getUnits() -> Variant:
 ## gets the game name
 func getGameName() -> String:
 	if game_state != null:
-		return game_state.getGameName()
+		return game_definition.game_name
 	else:
 		return ""
 
 
 ## Initializes a game state from a game definition
-func initGameStateFromGameDefinition(game_definition : GameDefinitionResource):
-	game_state = GameState.initFromGameDefinition(game_definition)
-	_pathfinder = game_state.get_pathfinder()
+func initGameStateFromGameDefinition(game_definition_resource : GameDefinitionResource):
+	initFromGameDefinition(game_definition_resource)
 	#INIT UNITS
 	# DEBUG
 	#var blu_id = game_state.add_team("blu team", Color.BLUE, [])
@@ -87,6 +104,78 @@ func initGameStateFromGameDefinition(game_definition : GameDefinitionResource):
 	# DEBUG
 
 	initGraphics()
+	
+## Initializes game state, game definition and pathfinder objects and assigns them to the respective member variables
+func initFromGameDefinition(game_definition_resource : GameDefinitionResource) -> void:
+	var unit_name_type_dict: Dictionary[String, int] = {}
+	var new_game_state = GameState.new()
+	var new_game_definition = GameDefinition.new()
+	var new_client_attributes = ClientAttributes.new()
+	new_game_definition.initUnitTypesFromResource(game_definition_resource, unit_name_type_dict)
+	new_game_definition.game_name = game_definition_resource.game_name
+	new_game_state._grid = GameGrid.initFromMapResource(game_definition_resource.loadMap())
+	
+	var game_def_teams: Array[TeamUiRes] = game_definition_resource.team_uis
+	var game_def_players: Array[PlayerUiRes] = game_definition_resource.player_uis
+	
+	
+	var team_id_dict: Dictionary[String, int] = {}
+	
+	var player_name_id_dict: Dictionary[String, int] = {}
+	#teams and players
+	for team in game_def_teams: 
+		var team_name = team.get_team_name()
+		var unit_names: Dictionary[String, bool] = team.get_units()
+		var team_units: Array[UnitType] = []
+		for unit_name in unit_names.keys(): 
+			if unit_names[unit_name]:
+				var cur_unit_type_id = unit_name_type_dict[unit_name]
+				team_units.append(new_game_definition.unit_types[cur_unit_type_id])
+		var team_id = new_game_state.add_team(team_name, team.get_team_color(), team_units)
+		team_id_dict[team_name] = team_id
+	
+	var client_player_added: bool = false
+	for player in game_def_players: 
+		var player_team = null
+		var ptdict = player.get_teams()
+		var player_name = player.get_player_name()
+		#get the team of the player
+		for t_name in ptdict.keys():
+			if ptdict[t_name]:
+				player_team = t_name
+		if player_team == null:
+			continue
+		#add the player 
+		var p_id = new_game_state.add_player(player_name, team_id_dict[player_team], false)
+		player_name_id_dict[player_name] = p_id
+		#add the client player as the first one
+		if !client_player_added: 
+			new_client_attributes.client_player_id = p_id
+			client_player_added = true
+	
+	#units on the map
+	var unit_layer = game_definition_resource.unit_layer
+	for x in unit_layer.width:
+		for y in unit_layer.height:
+			var cur_attributes = unit_layer.getItem(x, y)
+			if (cur_attributes.has(MapAttributes.UNIT_UNIT_LIB_ITEM_ID) and 
+				cur_attributes.has(MapAttributes.UNIT_TEAM_ID) and 
+				cur_attributes.has(MapAttributes.UNIT_PLAYER_ID)):
+				var unit_name = cur_attributes[MapAttributes.UNIT_UNIT_LIB_ITEM_ID]
+				var player_name = cur_attributes[MapAttributes.UNIT_PLAYER_ID]
+				new_game_state.addUnit(new_game_definition.unit_types.get(unit_name_type_dict[unit_name]), Vector2i(x, y), player_name_id_dict[player_name]) # FIXME redundant way to get unittype in first argument 
+
+	# TODO: Add import from game definition
+	GameArgs.initialize(new_game_state, game_definition_resource.game_rules)
+	
+	new_game_definition.pathfinder = DijkstraPathfinder.new()
+	new_game_definition.pathfinder.initialize(new_game_state.grid, new_game_state.units)
+	
+	game_state = new_game_state
+	game_definition = new_game_definition
+	client_attributes = new_client_attributes
+	
+	_pathfinder = new_game_definition.pathfinder
 
 
 ## Initializes the user interface and graphics elements at the start of the game
@@ -100,14 +189,22 @@ func load_game_from_file() -> void:
 
 
 ## Called by the FTM when file is loaded
-func load_game_definition(game_definition : Resource):
-	assert(game_definition != null, "Invalid game definition in file!")
-	initGameStateFromGameDefinition(game_definition)
+func load_game_definition(game_definition_resource : Resource):
+	assert(game_definition_resource != null, "Invalid game definition in file!")
+	initGameStateFromGameDefinition(game_definition_resource)
 	switch_gui_scene(IN_GAME_DEFAULT_GUI, getGameName())
 	ui_state = UIState.IN_GAME_DEFAULT
 	
-	MessageDispatcher.broadcast_message("Game \"%s\" loaded." % game_state.getGameName()) 
+	MessageDispatcher.broadcast_message("Game \"%s\" loaded." % game_definition.game_name)
 
+func end_turn() -> void:
+	_custom_graphics.clear()
+	game_state.end_turn()
+	units_changed.emit()
+	
+# ---
+# INFO MULTIPLAYER METHODS
+# ---
 
 var client_peer = WebSocketMultiplayerPeer.new()
 
@@ -136,34 +233,9 @@ func _on_connection_failed():
 
 func _on_server_disconnected():
 	_set_load_game_status("Disconnected from the server.")
-
-
-## Prints the map into a log file
-func printMap() -> void:
-	if (game_state != null):
-		game_state.printMap(true)
-
-
-## Prints all the unit types into a log file
-func printUnitTypes() -> void:
-	if (game_state != null):
-		game_state.printUnitTypes(true)
-
-
-## Prints all of the tile types into a log file console
-func printTileTypes() -> void:
-	if (game_state != null):
-		game_state.printTileTypes(true)
-
-
-func end_turn() -> void:
-	_custom_graphics.clear()
-	game_state.end_turn()
-	units_changed.emit()
-
-
-
-# STATE MACHINE FUNCTIONS
+# ---
+# INFO STATE MACHINE FUNCTIONS
+# ---
 
 ## Receives input from the graphics element.
 ##
@@ -206,7 +278,7 @@ func _handle_event_default_in_game(event : StateMachineEvent):
 			
 			
 			# The unit doesn't belong to the current player
-			if unit.get_player_id() != game_state.client_player_id: return
+			if unit.get_player_id() != client_attributes.client_player_id: return
 			
 			# The user clicked on a tile in the map limits and there is a unit on the tile
 			
@@ -241,7 +313,7 @@ func _handle_event_unit_move(event : StateMachineEvent) -> void:
 			
 			# If the user clicks on the latest waypoint, accept the movement command
 			if (!movement_waypoints.is_empty() and movement_waypoints.back() == event.grid_pos):
-				moved_unit.current_action = MoveAction.new(current_path, game_state.get_client_player_id(), moved_unit, game_state)
+				moved_unit.current_action = MoveAction.new(current_path, client_attributes.client_player_id, moved_unit, game_state)
 				_exit_unit_move()
 				return
 			
@@ -345,6 +417,26 @@ func receive_raw_input(event : InputEvent):
 		if event is InputEventMouseMotion:
 			receive_ui_event(MouseMovedToTileEvent.new(grid_graphics.get_current_hovered_tile_coords()))
 
+# ---
+# INFO LOGGING METHODS
+# ---
+
+## Prints the map into a log file
+func printMap() -> void:
+	if (game_state != null):
+		game_state.printMap(true)
+
+
+## Prints all the unit types into a log file
+func printUnitTypes() -> void:
+	if (game_state != null):
+		game_state.printUnitTypes(true)
+
+
+## Prints all of the tile types into a log file console
+func printTileTypes() -> void:
+	if (game_state != null):
+		game_state.printTileTypes(true)
 
 # TESTING FUNCTIONS BLOCK
 # THESE FUNCTIONS ARE SOLELY FOR TESTING THE PROGRAM
@@ -383,14 +475,3 @@ func _on_game_file_received(file_path: String):
 		load_game_definition(game_def)
 	else:
 		_set_load_game_status("Failed to load game file!")
-
-# GODOT PREDEFINED FUNCTIONS
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	grid_graphics.linkGameMaster(self)
-	_click_tracker.clicked.connect(_clicked)
-	_custom_graphics = grid_graphics.get_custom_graphics()
-	ftm.resource_uploaded.connect(load_game_definition)
-	Global.game_file_received.connect(_on_game_file_received)
-	switch_gui_scene(LOAD_GAME_GUI, null)
