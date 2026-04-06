@@ -2,13 +2,6 @@ class_name GameState
 extends RefCounted
 ## Class that represents everything that makes up the current state of the game, ex. the units, the map, etc
 
-# This should maybe be in the gamemaster if the gamestate is supposed to be practically
-# identical between clients
-## The player ID of the player currently playing on this instance of the game
-var client_player_id : int = -1
-
-var game_name : String
-
 var _grid : GameGrid ## Grid that represents the map
 var grid : GameGrid:
 	get: return _grid
@@ -21,9 +14,6 @@ var players_index = 0 # Count for how many players there are
 var units : Dictionary[int, Unit] = {} ## All the units in the game, NOTE: also stored in each map tile
 var players : Dictionary[int, Player] = {-1 : Player.NEUTRAL_PLAYER} ## All the players in the game
 var teams : Dictionary[int, Team] = {-1 : Team.NEUTRAL_TEAM} ## All the teams in the game
-var unit_types : Dictionary[int, UnitType] = {} ## All the types of units in the game
-var _pathfinder : DijkstraPathfinder ## Dijkstra pathfinder for unit pathing
-
 
 ## tracks the id to be given to the next unit that spawns
 ## increments by one each time
@@ -49,12 +39,13 @@ func addUnit(unit_type : UnitType, position : Vector2i, player_id : int) -> Unit
 	units.set(id, unit)
 	return unit
 
+#CAUTION commented out but possibly still used by something
 ## Adds a unit by unit type id.
 ## Will fail if there is no unit type corresponding to the id.
-func addUnitByTypeId(id : int, position : Vector2i, player_id : int) -> Unit:
-	var unit_type = unit_types.get(id)
-	assert(unit_type != null, "Tried to add unit with invalid type ID!")
-	return addUnit(unit_type, position, player_id)
+#func addUnitByTypeId(id : int, position : Vector2i, player_id : int) -> Unit:
+	#var unit_type = unit_types.get(id)
+	#assert(unit_type != null, "Tried to add unit with invalid type ID!")
+	#return addUnit(unit_type, position, player_id)
 
 
 ## Adds a team to the game.
@@ -153,93 +144,12 @@ func end_turn() -> void:
 	turn_number += 1
 
 
-## Initializes the unit types from a game definition
-func initUnitTypesFromResource(game_definition : GameDefinitionResource, 
-								unit_name_type_dict: Dictionary[String, int]) -> void:
-	var gd_units : Array[UnitResource] = game_definition.load_units()
-	var type_count : int = 0
-	for unit in gd_units:
-		var cur_unit_type = UnitType.initFromUnitResource(unit, type_count)
-		unit_types.set(type_count, cur_unit_type)
-		unit_name_type_dict[ cur_unit_type.unit_name] = type_count
-		type_count += 1
+
 		
-
-
-## Initializes and returns a game state object from a game definition
-static func initFromGameDefinition(game_definition : GameDefinitionResource) -> GameState:
-	var unit_name_type_dict: Dictionary[String, int] = {}
-	var game_state = GameState.new()
-	game_state.initUnitTypesFromResource(game_definition, unit_name_type_dict)
-	game_state.game_name = game_definition.game_name
-	game_state._grid = GameGrid.initFromMapResource(game_definition.loadMap())
-	
-	game_state._pathfinder = DijkstraPathfinder.new()
-	game_state._pathfinder.initialize(game_state.grid, game_state.units)
-	
-	var game_def_teams: Array[TeamUiRes] = game_definition.team_uis
-	var game_def_players: Array[PlayerUiRes] = game_definition.player_uis
-	
-	
-	var team_id_dict: Dictionary[String, int] = {}
-	
-	var player_name_id_dict: Dictionary[String, int] = {}
-	#teams and players
-	for team in game_def_teams: 
-		var team_name = team.get_team_name()
-		var unit_names: Dictionary[String, bool] = team.get_units()
-		var team_units: Array[UnitType] = []
-		for unit_name in unit_names.keys(): 
-			if unit_names[unit_name]:
-				var cur_unit_type_id = unit_name_type_dict[unit_name]
-				team_units.append(game_state.unit_types[cur_unit_type_id])
-		var team_id = game_state.add_team(team_name, team.get_team_color(), team_units)
-		team_id_dict[team_name] = team_id
-	
-	var client_player_added: bool = false
-	for player in game_def_players: 
-		var player_team = null
-		var ptdict = player.get_teams()
-		var player_name = player.get_player_name()
-		#get the team of the player
-		for t_name in ptdict.keys():
-			if ptdict[t_name]:
-				player_team = t_name
-		if player_team == null:
-			continue
-		#add the player 
-		var p_id = game_state.add_player(player_name, team_id_dict[player_team], false)
-		player_name_id_dict[player_name] = p_id
-		#add the client player as the first one
-		if !client_player_added: 
-			game_state.client_player_id = p_id
-			client_player_added = true
-	
-	#units on the map
-	var unit_layer = game_definition.unit_layer
-	for x in unit_layer.width:
-		for y in unit_layer.height:
-			var cur_attributes = unit_layer.getItem(x, y)
-			if (cur_attributes.has(MapAttributes.UNIT_UNIT_LIB_ITEM_ID) and 
-				cur_attributes.has(MapAttributes.UNIT_TEAM_ID) and 
-				cur_attributes.has(MapAttributes.UNIT_PLAYER_ID)):
-				var unit_name = cur_attributes[MapAttributes.UNIT_UNIT_LIB_ITEM_ID]
-				var player_name = cur_attributes[MapAttributes.UNIT_PLAYER_ID]
-				game_state.addUnitByTypeId(unit_name_type_dict[unit_name], Vector2i(x, y), player_name_id_dict[player_name])
-
-	# TODO: Add import from game definition
-	GameArgs.initialize(game_state, game_definition.game_rules)
-	
-	return game_state
-
 
 # ---
 # GETTERS AND SETTERS
 # ---
-
-func getGameName() -> String:
-	return game_name
-
 
 ## Returns the game grid
 func getGameGrid() -> GameGrid:
@@ -281,20 +191,10 @@ func get_unit_by_id(id : int) -> Unit:
 	return units.get(id)
 
 
-func get_pathfinder() -> DijkstraPathfinder:
-	return _pathfinder
-
-
 ## Returns the unit on the specified tile.
 ## Can return null if there is no unit on the tile.
 func get_unit_on_tile(coords : Vector2i) -> Unit:
 	return grid.get_unit_on_tile(coords)
-
-
-func get_client_player_id() -> int:
-	return client_player_id
-
-
 
 # ---
 # DEBUG FUNCTIONS
@@ -320,13 +220,6 @@ func printMap(to_log : bool):
 		grid.printMap(to_log)
 
 
-## Prints the unit types into a logfile
-func printUnitTypes(to_log : bool):
-	for type in unit_types.values():
-		if (to_log == true):
-			GML.log(type._to_string())
-		else:
-			print(type._to_string())
 
 
 ## Prints the tile types into a logfile
