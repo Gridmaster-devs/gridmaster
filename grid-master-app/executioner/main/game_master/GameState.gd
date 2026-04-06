@@ -1,6 +1,8 @@
 class_name GameState
 extends RefCounted
-## Class that represents everything that makes up the current state of the game, ex. the units, the map, etc
+## Stores the information about the state of the game i.e. data that changes 
+## during runtime (= as the game is played). Contrast with [GameDefinition].
+
 
 var _grid : GameGrid ## Grid that represents the map
 var grid : GameGrid:
@@ -101,51 +103,6 @@ func swap_units(unit1 : Unit, unit2 : Unit) -> void:
 func remove_unit(unit : Unit) -> void:
 	grid.remove_unit(unit.grid_position)
 	units.erase(unit.unit_id)
-
-
-## Ends the turn and processes all the actions that have been queued up.
-## Unit actions are processed before other actions.
-func end_turn() -> void:
-	var unit_array = units.values()
-	var sort_func : Callable = GameArgs.args.get(GameArgs.ArgType.UNIT_INITIATIVE_FUNC)
-	sort_func.call(unit_array)
-	
-	# Looping through the move actions until every unit has stopped
-	# (reached their destination, or gotten stopped by a fight or something else)
-	var done = false
-	while(done == false):
-		done = true
-		
-		# Advance one step in each MoveAction
-		for unit : Unit in unit_array:
-			if (unit.current_action is MoveAction and unit.has_stopped() == false):
-				done = false
-				(unit.current_action as MoveAction).step()
-		
-		var units_to_be_removed : Array[Unit] = []
-		
-		# If any units have died we remove them from the array
-		# We can't erase units while iterating over the array or it will break
-		for unit : Unit in unit_array:
-			if (unit.is_dead()):
-				units_to_be_removed.append(unit)
-		
-		# NOTE: Possible to improve efficiency by using indices of the units in the
-		# unit array so that it doesn't have to search for the position each time
-		for unit in units_to_be_removed:
-			unit_array.erase(unit)
-			remove_unit(unit)
-	
-	# Clear actions
-	for unit : Unit in unit_array:
-		unit.current_action = null
-		
-	
-	turn_number += 1
-
-
-
-		
 
 # ---
 # GETTERS AND SETTERS
