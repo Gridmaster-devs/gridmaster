@@ -9,13 +9,7 @@ var grid : GameGrid:
 	get: return _grid
 	set(v): return
 
-# These are used for generating team and player ids
-var teams_index = 0 # Count for how many teams there are
-var players_index = 0 # Count for how many players there are
-
 var units : Dictionary[int, Unit] = {} ## All the units in the game, NOTE: also stored in each map tile
-var players : Dictionary[int, Player] = {-1 : Player.NEUTRAL_PLAYER} ## All the players in the game
-var teams : Dictionary[int, Team] = {-1 : Team.NEUTRAL_TEAM} ## All the teams in the game
 
 ## tracks the id to be given to the next unit that spawns
 ## increments by one each time
@@ -31,10 +25,8 @@ var action_queue : Array[PlayerAction] = []
 ## Adds a unit to the game.
 ##
 ## Adding a unit with the player id of -1 makes it a neutral unit
-func addUnit(unit_type : UnitType, position : Vector2i, player_id : int) -> Unit:
+func addUnit(unit_type : UnitType, position : Vector2i, player : Player) -> Unit:
 	var id = getNewUnitId()
-	
-	var player : Player = players.get(player_id)
 	
 	var unit = Unit.new(unit_type, id, player, position)
 	grid.addUnit(unit)
@@ -48,21 +40,6 @@ func addUnit(unit_type : UnitType, position : Vector2i, player_id : int) -> Unit
 	#var unit_type = unit_types.get(id)
 	#assert(unit_type != null, "Tried to add unit with invalid type ID!")
 	#return addUnit(unit_type, position, player_id)
-
-
-## Adds a team to the game.
-func add_team(team_name : String, color : Color, team_units : Array[UnitType]) -> int:
-	var team_id : int = get_new_team_id()
-	teams.set(team_id, Team.new(team_name, team_id, color, team_units))
-	return team_id
-
-
-## Adds a player to the game.
-func add_player(player_name : String, team_id : int, computer : bool) -> int:
-	var player_id = get_new_player_id()
-	players.set(player_id, Player.new(player_name, player_id, teams.get(team_id), computer))
-	return player_id
-
 
 # NOTE: There's no cheat handling anywhere right now.
 # An opposing player could currently technically make their units have unlimited
@@ -123,17 +100,6 @@ func getNewUnitId() -> int:
 	unit_id_count += 1
 	return unit_id_count
 
-
-func get_new_team_id() -> int:
-	teams_index += 1
-	return teams_index
-
-
-func get_new_player_id() -> int:
-	players_index += 1
-	return players_index
-
-
 ## gets the game grid width
 func getGridWidth() -> int: 
 	return grid.getHeight()
@@ -158,8 +124,8 @@ func get_unit_on_tile(coords : Vector2i) -> Unit:
 # ---
 
 ## Creates a unit for testing
-func createDebugUnit(position : Vector2i)-> Unit:
-	return addUnit(UnitType.debugType(), position, -1)
+#func createDebugUnit(position : Vector2i)-> Unit:
+	#return addUnit(UnitType.debugType(), position, -1)
 
 
 ## Creates a simple test game for debugging

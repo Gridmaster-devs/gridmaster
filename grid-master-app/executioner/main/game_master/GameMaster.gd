@@ -113,7 +113,7 @@ func initFromGameDefinition(game_definition_resource : GameDefinitionResource) -
 			if unit_names[unit_name]:
 				var cur_unit_type_id = unit_name_type_dict[unit_name]
 				team_units.append(new_game_definition.unit_types[cur_unit_type_id])
-		var team_id = new_game_state.add_team(team_name, team.get_team_color(), team_units)
+		var team_id = new_game_definition.add_team(team_name, team.get_team_color(), team_units)
 		team_id_dict[team_name] = team_id
 	
 	var client_player_added: bool = false
@@ -128,7 +128,7 @@ func initFromGameDefinition(game_definition_resource : GameDefinitionResource) -
 		if player_team == null:
 			continue
 		#add the player 
-		var p_id = new_game_state.add_player(player_name, team_id_dict[player_team], false)
+		var p_id = new_game_definition.add_player(player_name, team_id_dict[player_team], false)
 		player_name_id_dict[player_name] = p_id
 		#add the client player as the first one
 		if !client_player_added: 
@@ -145,7 +145,7 @@ func initFromGameDefinition(game_definition_resource : GameDefinitionResource) -
 				cur_attributes.has(MapAttributes.UNIT_PLAYER_ID)):
 				var unit_name = cur_attributes[MapAttributes.UNIT_UNIT_LIB_ITEM_ID]
 				var player_name = cur_attributes[MapAttributes.UNIT_PLAYER_ID]
-				new_game_state.addUnit(new_game_definition.unit_types.get(unit_name_type_dict[unit_name]), Vector2i(x, y), player_name_id_dict[player_name]) # FIXME redundant way to get unittype in first argument 
+				new_game_state.addUnit(new_game_definition.unit_types.get(unit_name_type_dict[unit_name]), Vector2i(x, y), new_game_definition.get_player_by_id(player_name_id_dict[player_name])) # FIXME redundant way to get unittype in first argument 
 
 	# TODO: Add import from game definition
 	GameArgs.initialize(new_game_state, game_definition_resource.game_rules)
