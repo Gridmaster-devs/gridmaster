@@ -1,5 +1,8 @@
 class_name GameDefinition
 extends RefCounted
+## Stores the static (does not change during runtime) definitions of the currently played game. 
+## Contrast with [GameState].
+## NOTE that this game definition object is a distinct type and concept from [GameDefinitionResource]
 
 var game_name : String:
 	get:

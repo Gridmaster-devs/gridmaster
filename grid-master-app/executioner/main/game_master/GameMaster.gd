@@ -38,8 +38,9 @@ var current_possible_tiles : Array[Vector2i] = [] # Which tiles the unit can mov
 var current_path : Array[Vector2i] = [] # The cumulative path of the unit
 var movement_left : int # How many points of movement the unit still has left
 
+
 # ---
-# INFO OVERRIDDEN GODOT VIRTUAL METHODS
+# INFO OVERRIDDEN GODOT ENGINE VIRTUAL METHODS
 # ---
 
 # Called when the node enters the scene tree for the first time.
@@ -50,6 +51,7 @@ func _ready() -> void:
 	ftm.resource_uploaded.connect(load_game_definition)
 	Global.game_file_received.connect(_on_game_file_received)
 	switch_gui_scene(LOAD_GAME_GUI, null)
+
 
 # ---
 # INFO LOCAL (TO THIS CLIENT) METHODS
@@ -83,29 +85,9 @@ func getGameName() -> String:
 		return ""
 
 
-## Initializes a game state from a game definition
-func initGameStateFromGameDefinition(game_definition_resource : GameDefinitionResource):
-	initFromGameDefinition(game_definition_resource)
-	#INIT UNITS
-	# DEBUG
-	#var blu_id = game_state.add_team("blu team", Color.BLUE, [])
-	#var red_id = game_state.add_team("red team", Color.RED, [])
-	#var p1_id = game_state.add_player("player1", blu_id, false)
-	#var p2_id = game_state.add_player("player2", red_id, false)
-	
-	#game_state.addUnitByTypeId(0, Vector2i(0,0), p1_id)
-	#game_state.addUnitByTypeId(0, Vector2i(0,1), p1_id)
-	#game_state.addUnitByTypeId(0, Vector2i(1,0), p2_id)
-	#game_state.addUnitByTypeId(0, Vector2i(1,1), p2_id)
-	
-	#game_state.addUnitByTypeId(0, Vector2i(2,2), -1)
-	
-	#game_state.client_player_id = blu_id
-	# DEBUG
-
-	initGraphics()
-	
-## Initializes game state, game definition and pathfinder objects and assigns them to the respective member variables
+## Initializes game state, game definition and pathfinder objects and assigns them to the respective member variables.
+## Also initializes graphics.
+## NOTE that the game definition object initialized here ([GameDefinition]) is a distinct type and concept from [GameDefinitionResource].
 func initFromGameDefinition(game_definition_resource : GameDefinitionResource) -> void:
 	var unit_name_type_dict: Dictionary[String, int] = {}
 	var new_game_state = GameState.new()
@@ -176,7 +158,49 @@ func initFromGameDefinition(game_definition_resource : GameDefinitionResource) -
 	client_attributes = new_client_attributes
 	
 	_pathfinder = new_game_definition.pathfinder
+	
+	#initialize graphics
+	initGraphics()
 
+## Ends the turn and processes all the actions that have been queued up.
+## Unit actions are processed before other actions.
+func end_turn_local() -> void:
+	var unit_array = game_state.units.values()
+	var sort_func : Callable = GameArgs.args.get(GameArgs.ArgType.UNIT_INITIATIVE_FUNC)
+	sort_func.call(unit_array)
+	
+	# Looping through the move actions until every unit has stopped
+	# (reached their destination, or gotten stopped by a fight or something else)
+	var done = false
+	while(done == false):
+		done = true
+		
+		# Advance one step in each MoveAction
+		for unit : Unit in unit_array:
+			if (unit.current_action is MoveAction and unit.has_stopped() == false):
+				done = false
+				(unit.current_action as MoveAction).step()
+		
+		var units_to_be_removed : Array[Unit] = []
+		
+		# If any units have died we remove them from the array
+		# We can't erase units while iterating over the array or it will break
+		for unit : Unit in unit_array:
+			if (unit.is_dead()):
+				units_to_be_removed.append(unit)
+		
+		# NOTE: Possible to improve efficiency by using indices of the units in the
+		# unit array so that it doesn't have to search for the position each time
+		for unit in units_to_be_removed:
+			unit_array.erase(unit)
+			game_state.remove_unit(unit)
+	
+	# Clear actions
+	for unit : Unit in unit_array:
+		unit.current_action = null
+		
+	
+	game_state.turn_number += 1
 
 ## Initializes the user interface and graphics elements at the start of the game
 func initGraphics() -> void:
@@ -191,7 +215,7 @@ func load_game_from_file() -> void:
 ## Called by the FTM when file is loaded
 func load_game_definition(game_definition_resource : Resource):
 	assert(game_definition_resource != null, "Invalid game definition in file!")
-	initGameStateFromGameDefinition(game_definition_resource)
+	initFromGameDefinition(game_definition_resource)
 	switch_gui_scene(IN_GAME_DEFAULT_GUI, getGameName())
 	ui_state = UIState.IN_GAME_DEFAULT
 	
@@ -199,9 +223,10 @@ func load_game_definition(game_definition_resource : Resource):
 
 func end_turn() -> void:
 	_custom_graphics.clear()
-	game_state.end_turn()
+	end_turn_local()
 	units_changed.emit()
-	
+
+
 # ---
 # INFO MULTIPLAYER METHODS
 # ---
@@ -233,6 +258,8 @@ func _on_connection_failed():
 
 func _on_server_disconnected():
 	_set_load_game_status("Disconnected from the server.")
+	
+	
 # ---
 # INFO STATE MACHINE FUNCTIONS
 # ---
@@ -416,6 +443,7 @@ func receive_raw_input(event : InputEvent):
 	else:
 		if event is InputEventMouseMotion:
 			receive_ui_event(MouseMovedToTileEvent.new(grid_graphics.get_current_hovered_tile_coords()))
+
 
 # ---
 # INFO LOGGING METHODS
