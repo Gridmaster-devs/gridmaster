@@ -150,21 +150,20 @@ func initFromGameDefinition(game_definition_resource : GameDefinitionResource) -
 	# TODO: Add import from game definition
 	GameArgs.initialize(new_game_state, game_definition_resource.game_rules)
 	
-	new_game_definition.pathfinder = DijkstraPathfinder.new()
-	new_game_definition.pathfinder.initialize(new_game_state.grid, new_game_state.units)
+	_pathfinder = DijkstraPathfinder.new()
+	_pathfinder.initialize(new_game_state.grid, new_game_state.units)
 	
 	game_state = new_game_state
 	game_definition = new_game_definition
 	client_attributes = new_client_attributes
-	
-	_pathfinder = new_game_definition.pathfinder
 	
 	#initialize graphics
 	initGraphics()
 
 ## Ends the turn and processes all the actions that have been queued up.
 ## Unit actions are processed before other actions.
-func end_turn_local() -> void:
+## NOTE This method increments the game state by directly mutating game state. Contrast with [method GameMaster.process_end_turn_local_factory]
+func process_end_turn_local() -> void:
 	var unit_array = game_state.units.values()
 	var sort_func : Callable = GameArgs.args.get(GameArgs.ArgType.UNIT_INITIATIVE_FUNC)
 	sort_func.call(unit_array)
@@ -202,6 +201,50 @@ func end_turn_local() -> void:
 	
 	game_state.turn_number += 1
 
+### Ends the turn and processes all the actions that have been queued up.
+### Unit actions are processed before other actions.
+### NOTE This method does not increment the game state on its own, but returns a new gamestate that can be mounted. Contrast with [method GameMaster.process_end_turn_local]
+#func process_end_turn_local_factory() -> GameState:
+	#var new_game_state = GameState.new()
+	#var unit_array = game_state.units.values()
+	#var sort_func : Callable = GameArgs.args.get(GameArgs.ArgType.UNIT_INITIATIVE_FUNC)
+	#sort_func.call(unit_array)
+	#
+	## Looping through the move actions until every unit has stopped
+	## (reached their destination, or gotten stopped by a fight or something else)
+	#var done = false
+	#while(done == false):
+		#done = true
+		#
+		## Advance one step in each MoveAction
+		#for unit : Unit in unit_array:
+			#if (unit.current_action is MoveAction and unit.has_stopped() == false):
+				#done = false
+				#(unit.current_action as MoveAction).step()
+		#
+		#var units_to_be_removed : Array[Unit] = []
+		#
+		## If any units have died we remove them from the array
+		## We can't erase units while iterating over the array or it will break
+		#for unit : Unit in unit_array:
+			#if (unit.is_dead()):
+				#units_to_be_removed.append(unit)
+		#
+		## NOTE: Possible to improve efficiency by using indices of the units in the
+		## unit array so that it doesn't have to search for the position each time
+		#for unit in units_to_be_removed:
+			#unit_array.erase(unit)
+			#game_state.remove_unit(unit)
+	#
+	## Clear actions
+	#for unit : Unit in unit_array:
+		#unit.current_action = null
+		#
+	#
+	#game_state.turn_number += 1
+	
+
+
 ## Initializes the user interface and graphics elements at the start of the game
 func initGraphics() -> void:
 	grid_graphics.initFromGameGrid(getGameGrid())
@@ -221,9 +264,9 @@ func load_game_definition(game_definition_resource : Resource):
 	
 	MessageDispatcher.broadcast_message("Game \"%s\" loaded." % game_definition.game_name)
 
-func end_turn() -> void:
+func end_turn_local() -> void:
 	_custom_graphics.clear()
-	end_turn_local()
+	process_end_turn_local()
 	units_changed.emit()
 
 
@@ -321,7 +364,7 @@ func _handle_event_default_in_game(event : StateMachineEvent):
 	
 	elif event is ButtonPressedEvent:
 		if event.button_type == ButtonPressedEvent.ButtonType.END_TURN:
-			end_turn()
+			end_turn_local()
 
 
 ## Handler for when the user has clicked on a unit and is moving it
@@ -400,7 +443,7 @@ func _handle_event_unit_move(event : StateMachineEvent) -> void:
 	elif event is ButtonPressedEvent:
 		if event.button_type == ButtonPressedEvent.ButtonType.END_TURN:
 			_exit_unit_move()
-			end_turn()
+			end_turn_local()
 		
 
 

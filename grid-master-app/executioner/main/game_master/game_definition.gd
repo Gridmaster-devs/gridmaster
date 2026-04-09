@@ -15,8 +15,6 @@ var unit_types : Dictionary[int, UnitType] = {} ## All the types of units in the
 var players : Dictionary[int, Player] = {-1 : Player.NEUTRAL_PLAYER} ## All the players in the game
 var teams : Dictionary[int, Team] = {-1 : Team.NEUTRAL_TEAM} ## All the teams in the game
 
-var pathfinder : DijkstraPathfinder ## Dijkstra pathfinder for unit pathing
-
 # These are used for generating team and player ids
 var teams_index = 0 # Count for how many teams there are
 var players_index = 0 # Count for how many players there are

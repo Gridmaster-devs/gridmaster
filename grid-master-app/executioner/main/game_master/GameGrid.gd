@@ -3,7 +3,7 @@ extends RefCounted
 ## Represents the map, which is a grid of grid tiles
 
 
-var tiles : Array2D ## all the tiles on the map
+var tiles : Array2D ## all the tiles on the map, actual type signature should be Array2D[GridTile] but not supported by Godot
 var strategic_tile_types : Dictionary[int, TileType] ## Maps tile type IDs to the tile types
 var width : int ## The width of the grid
 var height : int ## The height of the grid
