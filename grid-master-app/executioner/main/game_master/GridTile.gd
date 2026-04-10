@@ -5,19 +5,12 @@ extends RefCounted
 
 # NOTE: Units are stored in both the grid tile and the game state object,
 # you have to remember to remove it from both places
-var unit : Unit = null ## Dictionary from Unit ID to the Units on the tile
 var tile_type : TileType ## Reference to the type of tile
 var position : Vector2i ## Position of the tile on the map, currently unused
 
 var protection : int:
 	get: return tile_type.attributes.get(TileType.TILE_ATTRIBUTE_TYPE.PROTECTION)
 	set(v): return
-
-
-## Returns the array of all the units on the grid tile
-func get_unit() -> Unit:
-	return unit
-
 
 ## Returns the type of the grid tile
 func getTileType() -> TileType:
@@ -27,23 +20,6 @@ func getTileType() -> TileType:
 ## Sets the tile type of the grid tile
 func setTileType(type : TileType) -> void:
 	tile_type = type
-
-
-## Adds the unit to the unit array
-func addUnit(unit_p : Unit) -> void:
-	unit = unit_p
-
-
-## Returns true if there is no unit on the tile and false
-## if there is
-func is_empty() -> bool:
-	return (unit == null)
-
-
-## Removes the unit on the tile from the tile if there is one
-func remove_unit() -> void:
-	unit = null
-
 
 func _to_string():
 	var ret_string : String = ""
@@ -56,11 +32,7 @@ func _to_string():
 	
 	ret_string += (" | ")
 	
-	ret_string += ("Unit: ")
-	if (unit == null):
-		ret_string += ("N/A")
-	else:
-		ret_string += str(unit.unit_id) # bad
+	ret_string += ("NOTE: Unit no longer stored on tile, rework this _to_string() method if you want it to print the unit on the tile again")
 	
 	ret_string += (")")
 	
