@@ -103,7 +103,7 @@ func step() -> void:
 		if (movement_req > built_up_movement): return
 		
 		# Check if there is a unit on the tile we're trying to move to
-		var unit_on_tile : Unit = next_tile.get_unit()
+		var unit_on_tile : Unit = _game_state.get_unit_by_position_nullable(next_tile.position)
 		
 		# There is a unit on the next tile we want to move to:
 		if unit_on_tile != null:
@@ -237,7 +237,7 @@ func next_movement_tile() -> Vector2i:
 				return path[current_tile]
 			
 			var tile = _game_state.getGameGrid().get_tile_vec(path[tile_index])
-			var tile_unit = tile.get_unit()
+			var tile_unit = _game_state.get_unit_by_position_nullable(tile.position)
 			
 			# If there is no unit on the tile we try to move to it
 			if (tile_unit == null):

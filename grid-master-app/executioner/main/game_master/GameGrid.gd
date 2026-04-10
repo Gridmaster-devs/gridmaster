@@ -40,48 +40,8 @@ func setTileType(x : int, y : int, tile_type : TileType) -> void:
 	getTile(x, y).setTileType(tile_type)
 
 
-## Returns the unit on the specified tile
-func getUnitOnTile(x : int, y : int) -> Unit:
-	return getTile(x, y).get_unit()
-
-
-## Returns the first unit on the tile.
-## Can return null if there are no units on the tile.
-func get_unit_on_tile(pos : Vector2i) -> Unit:
-	return get_tile_vec(pos).get_unit()
-
-
 func is_empty(pos : Vector2i) -> bool:
 	return get_tile_vec(pos).is_empty()
-
-
-# There's no error checking here because this SHOULD crash if
-# it gets wrong information
-## Removes a unit from the start tile, and adds it to the end tile.
-## Does NOT edit the unit's information at all.
-func move_unit(start_pos : Vector2i, end_pos : Vector2i) -> void:
-	var start_tile = get_tile_vec(start_pos)
-	var end_tile = get_tile_vec(end_pos)
-	var unit = start_tile.get_unit()
-	
-	assert(!start_tile.is_empty(), "Trying to move a non-existent unit!")
-	assert(end_tile.is_empty(), "Trying to move a unit to a tile that is not empty!")
-	
-	start_tile.remove_unit()
-	end_tile.addUnit(unit)
-
-
-func remove_unit(grid_pos : Vector2i):
-	get_tile_vec(grid_pos).remove_unit()
-
-
-## Adds a unit to the grid
-func addUnit(unit : Unit) -> void:
-	var pos = unit.getPosition()
-	
-	assert(get_tile_vec(unit.grid_position).is_empty(), "Trying to add a unit to a tile that is not empty!")
-	
-	getTile(pos.x, pos.y).addUnit(unit)
 
 
 func initTileTypesFromMapResource(attribute_grid: Array2D) -> void:

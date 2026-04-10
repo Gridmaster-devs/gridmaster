@@ -21,6 +21,13 @@ var turn_number : int = 0 ## What turn it is
 ## have pressed the "end turn" button.
 var action_queue : Array[PlayerAction] = []
 
+## Returns the unit in the specified position or null if the tile does not contain a unit at all
+func get_unit_by_position_nullable(pos: Vector2i) -> Unit:
+	for unit in units.values():
+		if unit.getPosition() == pos:
+			return unit
+	return null
+
 
 ## Adds a unit to the game.
 ##
@@ -29,11 +36,10 @@ func addUnit(unit_type : UnitType, position : Vector2i, player : Player) -> Unit
 	var id = getNewUnitId()
 	
 	var unit = Unit.new(unit_type, id, player, position)
-	grid.addUnit(unit)
 	units.set(id, unit)
 	return unit
 
-#CAUTION commented out but possibly still used by something
+## CAUTION @deprecated
 ## Adds a unit by unit type id.
 ## Will fail if there is no unit type corresponding to the id.
 #func addUnitByTypeId(id : int, position : Vector2i, player_id : int) -> Unit:
@@ -47,9 +53,7 @@ func addUnit(unit_type : UnitType, position : Vector2i, player : Player) -> Unit
 ## Moves a unit to a new position.
 func move_unit(unit_id : int, new_position : Vector2i) -> void:
 	var unit = get_unit_by_id(unit_id)
-	var cur_pos = unit.getPosition()
 	unit.set_position(new_position)
-	grid.move_unit(cur_pos, new_position)
 
 
 ## Swaps the positions of two units. Currently only called
@@ -78,7 +82,6 @@ func swap_units(unit1 : Unit, unit2 : Unit) -> void:
 
 ## Removes a unit from the map and the game
 func remove_unit(unit : Unit) -> void:
-	grid.remove_unit(unit.grid_position)
 	units.erase(unit.unit_id)
 
 # ---
@@ -112,12 +115,6 @@ func getGridHeight() -> int:
 
 func get_unit_by_id(id : int) -> Unit:
 	return units.get(id)
-
-
-## Returns the unit on the specified tile.
-## Can return null if there is no unit on the tile.
-func get_unit_on_tile(coords : Vector2i) -> Unit:
-	return grid.get_unit_on_tile(coords)
 
 # ---
 # DEBUG FUNCTIONS
