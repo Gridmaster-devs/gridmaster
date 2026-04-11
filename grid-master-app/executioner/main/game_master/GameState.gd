@@ -3,12 +3,6 @@ extends RefCounted
 ## Stores the information about the state of the game i.e. data that changes 
 ## during runtime (= as the game is played). Contrast with [GameDefinition].
 
-
-var _grid : GameGrid ## Grid that represents the map
-var grid : GameGrid:
-	get: return _grid
-	set(v): return
-
 var units : Dictionary[int, Unit] = {} ## All the units in the game, NOTE: also stored in each map tile
 
 ## tracks the id to be given to the next unit that spawns
@@ -62,14 +56,8 @@ func swap_units(unit1 : Unit, unit2 : Unit) -> void:
 	var u1_pos = unit1.grid_position
 	var u2_pos = unit2.grid_position
 	
-	grid.remove_unit(u1_pos)
-	grid.remove_unit(u2_pos)
-	
 	unit1.grid_position = u2_pos
 	unit2.grid_position = u1_pos
-	
-	grid.addUnit(unit1)
-	grid.addUnit(unit2)
 	
 	# The units' actions have to be move actions for this function to be called
 	# so it's okay to do this
@@ -88,11 +76,6 @@ func remove_unit(unit : Unit) -> void:
 # GETTERS AND SETTERS
 # ---
 
-## Returns the game grid
-func getGameGrid() -> GameGrid:
-	return grid
-
-
 ## Returns the unit array
 func getUnits() -> Array[Unit]:
 	return units.values()
@@ -102,15 +85,6 @@ func getUnits() -> Array[Unit]:
 func getNewUnitId() -> int:
 	unit_id_count += 1
 	return unit_id_count
-
-## gets the game grid width
-func getGridWidth() -> int: 
-	return grid.getHeight()
-
-
-## gets the game grid height
-func getGridHeight() -> int: 
-	return grid.getWidth()
 	
 
 func get_unit_by_id(id : int) -> Unit:
@@ -132,21 +106,6 @@ static func debugInit(map_width : int, map_height : int, game_name_p : String) -
 	gs.grid.debugFill()
 	gs.game_name = game_name_p
 	return gs
-
-
-## Prints the map into a logfile
-func printMap(to_log : bool):
-	if (grid != null):
-		grid.printMap(to_log)
-
-
-
-
-## Prints the tile types into a logfile
-func printTileTypes(to_log : bool):
-	if (grid != null):
-		grid.printTileTypes(to_log)
-
 
 # ---
 # GODOT PREDEFINED

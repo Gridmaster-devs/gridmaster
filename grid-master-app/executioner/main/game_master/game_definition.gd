@@ -4,12 +4,19 @@ extends RefCounted
 ## Contrast with [GameState].
 ## NOTE that this game definition object is a distinct type and concept from [GameDefinitionResource]
 
+var _grid : GameGrid ## Grid that represents the map
+var grid : GameGrid:
+	get: return _grid
+	set(v): return
+
+
 var game_name : String:
 	get:
 		return game_name
 	set(new_name):
 		game_name = new_name
-		
+
+
 var unit_types : Dictionary[int, UnitType] = {} ## All the types of units in the game
 
 var players : Dictionary[int, Player] = {-1 : Player.NEUTRAL_PLAYER} ## All the players in the game
@@ -18,6 +25,7 @@ var teams : Dictionary[int, Team] = {-1 : Team.NEUTRAL_TEAM} ## All the teams in
 # These are used for generating team and player ids
 var teams_index = 0 # Count for how many teams there are
 var players_index = 0 # Count for how many players there are
+
 
 ## Initializes the unit types from a game definition
 func initUnitTypesFromResource(game_definition : GameDefinitionResource, 
@@ -42,24 +50,57 @@ func add_player(player_name : String, team_id : int, computer : bool) -> int:
 	var player_id = get_new_player_id()
 	players.set(player_id, Player.new(player_name, player_id, teams.get(team_id), computer))
 	return player_id
-	
+
+
 func get_player_by_id(id: int) -> Player:
 	return players[id]
+
 
 func get_new_team_id() -> int:
 	teams_index += 1
 	return teams_index
 
+
 func get_new_player_id() -> int:
 	players_index += 1
 	return players_index
 
+
+## Returns the game grid
+func getGameGrid() -> GameGrid:
+	return grid
+
+
+## gets the game grid width
+func getGridWidth() -> int: 
+	return grid.getHeight()
+
+
+## gets the game grid height
+func getGridHeight() -> int: 
+	return grid.getWidth()
+
+
+# ---
 # INFO DEBUG methods
- 
-## Prints the unit types into a logfile
-func printUnitTypes(to_log : bool):
+# ---
+
+
+## TESTING Prints the unit types into a logfile
+func DEBUG_printUnitTypes(to_log : bool):
 	for type in unit_types.values():
 		if (to_log == true):
 			GML.log(type._to_string())
 		else:
 			print(type._to_string())
+			
+## TESTING Prints the map into a logfile
+func DEBUG_printMap(to_log : bool):
+	if (grid != null):
+		grid.printMap(to_log)
+
+
+## TESTING Prints the tile types into a logfile
+func DEBUG_printTileTypes(to_log : bool):
+	if (grid != null):
+		grid.printTileTypes(to_log)
