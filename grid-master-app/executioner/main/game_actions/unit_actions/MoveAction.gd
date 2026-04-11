@@ -94,7 +94,7 @@ func step() -> void:
 			stopped = true
 			return
 		
-		var next_tile = _game_state.getGameGrid().get_tile_vec(path[next_tile_index])
+		var next_tile = _game_definition.getGameGrid().get_tile_vec(path[next_tile_index])
 		
 		# Add next tile to movement requirements
 		movement_req += next_tile.getTileType().get_attribute(TileType.TILE_ATTRIBUTE_TYPE.MOVEMENT)
@@ -236,7 +236,7 @@ func next_movement_tile() -> Vector2i:
 				searching_next_tile = false
 				return path[current_tile]
 			
-			var tile = _game_state.getGameGrid().get_tile_vec(path[tile_index])
+			var tile = _game_definition.getGameGrid().get_tile_vec(path[tile_index])
 			var tile_unit = _game_state.get_unit_by_position_nullable(tile.position)
 			
 			# If there is no unit on the tile we try to move to it
@@ -265,9 +265,10 @@ func next_movement_tile() -> Vector2i:
 		return path[tile_index]
 
 
-func _init(path_p : Array[Vector2i], p_id : int, unit_p : Unit, game_state_p : GameState):
+func _init(path_p : Array[Vector2i], p_id : int, unit_p : Unit, game_state_p : GameState, game_definition: GameDefinition):
 	path = path_p
 	player_id = p_id
 	unit = unit_p
 	last_tile = path.size() - 1
 	_game_state = game_state_p
+	_game_definition = game_definition

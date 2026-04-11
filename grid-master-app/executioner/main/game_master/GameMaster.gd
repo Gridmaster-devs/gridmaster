@@ -64,7 +64,7 @@ func getGameGrid() -> Variant:
 	if game_state == null:
 		return null
 	else:
-		return game_state.getGameGrid()
+		return game_definition.getGameGrid()
 
 
 # This is ONLY for drawing the map and the units!!
@@ -95,7 +95,7 @@ func initFromGameDefinition(game_definition_resource : GameDefinitionResource) -
 	var new_client_attributes = ClientAttributes.new()
 	new_game_definition.initUnitTypesFromResource(game_definition_resource, unit_name_type_dict)
 	new_game_definition.game_name = game_definition_resource.game_name
-	new_game_state._grid = GameGrid.initFromMapResource(game_definition_resource.loadMap())
+	new_game_definition._grid = GameGrid.initFromMapResource(game_definition_resource.loadMap())
 	
 	var game_def_teams: Array[TeamUiRes] = game_definition_resource.team_uis
 	var game_def_players: Array[PlayerUiRes] = game_definition_resource.player_uis
@@ -148,10 +148,10 @@ func initFromGameDefinition(game_definition_resource : GameDefinitionResource) -
 				new_game_state.addUnit(new_game_definition.unit_types.get(unit_name_type_dict[unit_name]), Vector2i(x, y), new_game_definition.get_player_by_id(player_name_id_dict[player_name])) # FIXME redundant way to get unittype in first argument 
 
 	# TODO: Add import from game definition
-	GameArgs.initialize(new_game_state, game_definition_resource.game_rules)
+	GameArgs.initialize(new_game_state, new_game_definition, game_definition_resource.game_rules)
 	
 	_pathfinder = DijkstraPathfinder.new()
-	_pathfinder.initialize(new_game_state, new_game_state.units)
+	_pathfinder.initialize(new_game_state, new_game_definition, new_game_state.units)
 	
 	game_state = new_game_state
 	game_definition = new_game_definition
@@ -383,7 +383,7 @@ func _handle_event_unit_move(event : StateMachineEvent) -> void:
 			
 			# If the user clicks on the latest waypoint, accept the movement command
 			if (!movement_waypoints.is_empty() and movement_waypoints.back() == event.grid_pos):
-				moved_unit.current_action = MoveAction.new(current_path, client_attributes.client_player_id, moved_unit, game_state)
+				moved_unit.current_action = MoveAction.new(current_path, client_attributes.client_player_id, moved_unit, game_state, game_definition)
 				_exit_unit_move()
 				return
 			
