@@ -32,8 +32,7 @@ enum ArgVarType {PERCENT_RANGE, COMBAT_ROUNDS}
 
 # This is required for some of the functions
 # Ex. the fight function might need to know what tile the unit is standing on
-var _game_state : GameState
-var _game_definition: GameDefinition
+var _game_data_provider: GameDataManager
 
 ## The dictionary containing the function arguments themselves
 var args : Dictionary[ArgType, Callable]
@@ -174,7 +173,7 @@ func _gen_default_fight_func() -> void:
 		var damage_func : Callable = args.get(ArgType.DAMAGE_FUNC)
 		
 		# Whether the units can be damaged by the other
-		var tile_protection : int = _game_definition.grid.get_tile_vec(unit2.grid_position).protection
+		var tile_protection : int = _game_data_provider.get_grid().get_tile_vec(unit2.grid_position).protection
 		var u2_damageable : bool = unit1.piercing >= unit2.armor
 		var u1_damageable : bool = unit2.piercing >= unit1.armor
 		
@@ -274,16 +273,15 @@ func _gen_default_initiative_func() -> void:
 
 # This is necessary because _init() does not work with autoloaded objects
 ## Initializes the GameArgs object.
-func initialize(gs : GameState, gd: GameDefinition, game_rules: Dictionary[String, Variant]) -> void:
-	_game_state = gs
-	_game_definition = gd
+func initialize(game_data_provider, game_rules: Dictionary[String, Variant]) -> void:
+	_game_data_provider = game_data_provider
 	
 	arg_vars.set(ArgVarType.PERCENT_RANGE, 100)
 	
 	# TODO: This should be set in the game definition
 	arg_vars.set(ArgVarType.COMBAT_ROUNDS, game_rules.get("combat_rounds", 4))
 	
-	# This should be replaced with reading arguments from the game definition
+	# TODO This should be replaced with reading arguments from the game definition
 	# and then generating the appopriate function
 	_gen_default_fight_func()
 	_gen_default_initiative_func()

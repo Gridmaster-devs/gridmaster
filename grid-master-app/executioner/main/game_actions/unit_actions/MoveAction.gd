@@ -94,7 +94,7 @@ func step() -> void:
 			stopped = true
 			return
 		
-		var next_tile = _game_definition.getGameGrid().get_tile_vec(path[next_tile_index])
+		var next_tile = _game_data_provider.get_grid().get_tile_vec(path[next_tile_index])
 		
 		# Add next tile to movement requirements
 		movement_req += next_tile.getTileType().get_attribute(TileType.TILE_ATTRIBUTE_TYPE.MOVEMENT)
@@ -103,7 +103,7 @@ func step() -> void:
 		if (movement_req > built_up_movement): return
 		
 		# Check if there is a unit on the tile we're trying to move to
-		var unit_on_tile : Unit = _game_state.get_unit_by_position_nullable(next_tile.position)
+		var unit_on_tile : Unit = _game_data_provider.get_unit_by_position_nullable(next_tile.position)
 		
 		# There is a unit on the next tile we want to move to:
 		if unit_on_tile != null:
@@ -187,10 +187,11 @@ func step() -> void:
 					# We see if they've suggested a swap with us
 					if (unit_on_tile.get_swap_suggested_unit() == unit.unit_id):
 						
+						# DANGER Should actions directly mutate game state?
 						# They have
 						swap_movement_cost = movement_req
 						swap_distance = 1 + loops
-						_game_state.swap_units(unit, unit_on_tile)
+						_game_data_provider.get_game_state().swap_units(unit, unit_on_tile)
 
 					else:
 						# They haven't
@@ -207,7 +208,8 @@ func step() -> void:
 			# There is nothing on the tile and
 			# nothing prevents us from moving
 			
-			_game_state.move_unit(unit.getId(), path[next_tile_index])
+			# DANGER Should actions directly mutate game state?
+			_game_data_provider.get_game_state().move_unit(unit.getId(), path[next_tile_index])
 			current_tile = next_tile_index
 			built_up_movement -= movement_req
 			reset_swap()
@@ -236,8 +238,8 @@ func next_movement_tile() -> Vector2i:
 				searching_next_tile = false
 				return path[current_tile]
 			
-			var tile = _game_definition.getGameGrid().get_tile_vec(path[tile_index])
-			var tile_unit = _game_state.get_unit_by_position_nullable(tile.position)
+			var tile = _game_data_provider.get_grid().get_tile_vec(path[tile_index])
+			var tile_unit = _game_data_provider.get_unit_by_position_nullable(tile.position)
 			
 			# If there is no unit on the tile we try to move to it
 			if (tile_unit == null):
@@ -265,10 +267,9 @@ func next_movement_tile() -> Vector2i:
 		return path[tile_index]
 
 
-func _init(path_p : Array[Vector2i], p_id : int, unit_p : Unit, game_state_p : GameState, game_definition: GameDefinition):
+func _init(path_p : Array[Vector2i], p_id : int, unit_p : Unit, game_data_provider: GameDataManager):
 	path = path_p
 	player_id = p_id
 	unit = unit_p
 	last_tile = path.size() - 1
-	_game_state = game_state_p
-	_game_definition = game_definition
+	_game_data_provider = game_data_provider
