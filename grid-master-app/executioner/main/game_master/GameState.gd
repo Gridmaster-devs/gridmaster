@@ -33,13 +33,6 @@ func addUnit(unit_type : UnitType, position : Vector2i, player : Player) -> Unit
 	units.set(id, unit)
 	return unit
 
-## CAUTION @deprecated
-## Adds a unit by unit type id.
-## Will fail if there is no unit type corresponding to the id.
-#func addUnitByTypeId(id : int, position : Vector2i, player_id : int) -> Unit:
-	#var unit_type = unit_types.get(id)
-	#assert(unit_type != null, "Tried to add unit with invalid type ID!")
-	#return addUnit(unit_type, position, player_id)
 
 # NOTE: There's no cheat handling anywhere right now.
 # An opposing player could currently technically make their units have unlimited
@@ -72,6 +65,8 @@ func swap_units(unit1 : Unit, unit2 : Unit) -> void:
 func remove_unit(unit : Unit) -> void:
 	units.erase(unit.unit_id)
 
+func increment_turn_number() -> void:
+	turn_number += 1
 # ---
 # GETTERS AND SETTERS
 # ---
@@ -100,7 +95,7 @@ func get_unit_by_id(id : int) -> Unit:
 
 
 ## Creates a simple test game for debugging
-static func debugInit(map_width : int, map_height : int, game_name_p : String) -> GameState:
+static func DEBUG_init(map_width : int, map_height : int, game_name_p : String) -> GameState:
 	var gs = GameState.new()
 	gs.grid = GameGrid.new(map_width, map_height)
 	gs.grid.debugFill()

@@ -7,22 +7,17 @@ extends RefCounted
 const MAX_INT : int = 9223372036854775807
 
 var _djikstra_grid : Array[DijkstraNode] # Array of Dijkstra nodes
-var _game_state : GameState
-var _game_definition: GameDefinition
-var _units : Dictionary[int, Unit] # Array of units as in the gamestate
+var _game_data_provider : GameDataManager
 var _grid_width : int
 var _grid_height : int
 
 
 ## Initializes the Djikstra Pathfinder's grid from a game_grid.
 ## Only needs to be called once when a game is started.
-func initialize(game_state: GameState, game_definition: GameDefinition, units : Dictionary[int, Unit]) -> void:
-	assert(game_state != null, "Tried giving null game grid to Djikstra Pathfinder!")
-	_units = units
-	_game_state = game_state
-	_game_definition = game_definition
-	_grid_width = game_definition.grid.getWidth()
-	_grid_height = game_definition.grid.getHeight()
+func _init(game_data_provider: GameDataManager) -> void:
+	_game_data_provider = game_data_provider
+	_grid_width = game_data_provider.get_grid().getWidth()
+	_grid_height = game_data_provider.get_grid().getHeight()
 
 	for y in range(0, _grid_height):
 		for x in range(0, _grid_width):
@@ -55,7 +50,7 @@ func get_index_vec(pos : Vector2i):
 func update_grid() -> void:
 	for y in range(0, _grid_height):
 		for x in range(0, _grid_width):
-			var tile_type : TileType = _game_definition.grid.getTileType(x, y)
+			var tile_type : TileType = _game_data_provider.get_grid().getTileType(x, y)
 			var node : DijkstraNode = get_node(x, y)
 			node.movement = tile_type.get_attribute(TileType.TILE_ATTRIBUTE_TYPE.MOVEMENT)
 
@@ -89,7 +84,7 @@ func _reset_nodes() -> void:
 	
 	for node : DijkstraNode in _djikstra_grid:
 		reset_func.call(node)
-		node.current_unit = _game_state.get_unit_by_position_nullable(node.position) 
+		node.current_unit = _game_data_provider.get_unit_by_position_nullable(node.position) 
 
 
 ## Returns an array of all tiles that are possible to reach from
@@ -103,7 +98,7 @@ func tiles_from_position(start_position : Vector2i, movement_available : int, un
 	
 	# Checking for movement targets of units that are on the same team
 	var movement_targets : Dictionary[Vector2i, bool] = {}
-	for unit : Unit in _units.values():
+	for unit : Unit in _game_data_provider.get_units().values():
 		if (unit.get_team_id() == team_id and unit.current_action is MoveAction):
 			movement_targets.set((unit.current_action as MoveAction).movement_target(), true)
 	

@@ -26,9 +26,8 @@ var _click_tracker := ClickTracker.new()
 var ui_state : UIState = UIState.LOAD_GAME
 var gui_scene : GUIScene
 
-var game_state : GameState ## The state of the game
-var game_definition: GameDefinition
-var client_attributes: ClientAttributes
+var data_manager: GameDataManager
+
 var _pathfinder : DijkstraPathfinder ## The pathfinder for the game state
 
 # Variables for the unit movement state
@@ -45,7 +44,7 @@ var movement_left : int # How many points of movement the unit still has left
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	grid_graphics.linkGameMaster(self)
+	units_changed.connect(grid_graphics._unitsChanged)
 	_click_tracker.clicked.connect(_clicked)
 	_custom_graphics = grid_graphics.get_custom_graphics()
 	ftm.resource_uploaded.connect(load_game_definition)
@@ -57,38 +56,41 @@ func _ready() -> void:
 # INFO LOCAL (TO THIS CLIENT) METHODS
 # ---
 
-# This is ONLY for drawing the map and the units!!
-# Only the game master should EVER modify the game state
-## Returns the game grid if the game state is initialized
-func getGameGrid() -> Variant:
-	if game_state == null:
-		return null
-	else:
-		return game_definition.getGameGrid()
+## This is ONLY for drawing the map and the units!!
+## Only the game master should EVER modify the game state
+### Returns the game grid if the game state is initialized
+#func getGameGrid() -> Variant:
+	#if game_state == null:
+		#return null
+	#else:
+		#return game_definition.getGameGrid()
+#
+#
+## This is ONLY for drawing the map and the units!!
+## Only the game master should EVER modify the game state
+### Returns the units in the game if the game state is initialized
+#func getUnits() -> Variant:
+	#if game_state == null:
+		#return null
+	#else:
+		#return game_state.getUnits()
+#
+#
+### gets the game name
+#func getGameName() -> String:
+	#if game_state != null:
+		#return game_definition.game_name
+	#else:
+		#return ""
 
-
-# This is ONLY for drawing the map and the units!!
-# Only the game master should EVER modify the game state
-## Returns the units in the game if the game state is initialized
-func getUnits() -> Variant:
-	if game_state == null:
-		return null
-	else:
-		return game_state.getUnits()
-
-
-## gets the game name
-func getGameName() -> String:
-	if game_state != null:
-		return game_definition.game_name
-	else:
-		return ""
-
-
+# TODO consider moving to GameDataManager?
 ## Initializes game state, game definition and pathfinder objects and assigns them to the respective member variables.
 ## Also initializes graphics.
 ## NOTE that the game definition object initialized here ([GameDefinition]) is a distinct type and concept from [GameDefinitionResource].
 func initFromGameDefinition(game_definition_resource : GameDefinitionResource) -> void:
+	
+	# Initialize new game data objects
+	
 	var unit_name_type_dict: Dictionary[String, int] = {}
 	var new_game_state = GameState.new()
 	var new_game_definition = GameDefinition.new()
@@ -146,16 +148,17 @@ func initFromGameDefinition(game_definition_resource : GameDefinitionResource) -
 				var unit_name = cur_attributes[MapAttributes.UNIT_UNIT_LIB_ITEM_ID]
 				var player_name = cur_attributes[MapAttributes.UNIT_PLAYER_ID]
 				new_game_state.addUnit(new_game_definition.unit_types.get(unit_name_type_dict[unit_name]), Vector2i(x, y), new_game_definition.get_player_by_id(player_name_id_dict[player_name])) # FIXME redundant way to get unittype in first argument 
-
+	
+	# Initialize GameDataManager with initialized game data objects
+	
+	data_manager = GameDataManager.new(new_game_state, new_game_definition, new_client_attributes)
+	
+	# Initialize 
+	
+	_pathfinder = DijkstraPathfinder.new(data_manager)
+	
 	# TODO: Add import from game definition
-	GameArgs.initialize(new_game_state, new_game_definition, game_definition_resource.game_rules)
-	
-	_pathfinder = DijkstraPathfinder.new()
-	_pathfinder.initialize(new_game_state, new_game_definition, new_game_state.units)
-	
-	game_state = new_game_state
-	game_definition = new_game_definition
-	client_attributes = new_client_attributes
+	GameArgs.initialize(data_manager, game_definition_resource.game_rules)
 	
 	#initialize graphics
 	initGraphics()
@@ -164,7 +167,7 @@ func initFromGameDefinition(game_definition_resource : GameDefinitionResource) -
 ## Unit actions are processed before other actions.
 ## NOTE This method increments the game state by directly mutating game state. Contrast with [method GameMaster.process_end_turn_local_factory]
 func process_end_turn_local() -> void:
-	var unit_array = game_state.units.values()
+	var unit_array = data_manager.get_units().values()
 	var sort_func : Callable = GameArgs.args.get(GameArgs.ArgType.UNIT_INITIATIVE_FUNC)
 	sort_func.call(unit_array)
 	
@@ -192,14 +195,14 @@ func process_end_turn_local() -> void:
 		# unit array so that it doesn't have to search for the position each time
 		for unit in units_to_be_removed:
 			unit_array.erase(unit)
-			game_state.remove_unit(unit)
+			data_manager.remove_unit(unit)
 	
 	# Clear actions
 	for unit : Unit in unit_array:
 		unit.current_action = null
 		
 	
-	game_state.turn_number += 1
+	data_manager.increment_turn_number()
 
 ### Ends the turn and processes all the actions that have been queued up.
 ### Unit actions are processed before other actions.
@@ -247,7 +250,7 @@ func process_end_turn_local() -> void:
 
 ## Initializes the user interface and graphics elements at the start of the game
 func initGraphics() -> void:
-	grid_graphics.initFromGameGrid(getGameGrid())
+	grid_graphics.initFromGameGrid(data_manager.get_grid(), data_manager)
 
 
 ## Opens the load game dialog
@@ -259,10 +262,10 @@ func load_game_from_file() -> void:
 func load_game_definition(game_definition_resource : Resource):
 	assert(game_definition_resource != null, "Invalid game definition in file!")
 	initFromGameDefinition(game_definition_resource)
-	switch_gui_scene(IN_GAME_DEFAULT_GUI, getGameName())
+	switch_gui_scene(IN_GAME_DEFAULT_GUI, data_manager.get_game_name())
 	ui_state = UIState.IN_GAME_DEFAULT
 	
-	MessageDispatcher.broadcast_message("Game \"%s\" loaded." % game_definition.game_name)
+	MessageDispatcher.broadcast_message("Game \"%s\" loaded." % data_manager.get_game_name())
 
 func end_turn_local() -> void:
 	_custom_graphics.clear()
@@ -343,12 +346,12 @@ func _handle_event_default_in_game(event : StateMachineEvent):
 		if event.mouse_button == MOUSE_BUTTON_LEFT: # User left clicked on the grid
 			if event.grid_pos == Vector2i(-1, -1): return # The user clicked outside the map
 			
-			var unit = game_state.get_unit_by_position_nullable(event.grid_pos)
+			var unit = data_manager.get_unit_by_position_nullable(event.grid_pos)
 			if unit == null: return # There is no unit on the tile
 			
 			
 			# The unit doesn't belong to the current player
-			if unit.get_player_id() != client_attributes.client_player_id: return
+			if unit.get_player_id() != data_manager.get_client_attributes().client_player_id: return
 			
 			# The user clicked on a tile in the map limits and there is a unit on the tile
 			
@@ -383,7 +386,7 @@ func _handle_event_unit_move(event : StateMachineEvent) -> void:
 			
 			# If the user clicks on the latest waypoint, accept the movement command
 			if (!movement_waypoints.is_empty() and movement_waypoints.back() == event.grid_pos):
-				moved_unit.current_action = MoveAction.new(current_path, client_attributes.client_player_id, moved_unit, game_state, game_definition)
+				moved_unit.current_action = MoveAction.new(current_path, data_manager.get_client_attributes().client_player_id, moved_unit, data_manager)
 				_exit_unit_move()
 				return
 			
@@ -494,48 +497,44 @@ func receive_raw_input(event : InputEvent):
 
 ## Prints the map into a log file
 func printMap() -> void:
-	if (game_state != null):
-		game_state.printMap(true)
+	data_manager.get_game_state().printMap(true)
 
 
 ## Prints all the unit types into a log file
 func printUnitTypes() -> void:
-	if (game_state != null):
-		game_state.printUnitTypes(true)
+	data_manager.get_game_state().printUnitTypes(true)
 
 
 ## Prints all of the tile types into a log file console
 func printTileTypes() -> void:
-	if (game_state != null):
-		game_state.printTileTypes(true)
+	data_manager.get_game_state().printTileTypes(true)
 
 # TESTING FUNCTIONS BLOCK
 # THESE FUNCTIONS ARE SOLELY FOR TESTING THE PROGRAM
 # THEY ARE ALWAYS TEMPORARY AND MUST EVENTUALLY BE REMOVED
 
-## Creates a debug game for testing
-func DEBUG_init_game() -> void:
-	game_state = GameState.debugInit(10, 10, "Test game")
+### Creates a debug game for testing
+#func DEBUG_init_game() -> void:
+	#game_state = GameState.debugInit(10, 10, "Test game")
 
 
 ## Creates a debug game, places some units, and prints the map
-func DEBUG_test():
-	DEBUG_init_game()
-	game_state.createDebugUnit(Vector2i(0,0))
-	game_state.createDebugUnit(Vector2i(5,5))
-	printMap()
+#func DEBUG_test():
+	#DEBUG_init_game()
+	#data_manager.get_game_state().createDebugUnit(Vector2i(0,0))
+	#data_manager.get_game_state().createDebugUnit(Vector2i(5,5))
+	#printMap()
 
 
 ## Creates a default unit for testing
 func DEBUG_create_default_unit(position : Vector2i) -> void:
-	if game_state != null:
-		game_state.createDebugUnit(position)
+	data_manager.get_game_state().createDebugUnit(position)
 
 
-## Creates a unit from a unit id for testing
-func DEBUG_create_unit(unit_type_id : int, position : Vector2i) -> void:
-	if game_state != null:
-		game_state.addUnitByTypeId(unit_type_id, position, -1)
+### Creates a unit from a unit id for testing
+#func DEBUG_create_unit(unit_type_id : int, position : Vector2i) -> void:
+	#if game_state != null:
+		#game_state.addUnitByTypeId(unit_type_id, position, -1)
 
 
 

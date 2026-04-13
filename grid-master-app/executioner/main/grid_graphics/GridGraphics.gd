@@ -1,6 +1,8 @@
 class_name GridGraphics
 extends Control
-## Class / Node that is responsible for drawing the grid graphics of the game
+## Class / Node that is responsible for drawing the grid graphics of the game.
+## Usage without calling a constructor at any point currently leads to
+## undefined behaviour.
 
 ## Size for the tiles of the grid.
 ## This is the internal size of the grid for the godot engine,
@@ -20,7 +22,7 @@ const UNIT_CONTAINER : PackedScene = preload("res://executioner/main/grid_graphi
 @onready var custom_graphics : CustomGraphics = $"SubViewportContainer/Grid Graphics Viewport/CustomGraphics"
 
 
-var game_master : GameMaster # NOTE: Might be unnecessary when using groups
+var _game_data_provider : GameDataManager
 var _grid_width : int
 var _grid_height : int
 
@@ -34,13 +36,14 @@ var active_units: Array[UnitContainer]
 # and replace with a more elegant solution to query state as needed
 ## Gives this object a reference to the game master, and connects
 ## its signals to functions in this object
-func linkGameMaster(game_master_p : GameMaster):
-	game_master = game_master_p
-	game_master.units_changed.connect(_unitsChanged)
+#func linkGameMaster(game_master_p : GameMaster):
+	#game_master = game_master_p
+	#game_master.units_changed.connect(_unitsChanged)
 
 
-## Called by the game master at the start
-func initFromGameGrid(game_grid : GameGrid):
+## Current "default" custom constructor. Intended to be called by the GameMaster.
+func initFromGameGrid(game_grid : GameGrid, game_data_provider):
+	_game_data_provider = game_data_provider
 	grid_graphics_viewport.resize(self.size)
 	_initTileGrid(game_grid)
 	_initBackgroundGrid(game_grid)
@@ -91,8 +94,8 @@ func _clearUnits():
 
 ## Gets the units from the game master and puts them in the active units array
 func _getUnits():
-	if (game_master != null):
-		var units = game_master.getUnits()
+	if (_game_data_provider != null):
+		var units = _game_data_provider.get_units().values()
 		if (units != null):
 			_clearUnits()
 			for unit : Unit in units:
