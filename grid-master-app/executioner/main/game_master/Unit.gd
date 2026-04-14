@@ -55,6 +55,7 @@ var armor : int:
 
 var grid_position : Vector2i ## The current position of the unit on the grid
 
+# DANGER Forgoing this reference and using a global queue would be better for actions
 var current_action : UnitAction = null ## The action the unit is set to perform on this turn
 
 ## Initializes the unit from a specific unit type
@@ -63,6 +64,17 @@ func initFromUnitType() -> void:
 	_hp = type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.MAX_HP)
 	_morale = type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.INITIAL_MORALE)
 
+func deep_copy() -> Unit:
+	var new_unit = Unit.new(self.type, self.unit_id, self.player, self.grid_position)
+	new_unit._hp = self._hp
+	new_unit._morale = self._morale
+	var old_action = self.current_action
+	if old_action == null:
+		new_unit.current_action = null
+	else:
+		new_unit.current_action = MoveAction.new(old_action.path, old_action.player_id, new_unit, old_action._game_data_provider)
+	
+	return new_unit
 
 ## Returns the ID of the unit
 func getId() -> int:
