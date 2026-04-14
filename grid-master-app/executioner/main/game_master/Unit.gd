@@ -53,6 +53,10 @@ var armor : int:
 	get: return type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.ARMOR)
 	set(v): return
 
+var vision_range : int:
+	get: return type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.VISION_RANGE)
+	set(v): return
+
 var grid_position : Vector2i ## The current position of the unit on the grid
 
 # DANGER Forgoing this reference and using a global queue would be better for actions
