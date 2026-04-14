@@ -95,7 +95,7 @@ func _clearUnits():
 ## Gets the units from the game master and puts them in the active units array
 func _getUnits():
 	if (_game_data_provider != null):
-		var units = _game_data_provider.get_units().values()
+		var units = _game_data_provider.get_visible_units()
 		if (units != null):
 			_clearUnits()
 			for unit : Unit in units:
