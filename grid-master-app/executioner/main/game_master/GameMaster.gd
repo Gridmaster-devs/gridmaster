@@ -167,6 +167,7 @@ func initFromGameDefinition(game_definition_resource : GameDefinitionResource) -
 ## Unit actions are processed before other actions.
 ## NOTE This method increments the game state by directly mutating game state. Contrast with [method GameMaster.process_end_turn_local_factory]
 func process_end_turn_local() -> void:
+	
 	var unit_array = data_manager.get_units().values()
 	var sort_func : Callable = GameArgs.args.get(GameArgs.ArgType.UNIT_INITIATIVE_FUNC)
 	sort_func.call(unit_array)
@@ -204,49 +205,54 @@ func process_end_turn_local() -> void:
 	
 	data_manager.increment_turn_number()
 
-### Ends the turn and processes all the actions that have been queued up.
-### Unit actions are processed before other actions.
-### NOTE This method does not increment the game state on its own, but returns a new gamestate that can be mounted. Contrast with [method GameMaster.process_end_turn_local]
-#func process_end_turn_local_factory() -> GameState:
-	#var new_game_state = GameState.new()
-	#var unit_array = game_state.units.values()
-	#var sort_func : Callable = GameArgs.args.get(GameArgs.ArgType.UNIT_INITIATIVE_FUNC)
-	#sort_func.call(unit_array)
-	#
-	## Looping through the move actions until every unit has stopped
-	## (reached their destination, or gotten stopped by a fight or something else)
-	#var done = false
-	#while(done == false):
-		#done = true
-		#
-		## Advance one step in each MoveAction
-		#for unit : Unit in unit_array:
-			#if (unit.current_action is MoveAction and unit.has_stopped() == false):
-				#done = false
-				#(unit.current_action as MoveAction).step()
-		#
-		#var units_to_be_removed : Array[Unit] = []
-		#
-		## If any units have died we remove them from the array
-		## We can't erase units while iterating over the array or it will break
-		#for unit : Unit in unit_array:
-			#if (unit.is_dead()):
-				#units_to_be_removed.append(unit)
-		#
-		## NOTE: Possible to improve efficiency by using indices of the units in the
-		## unit array so that it doesn't have to search for the position each time
-		#for unit in units_to_be_removed:
-			#unit_array.erase(unit)
-			#game_state.remove_unit(unit)
-	#
-	## Clear actions
-	#for unit : Unit in unit_array:
-		#unit.current_action = null
-		#
-	#
-	#game_state.turn_number += 1
+## Ends the turn and processes all the actions that have been queued up.
+## Unit actions are processed before other actions.
+## NOTE This method does not increment the game state on its own, but returns a new gamestate that can be mounted. Contrast with [method GameMaster.process_end_turn_local]
+## INFO Essentially a proof of concept that game_state can be 
+func process_end_turn_local_builder() -> GameState:
+	var new_game_state = data_manager.get_game_state().deep_copy()
 	
-
+	# Have to mount new game state here because actions rely on it right now
+	data_manager.replace_game_state(new_game_state)
+	
+	var unit_array = new_game_state._units.values()
+	var sort_func : Callable = GameArgs.args.get(GameArgs.ArgType.UNIT_INITIATIVE_FUNC)
+	sort_func.call(unit_array)
+	
+	# Looping through the move actions until every unit has stopped
+	# (reached their destination, or gotten stopped by a fight or something else)
+	var done = false
+	while(done == false):
+		done = true
+		
+		# Advance one step in each MoveAction
+		for unit : Unit in unit_array:
+			if (unit.current_action is MoveAction and unit.has_stopped() == false):
+				done = false
+				(unit.current_action as MoveAction).step()
+		
+		var units_to_be_removed : Array[Unit] = []
+		
+		# If any units have died we remove them from the array
+		# We can't erase units while iterating over the array or it will break
+		for unit : Unit in unit_array:
+			if (unit.is_dead()):
+				units_to_be_removed.append(unit)
+		
+		# NOTE: Possible to improve efficiency by using indices of the units in the
+		# unit array so that it doesn't have to search for the position each time
+		for unit in units_to_be_removed:
+			unit_array.erase(unit)
+			new_game_state.remove_unit(unit)
+	
+	# Clear actions
+	for unit : Unit in unit_array:
+		unit.current_action = null
+		
+	
+	new_game_state.turn_number += 1
+	
+	return new_game_state
 
 ## Initializes the user interface and graphics elements at the start of the game
 func initGraphics() -> void:
@@ -269,7 +275,8 @@ func load_game_definition(game_definition_resource : Resource):
 
 func end_turn_local() -> void:
 	_custom_graphics.clear()
-	process_end_turn_local()
+	#process_end_turn_local()
+	data_manager.replace_game_state(process_end_turn_local_builder())
 	units_changed.emit()
 
 

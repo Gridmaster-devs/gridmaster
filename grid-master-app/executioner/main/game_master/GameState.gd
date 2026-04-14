@@ -3,7 +3,7 @@ extends RefCounted
 ## Stores the information about the state of the game i.e. data that changes 
 ## during runtime (= as the game is played). Contrast with [GameDefinition].
 
-var units : Dictionary[int, Unit] = {} ## All the units in the game, NOTE: also stored in each map tile
+var _units : Dictionary[int, Unit] = {} ## All the units in the game, NOTE: also stored in each map tile
 
 ## tracks the id to be given to the next unit that spawns
 ## increments by one each time
@@ -11,13 +11,9 @@ var unit_id_count : int = 0
 
 var turn_number : int = 0 ## What turn it is
 
-## Contains the actions of the players. The actions are executed when all players
-## have pressed the "end turn" button.
-var action_queue : Array[PlayerAction] = []
-
 ## Returns the unit in the specified position or null if the tile does not contain a unit at all
 func get_unit_by_position_nullable(pos: Vector2i) -> Unit:
-	for unit in units.values():
+	for unit in _units.values():
 		if unit.getPosition() == pos:
 			return unit
 	return null
@@ -30,7 +26,7 @@ func addUnit(unit_type : UnitType, position : Vector2i, player : Player) -> Unit
 	var id = getNewUnitId()
 	
 	var unit = Unit.new(unit_type, id, player, position)
-	units.set(id, unit)
+	_units.set(id, unit)
 	return unit
 
 
@@ -63,17 +59,29 @@ func swap_units(unit1 : Unit, unit2 : Unit) -> void:
 
 ## Removes a unit from the map and the game
 func remove_unit(unit : Unit) -> void:
-	units.erase(unit.unit_id)
+	_units.erase(unit.unit_id)
 
 func increment_turn_number() -> void:
 	turn_number += 1
+
+
+func deep_copy() -> GameState:
+	var new_state = GameState.new()
+	
+	for unit in _units.values():
+		var new_unit = unit.deep_copy()
+		new_state._units[new_unit.unit_id] = new_unit
+	new_state.turn_number = self.turn_number
+	
+	return new_state
+
 # ---
 # GETTERS AND SETTERS
 # ---
 
 ## Returns the unit array
 func getUnits() -> Array[Unit]:
-	return units.values()
+	return _units.values()
 
 
 ## Gets a unit id for a new unit
@@ -83,7 +91,7 @@ func getNewUnitId() -> int:
 	
 
 func get_unit_by_id(id : int) -> Unit:
-	return units.get(id)
+	return _units.get(id)
 
 # ---
 # DEBUG FUNCTIONS

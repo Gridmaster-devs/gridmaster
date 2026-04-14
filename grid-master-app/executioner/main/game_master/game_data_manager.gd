@@ -33,7 +33,7 @@ func get_game_name() -> String:
 	return _game_definition.game_name
 	
 func get_units() -> Dictionary[int, Unit]:
-	return _game_state.units
+	return _game_state._units
 
 func get_unit_by_position_nullable(pos: Vector2i) -> Unit:
 	return _game_state.get_unit_by_position_nullable(pos)
@@ -44,6 +44,10 @@ func get_grid() -> GameGrid:
 # ---
 # INFO mutating methods
 # ---
+
+## Replace entire game state with new instance
+func replace_game_state(new_game_state: GameState) -> void:
+	_game_state = new_game_state
 
 func increment_turn_number() -> void:
 	_game_state.increment_turn_number()
