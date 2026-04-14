@@ -266,6 +266,8 @@ func next_movement_tile() -> Vector2i:
 		searching_next_tile = false
 		return path[tile_index]
 
+func deep_copy(new_unit: Unit) -> MoveAction:
+	return MoveAction.new(path, player_id, new_unit, _game_data_provider)
 
 func _init(path_p : Array[Vector2i], p_id : int, unit_p : Unit, game_data_provider: GameDataManager):
 	path = path_p
