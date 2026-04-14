@@ -72,7 +72,7 @@ func deep_copy() -> Unit:
 	if old_action == null:
 		new_unit.current_action = null
 	else:
-		new_unit.current_action = MoveAction.new(old_action.path, old_action.player_id, new_unit, old_action._game_data_provider)
+		new_unit.current_action = old_action.deep_copy(new_unit)
 	
 	return new_unit
 
