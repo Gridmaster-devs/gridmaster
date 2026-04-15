@@ -92,7 +92,7 @@ func initFromGameDefinition(game_definition_resource : GameDefinitionResource) -
 	# Initialize new game data objects
 	
 	var unit_name_type_dict: Dictionary[String, int] = {}
-	var new_game_state = GameState.new()
+	var new_game_state = GameState.new({}, 0, 0)
 	var new_game_definition = GameDefinition.new()
 	var new_client_attributes = ClientAttributes.new()
 	new_game_definition.initUnitTypesFromResource(game_definition_resource, unit_name_type_dict)
@@ -248,9 +248,9 @@ func process_end_turn_local_builder() -> GameState:
 	# Clear actions
 	for unit : Unit in unit_array:
 		unit.current_action = null
-		
-	
-	new_game_state.turn_number += 1
+
+
+	new_game_state.increment_turn_number()
 	
 	return new_game_state
 

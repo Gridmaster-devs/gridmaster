@@ -7,10 +7,10 @@ var _units : Dictionary[int, Unit] = {} ## All the units in the game, NOTE: also
 
 ## tracks the id to be given to the next unit that spawns
 ## increments by one each time
-var unit_id_count : int = 0
+var _unit_id_count : int = 0
 
 ## What turn it is
-var turn_number : int = 0 
+var _turn_number : int = 0 
 
 
 ## Adds a unit to the game.
@@ -56,17 +56,17 @@ func remove_unit(unit : Unit) -> void:
 	_units.erase(unit.unit_id)
 
 func increment_turn_number() -> void:
-	turn_number += 1
+	_turn_number += 1
 
 
 func deep_copy() -> GameState:
-	var new_state = GameState.new()
+	var new_units: Dictionary[int, Unit] = {}
 	
 	for unit in _units.values():
 		var new_unit = unit.deep_copy()
-		new_state._units[new_unit.unit_id] = new_unit
-	new_state.turn_number = self.turn_number
-	new_state.unit_id_count = self.unit_id_count
+		new_units[new_unit.unit_id] = new_unit
+	
+	var new_state = GameState.new(new_units, self._turn_number, self._unit_id_count)
 	
 	return new_state
 
@@ -81,8 +81,8 @@ func getUnits() -> Array[Unit]:
 
 ## Gets a unit id for a new unit
 func getNewUnitId() -> int:
-	unit_id_count += 1
-	return unit_id_count
+	_unit_id_count += 1
+	return _unit_id_count
 	
 
 func get_unit_by_id(id : int) -> Unit:
@@ -105,16 +105,18 @@ func get_unit_by_position_nullable(pos: Vector2i) -> Unit:
 
 
 ## Creates a simple test game for debugging
-static func DEBUG_init(map_width : int, map_height : int, game_name_p : String) -> GameState:
-	var gs = GameState.new()
-	gs.grid = GameGrid.new(map_width, map_height)
-	gs.grid.debugFill()
-	gs.game_name = game_name_p
-	return gs
+#static func DEBUG_init(map_width : int, map_height : int, game_name_p : String) -> GameState:
+	#var gs = GameState.new()
+	#gs.grid = GameGrid.new(map_width, map_height)
+	#gs.grid.debugFill()
+	#gs.game_name = game_name_p
+	#return gs
 
 # ---
 # GODOT PREDEFINED
 # ---
 
-func _init():
-	pass
+func _init(units : Dictionary[int, Unit], turn_number : int, unit_id_count : int):
+	_units = units
+	_unit_id_count = unit_id_count
+	_turn_number = turn_number
