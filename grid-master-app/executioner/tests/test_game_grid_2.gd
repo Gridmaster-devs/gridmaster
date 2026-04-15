@@ -39,30 +39,31 @@ func test_tile_access_and_modification():
 	assert_eq(game_grid.getTileType(x, y), tile_type, "Tile type should be updated")
 	assert_eq(game_grid.getTile(x, y).getTileType().tile_name, "TestTile", "Tile name should match")
 
-func test_unit_management():
-	# Setup grid with tiles
-	var fill_func = func(_x, _y):
-		return GridTile.new(TileType.new(), Vector2i(_x, _y))
-	game_grid.fillTiles(fill_func)
-	
-	# Create dependencies for Unit
-	var unit_type = UnitType.new()
-	var attributes: Dictionary[UnitType.UNIT_ATTRIBUTE_TYPE, Variant] = {}
-	attributes[UnitType.UNIT_ATTRIBUTE_TYPE.MAX_HP] = 10
-	attributes[UnitType.UNIT_ATTRIBUTE_TYPE.INITIAL_MORALE] = 5
-	attributes[UnitType.UNIT_ATTRIBUTE_TYPE.MOVEMENT_SPEED] = 2
-	unit_type.attributes = attributes
-	
-	var unit_pos = Vector2i(1, 1)
-	var team: Team = Team.new("Test team", 1, Color(0, 0, 0), [])
-	var player: Player = Player.new("Test player", 1, team, false)
-	var unit = Unit.new(unit_type, 1, player, unit_pos)
-	
-	game_grid.addUnit(unit)
-	
-	var unit_on_tile = game_grid.getUnitOnTile(1, 1)
-	# Chech taht the unit is added to the tile
-	assert_eq(unit_on_tile, unit, "Recently added unit should be in the returned units")
+# DEPRECATED functionality
+#func test_unit_management():
+	## Setup grid with tiles
+	#var fill_func = func(_x, _y):
+		#return GridTile.new(TileType.new(), Vector2i(_x, _y))
+	#game_grid.fillTiles(fill_func)
+	#
+	## Create dependencies for Unit
+	#var unit_type = UnitType.new()
+	#var attributes: Dictionary[UnitType.UNIT_ATTRIBUTE_TYPE, Variant] = {}
+	#attributes[UnitType.UNIT_ATTRIBUTE_TYPE.MAX_HP] = 10
+	#attributes[UnitType.UNIT_ATTRIBUTE_TYPE.INITIAL_MORALE] = 5
+	#attributes[UnitType.UNIT_ATTRIBUTE_TYPE.MOVEMENT_SPEED] = 2
+	#unit_type.attributes = attributes
+	#
+	#var unit_pos = Vector2i(1, 1)
+	#var team: Team = Team.new("Test team", 1, Color(0, 0, 0), [])
+	#var player: Player = Player.new("Test player", 1, team, false)
+	#var unit = Unit.new(unit_type, 1, player, unit_pos)
+	#
+	#game_grid.addUnit(unit)
+	#
+	#var unit_on_tile = game_grid.getUnitOnTile(1, 1)
+	## Chech taht the unit is added to the tile
+	#assert_eq(unit_on_tile, unit, "Recently added unit should be in the returned units")
 
 #func test_init_from_map_resource():
 	## Create a mock map
