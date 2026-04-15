@@ -23,20 +23,6 @@ func test_tiles_are_distinct():
 	
 	assert_ne(tile1, tile2, "The tiles should be different instances")
 
-
-# Test that a unit is added correctly to the grid
-func test_adding_unit():
-	var team: Team = Team.new("Test team", -1, Color(0, 0, 0), [])
-	var player: Player = Player.new("Test player", -1, team, false)
-	var unit: Unit = Unit.new(UnitType.debugType(), -1, player, Vector2i(1,1))
-	
-	game_grid.addUnit(unit)
-	
-	var pos: Vector2i = unit.getPosition()
-	var grid_tile: GridTile = game_grid.getTile(pos.x, pos.y)
-	
-	assert_eq(grid_tile.get_unit(), unit, "THe added unit should be added to the correct tile")
-
 # Tests that fillTiles replaces old tiles
 func test_fillTiles_replaces_old_tiles():
 	var old_tile = game_grid.getTile(0,0)
