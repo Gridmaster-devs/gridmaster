@@ -9,14 +9,8 @@ var _units : Dictionary[int, Unit] = {} ## All the units in the game, NOTE: also
 ## increments by one each time
 var unit_id_count : int = 0
 
-var turn_number : int = 0 ## What turn it is
-
-## Returns the unit in the specified position or null if the tile does not contain a unit at all
-func get_unit_by_position_nullable(pos: Vector2i) -> Unit:
-	for unit in _units.values():
-		if unit.getPosition() == pos:
-			return unit
-	return null
+## What turn it is
+var turn_number : int = 0 
 
 
 ## Adds a unit to the game.
@@ -72,6 +66,7 @@ func deep_copy() -> GameState:
 		var new_unit = unit.deep_copy()
 		new_state._units[new_unit.unit_id] = new_unit
 	new_state.turn_number = self.turn_number
+	new_state.unit_id_count = self.unit_id_count
 	
 	return new_state
 
@@ -92,6 +87,13 @@ func getNewUnitId() -> int:
 
 func get_unit_by_id(id : int) -> Unit:
 	return _units.get(id)
+
+## Returns the unit in the specified position or null if the tile does not contain a unit at all
+func get_unit_by_position_nullable(pos: Vector2i) -> Unit:
+	for unit in _units.values():
+		if unit.getPosition() == pos:
+			return unit
+	return null
 
 # ---
 # DEBUG FUNCTIONS

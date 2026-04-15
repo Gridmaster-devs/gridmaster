@@ -208,7 +208,7 @@ func process_end_turn_local() -> void:
 ## Ends the turn and processes all the actions that have been queued up.
 ## Unit actions are processed before other actions.
 ## NOTE This method does not increment the game state on its own, but returns a new gamestate that can be mounted. Contrast with [method GameMaster.process_end_turn_local]
-## INFO Essentially a proof of concept that game_state can be 
+## INFO Essentially a proof of concept that game_state is now a completely portable object that can be mounted at will
 func process_end_turn_local_builder() -> GameState:
 	var new_game_state = data_manager.get_game_state().deep_copy()
 	
