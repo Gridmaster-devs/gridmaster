@@ -74,7 +74,7 @@ func reset_swap() -> void:
 
 
 ## Tries to move the unit one step forward when called by the
-## game state's end turn function
+## game master's end turn function
 func step() -> void:
 	var loops = 0
 	# We have already stopped
