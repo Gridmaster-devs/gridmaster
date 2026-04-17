@@ -1,7 +1,9 @@
 extends GutTest
 
 var game_state : GameState
-var game_master : GameMaster
+var game_def: GameDefinition
+var game_manager: GameDataManager
+var client_attributes: ClientAttributes
 var game_grid: GameGrid
 var player_1_id: int
 var player_2_id: int
@@ -9,11 +11,12 @@ var enemy_player_id: int
 
 
 func before_each():
-	game_state = GameState.new()
-	game_master = GameMaster.new()
+	game_state = GameState.new({}, 0, 0)
 	game_grid = GameGrid.new(10, 10)
-	game_state._grid = game_grid
-	game_master.game_state = game_state
+	game_def = GameDefinition.new()
+	client_attributes = ClientAttributes.new()
+	game_manager = GameDataManager.new(game_state, game_def, client_attributes)
+	game_def._grid = game_grid
 	
 	# Setup grid with tiles
 	var fill_func = func(_x, _y):
@@ -21,21 +24,18 @@ func before_each():
 	game_grid.fillTiles(fill_func)
 	
 	#Add teams and players
-	var team_1_id: int = game_state.add_team("Team 1", Color(0, 0, 0), [])
-	player_1_id = game_state.add_player("Player 1", team_1_id, false)
-	player_2_id = game_state.add_player("Player 2", team_1_id, false)
-	var enemy_team_id: int = game_state.add_team("Enemy team", Color(0, 0, 0), [])
-	enemy_player_id = game_state.add_player("Enemy player", enemy_team_id, false)
-	game_state.client_player_id = player_1_id
+	var team_1_id: int = game_def.add_team("Team 1", Color(0, 0, 0), [])
+	player_1_id = game_def.add_player("Player 1", team_1_id, false)
+	player_2_id = game_def.add_player("Player 2", team_1_id, false)
+	var enemy_team_id: int = game_def.add_team("Enemy team", Color(0, 0, 0), [])
+	enemy_player_id = game_def.add_player("Enemy player", enemy_team_id, false)
+	client_attributes.client_player_id = player_1_id
 	
-
-func after_each():
-	game_state = null
-	game_master = null
 
 
 #Helper function to add units to the game state
 func add_unit(player_id: int, pos: Vector2i, vision_range:= 1) -> Unit:
+	var player: Player = game_def.players.get(player_id)
 	var unit_type: UnitType = UnitType.new()
 	#Create unit attributes
 	var attributes: Dictionary[UnitType.UNIT_ATTRIBUTE_TYPE, Variant] = {}
@@ -46,17 +46,17 @@ func add_unit(player_id: int, pos: Vector2i, vision_range:= 1) -> Unit:
 	unit_type.attributes = attributes
 	
 	#Add the unit to the game state
-	return game_state.addUnit(unit_type, pos, player_id)
+	return game_state.addUnit(unit_type, pos, player)
 
 #Test that own units always appear visible
 func test_own_units_always_visible():
-	var client_id: int = game_state.get_client_player_id()
+	var client_id: int = client_attributes.client_player_id
 	#Add a few units 
 	add_unit(client_id, Vector2i(0, 0))
 	add_unit(client_id, Vector2i(1, 0))
 	add_unit(client_id, Vector2i(1, 1))
 	
-	var visible: Variant = game_master.get_visible_units()
+	var visible: Variant = game_manager.get_visible_units()
 	
 	for unit in game_state.getUnits():
 		if unit.get_player_id() == client_id:
@@ -64,13 +64,13 @@ func test_own_units_always_visible():
 
 #Test that teammates units are always visible
 func test_teammate_units_visible():
-	var client_team_id: int = game_state.players.get(game_state.get_client_player_id()).team.team_id
+	var client_team_id: int = game_def.players.get(client_attributes.client_player_id).team.team_id
 	#Add a few units 
 	add_unit(player_2_id, Vector2i(0, 0))
 	add_unit(player_2_id, Vector2i(1, 0))
 	add_unit(player_2_id, Vector2i(1, 1))
 	
-	var visible: Variant = game_master.get_visible_units()
+	var visible: Variant = game_manager.get_visible_units()
 	
 	for unit in game_state.getUnits():
 		if unit.get_team_id() == client_team_id:
@@ -95,7 +95,7 @@ func test_visibility():
 				continue
 			var enemy_pos = Vector2i(i, j)
 			var enemy_unit: Unit = add_unit(enemy_player_id, enemy_pos)
-			var visible: Variant = game_master.get_visible_units()
+			var visible: Variant = game_manager.get_visible_units()
 			var dx: int = abs(unit_pos.x - enemy_pos.x)
 			var dy: int = abs(unit_pos.y - enemy_pos.y)
 			#Checks if enemy is within vision range
