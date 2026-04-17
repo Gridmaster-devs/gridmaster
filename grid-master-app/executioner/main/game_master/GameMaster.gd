@@ -51,29 +51,6 @@ func _ready() -> void:
 	Global.game_file_received.connect(_on_game_file_received)
 	switch_gui_scene(LOAD_GAME_GUI, null)
 
-# Returns the units visible for the player
-func get_visible_units() -> Variant:
-	if game_state == null:
-		return null
-	
-	var visible_units: Array[Unit] = []
-	var my_player_id: int = game_state.get_client_player_id()
-	var my_player: Player =  game_state.players.get(my_player_id)
-	
-	if my_player == null:
-		return []
-	
-	var my_team_id: int = my_player.team.team_id
-	for unit in game_state.getUnits():
-		var unit_team_id: int = unit.get_team_id()
-		
-		# Always sees units on the same team
-		if unit_team_id == my_team_id:
-			visible_units.append(unit)
-		elif game_state.is_unit_visible(unit, my_player_id):
-			visible_units.append(unit)
-		
-	return visible_units
 
 
 # ---

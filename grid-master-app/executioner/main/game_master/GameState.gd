@@ -58,26 +58,6 @@ func remove_unit(unit : Unit) -> void:
 func increment_turn_number() -> void:
 	_turn_number += 1
 
-# Used for visibility logic. Checks if the target unit is visible to a player
-func is_unit_visible(target_unit: Unit, player_id: int) -> bool:
-	var player: Player = players.get(player_id)
-	
-	if player == null:
-		return false
-		
-	
-	# Goes over each unit in the game
-	for unit in units.values():
-		# Only check with units that belong to the player
-		if unit.get_player_id() == player_id:
-			var dx: int = abs(unit.getPosition().x - target_unit.getPosition().x)
-			var dy: int = abs(unit.getPosition().y - target_unit.getPosition().y)
-			
-			if max(dx, dy) <= unit.vision_range:
-				return true
-		
-	return false
-
 
 func deep_copy() -> GameState:
 	var new_units: Dictionary[int, Unit] = {}
