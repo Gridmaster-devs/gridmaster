@@ -59,6 +59,7 @@ func get_units() -> Array[UnitResource]:
 		save_to_resource.emit(unit_resource)
 	return tree_panel.get_units()
 
+# TODO just use signals or something
 # lets the UI elements know the current edited unit was removed, so they
 # should reset their values
 func unit_resource_removed():

@@ -6,6 +6,23 @@ extends Resource
 @export var attributes : Dictionary
 @export var actions : Array[Action]
 
+## specifically meant to be used only in editor and not in the exported resource.
+var id: int
+
+static var _next_id: int
+
+var name: String:
+	get:
+		var name_attribute = get_attribute_value("name")
+		if name_attribute == null:
+			return ""
+		else:
+			return name_attribute
+	set(v): return
+	
+func _init():
+	id = _next_id
+	_next_id += 1
 
 ## takes an attribute of a certain name and puts its value in the dictionary
 func set_attribute(name_p : String, value_p):
