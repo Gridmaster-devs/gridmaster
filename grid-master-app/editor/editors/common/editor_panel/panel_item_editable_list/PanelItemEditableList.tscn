@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3 uid="uid://xdwmij3vwtpt"]
+
+[ext_resource type="Script" uid="uid://doeyglgcxvyh8" path="res://editor/editors/common/editor_panel/panel_item_editable_list/panel_item_editable_list.gd" id="1_1xsm0"]
+[ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://editor/themes/editor-theme.tres" id="1_d571p"]
+
+[node name="PanelItemEditableList" type="VBoxContainer"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_1xsm0")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+
+[node name="AddContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="DropDown" type="OptionButton" parent="AddContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("1_d571p")
+
+[node name="AddButton" type="Button" parent="AddContainer"]
+layout_mode = 2
+text = "+"

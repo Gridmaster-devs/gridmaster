@@ -2,6 +2,7 @@
 class_name PanelItem
 extends HBoxContainer
 
+
 enum PanelType {FIELD, CHECKBOX, DROPDOWN, SPINBOX}
 
 # the text that will be shown to the user, explains the attribute
@@ -151,6 +152,7 @@ func make_checkbox_item():
 	checkbox.size_flags_horizontal = SIZE_EXPAND_FILL
 	checkbox.set_disabled(false)
 	
+	
 func make_dropdown_item():
 	var root = get_tree().edited_scene_root
 	var label = Label.new()
@@ -206,6 +208,7 @@ func _get_property_list():
 		PanelType.SPINBOX:
 			pass
 	return properties
+	
 	
 # solely for debugging
 func test_parent():

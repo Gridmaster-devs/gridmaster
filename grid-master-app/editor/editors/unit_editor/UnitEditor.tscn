@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://d1mgyle0o8kx3"]
+[gd_scene load_steps=10 format=3 uid="uid://d1mgyle0o8kx3"]
 
 [ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://editor/themes/editor-theme.tres" id="1_ke4m8"]
 [ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="2_7lyne"]
@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://ba5as4lpqxka2" path="res://editor/editors/unit_editor/FileTreePanel.tscn" id="5_67da3"]
 [ext_resource type="PackedScene" uid="uid://b8u4a8d5rc0yj" path="res://editor/editors/unit_editor/UnitInfoPanel.tscn" id="6_k1fjl"]
 [ext_resource type="PackedScene" uid="uid://rtqqyrnt8pr0" path="res://editor/editors/unit_editor/ActionPanel.tscn" id="7_ip3j4"]
+[ext_resource type="PackedScene" uid="uid://xdwmij3vwtpt" path="res://editor/editors/common/editor_panel/panel_item_editable_list/PanelItemEditableList.tscn" id="8_8onv2"]
 
 [node name="UnitEditor" type="PanelContainer"]
 anchors_preset = 15
@@ -51,10 +52,11 @@ theme_type_variation = &"EditorHBox"
 [node name="AttributesPanel" parent="HBoxContainer/VBoxContainer/HBoxContainer" instance=ExtResource("2_7lyne")]
 layout_mode = 2
 size_flags_horizontal = 3
-section_headers = Array[String](["Movement", "Interaction"])
+title = "AttributesPanel"
+section_headers = Array[String](["Movement", "Interaction", "Production"])
 
 [node name="TopLabel" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox" index="0"]
-text = "Attributes"
+text = "AttributesPanel"
 
 [node name="Movement" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
 layout_mode = 2
@@ -137,6 +139,51 @@ text = "Capturable"
 [node name="CheckBox" type="CheckBox" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Interaction/Capturable"]
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="Production" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox" index="2"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Production"]
+layout_mode = 2
+theme_type_variation = &"SectionLabel"
+text = "Production"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Production cost (self)" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Production" instance=ExtResource("3_ad1yx")]
+layout_mode = 2
+attribute_name = "production_cost"
+text = "Production cost (self)"
+type = 3
+
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Production/Production cost (self)"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Production cost (self)"
+
+[node name="SpinBox" type="SpinBox" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Production/Production cost (self)"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Production unit" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Production" instance=ExtResource("3_ad1yx")]
+layout_mode = 2
+attribute_name = "is_production_unit"
+text = "Production unit"
+type = 1
+
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Production/Production unit"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Production unit"
+
+[node name="CheckBox" type="CheckBox" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Production/Production unit"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PanelItemEditableList" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Production" node_paths=PackedStringArray("options_list_provider") instance=ExtResource("8_8onv2")]
+layout_mode = 2
+options_list_provider = NodePath("../../../../../../../../UnitTreePanel")
+label_text = "Producible units "
 
 [node name="ResourcesPanel" parent="HBoxContainer/VBoxContainer/HBoxContainer" instance=ExtResource("2_7lyne")]
 layout_mode = 2
@@ -386,6 +433,8 @@ vertical_alignment = 1
 [node name="ActionPanel" parent="HBoxContainer" instance=ExtResource("7_ip3j4")]
 layout_mode = 2
 size_flags_horizontal = 3
+
+[connection signal="units_changed" from="HBoxContainer/UnitTreePanel" to="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Production/PanelItemEditableList" method="options_changed"]
 
 [editable path="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel"]
 [editable path="HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel"]
