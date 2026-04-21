@@ -82,12 +82,10 @@ func initFromGameDefinition(game_definition_resource : GameDefinitionResource) -
 func end_network_game_turn() -> void:
 	_custom_graphics.clear()
 
-	var game_state = data_manager.get_game_state()
-
 	# Compile locally assigned actions into the queue for server to process
 	var outgoing_actions: Array = []
-	for unit in game_state.units.values():
-		if unit.get_player_id() == game_state.client_player_id and unit.current_action != null:
+	for unit in data_manager.get_units().values():
+		if unit.get_player_id() == data_manager.get_client_player_id() and unit.current_action != null:
 			var action = unit.current_action
 			if action is MoveAction:
 				outgoing_actions.append({
@@ -98,7 +96,7 @@ func end_network_game_turn() -> void:
 				})
 			# TODO: Implement other actions as well in addition to the MoveAction..
 
-	print("[Client] Packing end_turn actions. Checked %d units. Found %d valid actions for player %d." % [game_state.units.size(), outgoing_actions.size(), game_state.client_player_id])
+	print("[Client] Packing end_turn actions. Checked %d units. Found %d valid actions for player %d." % [data_manager.get_units().size(), outgoing_actions.size(), data_manager.get_client_player_id()])
 
 	Networking.end_peer_turn.rpc_id(Networking.SERVER_PEER_ID, outgoing_actions)
 
@@ -516,10 +514,9 @@ func _on_game_file_received(file_path: String, team_id: int):
 	if game_def:
 		load_game_definition(game_def)
 		# Set the client player ID based on team selection
-		var game_state = data_manager.get_game_state()
-		for player in game_state.players.values():
+		for player in data_manager.get_players().values():
 			if player.team != null and player.team.team_id == team_id:
-				game_state.client_player_id = player.player_id
+				data_manager.get_client_attributes().client_player_id = player.player_id
 				print("Set client_player_id to %d (team %d)" % [player.player_id, team_id])
 				break
 	else:
@@ -540,28 +537,27 @@ func _on_turn_ended(state_update: Dictionary):
 
 func _apply_state_update(state_update: Dictionary) -> void:
 	# Create units from the dictionary
-	var game_state = data_manager.get_game_state()
-	if game_state != null:
-		game_state.increment_turn_number()
+	if data_manager != null:
+		data_manager.increment_turn_number()
 
 		var alive_unit_ids = []
 		for u_state in state_update["units"]:
 			alive_unit_ids.append(u_state["id"])
 
 		var dead_units = []
-		for unit in game_state.units.values():
+		for unit in data_manager.get_units().values():
 			if not alive_unit_ids.has(unit.getId()):
 				dead_units.append(unit)
 
 		for unit in dead_units:
-			game_state.remove_unit(unit)
+			data_manager.remove_unit(unit)
 
 		for u_state in state_update["units"]:
 			var unit_id = u_state["id"]
-			var unit = game_state.get_unit_by_id(unit_id)
+			var unit = data_manager.get_unit_by_id(unit_id)
 			if unit != null:
 				if unit.grid_position != u_state["position"]:
-					game_state.move_unit(unit.getId(), u_state["position"])
+					data_manager.move_unit(unit.getId(), u_state["position"])
 				if u_state.has("hp"):
 					unit._hp = u_state["hp"]
 				unit.current_action = null

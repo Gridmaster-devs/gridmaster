@@ -100,6 +100,18 @@ func get_game_name() -> String:
 	
 func get_units() -> Dictionary[int, Unit]:
 	return _game_state._units
+	 
+func get_teams() -> Dictionary[int, Team]:
+	return _game_definition.teams
+	
+func get_players() -> Dictionary[int, Player]:
+	return _game_definition.players
+	
+func get_client_player_id() -> int:
+	return _client_attributes.client_player_id
+	
+func get_turn_number() -> int:
+	return _game_state._turn_number
 
 # Returns all units currently visible from the perspective of the client player
 func get_visible_units() -> Variant:
@@ -129,6 +141,9 @@ func get_visible_units() -> Variant:
 
 func get_unit_by_position_nullable(pos: Vector2i) -> Unit:
 	return _game_state.get_unit_by_position_nullable(pos)
+	
+func get_unit_by_id(id: int) -> Unit:
+	return _game_state.get_unit_by_id(id)
 
 func get_grid() -> GameGrid:
 	return _game_definition.grid
@@ -159,6 +174,9 @@ func _is_unit_visible(target_unit: Unit, player_id: int) -> bool:
 # ---
 # INFO mutating methods
 # ---
+
+func move_unit(unit_id : int, new_position : Vector2i) -> void:
+	_game_state.move_unit(unit_id, new_position)
 
 ## Replace entire game state with new instance
 func replace_game_state(new_game_state: GameState) -> void:

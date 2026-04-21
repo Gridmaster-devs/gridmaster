@@ -10,14 +10,13 @@ const EXIT_FAILURE = 1
 
 ## Configurable server variables
 const PORT = 55555
-const GAME_FILE_PATH = "res://game_cats_dogs.tres"
+const GAME_FILE_PATH = "res://game_cats_dogs_with_vision.tres"
 
 ## The core game server instance
 var server = WebSocketMultiplayerPeer.new()
 
 ## Server state object
-const ServerStateModule = preload("res://server/server_state.gd")
-var state = null
+var server_state: ServerState = null
 
 ## Dictionary that maps network peer IDs (int) to ClientInfo instances
 var clients : Dictionary = {}
@@ -63,9 +62,10 @@ func start_server():
 		exit(EXIT_FAILURE)
 
 	# Initialize the server state
-	state = ServerStateModule.ServerState.new(game_def)
+	server_state = ServerState.new(game_def)
+	GameArgs.initialize(server_state.data_manager, game_def.game_rules)
 	# TODO: Fix direct variable access later
-	if !state.game_definition:
+	if !server_state.game_definition_resource:
 		GML.log(
 			"Failed to instantiate the game state object from the game definition resource.",
 			GML.LogLevel.FATAL
@@ -92,9 +92,9 @@ func _ready():
 #		will be most likely the easiest way to implement this feature.
 func _on_game_file_requested(peer_id: int, team_id: int):
 	GML.log("Peer %d requested game file. Sending..." % peer_id, GML.LogLevel.INFO)
-	if state.clients.keys().has(peer_id) and state.clients[peer_id] == ServerStateModule.TEAM_ID_NOT_SELECTED:
+	if server_state.clients.keys().has(peer_id) and server_state.clients[peer_id] == server_state.TEAM_ID_NOT_SELECTED:
 		# TODO: Check that the given team_id exists.
-		state.clients[peer_id] = team_id
+		server_state.clients[peer_id] = team_id
 		GML.log("Assigned peer %d to team %d" % [peer_id, team_id])
 	else:
 		GML.error(
@@ -109,8 +109,8 @@ func _on_teams_requested(peer_id: int):
 	GML.log("Peer %d requested teams list" % peer_id, GML.LogLevel.INFO)
 
 	var teams_data: Array[Dictionary] = []
-	for team_id in state.game_state.teams.keys():
-		var team: Team = state.game_state.teams[team_id]
+	for team_id in server_state.data_manager.get_teams().keys():
+		var team: Team = server_state.data_manager.get_teams()[team_id]
 		teams_data.append({
 			"id": team_id,
 			"name": team.team_name,
@@ -122,7 +122,7 @@ func _on_teams_requested(peer_id: int):
 
 func _on_game_state_requested(peer_id: int) -> void:
 	GML.log("Peer %d requested the game state." % peer_id, GML.LogLevel.INFO)
-	if !state.game_state:
+	if !server_state.game_state:
 		GML.log("Player requested game state which doesn't exist on server. Check whether initialization of the server failed.", GML.LogLevel.FATAL)
 		exit(EXIT_FAILURE)
 	else:
@@ -132,38 +132,38 @@ func _on_game_state_requested(peer_id: int) -> void:
 # the game state within the client side.
 func _create_state_update_dict() -> Dictionary:
 	var units_state = []
-	for unit in state.game_state.units.values():
+	for unit in server_state.data_manager.get_units().values():
 		units_state.append({
 			"id": unit.getId(),
 			"position": unit.grid_position,
 			"hp": unit.hp
 		})
 	return {
-		"turn_number": state.game_state.turn_number,
+		"turn_number": server_state.data_manager.get_turn_number() ,
 		"units": units_state
 	}
 
 # End the player turn
 func _on_team_turn_end(peer_id: int, action_queue: Array) -> void:
-	if !state.clients.keys().has(peer_id):
+	if !server_state.clients.keys().has(peer_id):
 		GML.log("Unknown client tried to end turn. Rejecting.", GML.LogLevel.ERROR)
 		return
 
-	var player_team: Team = state.get_player_team_nullable(peer_id)
+	var player_team: Team = server_state.get_player_team_nullable(peer_id)
 	if !player_team:
 		GML.log("Player %d tried to end turn but isn't part of any team." % peer_id, GML.LogLevel.ERROR)
 		return
 
 	GML.log("Peer %d requested team '%s' turn end with %d actions." % [peer_id, player_team.team_name, action_queue.size()], GML.LogLevel.INFO)
-	if !state.team_has_ended_turn(player_team.team_id):
-		state.end_team_turn(player_team.team_id)
+	if !server_state.team_has_ended_turn(player_team.team_id):
+		server_state.end_team_turn(player_team.team_id)
 		GML.log("Validated turn end for peer team %s." % [player_team.team_name], GML.LogLevel.INFO)
 
 		if typeof(action_queue) == TYPE_ARRAY:
 			for dict_action in action_queue:
 				if typeof(dict_action) == TYPE_DICTIONARY and dict_action.get("path") != null and dict_action.get("unit_id") != null:
 					var unit_id = dict_action.get("unit_id")
-					var real_unit = state.game_state.get_unit_by_id(unit_id)
+					var real_unit = server_state.data_manager.get_unit_by_id(unit_id)
 					#var logical_p_id = dict_action.get("player_id", -1)
 
 					GML.log("Action queued for unit_id: %d (player %d)" % [unit_id, peer_id], GML.LogLevel.INFO)
@@ -179,11 +179,11 @@ func _on_team_turn_end(peer_id: int, action_queue: Array) -> void:
 
 						## Create actions for units.
 						# MoveAction
-						real_unit.current_action = load("res://executioner/main/game_actions/unit_actions/MoveAction.gd").new(
+						real_unit.current_action = MoveAction.new(
 							typed_path,
 							peer_id,  # Seems that this is not used, so shouldn't matter even if we move units as teams and not as players.
 							real_unit,
-							state.game_state
+							server_state.data_manager
 						)
 					elif !real_unit:
 						GML.log("Could not find unit with id %d" % unit_id, GML.LogLevel.ERROR)
@@ -194,17 +194,17 @@ func _on_team_turn_end(peer_id: int, action_queue: Array) -> void:
 			return
 
 	# Process the turn only when all peers have submitted their actions
-	if state.teams_ended() < state.total_teams():
-		GML.log("%d/%d teams have ended their turn. Waiting for the rest to finish their turns." % [state.teams_ended(), state.total_teams()], GML.LogLevel.INFO)
+	if server_state.teams_ended() < server_state.total_teams():
+		GML.log("%d/%d teams have ended their turn. Waiting for the rest to finish their turns." % [server_state.teams_ended(), server_state.total_teams()], GML.LogLevel.INFO)
 		return
 
 	GML.log("All players have ended their turn. Processing actions..", GML.LogLevel.INFO)
 	
 	# Clear the array of all the teams that have ended their turn
-	state.clear_turns()
+	server_state.clear_turns()
 	
 	## Finally execute all the actions
-	var unit_array = state.game_state.units.values()
+	var unit_array = server_state.data_manager.get_units().values()
 	var sort_func : Callable = GameArgs.args.get(GameArgs.ArgType.UNIT_INITIATIVE_FUNC)
 	sort_func.call(unit_array)
 	
@@ -232,13 +232,13 @@ func _on_team_turn_end(peer_id: int, action_queue: Array) -> void:
 		# unit array so that it doesn't have to search for the position each time
 		for unit in units_to_be_removed:
 			unit_array.erase(unit)
-			state.game_state.remove_unit(unit)
+			server_state.data_manager.remove_unit(unit)
 
 	## Clear turn related information and increment the turn number
 	# Clear actions
 	for unit : Unit in unit_array:
 		unit.current_action = null
-	state.game_state.increment_turn_number()
+	server_state.data_manager.increment_turn_number()
 
 	# Send the state update dict to all the clients.
 	Networking.end_turn.rpc(_create_state_update_dict())
@@ -246,8 +246,8 @@ func _on_team_turn_end(peer_id: int, action_queue: Array) -> void:
 ## Called when a peer connects to the server
 func _peer_connected(peer_id):
 	GML.log("Connected %d" % peer_id, GML.LogLevel.INFO)
-	state.join(peer_id)
-	GML.log("Active clients: %d" % state.active_clients())
+	server_state.join(peer_id)
+	GML.log("Active clients: %d" % server_state.active_clients())
 
 ## Called when a peer disconnects from the server
 # TODO: When re-joining, give the players option to choose the player / team
