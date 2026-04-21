@@ -1,0 +1,48 @@
+[gd_scene load_steps=2 format=3 uid="uid://dmycwbfwgydgx"]
+
+[ext_resource type="Script" path="res://executioner/main/game_master/gui_scenes/team_select_gui.gd" id="1_script"]
+
+[node name="TeamSelectGUI" type="Node"]
+script = ExtResource("1_script")
+
+[node name="TeamsContainer" type="VBoxContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -100.0
+offset_right = 150.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="StatusLabel" type="Label" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = 50.0
+offset_right = 200.0
+offset_bottom = 100.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 24
+text = "Connecting..."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TitleLabel" type="Label" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = -200.0
+offset_right = 200.0
+offset_bottom = -150.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 32
+text = "Select Team"
+horizontal_alignment = 1
+vertical_alignment = 1

@@ -1,63 +1,263 @@
 ## This is the entrypoint for the game server
-## Handles incoming WebSocket multiplayer connections and maintains the list of connected players.
+## Handles incoming WebSocket multiplayer connections and maintains the list of connected clients.
 
 extends Node
 
-# TODO: GameAction subclasses are something around which we want to build the gamestate updating logic
-#		(UnitAction, PlayerAction etc.)
 
-# TODO: GameState object should be an synchronized (use MultiplayerSynchronizer) object that's
-#		shared between server and the clients. The client should.
+
+## Constants
+const EXIT_FAILURE = 1
 
 ## Configurable server variables
 const PORT = 55555
+const GAME_FILE_PATH = "res://game_cats_dogs_with_vision.tres"
 
 ## The core game server instance
 var server = WebSocketMultiplayerPeer.new()
 
-## Dictionary that maps network peer IDs (int) to Player representations (Player.gd)
-var players : Dictionary = {}
+## Server state object
+var server_state: ServerState = null
+
+## Dictionary that maps network peer IDs (int) to ClientInfo instances
+var clients : Dictionary = {}
+
+## Helpers
+func exit(code: int) -> void:
+	# TODO: Implement
+	return
+
+## Cached game definition for team info
+#var game_definition : GameDefinitionResource = null
+## Game state
+# TODO: Implement the game state saving + loading functionality
+# 		For game state saving functionality, refer to:
+#		https://docs.godotengine.org/en/stable/tutorials/io/saving_games.html
+#var game_state: GameState = null
+
+## Turn tracking (TODO: This needs to be saved somewhere with the gamestate)
+#var current_turn : int = 1
+#var teams_ended_turn : Dictionary = {}  # team_index -> bool
+#var turn_actions_by_team : Dictionary = {}  # team_index -> Array of actions
+
+## Tracker for peers that have submitted their turn commands
+# TODO: Remove this and use the team turns instead
+var players_ended_turn: Array[int] = []
 
 ## Create and initialize the server object
 func start_server():
-	print("Starting server..")
+	GML.log("Starting server..", GML.LogLevel.INFO)
 	multiplayer.multiplayer_peer = null
 	var err = server.create_server(PORT)
 	if err != OK:
-		printerr("Failed to create the server instance. Error code: %d" % err)
+		GML.log("Failed to create the server instance. Error code: %d" % err, GML.LogLevel.FATAL)
+		exit(EXIT_FAILURE)
 	multiplayer.multiplayer_peer = server
+
+	var game_def = load(GAME_FILE_PATH) as GameDefinitionResource
+	if !game_def:
+		GML.log(
+			"Failed to load game definition from the path '%s'." % GAME_FILE_PATH,
+			GML.LogLevel.FATAL
+		)
+		exit(EXIT_FAILURE)
+
+	# Initialize the server state
+	server_state = ServerState.new(game_def)
+	GameArgs.initialize(server_state.data_manager, game_def.game_rules)
+	# TODO: Fix direct variable access later
+	if !server_state.game_definition_resource:
+		GML.log(
+			"Failed to instantiate the game state object from the game definition resource.",
+			GML.LogLevel.FATAL
+		)
+		exit(EXIT_FAILURE)
+	else:
+		GML.log(
+			"Successfully loaded game definition: %s." % game_def.game_name,
+			GML.LogLevel.INFO
+		)
 
 func _ready():
 	multiplayer.peer_connected.connect(_peer_connected)
 	multiplayer.peer_disconnected.connect(_peer_disconnected)
-	Global.game_file_requested.connect(_on_game_file_requested)
+	# TODO: Handle this correctly with the new changes
+	Networking.teams_requested.connect(_on_teams_requested)
+	Networking.game_file_requested.connect(_on_game_file_requested)
+	Networking.game_state_requested.connect(_on_game_state_requested)
+	Networking.request_peer_turn_end.connect(_on_team_turn_end)
 	start_server()
 
-func _on_game_file_requested(peer_id: int):
-	print("Peer %d requested game file. Sending..." % peer_id)
-	Global.receive_game_file.rpc_id(peer_id, "res://game_cats_dogs.tres")
+# TODO: In order to continue an existing game, we can just set the clients
+#		to load the game file and then send the saved game state, which
+#		will be most likely the easiest way to implement this feature.
+func _on_game_file_requested(peer_id: int, team_id: int):
+	GML.log("Peer %d requested game file. Sending..." % peer_id, GML.LogLevel.INFO)
+	if server_state.clients.keys().has(peer_id) and server_state.clients[peer_id] == server_state.TEAM_ID_NOT_SELECTED:
+		# TODO: Check that the given team_id exists.
+		server_state.clients[peer_id] = team_id
+		GML.log("Assigned peer %d to team %d" % [peer_id, team_id])
+	else:
+		GML.error(
+			"Failed to assign the peer %d a team (%d). " + 
+			"Client either not connected or is already part of a team." % [peer_id, team_id]
+		)
+		return
 
-## Fired when a peer connects to the server
-func _peer_connected(id):
-	print("Connected %d" % id)
-	var PlayerClass = load("res://executioner/main/game_master/Player.gd")
+	Networking.receive_game_file.rpc_id(peer_id, GAME_FILE_PATH, team_id)
 
-	# Instantiate a new Player
-	var new_player = PlayerClass.new()
-	new_player.player_id = id
-	# Assign teams based on connection order
-	new_player.team_id = players.size()
-	new_player.computer = false
-	new_player.player_name = "Player %d" % id
+func _on_teams_requested(peer_id: int):
+	GML.log("Peer %d requested teams list" % peer_id, GML.LogLevel.INFO)
 
-	players[id] = new_player
+	var teams_data: Array[Dictionary] = []
+	for team_id in server_state.data_manager.get_teams().keys():
+		var team: Team = server_state.data_manager.get_teams()[team_id]
+		teams_data.append({
+			"id": team_id,
+			"name": team.team_name,
+			"color": team.color.to_html()
+		})
 
-	# TODO: The server needs to add the player to the world, assign the correct team to itself
-	#		and set the appropriate values for it.
+	GML.log("Sending %d teams: %s" % [teams_data.size(), teams_data], GML.LogLevel.INFO)
+	Networking.receive_teams.rpc_id(peer_id, teams_data)
 
-## Fired when a peer disconnects from the server
+func _on_game_state_requested(peer_id: int) -> void:
+	GML.log("Peer %d requested the game state." % peer_id, GML.LogLevel.INFO)
+	if !server_state.game_state:
+		GML.log("Player requested game state which doesn't exist on server. Check whether initialization of the server failed.", GML.LogLevel.FATAL)
+		exit(EXIT_FAILURE)
+	else:
+		Networking.receive_game_state.rpc_id(peer_id, _create_state_update_dict())
+
+# Returns the dictionary that is used to update
+# the game state within the client side.
+func _create_state_update_dict() -> Dictionary:
+	var units_state = []
+	for unit in server_state.data_manager.get_units().values():
+		units_state.append({
+			"id": unit.getId(),
+			"position": unit.grid_position,
+			"hp": unit.hp
+		})
+	return {
+		"turn_number": server_state.data_manager.get_turn_number() ,
+		"units": units_state
+	}
+
+# End the player turn
+func _on_team_turn_end(peer_id: int, action_queue: Array) -> void:
+	if !server_state.clients.keys().has(peer_id):
+		GML.log("Unknown client tried to end turn. Rejecting.", GML.LogLevel.ERROR)
+		return
+
+	var player_team: Team = server_state.get_player_team_nullable(peer_id)
+	if !player_team:
+		GML.log("Player %d tried to end turn but isn't part of any team." % peer_id, GML.LogLevel.ERROR)
+		return
+
+	GML.log("Peer %d requested team '%s' turn end with %d actions." % [peer_id, player_team.team_name, action_queue.size()], GML.LogLevel.INFO)
+	if !server_state.team_has_ended_turn(player_team.team_id):
+		server_state.end_team_turn(player_team.team_id)
+		GML.log("Validated turn end for peer team %s." % [player_team.team_name], GML.LogLevel.INFO)
+
+		if typeof(action_queue) == TYPE_ARRAY:
+			for dict_action in action_queue:
+				if typeof(dict_action) == TYPE_DICTIONARY and dict_action.get("path") != null and dict_action.get("unit_id") != null:
+					var unit_id = dict_action.get("unit_id")
+					var real_unit = server_state.data_manager.get_unit_by_id(unit_id)
+					#var logical_p_id = dict_action.get("player_id", -1)
+
+					GML.log("Action queued for unit_id: %d (player %d)" % [unit_id, peer_id], GML.LogLevel.INFO)
+
+					# Use team id instead of player id
+					if real_unit != null and real_unit.get_team_id() == player_team.team_id:
+						var path_raw = dict_action.get("path")
+						var typed_path: Array[Vector2i] = []
+						for p in path_raw:
+							typed_path.append(p)
+
+						GML.log("Resolving path %s for unit %d" % [typed_path, unit_id], GML.LogLevel.INFO)
+
+						## Create actions for units.
+						# MoveAction
+						real_unit.current_action = MoveAction.new(
+							typed_path,
+							peer_id,  # Seems that this is not used, so shouldn't matter even if we move units as teams and not as players.
+							real_unit,
+							server_state.data_manager
+						)
+					elif !real_unit:
+						GML.log("Could not find unit with id %d" % unit_id, GML.LogLevel.ERROR)
+					else:
+						GML.log("Unit %d does not match team_id %d" % [unit_id, player_team.team_id], GML.LogLevel.ERROR)
+		else:
+			GML.log("Team turn already have been ended.", GML.LogLevel.WARN)
+			return
+
+	# Process the turn only when all peers have submitted their actions
+	if server_state.teams_ended() < server_state.total_teams():
+		GML.log("%d/%d teams have ended their turn. Waiting for the rest to finish their turns." % [server_state.teams_ended(), server_state.total_teams()], GML.LogLevel.INFO)
+		return
+
+	GML.log("All players have ended their turn. Processing actions..", GML.LogLevel.INFO)
+	
+	# Clear the array of all the teams that have ended their turn
+	server_state.clear_turns()
+	
+	## Finally execute all the actions
+	var unit_array = server_state.data_manager.get_units().values()
+	var sort_func : Callable = GameArgs.args.get(GameArgs.ArgType.UNIT_INITIATIVE_FUNC)
+	sort_func.call(unit_array)
+	
+	# Looping through the move actions until every unit has stopped
+	# (reached their destination, or gotten stopped by a fight or something else)
+	var done = false
+	while not done:
+		done = true
+
+		# Advance one step in each MoveAction
+		for unit : Unit in unit_array:
+			if (unit.current_action is MoveAction and unit.has_stopped() == false):
+				done = false
+				(unit.current_action as MoveAction).step()
+
+		var units_to_be_removed : Array[Unit] = []
+
+		# If any units have died we remove them from the array
+		# We can't erase units while iterating over the array or it will break
+		for unit : Unit in unit_array:
+			if (unit.is_dead()):
+				units_to_be_removed.append(unit)
+
+		# NOTE: Possible to improve efficiency by using indices of the units in the
+		# unit array so that it doesn't have to search for the position each time
+		for unit in units_to_be_removed:
+			unit_array.erase(unit)
+			server_state.data_manager.remove_unit(unit)
+
+	## Clear turn related information and increment the turn number
+	# Clear actions
+	for unit : Unit in unit_array:
+		unit.current_action = null
+	server_state.data_manager.increment_turn_number()
+
+	# Send the state update dict to all the clients.
+	Networking.end_turn.rpc(_create_state_update_dict())
+
+## Called when a peer connects to the server
+func _peer_connected(peer_id):
+	GML.log("Connected %d" % peer_id, GML.LogLevel.INFO)
+	server_state.join(peer_id)
+	GML.log("Active clients: %d" % server_state.active_clients())
+
+## Called when a peer disconnects from the server
+# TODO: When re-joining, give the players option to choose the player / team
+#		(e.g. show team color and player name, so that they can recognize
+#		who they were in the previous session. Other option is to use
+#		persistent storage to save the player ID. E.g. something like:
+#		https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Client-side_APIs/Client-side_storage
+# 		but via Godot.
 func _peer_disconnected(id):
-	if players.has(id):
-		players.erase(id)
-	print("Disconnected %d" % id)
-
+	if clients.has(id):
+		clients.erase(id)
+		GML.log("Disconnected %d" % id, GML.LogLevel.INFO)
+	GML.log("Active clients: %d" % clients.size())

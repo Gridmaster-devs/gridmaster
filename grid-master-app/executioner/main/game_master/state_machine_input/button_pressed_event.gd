@@ -1,7 +1,7 @@
 class_name ButtonPressedEvent
 extends GUIEvent
 
-enum ButtonType {LOAD_GAME, END_TURN, CONNECT_TO_SERVER}
+enum ButtonType {LOAD_GAME, END_TURN, CONNECT_TO_SERVER, SELECT_TEAM}
 
 var button_type : ButtonType
 var additional_args : Variant
