@@ -9,9 +9,10 @@ signal units_changed
 # where each subclass has a reference to the gamestate and handles the given input differently.
 # This might end up being a lot cleaner as the amount of possible UI states expands, and might
 # be needed to prevent the game master file being enormous.
-enum UIState {LOAD_GAME, IN_GAME_DEFAULT, UNIT_MOVE}
+enum UIState {LOAD_GAME, TEAM_SELECT, IN_GAME_DEFAULT, UNIT_MOVE}
 
 const LOAD_GAME_GUI : PackedScene = preload("res://executioner/main/game_master/gui_scenes/load_game_gui.tscn")
+const TEAM_SELECT_GUI : PackedScene = preload("res://executioner/main/game_master/gui_scenes/team_select_gui.tscn")
 const IN_GAME_DEFAULT_GUI : PackedScene = preload("res://executioner/main/game_master/gui_scenes/in_game_default_gui.tscn")
 
 static var GROUP_NAME : String = "GameMaster"
@@ -48,11 +49,13 @@ func _ready() -> void:
 	_click_tracker.clicked.connect(_clicked)
 	_custom_graphics = grid_graphics.get_custom_graphics()
 	ftm.resource_uploaded.connect(load_game_definition)
-	Global.game_file_received.connect(_on_game_file_received)
 	## Network functionality
 	# TODO: If this causes issues, separate network vs. local signals
-	Global.turn_ended.connect(_on_turn_ended)
-	Global.game_state_received.connect(_on_game_state_received)
+	Networking.connected_to_server_signal.connect(_on_connected_to_server)
+	Networking.teams_received.connect(_on_teams_received)
+	Networking.game_file_received.connect(_on_game_file_received)
+	Networking.turn_ended.connect(_on_turn_ended)
+	Networking.game_state_received.connect(_on_game_state_received)
 	switch_gui_scene(LOAD_GAME_GUI, null)
 
 # ---
@@ -158,7 +161,7 @@ func end_network_game_turn() -> void:
 
 	print("[Client] Packing end_turn actions. Checked %d units. Found %d valid actions for player %d." % [game_state.units.size(), outgoing_actions.size(), game_state.client_player_id])
 
-	Global.end_peer_turn.rpc_id(Global.SERVER_PEER_ID, multiplayer.get_unique_id(), outgoing_actions)
+	Networking.end_peer_turn.rpc_id(Networking.SERVER_PEER_ID, outgoing_actions)
 
 	print("[Client] Turn ended, waiting for server...")
 
@@ -311,7 +314,8 @@ func connect_to_server():
 func _on_connected_to_server():
 	_set_load_game_status("Successfully connected to the server!")
 	_set_load_game_status("Loading game..")
-	Global.request_game_file.rpc_id(Global.SERVER_PEER_ID)
+	switch_gui_scene(TEAM_SELECT_GUI, null)
+	ui_state = UIState.TEAM_SELECT
 
 func _on_connection_failed():
 	_set_load_game_status("Connection to the server failed.")
@@ -337,6 +341,9 @@ func receive_ui_event(event : StateMachineEvent):
 		UIState.LOAD_GAME:
 			_handle_event_load_game(event)
 		
+		UIState.TEAM_SELECT:
+			_handle_event_team_select(event)
+		
 		UIState.IN_GAME_DEFAULT:
 			_handle_event_default_in_game(event)
 		
@@ -351,7 +358,17 @@ func _handle_event_load_game(event : StateMachineEvent):
 		if button_press.button_type == ButtonPressedEvent.ButtonType.LOAD_GAME:
 			load_game_from_file()
 		elif button_press.button_type == ButtonPressedEvent.ButtonType.CONNECT_TO_SERVER:
-			connect_to_server()
+			_set_load_game_status("Connecting to server...")
+			Networking.connect_to_server()
+
+
+## Handles input when in the team selection screen
+func _handle_event_team_select(event : StateMachineEvent):
+	if event is ButtonPressedEvent:
+		var button_press := event as ButtonPressedEvent
+		if button_press.button_type == ButtonPressedEvent.ButtonType.SELECT_TEAM:
+			var team_index = button_press.additional_args as int
+			Networking.select_team(team_index)
 
 
 ## Default handler for in-game
@@ -554,13 +571,26 @@ func DEBUG_create_default_unit(position : Vector2i) -> void:
 
 
 
-func _on_game_file_received(file_path: String):
-	print("Received game file from server: ", file_path)
+func _on_game_file_received(file_path: String, team_id: int):
+	print("Received game file from server: %s, team_id: %d" % [file_path, team_id])
 	var game_def = load(file_path)
 	if game_def:
 		load_game_definition(game_def)
+		# Set the client player ID based on team selection
+		var game_state = data_manager.get_game_state()
+		for player in game_state.players.values():
+			if player.team != null and player.team.team_id == team_id:
+				game_state.client_player_id = player.player_id
+				print("Set client_player_id to %d (team %d)" % [player.player_id, team_id])
+				break
 	else:
-		_set_load_game_status("Failed to load game file!")
+		if gui_scene is TeamSelectGUI:
+			gui_scene.set_status("Failed to load game file!")
+
+func _on_teams_received(teams: Array):
+	print("Received teams from server: ", teams)
+	if gui_scene is TeamSelectGUI:
+		gui_scene.populate_teams(teams)
 
 func _on_game_state_received(state_update: Dictionary):
 	_apply_state_update(state_update)
