@@ -59,23 +59,16 @@ jobs:
         uses: azure/login@v2
         with:
           creds: '{"clientId":"${{ vars.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_TENANT_ID }}"}'
-      - name: Build and deploy Container App
-        uses: azure/container-apps-deploy-action@v2
+      - name: Deploy container apps
+        uses: azure/bicep-deploy@v2
         with:
-          resourceGroup: rg-gridmaster-prod
-          acrName: gridmasterprivate
-          acrUsername: ${{ secrets.ACR_USERNAME }}
-          acrPassword: ${{ secrets.ACR_PASSWORD }}
-          containerAppName: gridmaster-editor
-          imageToDeploy: gridmasterprivate.azurecr.io/gridmaster/editor:${{ github.sha }}
-          targetPort: 80
-      - name: Build and deploy Container App
-        uses: azure/container-apps-deploy-action@v2
-        with:
-          resourceGroup: rg-gridmaster-prod
-          acrName: gridmasterprivate
-          acrUsername: ${{ secrets.ACR_USERNAME }}
-          acrPassword: ${{ secrets.ACR_PASSWORD }}
-          containerAppName: gridmaster-client
-          imageToDeploy: gridmasterprivate.azurecr.io/gridmaster/client:${{ github.sha }}
-          targetPort: 80
+          type: deployment
+          operation: create
+          scope: resourceGroup
+          resource-group-name: rg-gridmaster-prod
+          subscription-id: secrets.AZURE_SUBSCRIPTION_ID
+          template-file: /infra/main.bicep
+          parameters: |
+            commit_SHA: ${{ github.sha }}
+            spClientId: vars.AZURE_CLIENT_ID
+            spClientSecret: secrets.AZURE_CLIENT_SECRET
