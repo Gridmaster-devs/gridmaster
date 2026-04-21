@@ -11,10 +11,76 @@ var _game_state: GameState
 var _game_definition: GameDefinition
 var _client_attributes: ClientAttributes
 
+## meant mainly for internal consumption now, use [method GameDataManager.initFromGameDefinition]
 func _init(game_state: GameState, game_definition: GameDefinition, client_attributes: ClientAttributes) -> void:
 	_game_state = game_state
 	_game_definition = game_definition
 	_client_attributes = client_attributes
+
+## Initializes game state, game definition and pathfinder objects and assigns them to the respective member variables.
+## NOTE that the game definition object initialized here ([GameDefinition]) is a distinct type and concept from [GameDefinitionResource].
+static func initFromGameDefinition(game_definition_resource : GameDefinitionResource) -> GameDataManager:
+	## Initialize new game data objects
+	var unit_name_type_dict: Dictionary[String, int] = {}
+	var new_game_state = GameState.new({}, 0, 0)
+	var new_game_definition = GameDefinition.new()
+	var new_client_attributes = ClientAttributes.new()
+	new_game_definition.initUnitTypesFromResource(game_definition_resource, unit_name_type_dict)
+	new_game_definition.game_name = game_definition_resource.game_name
+	new_game_definition._grid = GameGrid.initFromMapResource(game_definition_resource.loadMap())
+	
+	var game_def_teams: Array[TeamUiRes] = game_definition_resource.team_uis
+	var game_def_players: Array[PlayerUiRes] = game_definition_resource.player_uis
+	
+	
+	var team_id_dict: Dictionary[String, int] = {}
+	
+	var player_name_id_dict: Dictionary[String, int] = {}
+	#teams and players
+	for team in game_def_teams: 
+		var team_name = team.get_team_name()
+		var unit_names: Dictionary[String, bool] = team.get_units()
+		var team_units: Array[UnitType] = []
+		for unit_name in unit_names.keys(): 
+			if unit_names[unit_name]:
+				var cur_unit_type_id = unit_name_type_dict[unit_name]
+				team_units.append(new_game_definition.unit_types[cur_unit_type_id])
+		var team_id = new_game_definition.add_team(team_name, team.get_team_color(), team_units)
+		team_id_dict[team_name] = team_id
+	
+	var client_player_added: bool = false
+	for player in game_def_players: 
+		var player_team = null
+		var ptdict = player.get_teams()
+		var player_name = player.get_player_name()
+		#get the team of the player
+		for t_name in ptdict.keys():
+			if ptdict[t_name]:
+				player_team = t_name
+		if player_team == null:
+			continue
+		#add the player 
+		var p_id = new_game_definition.add_player(player_name, team_id_dict[player_team], false)
+		player_name_id_dict[player_name] = p_id
+		#add the client player as the first one
+		if !client_player_added: 
+			new_client_attributes.client_player_id = p_id
+			client_player_added = true
+	
+	#units on the map
+	var unit_layer = game_definition_resource.unit_layer
+	for x in unit_layer.width:
+		for y in unit_layer.height:
+			var cur_attributes = unit_layer.getItem(x, y)
+			if (cur_attributes.has(MapAttributes.UNIT_UNIT_LIB_ITEM_ID) and 
+				cur_attributes.has(MapAttributes.UNIT_TEAM_ID) and 
+				cur_attributes.has(MapAttributes.UNIT_PLAYER_ID)):
+				var unit_name = cur_attributes[MapAttributes.UNIT_UNIT_LIB_ITEM_ID]
+				var player_name = cur_attributes[MapAttributes.UNIT_PLAYER_ID]
+				new_game_state.addUnit(new_game_definition.unit_types.get(unit_name_type_dict[unit_name]), Vector2i(x, y), new_game_definition.get_player_by_id(player_name_id_dict[player_name])) # FIXME redundant way to get unittype in first argument 
+	
+	# Initialize GameDataManager with initialized game data objects
+	return GameDataManager.new(new_game_state, new_game_definition, new_client_attributes)
 
 # ---
 # INFO read-only methods

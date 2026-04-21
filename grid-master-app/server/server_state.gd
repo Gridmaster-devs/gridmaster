@@ -14,7 +14,7 @@ extends Node
 # 3. load() which loads a saved ServerState object from the disk
 class ServerState:
 	var game_definition: GameDefinitionResource
-	var game_state: GameState
+	#var game_state: GameState
 	var data_manager: GameDataManager
 	var current_turn: int
 
