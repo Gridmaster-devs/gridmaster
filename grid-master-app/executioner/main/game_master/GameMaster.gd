@@ -48,7 +48,7 @@ func _ready() -> void:
 	units_changed.connect(grid_graphics._unitsChanged)
 	_click_tracker.clicked.connect(_clicked)
 	_custom_graphics = grid_graphics.get_custom_graphics()
-	ftm.resource_uploaded.connect(load_game_definition)
+	ftm.resource_uploaded.connect(local_init_game)
 	## Network functionality
 	# TODO: If this causes issues, separate network vs. local signals
 	Networking.connected_to_server_signal.connect(_on_connected_to_server)
@@ -63,9 +63,8 @@ func _ready() -> void:
 # ---
 
 # TODO Make initial execution path clearer (e.g. who the heck calls this?)
-## Initializes the execution/client when a [GameDefinitionResource] is available
-## Also initializes graphics.
-func initFromGameDefinition(game_definition_resource : GameDefinitionResource) -> void:
+## Initializes the data  when a [GameDefinitionResource] is available
+func initGameDataFromGameDefinition(game_definition_resource : GameDefinitionResource) -> void:
 	
 	#Initialize state
 	data_manager = GameDataManager.initFromGameDefinition(game_definition_resource)
@@ -75,9 +74,18 @@ func initFromGameDefinition(game_definition_resource : GameDefinitionResource) -
 	
 	# TODO: Add import from game definition (edit: INFO what does this mean??)
 	GameArgs.initialize(data_manager, game_definition_resource.game_rules)
+
+## Called by FTM when a game is loaded locally
+func local_init_game(game_definition_resource: GameDefinitionResource):
+	assert(game_definition_resource != null, "Invalid game definition in file!")
+	initGameDataFromGameDefinition(game_definition_resource)
 	
-	#initialize graphics
+	switch_gui_scene(IN_GAME_DEFAULT_GUI, data_manager.get_game_name())
+	ui_state = UIState.IN_GAME_DEFAULT
+	
 	initGraphics()
+	
+	MessageDispatcher.broadcast_message("Game \"%s\" loaded." % data_manager.get_game_name())
 
 func end_network_game_turn() -> void:
 	_custom_graphics.clear()
@@ -201,16 +209,6 @@ func initGraphics() -> void:
 ## Opens the load game dialog
 func load_game_from_file() -> void:
 	ftm.upload_data("*.tres", true)
-
-
-## Called by the FTM when file is loaded
-func load_game_definition(game_definition_resource : Resource):
-	assert(game_definition_resource != null, "Invalid game definition in file!")
-	initFromGameDefinition(game_definition_resource)
-	switch_gui_scene(IN_GAME_DEFAULT_GUI, data_manager.get_game_name())
-	ui_state = UIState.IN_GAME_DEFAULT
-	
-	MessageDispatcher.broadcast_message("Game \"%s\" loaded." % data_manager.get_game_name())
 
 func end_turn_local() -> void:
 	_custom_graphics.clear()
@@ -505,20 +503,24 @@ func DEBUG_create_default_unit(position : Vector2i) -> void:
 #func DEBUG_create_unit(unit_type_id : int, position : Vector2i) -> void:
 	#if game_state != null:
 		#game_state.addUnitByTypeId(unit_type_id, position, -1)
-
-
+	
+	MessageDispatcher.broadcast_message("Game \"%s\" loaded." % data_manager.get_game_name())
 
 func _on_game_file_received(file_path: String, team_id: int):
 	print("Received game file from server: %s, team_id: %d" % [file_path, team_id])
-	var game_def = load(file_path)
-	if game_def:
-		load_game_definition(game_def)
+	var game_definition_resource = load(file_path)
+	if game_definition_resource != null:
+		initGameDataFromGameDefinition(game_definition_resource)
 		# Set the client player ID based on team selection
 		for player in data_manager.get_players().values():
 			if player.team != null and player.team.team_id == team_id:
 				data_manager.get_client_attributes().client_player_id = player.player_id
 				print("Set client_player_id to %d (team %d)" % [player.player_id, team_id])
 				break
+		switch_gui_scene(IN_GAME_DEFAULT_GUI, data_manager.get_game_name())
+		ui_state = UIState.IN_GAME_DEFAULT
+		initGraphics()
+		MessageDispatcher.broadcast_message("Game \"%s\" loaded." % data_manager.get_game_name())
 	else:
 		if gui_scene is TeamSelectGUI:
 			gui_scene.set_status("Failed to load game file!")

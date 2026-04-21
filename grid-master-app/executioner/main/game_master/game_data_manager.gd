@@ -114,9 +114,9 @@ func get_turn_number() -> int:
 	return _game_state._turn_number
 
 # Returns all units currently visible from the perspective of the client player
-func get_visible_units() -> Variant:
+func get_visible_units() -> Array[Unit]:
 	if _game_state == null:
-		return null
+		return []
 	
 	var visible_units: Array[Unit] = []
 	# Use the pov of the client player
@@ -136,7 +136,7 @@ func get_visible_units() -> Variant:
 			visible_units.append(unit)
 		elif _is_unit_visible(unit, client_player_id):
 			visible_units.append(unit)
-		
+
 	return visible_units
 
 func get_unit_by_position_nullable(pos: Vector2i) -> Unit:
