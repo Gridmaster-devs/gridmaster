@@ -48,7 +48,7 @@ func _ready() -> void:
 	units_changed.connect(grid_graphics._unitsChanged)
 	_click_tracker.clicked.connect(_clicked)
 	_custom_graphics = grid_graphics.get_custom_graphics()
-	ftm.resource_uploaded.connect(load_game_definition)
+	ftm.resource_uploaded.connect(local_init_game)
 	## Network functionality
 	# TODO: If this causes issues, separate network vs. local signals
 	Networking.connected_to_server_signal.connect(_on_connected_to_server)
@@ -63,9 +63,8 @@ func _ready() -> void:
 # ---
 
 # TODO Make initial execution path clearer (e.g. who the heck calls this?)
-## Initializes the execution/client when a [GameDefinitionResource] is available
-## Also initializes graphics.
-func initFromGameDefinition(game_definition_resource : GameDefinitionResource) -> void:
+## Initializes the data  when a [GameDefinitionResource] is available
+func initGameDataFromGameDefinition(game_definition_resource : GameDefinitionResource) -> void:
 	
 	#Initialize state
 	data_manager = GameDataManager.initFromGameDefinition(game_definition_resource)
@@ -75,32 +74,19 @@ func initFromGameDefinition(game_definition_resource : GameDefinitionResource) -
 	
 	# TODO: Add import from game definition (edit: INFO what does this mean??)
 	GameArgs.initialize(data_manager, game_definition_resource.game_rules)
+
+## Called by FTM when a game is loaded locally
+func local_init_game(game_definition_resource: GameDefinitionResource):
+	assert(game_definition_resource != null, "Invalid game definition in file!")
+	initGameDataFromGameDefinition(game_definition_resource)
 	
-	#initialize graphics
+	switch_gui_scene(IN_GAME_DEFAULT_GUI, data_manager.get_game_name())
+	ui_state = UIState.IN_GAME_DEFAULT
+	
 	initGraphics()
+	
+	MessageDispatcher.broadcast_message("Game \"%s\" loaded." % data_manager.get_game_name())
 
-func end_network_game_turn() -> void:
-	_custom_graphics.clear()
-
-	# Compile locally assigned actions into the queue for server to process
-	var outgoing_actions: Array = []
-	for unit in data_manager.get_units().values():
-		if unit.get_player_id() == data_manager.get_client_player_id() and unit.current_action != null:
-			var action = unit.current_action
-			if action is MoveAction:
-				outgoing_actions.append({
-					"type": "MoveAction",
-					"path": action.path,
-					"player_id": action.player_id,
-					"unit_id": action.unit.getId()
-				})
-			# TODO: Implement other actions as well in addition to the MoveAction..
-
-	print("[Client] Packing end_turn actions. Checked %d units. Found %d valid actions for player %d." % [data_manager.get_units().size(), outgoing_actions.size(), data_manager.get_client_player_id()])
-
-	Networking.end_peer_turn.rpc_id(Networking.SERVER_PEER_ID, outgoing_actions)
-
-	print("[Client] Turn ended, waiting for server...")
 
 ## Ends the turn and processes all the actions that have been queued up.
 ## Unit actions are processed before other actions.
@@ -203,15 +189,6 @@ func load_game_from_file() -> void:
 	ftm.upload_data("*.tres", true)
 
 
-## Called by the FTM when file is loaded
-func load_game_definition(game_definition_resource : Resource):
-	assert(game_definition_resource != null, "Invalid game definition in file!")
-	initFromGameDefinition(game_definition_resource)
-	switch_gui_scene(IN_GAME_DEFAULT_GUI, data_manager.get_game_name())
-	ui_state = UIState.IN_GAME_DEFAULT
-	
-	MessageDispatcher.broadcast_message("Game \"%s\" loaded." % data_manager.get_game_name())
-
 func end_turn_local() -> void:
 	_custom_graphics.clear()
 	#process_end_turn_local()
@@ -260,6 +237,92 @@ func _on_connection_failed():
 func _on_server_disconnected():
 	_set_load_game_status("Disconnected from the server.")
 
+
+func _on_game_file_received(file_path: String, team_id: int):
+	print("Received game file from server: %s, team_id: %d" % [file_path, team_id])
+	var game_definition_resource = load(file_path)
+	if game_definition_resource != null:
+		initGameDataFromGameDefinition(game_definition_resource)
+		# Set the client player ID based on team selection
+		for player in data_manager.get_players().values():
+			if player.team != null and player.team.team_id == team_id:
+				data_manager.get_client_attributes().client_player_id = player.player_id
+				print("Set client_player_id to %d (team %d)" % [player.player_id, team_id])
+				break
+		switch_gui_scene(IN_GAME_DEFAULT_GUI, data_manager.get_game_name())
+		ui_state = UIState.IN_GAME_DEFAULT
+		initGraphics()
+		MessageDispatcher.broadcast_message("Game \"%s\" loaded." % data_manager.get_game_name())
+	else:
+		if gui_scene is TeamSelectGUI:
+			gui_scene.set_status("Failed to load game file!")
+
+func _on_teams_received(teams: Array):
+	print("Received teams from server: ", teams)
+	if gui_scene is TeamSelectGUI:
+		gui_scene.populate_teams(teams)
+
+func _on_game_state_received(state_update: Dictionary):
+	_apply_state_update(state_update)
+	switch_gui_scene(IN_GAME_DEFAULT_GUI, data_manager.get_game_name())
+	
+func end_network_game_turn() -> void:
+	_custom_graphics.clear()
+
+	# Compile locally assigned actions into the queue for server to process
+	var outgoing_actions: Array = []
+	for unit in data_manager.get_units().values():
+		if unit.get_player_id() == data_manager.get_client_player_id() and unit.current_action != null:
+			var action = unit.current_action
+			if action is MoveAction:
+				outgoing_actions.append({
+					"type": "MoveAction",
+					"path": action.path,
+					"player_id": action.player_id,
+					"unit_id": action.unit.getId()
+				})
+			# TODO: Implement other actions as well in addition to the MoveAction..
+
+	print("[Client] Packing end_turn actions. Checked %d units. Found %d valid actions for player %d." % [data_manager.get_units().size(), outgoing_actions.size(), data_manager.get_client_player_id()])
+
+	Networking.end_peer_turn.rpc_id(Networking.SERVER_PEER_ID, outgoing_actions)
+
+	print("[Client] Turn ended, waiting for server...")
+
+func _on_turn_ended(state_update: Dictionary):
+	_apply_state_update(state_update)
+
+func _apply_state_update(state_update: Dictionary) -> void:
+	# Create units from the dictionary
+	if data_manager != null:
+		data_manager.increment_turn_number()
+
+		var alive_unit_ids = []
+		for u_state in state_update["units"]:
+			alive_unit_ids.append(u_state["id"])
+
+		var dead_units = []
+		for unit in data_manager.get_units().values():
+			if not alive_unit_ids.has(unit.getId()):
+				dead_units.append(unit)
+
+		for unit in dead_units:
+			data_manager.remove_unit(unit)
+
+		for u_state in state_update["units"]:
+			var unit_id = u_state["id"]
+			var unit = data_manager.get_unit_by_id(unit_id)
+			if unit != null:
+				if unit.grid_position != u_state["position"]:
+					data_manager.move_unit(unit.getId(), u_state["position"])
+				if u_state.has("hp"):
+					unit._hp = u_state["hp"]
+				unit.current_action = null
+
+		units_changed.emit()
+		# NOTE: most likely redundant call. Left since there is small possibility
+		#		that some functions might change it in between calls to this function?
+		ui_state = UIState.IN_GAME_DEFAULT
 
 # ---
 # INFO STATE MACHINE FUNCTIONS
@@ -483,86 +546,6 @@ func printTileTypes() -> void:
 # THESE FUNCTIONS ARE SOLELY FOR TESTING THE PROGRAM
 # THEY ARE ALWAYS TEMPORARY AND MUST EVENTUALLY BE REMOVED
 
-### Creates a debug game for testing
-#func DEBUG_init_game() -> void:
-	#game_state = GameState.debugInit(10, 10, "Test game")
-
-
-## Creates a debug game, places some units, and prints the map
-#func DEBUG_test():
-	#DEBUG_init_game()
-	#data_manager.get_game_state().createDebugUnit(Vector2i(0,0))
-	#data_manager.get_game_state().createDebugUnit(Vector2i(5,5))
-	#printMap()
-
-
 ## Creates a default unit for testing
 func DEBUG_create_default_unit(position : Vector2i) -> void:
 	data_manager.get_game_state().createDebugUnit(position)
-
-
-### Creates a unit from a unit id for testing
-#func DEBUG_create_unit(unit_type_id : int, position : Vector2i) -> void:
-	#if game_state != null:
-		#game_state.addUnitByTypeId(unit_type_id, position, -1)
-
-
-
-func _on_game_file_received(file_path: String, team_id: int):
-	print("Received game file from server: %s, team_id: %d" % [file_path, team_id])
-	var game_def = load(file_path)
-	if game_def:
-		load_game_definition(game_def)
-		# Set the client player ID based on team selection
-		for player in data_manager.get_players().values():
-			if player.team != null and player.team.team_id == team_id:
-				data_manager.get_client_attributes().client_player_id = player.player_id
-				print("Set client_player_id to %d (team %d)" % [player.player_id, team_id])
-				break
-	else:
-		if gui_scene is TeamSelectGUI:
-			gui_scene.set_status("Failed to load game file!")
-
-func _on_teams_received(teams: Array):
-	print("Received teams from server: ", teams)
-	if gui_scene is TeamSelectGUI:
-		gui_scene.populate_teams(teams)
-
-func _on_game_state_received(state_update: Dictionary):
-	_apply_state_update(state_update)
-	switch_gui_scene(IN_GAME_DEFAULT_GUI, data_manager.get_game_name())
-
-func _on_turn_ended(state_update: Dictionary):
-	_apply_state_update(state_update)
-
-func _apply_state_update(state_update: Dictionary) -> void:
-	# Create units from the dictionary
-	if data_manager != null:
-		data_manager.increment_turn_number()
-
-		var alive_unit_ids = []
-		for u_state in state_update["units"]:
-			alive_unit_ids.append(u_state["id"])
-
-		var dead_units = []
-		for unit in data_manager.get_units().values():
-			if not alive_unit_ids.has(unit.getId()):
-				dead_units.append(unit)
-
-		for unit in dead_units:
-			data_manager.remove_unit(unit)
-
-		for u_state in state_update["units"]:
-			var unit_id = u_state["id"]
-			var unit = data_manager.get_unit_by_id(unit_id)
-			if unit != null:
-				if unit.grid_position != u_state["position"]:
-					data_manager.move_unit(unit.getId(), u_state["position"])
-				if u_state.has("hp"):
-					unit._hp = u_state["hp"]
-				unit.current_action = null
-
-		units_changed.emit()
-		# NOTE: most likely redundant call. Left since there is small possibility
-		#		that some functions might change it in between calls to this function?
-		ui_state = UIState.IN_GAME_DEFAULT
