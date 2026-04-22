@@ -7,6 +7,7 @@ var _name: String = "unknown"
 ##draggable variables
 var dragging := false
 var drag_offset := Vector2.ZERO
+var _blocking: bool = true
 
 func _gui_input(event):
 	if event is InputEventMouseButton:
@@ -26,10 +27,20 @@ func get_popup_name() -> String:
 	return _name
 
 func add_to_tree() -> void:
-	Global.popup_manager.add_popup(self)
+	if _blocking: 
+		Global.popup_manager.add_popup(self)
+	else:
+		Global.popup_manager.add_popup_non_blocking(self)
+
+
 
 func remove_from_tree() -> void: 
 	Global.popup_manager.close_popup(self)
+
+func set_blocking() -> void:
+	_blocking = true
+func set_unblocking() -> void: 
+	_blocking = false
 
 #CALL SET_POPUP_NAME() when extending
 @abstract func _init() -> void
