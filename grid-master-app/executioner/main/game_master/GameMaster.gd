@@ -9,9 +9,10 @@ signal units_changed
 # where each subclass has a reference to the gamestate and handles the given input differently.
 # This might end up being a lot cleaner as the amount of possible UI states expands, and might
 # be needed to prevent the game master file being enormous.
-enum UIState {LOAD_GAME, TEAM_SELECT, IN_GAME_DEFAULT, UNIT_MOVE}
+enum UIState {LOAD_GAME, SERVER_BROWSER, TEAM_SELECT, IN_GAME_DEFAULT, UNIT_MOVE}
 
 const LOAD_GAME_GUI : PackedScene = preload("res://executioner/main/game_master/gui_scenes/load_game_gui.tscn")
+const SERVER_BROWSER_GUI : PackedScene = preload("res://executioner/main/game_master/gui_scenes/server_browser_gui.tscn")
 const TEAM_SELECT_GUI : PackedScene = preload("res://executioner/main/game_master/gui_scenes/team_select_gui.tscn")
 const IN_GAME_DEFAULT_GUI : PackedScene = preload("res://executioner/main/game_master/gui_scenes/in_game_default_gui.tscn")
 
@@ -56,6 +57,8 @@ func _ready() -> void:
 	Networking.game_file_received.connect(_on_game_file_received)
 	Networking.turn_ended.connect(_on_turn_ended)
 	Networking.game_state_received.connect(_on_game_state_received)
+	Networking.connected_for_upload_signal.connect(_on_connected_for_upload)
+	Networking.game_upload_result_received.connect(_on_game_upload_result)
 	switch_gui_scene(LOAD_GAME_GUI, null)
 
 # ---
@@ -213,19 +216,6 @@ func _set_load_game_status(text: String):
 	if gui_scene is LoadGameGUI:
 		gui_scene.set_connection_status(text)
 
-# WARNING This is apparently redundant since the one used is actually in networking.gd
-#func connect_to_server():
-	#_set_load_game_status("Attempting to connect to server...")
-	## FIXME: Hardcoded server IP address and port
-	#var err = client_peer.create_client("ws://127.0.0.1:55555")
-	#if err == OK:
-		#multiplayer.multiplayer_peer = client_peer
-		#multiplayer.connected_to_server.connect(_on_connected_to_server)
-		#multiplayer.connection_failed.connect(_on_connection_failed)
-		#multiplayer.server_disconnected.connect(_on_server_disconnected)
-	#else:
-		#_set_load_game_status("Failed to create client peer. Error code: %d" % err)
-
 func _on_connected_to_server():
 	_set_load_game_status("Successfully connected to the server!")
 	_set_load_game_status("Loading game..")
@@ -239,22 +229,32 @@ func _on_server_disconnected():
 	_set_load_game_status("Disconnected from the server.")
 
 
-func _on_game_file_received(file_path: String, team_id: int):
-	print("Received game file from server: %s, team_id: %d" % [file_path, team_id])
-	var game_definition_resource = load(file_path)
+func _on_game_file_received(file_data: PackedByteArray, team_id: int):
+	GML.log("Received game file from server: %d bytes, team_id: %d" % [file_data.size(), team_id], GML.LogLevel.DEBUG)
+	const LOCAL_PATH := "user://server_game.tres"
+	var file := FileAccess.open(LOCAL_PATH, FileAccess.WRITE)
+	if file == null:
+		GML.log("Failed to write received game file locally.", GML.LogLevel.ERROR)
+		if gui_scene is TeamSelectGUI:
+			gui_scene.set_status("Failed to load game file!")
+		return
+	file.store_buffer(file_data)
+	file.close()
+	var game_definition_resource := ResourceLoader.load(LOCAL_PATH, "", ResourceLoader.CACHE_MODE_IGNORE) as GameDefinitionResource
 	if game_definition_resource != null:
 		initGameDataFromGameDefinition(game_definition_resource)
-		# Set the client player ID based on team selection
 		for player in data_manager.get_players().values():
 			if player.team != null and player.team.team_id == team_id:
 				data_manager.get_client_attributes().client_player_id = player.player_id
-				print("Set client_player_id to %d (team %d)" % [player.player_id, team_id])
+				GML.log("Set client_player_id to %d (team %d)" % [player.player_id, team_id], GML.LogLevel.DEBUG)
 				break
 		switch_gui_scene(IN_GAME_DEFAULT_GUI, data_manager.get_game_name())
 		ui_state = UIState.IN_GAME_DEFAULT
 		initGraphics()
 		MessageDispatcher.broadcast_message("Game \"%s\" loaded." % data_manager.get_game_name())
+		# The server will follow immediately with a game_state_received to sync the current turn.
 	else:
+		GML.log("Failed to parse received game file as GameDefinitionResource.", GML.LogLevel.ERROR)
 		if gui_scene is TeamSelectGUI:
 			gui_scene.set_status("Failed to load game file!")
 
@@ -288,10 +288,15 @@ func end_network_game_turn() -> void:
 
 	Networking.end_peer_turn.rpc_id(Networking.SERVER_PEER_ID, outgoing_actions)
 
+	if gui_scene is InGameDefaultGUI:
+		gui_scene.set_waiting()
+
 	print("[Client] Turn ended, waiting for server...")
 
 func _on_turn_ended(state_update: Dictionary):
 	_apply_state_update(state_update)
+	if gui_scene is InGameDefaultGUI:
+		gui_scene.set_turn_active()
 	# Broadcast every message received from the server in order (FIFO).
 	if state_update.keys().has("message_queue"):
 		var message_queue: Array[String] = state_update["message_queue"]
@@ -347,6 +352,9 @@ func receive_ui_event(event : StateMachineEvent):
 		UIState.LOAD_GAME:
 			_handle_event_load_game(event)
 		
+		UIState.SERVER_BROWSER:
+			_handle_event_server_browser(event)
+		
 		UIState.TEAM_SELECT:
 			_handle_event_team_select(event)
 		
@@ -364,8 +372,88 @@ func _handle_event_load_game(event : StateMachineEvent):
 		if button_press.button_type == ButtonPressedEvent.ButtonType.LOAD_GAME:
 			load_game_from_file()
 		elif button_press.button_type == ButtonPressedEvent.ButtonType.CONNECT_TO_SERVER:
-			_set_load_game_status("Connecting to server...")
-			Networking.connect_to_server()
+			switch_gui_scene(SERVER_BROWSER_GUI, null)
+			ui_state = UIState.SERVER_BROWSER
+
+
+## Handles input when in the server browser screen
+func _handle_event_server_browser(event : StateMachineEvent):
+	if event is ButtonPressedEvent:
+		var button_press := event as ButtonPressedEvent
+		if button_press.button_type == ButtonPressedEvent.ButtonType.BACK:
+			switch_gui_scene(LOAD_GAME_GUI, null)
+			ui_state = UIState.LOAD_GAME
+		elif button_press.button_type == ButtonPressedEvent.ButtonType.PLAY_ON_SERVER:
+			var ip := button_press.additional_args as String
+			if gui_scene is ServerBrowserGUI:
+				gui_scene.set_status("Connecting...")
+			Networking.connect_to_server(ip)
+		elif button_press.button_type == ButtonPressedEvent.ButtonType.UPLOAD_GAME:
+			_pending_upload_ip = button_press.additional_args as String
+			if gui_scene is ServerBrowserGUI:
+				gui_scene.set_status("Select game file to upload...")
+			# Temporarily disconnect local_init_game so selecting the upload
+			# file doesn't start the game locally.
+			ftm.resource_uploaded.disconnect(local_init_game)
+			ftm.file_upload_cancelled.connect(_on_upload_cancelled, CONNECT_ONE_SHOT)
+			ftm.resource_uploaded.connect(_on_upload_file_selected, CONNECT_ONE_SHOT)
+			ftm.upload_data("*.tres", true)
+
+
+var _pending_upload_ip: String = ""
+var _pending_upload_resource: Resource = null
+
+
+func _on_upload_cancelled() -> void:
+	# User dismissed the file picker without selecting — restore normal load flow.
+	if not ftm.resource_uploaded.is_connected(local_init_game):
+		ftm.resource_uploaded.connect(local_init_game)
+	if ftm.resource_uploaded.is_connected(_on_upload_file_selected):
+		ftm.resource_uploaded.disconnect(_on_upload_file_selected)
+
+
+func _on_upload_file_selected(resource: Resource) -> void:
+	_pending_upload_resource = resource
+	GML.log("Upload file selected, connecting to: %s" % _pending_upload_ip, GML.LogLevel.DEBUG)
+	if gui_scene is ServerBrowserGUI:
+		gui_scene.set_status("Connecting to server...")
+	Networking.connect_for_upload(_pending_upload_ip)
+
+
+func _on_connected_for_upload() -> void:
+	GML.log("Connected for upload, sending file.", GML.LogLevel.DEBUG)
+	if _pending_upload_resource == null:
+		GML.log("No pending upload resource, aborting.", GML.LogLevel.ERROR)
+		return
+	if gui_scene is ServerBrowserGUI:
+		gui_scene.set_status("Uploading game file...")
+	const TEMP_PATH := "user://upload_temp.tres"
+	ResourceSaver.save(_pending_upload_resource, TEMP_PATH)
+	var file_data := FileAccess.get_file_as_bytes(TEMP_PATH)
+	GML.log("Sending %d bytes to server." % file_data.size(), GML.LogLevel.DEBUG)
+	Networking.upload_game_file.rpc_id(Networking.SERVER_PEER_ID, file_data)
+	_pending_upload_resource = null
+
+
+func _on_game_upload_result(success: bool) -> void:
+	GML.log("Upload result received: %s" % ("success" if success else "failure"), GML.LogLevel.DEBUG)
+	if gui_scene is ServerBrowserGUI:
+		gui_scene.set_status("Upload successful! Refreshing..." if success else "Upload failed.")
+	Networking._uploading = false
+	multiplayer.multiplayer_peer = null
+	# Close the upload socket and replace client_peer with a fresh object so
+	# any subsequent connect_to_server / connect_for_upload starts clean.
+	Networking.client_peer.close()
+	Networking.client_peer = WebSocketMultiplayerPeer.new()
+	# Restore local game-loading signal now that upload is complete.
+	if not ftm.resource_uploaded.is_connected(local_init_game):
+		ftm.resource_uploaded.connect(local_init_game)
+	if success:
+		# Wait one frame for the socket close to flush before reloading the browser.
+		await get_tree().process_frame
+		GML.log("Reloading server browser after upload.", GML.LogLevel.DEBUG)
+		switch_gui_scene(SERVER_BROWSER_GUI, null)
+		ui_state = UIState.SERVER_BROWSER
 
 
 ## Handles input when in the team selection screen

@@ -10,7 +10,9 @@ const EXIT_FAILURE = 1
 
 ## Configurable server variables
 const PORT = 443
-const GAME_FILE_PATH = "res://game_cats_dogs_with_vision.tres"
+
+## The file path to the game definition resource that the server uses always
+const GAME_FILE_PATH = "user://game.tres"
 
 ## The core game server instance
 var server = WebSocketMultiplayerPeer.new()
@@ -47,35 +49,18 @@ var players_ended_turn: Array[int] = []
 func start_server():
 	GML.log("Starting server..", GML.LogLevel.INFO)
 	multiplayer.multiplayer_peer = null
+	# Increase buffers to handle large game file transfers (default is 65536 = 64KB)
+	server.inbound_buffer_size = 10 * 1024 * 1024   # 10 MB — for receiving uploads
+	server.outbound_buffer_size = 10 * 1024 * 1024  # 10 MB — for sending game file to clients
 	var err = server.create_server(PORT)
 	if err != OK:
 		GML.log("Failed to create the server instance. Error code: %d" % err, GML.LogLevel.FATAL)
 		exit(EXIT_FAILURE)
 	multiplayer.multiplayer_peer = server
 
-	var game_def = load(GAME_FILE_PATH) as GameDefinitionResource
-	if !game_def:
-		GML.log(
-			"Failed to load game definition from the path '%s'." % GAME_FILE_PATH,
-			GML.LogLevel.FATAL
-		)
-		exit(EXIT_FAILURE)
-
-	# Initialize the server state
-	server_state = ServerState.new(game_def)
-	GameArgs.initialize(server_state.data_manager, game_def.game_rules)
-	# TODO: Fix direct variable access later
-	if !server_state.game_definition_resource:
-		GML.log(
-			"Failed to instantiate the game state object from the game definition resource.",
-			GML.LogLevel.FATAL
-		)
-		exit(EXIT_FAILURE)
-	else:
-		GML.log(
-			"Successfully loaded game definition: %s." % game_def.game_name,
-			GML.LogLevel.INFO
-		)
+	# Ensure user:// directory exists (may be absent on first Docker run).
+	DirAccess.make_dir_recursive_absolute(OS.get_user_data_dir())
+	GML.log("Server started. Upload a game file to begin.", GML.LogLevel.INFO)
 
 func _ready():
 	multiplayer.peer_connected.connect(_peer_connected)
@@ -85,10 +70,47 @@ func _ready():
 	Networking.game_file_requested.connect(_on_game_file_requested)
 	Networking.game_state_requested.connect(_on_game_state_requested)
 	Networking.request_peer_turn_end.connect(_on_team_turn_end)
+
+	Networking.game_upload_requested.connect(_on_game_upload_requested)
+
 	# Connect message dispatcher to local callback that collects all
 	# event messages that are sent to all players when the turn ends.
 	MessageDispatcher.message_broadcast.connect(_on_message_broadcast)
 	start_server()
+
+func _on_game_upload_requested(peer_id: int, file_data: PackedByteArray) -> void:
+	GML.log("[Upload] Signal received from peer %d, %d bytes" % [peer_id, file_data.size()], GML.LogLevel.INFO)
+	if file_data.is_empty():
+		GML.log("[Upload] Received empty file data from peer %d. Rejecting." % peer_id, GML.LogLevel.ERROR)
+		Networking.receive_upload_result.rpc_id(peer_id, false)
+		return
+	GML.log("[Upload] Writing to: %s" % ProjectSettings.globalize_path(GAME_FILE_PATH), GML.LogLevel.DEBUG)
+	var file := FileAccess.open(GAME_FILE_PATH, FileAccess.WRITE)
+	if file == null:
+		GML.log("[Upload] Failed to open game file path for writing. Error: %s" % FileAccess.get_open_error(), GML.LogLevel.ERROR)
+		Networking.receive_upload_result.rpc_id(peer_id, false)
+		return
+	file.store_buffer(file_data)
+	file.close()
+	var written := FileAccess.get_file_as_bytes(GAME_FILE_PATH)
+	if written.size() != file_data.size():
+		GML.log("[Upload] Size mismatch after write: expected %d bytes, got %d bytes." % [file_data.size(), written.size()], GML.LogLevel.ERROR)
+		Networking.receive_upload_result.rpc_id(peer_id, false)
+		return
+	GML.log("[Upload] File verified on disk (%d bytes). Attempting to load as GameDefinitionResource." % written.size(), GML.LogLevel.DEBUG)
+	# CACHE_MODE_IGNORE forces Godot to re-read from disk rather than returning
+	# a cached resource from a prior load() of the same path.
+	var game_def := ResourceLoader.load(GAME_FILE_PATH, "", ResourceLoader.CACHE_MODE_IGNORE) as GameDefinitionResource
+	if game_def == null:
+		GML.log("[Upload] Loaded resource is null or not a GameDefinitionResource.", GML.LogLevel.ERROR)
+		Networking.receive_upload_result.rpc_id(peer_id, false)
+		return
+	GML.log("[Upload] GameDefinitionResource loaded: '%s'. Reinitializing server state." % game_def.game_name, GML.LogLevel.INFO)
+	server_state = ServerState.new(game_def)
+	GameArgs.initialize(server_state.data_manager, game_def.game_rules)
+	GML.log("[Upload] Game updated to: %s" % game_def.game_name, GML.LogLevel.INFO)
+	Networking.receive_upload_result.rpc_id(peer_id, true)
+
 
 func _on_message_broadcast(message: String) -> void:
 	server_state.push_message(message)
@@ -98,6 +120,9 @@ func _on_message_broadcast(message: String) -> void:
 #		will be most likely the easiest way to implement this feature.
 func _on_game_file_requested(peer_id: int, team_id: int):
 	GML.log("Peer %d requested game file. Sending..." % peer_id, GML.LogLevel.INFO)
+	if server_state == null:
+		GML.log("Peer %d requested game file but no game is loaded yet." % peer_id, GML.LogLevel.WARN)
+		return
 	if server_state.clients.keys().has(peer_id) and server_state.clients[peer_id] == server_state.TEAM_ID_NOT_SELECTED:
 		# TODO: Check that the given team_id exists.
 		server_state.clients[peer_id] = team_id
@@ -109,10 +134,19 @@ func _on_game_file_requested(peer_id: int, team_id: int):
 		)
 		return
 
-	Networking.receive_game_file.rpc_id(peer_id, GAME_FILE_PATH, team_id)
+	var file_data := FileAccess.get_file_as_bytes(GAME_FILE_PATH)
+	if file_data.is_empty():
+		GML.log("Failed to read game file bytes from: %s" % GAME_FILE_PATH, GML.LogLevel.ERROR)
+		return
+	GML.log("Sending game file to peer %d (%d bytes)" % [peer_id, file_data.size()], GML.LogLevel.INFO)
+	Networking.receive_game_file.rpc_id(peer_id, file_data, team_id)
+	Networking.receive_game_state.rpc_id(peer_id, _create_state_update_dict())
 
 func _on_teams_requested(peer_id: int):
 	GML.log("Peer %d requested teams list" % peer_id, GML.LogLevel.INFO)
+	if server_state == null:
+		GML.log("Peer %d requested teams but no game is loaded yet." % peer_id, GML.LogLevel.WARN)
+		return
 
 	var teams_data: Array[Dictionary] = []
 	for team_id in server_state.data_manager.get_teams().keys():
@@ -256,6 +290,9 @@ func _on_team_turn_end(peer_id: int, action_queue: Array) -> void:
 ## Called when a peer connects to the server
 func _peer_connected(peer_id):
 	GML.log("Connected %d" % peer_id, GML.LogLevel.INFO)
+	if server_state == null:
+		GML.log("Peer %d connected but no game is loaded yet." % peer_id, GML.LogLevel.WARN)
+		return
 	server_state.join(peer_id)
 	GML.log("Active clients: %d" % server_state.active_clients())
 
@@ -267,7 +304,8 @@ func _peer_connected(peer_id):
 #		https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Client-side_APIs/Client-side_storage
 # 		but via Godot.
 func _peer_disconnected(id):
-	if clients.has(id):
-		clients.erase(id)
-		GML.log("Disconnected %d" % id, GML.LogLevel.INFO)
-	GML.log("Active clients: %d" % clients.size())
+	GML.log("Disconnected %d" % id, GML.LogLevel.INFO)
+	if server_state == null:
+		return
+	server_state.clients.erase(id)
+	GML.log("Active clients: %d" % server_state.active_clients())

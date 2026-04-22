@@ -1,0 +1,88 @@
+[gd_scene load_steps=2 format=3 uid="uid://dv1kp3w8n2xqm"]
+
+[ext_resource type="Script" uid="uid://bm20g3at1pjot" path="res://executioner/main/game_master/gui_scenes/server_browser_gui.gd" id="1_sbgui"]
+
+[node name="ServerBrowserGUI" type="Node"]
+script = ExtResource("1_sbgui")
+
+[node name="TitleLabel" type="Label" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = -280.0
+offset_right = 200.0
+offset_bottom = -220.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 32
+text = "Server Browser"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ServersContainer" type="VBoxContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -225.0
+offset_top = -200.0
+offset_right = 225.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="ActionPanel" type="VBoxContainer" parent="."]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -175.0
+offset_top = 20.0
+offset_right = 175.0
+offset_bottom = 220.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 15
+
+[node name="SelectedServerLabel" type="Label" parent="ActionPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+
+[node name="PlayButton" type="Button" parent="ActionPanel"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Play"
+
+[node name="UploadNewGameButton" type="Button" parent="ActionPanel"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Upload New Game"
+
+[node name="StatusLabel" type="Label" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -250.0
+offset_top = 230.0
+offset_right = 250.0
+offset_bottom = 280.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BackButton" type="Button" parent="."]
+anchors_preset = 1
+anchor_right = 0.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 120.0
+offset_bottom = 55.0
+theme_override_font_sizes/font_size = 20
+text = "Back"
