@@ -42,9 +42,10 @@ func query_server_info(ip: String) -> String:
 	if ping_peer.create_client(ip) != OK:
 		return ""
 
+	var saved_peer = multiplayer.multiplayer_peer
 	multiplayer.multiplayer_peer = ping_peer
 
-	var result := ["", false]  # [game_name, received] — Array passed by reference to lambda
+	var result := ["", false]
 	var rpc_sent := false
 	var handler := func(name: String) -> void:
 		result[0] = name
@@ -64,7 +65,8 @@ func query_server_info(ip: String) -> String:
 	if not result[1] and server_info_received.is_connected(handler):
 		server_info_received.disconnect(handler)
 
-	multiplayer.multiplayer_peer = null
+	multiplayer.multiplayer_peer = saved_peer
+	## Must explicitly close the ping peer after polling, otherwise the connection lingers and can cause issues with subsequent connections.
 	ping_peer.close()
 	return result[0]
 
