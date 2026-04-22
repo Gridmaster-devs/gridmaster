@@ -6748,7 +6748,7 @@ attributes = {
 
 [resource]
 script = ExtResource("5_y5hpn")
-game_name = "game"
+game_name = "Orcs, Humans and Elves"
 units = Array[ExtResource("7_l3qrs")]([SubResource("Resource_saxny"), SubResource("Resource_cby10"), SubResource("Resource_cy62y"), SubResource("Resource_swxko"), SubResource("Resource_3shnj"), SubResource("Resource_a7sal")])
 map = SubResource("Resource_l05uw")
 unit_layer = SubResource("Resource_uroil")

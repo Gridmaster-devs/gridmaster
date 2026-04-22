@@ -5457,7 +5457,7 @@ attributes = {
 
 [resource]
 script = ExtResource("4_oafur")
-game_name = "game"
+game_name = "Cats and Dogs"
 units = Array[ExtResource("6_d0s1v")]([SubResource("Resource_qv3pb"), SubResource("Resource_6tpdn"), SubResource("Resource_dfr1b")])
 map = SubResource("Resource_ys45c")
 unit_layer = SubResource("Resource_un45a")

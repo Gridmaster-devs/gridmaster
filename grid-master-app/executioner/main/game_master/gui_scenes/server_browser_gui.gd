@@ -10,7 +10,8 @@ extends GUIScene
 @onready var _back_button: Button = $BackButton
 
 const SERVERS: Array = [
-	{"ip": "ws://127.0.0.1:55555"},
+	{"ip": "wss://gridmaster-server.calmmeadow-c81c2c38.northeurope.azurecontainerapps.io"},
+	{"ip": "ws://127.0.0.1:443"},
 ]
 
 var _selected_server: Dictionary = {}
