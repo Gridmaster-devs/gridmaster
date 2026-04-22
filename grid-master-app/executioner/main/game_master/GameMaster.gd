@@ -57,6 +57,8 @@ func _ready() -> void:
 	Networking.game_file_received.connect(_on_game_file_received)
 	Networking.turn_ended.connect(_on_turn_ended)
 	Networking.game_state_received.connect(_on_game_state_received)
+	Networking.connected_for_upload_signal.connect(_on_connected_for_upload)
+	Networking.game_upload_result_received.connect(_on_game_upload_result)
 	switch_gui_scene(LOAD_GAME_GUI, null)
 
 # ---
@@ -376,7 +378,64 @@ func _handle_event_server_browser(event : StateMachineEvent):
 				gui_scene.set_status("Connecting...")
 			Networking.connect_to_server(ip)
 		elif button_press.button_type == ButtonPressedEvent.ButtonType.UPLOAD_GAME:
-			pass # TODO: implement upload game to server
+			_pending_upload_ip = button_press.additional_args as String
+			if gui_scene is ServerBrowserGUI:
+				gui_scene.set_status("Select game file to upload...")
+			# Temporarily disconnect local_init_game so selecting the upload
+			# file doesn't start the game locally.
+			ftm.resource_uploaded.disconnect(local_init_game)
+			ftm.file_upload_cancelled.connect(_on_upload_cancelled, CONNECT_ONE_SHOT)
+			ftm.resource_uploaded.connect(_on_upload_file_selected, CONNECT_ONE_SHOT)
+			ftm.upload_data("*.tres", true)
+
+
+var _pending_upload_ip: String = ""
+var _pending_upload_resource: Resource = null
+
+
+func _on_upload_cancelled() -> void:
+	# User dismissed the file picker without selecting — restore normal load flow.
+	if not ftm.resource_uploaded.is_connected(local_init_game):
+		ftm.resource_uploaded.connect(local_init_game)
+	if ftm.resource_uploaded.is_connected(_on_upload_file_selected):
+		ftm.resource_uploaded.disconnect(_on_upload_file_selected)
+
+
+func _on_upload_file_selected(resource: Resource) -> void:
+	_pending_upload_resource = resource
+	GML.log("Upload file selected, connecting to: %s" % _pending_upload_ip, GML.LogLevel.DEBUG)
+	if gui_scene is ServerBrowserGUI:
+		gui_scene.set_status("Connecting to server...")
+	Networking.connect_for_upload(_pending_upload_ip)
+
+
+func _on_connected_for_upload() -> void:
+	GML.log("Connected for upload, sending file.", GML.LogLevel.DEBUG)
+	if _pending_upload_resource == null:
+		GML.log("No pending upload resource, aborting.", GML.LogLevel.ERROR)
+		return
+	if gui_scene is ServerBrowserGUI:
+		gui_scene.set_status("Uploading game file...")
+	const TEMP_PATH := "user://upload_temp.tres"
+	ResourceSaver.save(_pending_upload_resource, TEMP_PATH)
+	var file_data := FileAccess.get_file_as_bytes(TEMP_PATH)
+	GML.log("Sending %d bytes to server." % file_data.size(), GML.LogLevel.DEBUG)
+	Networking.upload_game_file.rpc_id(Networking.SERVER_PEER_ID, file_data)
+	_pending_upload_resource = null
+
+
+func _on_game_upload_result(success: bool) -> void:
+	GML.log("Upload result received: %s" % ("success" if success else "failure"), GML.LogLevel.DEBUG)
+	if gui_scene is ServerBrowserGUI:
+		gui_scene.set_status("Upload successful! Refreshing..." if success else "Upload failed.")
+	Networking._uploading = false
+	multiplayer.multiplayer_peer = null
+	# Restore local game-loading signal now that upload is complete.
+	if not ftm.resource_uploaded.is_connected(local_init_game):
+		ftm.resource_uploaded.connect(local_init_game)
+	if success:
+		# Re-query the server so the name updates in the browser
+		gui_scene.refresh_servers()
 
 
 ## Handles input when in the team selection screen

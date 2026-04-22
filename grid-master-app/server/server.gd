@@ -47,6 +47,9 @@ var players_ended_turn: Array[int] = []
 func start_server():
 	GML.log("Starting server..", GML.LogLevel.INFO)
 	multiplayer.multiplayer_peer = null
+	# Increase buffer to handle large game file uploads (default is 65536 = 64KB)
+	server.inbound_buffer_size = 10 * 1024 * 1024  # 10 MB
+	GML.log("WebSocket inbound_buffer_size set to 10MB.", GML.LogLevel.DEBUG)
 	var err = server.create_server(PORT)
 	if err != OK:
 		GML.log("Failed to create the server instance. Error code: %d" % err, GML.LogLevel.FATAL)
@@ -85,7 +88,36 @@ func _ready():
 	Networking.game_file_requested.connect(_on_game_file_requested)
 	Networking.game_state_requested.connect(_on_game_state_requested)
 	Networking.request_peer_turn_end.connect(_on_team_turn_end)
+	Networking.server_info_requested.connect(_on_server_info_requested)
+	Networking.game_upload_requested.connect(_on_game_upload_requested)
 	start_server()
+
+func _on_server_info_requested(peer_id: int) -> void:
+	var game_name := server_state.data_manager.get_game_name() if server_state != null else ""
+	Networking.receive_server_info.rpc_id(peer_id, game_name)
+
+func _on_game_upload_requested(peer_id: int, file_data: PackedByteArray) -> void:
+	GML.log("[Upload] Signal received from peer %d, %d bytes" % [peer_id, file_data.size()], GML.LogLevel.INFO)
+	const UPLOAD_PATH := "user://uploaded_game.tres"
+	GML.log("[Upload] Opening write path: %s" % ProjectSettings.globalize_path(UPLOAD_PATH), GML.LogLevel.DEBUG)
+	var file := FileAccess.open(UPLOAD_PATH, FileAccess.WRITE)
+	if file == null:
+		GML.log("[Upload] Failed to open upload path for writing. Error: %s" % FileAccess.get_open_error(), GML.LogLevel.ERROR)
+		Networking.receive_upload_result.rpc_id(peer_id, false)
+		return
+	file.store_buffer(file_data)
+	file.close()
+	GML.log("[Upload] File written, attempting to load as GameDefinitionResource.", GML.LogLevel.DEBUG)
+	var game_def := load(UPLOAD_PATH) as GameDefinitionResource
+	if game_def == null:
+		GML.log("[Upload] Loaded resource is null or not a GameDefinitionResource.", GML.LogLevel.ERROR)
+		Networking.receive_upload_result.rpc_id(peer_id, false)
+		return
+	GML.log("[Upload] GameDefinitionResource loaded: '%s'. Reinitializing server state." % game_def.game_name, GML.LogLevel.INFO)
+	server_state = ServerState.new(game_def)
+	GameArgs.initialize(server_state.data_manager, game_def.game_rules)
+	GML.log("[Upload] Game updated to: %s" % game_def.game_name, GML.LogLevel.INFO)
+	Networking.receive_upload_result.rpc_id(peer_id, true)
 
 # TODO: In order to continue an existing game, we can just set the clients
 #		to load the game file and then send the saved game state, which
@@ -257,7 +289,6 @@ func _peer_connected(peer_id):
 #		https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Client-side_APIs/Client-side_storage
 # 		but via Godot.
 func _peer_disconnected(id):
-	if clients.has(id):
-		clients.erase(id)
-		GML.log("Disconnected %d" % id, GML.LogLevel.INFO)
-	GML.log("Active clients: %d" % clients.size())
+	server_state.clients.erase(id)
+	GML.log("Disconnected %d" % id, GML.LogLevel.INFO)
+	GML.log("Active clients: %d" % server_state.active_clients())
