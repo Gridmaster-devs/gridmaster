@@ -22,6 +22,9 @@ var current_turn: int
 var clients: Dictionary[int, int] = {}
 var teams_ended_turn: Array[int] = []
 
+# FIFO queue for turn messages
+var _message_queue: Array[String] = []
+
 func _init(game_definition: GameDefinitionResource) -> void:
 	self.game_definition_resource = game_definition
 	self.data_manager = GameDataManager.initFromGameDefinition(game_definition)
@@ -64,6 +67,15 @@ func end_team_turn(team_id: int) -> void:
 # Clear the array tracking all the team_id's that have ended their turns.
 func clear_turns() -> void:
 	teams_ended_turn.clear()
+
+func get_message_queue() -> Array[String]:
+	return _message_queue
+
+func push_message(message: String) -> void:
+	_message_queue.push_back(message)
+
+func clear_message_queue() -> void:
+	_message_queue.clear()
 
 func team_has_ended_turn(team_id: int) -> bool:
 	# TODO: Make sure this works.

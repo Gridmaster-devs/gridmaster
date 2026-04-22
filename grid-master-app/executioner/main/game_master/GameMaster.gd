@@ -292,6 +292,11 @@ func end_network_game_turn() -> void:
 
 func _on_turn_ended(state_update: Dictionary):
 	_apply_state_update(state_update)
+	# Broadcast every message received from the server in order (FIFO).
+	if state_update.keys().has("message_queue"):
+		var message_queue: Array[String] = state_update["message_queue"]
+		for message in message_queue:
+			MessageDispatcher.broadcast_message(message)
 
 func _apply_state_update(state_update: Dictionary) -> void:
 	# Create units from the dictionary
