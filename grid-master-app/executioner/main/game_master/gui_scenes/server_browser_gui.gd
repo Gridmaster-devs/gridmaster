@@ -56,23 +56,7 @@ func _populate_servers() -> void:
 
 
 func _ping_all_servers() -> void:
-	for i in range(SERVERS.size()):
-		await _ping_server(i)
-
-
-func _ping_server(index: int) -> void:
-	var server: Dictionary = SERVERS[index]
-	var server_name: String = server.get("name", "Server %d" % (index + 1))
-	var game_name: String = await Networking.query_server_info(server["ip"])
-	if game_name.is_empty():
-		_status_indicators[index].color = Color.RED
-		_server_buttons[index].text = "%s | Offline" % server_name
-	elif game_name == "NO_GAME":
-		_status_indicators[index].color = Color.YELLOW
-		_server_buttons[index].text = "%s | Online | No game uploaded" % server_name
-	else:
-		_status_indicators[index].color = Color.GREEN
-		_server_buttons[index].text = "%s | %s" % [server_name, game_name]
+	pass
 
 
 func _on_server_selected(server: Dictionary, server_name: String) -> void:

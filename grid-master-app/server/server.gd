@@ -71,17 +71,12 @@ func _ready():
 	Networking.game_state_requested.connect(_on_game_state_requested)
 	Networking.request_peer_turn_end.connect(_on_team_turn_end)
 
-	Networking.server_info_requested.connect(_on_server_info_requested)
 	Networking.game_upload_requested.connect(_on_game_upload_requested)
 
 	# Connect message dispatcher to local callback that collects all
 	# event messages that are sent to all players when the turn ends.
 	MessageDispatcher.message_broadcast.connect(_on_message_broadcast)
 	start_server()
-
-func _on_server_info_requested(peer_id: int) -> void:
-	var game_name := server_state.data_manager.get_game_name() if server_state != null else "NO_GAME"
-	Networking.receive_server_info.rpc_id(peer_id, game_name)
 
 func _on_game_upload_requested(peer_id: int, file_data: PackedByteArray) -> void:
 	GML.log("[Upload] Signal received from peer %d, %d bytes" % [peer_id, file_data.size()], GML.LogLevel.INFO)
