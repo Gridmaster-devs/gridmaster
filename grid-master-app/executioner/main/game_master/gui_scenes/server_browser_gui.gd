@@ -67,6 +67,9 @@ func _ping_server(index: int) -> void:
 	if game_name.is_empty():
 		_status_indicators[index].color = Color.RED
 		_server_buttons[index].text = "%s | Offline" % server_name
+	elif game_name == "NO_GAME":
+		_status_indicators[index].color = Color.YELLOW
+		_server_buttons[index].text = "%s | Online | No game uploaded" % server_name
 	else:
 		_status_indicators[index].color = Color.GREEN
 		_server_buttons[index].text = "%s | %s" % [server_name, game_name]

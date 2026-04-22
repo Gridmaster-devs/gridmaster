@@ -15,7 +15,7 @@ signal teams_requested(peer_id: int)
 signal teams_received(teams: Array)
 # Game file
 signal game_file_requested(peer_id: int, team_index: int)
-signal game_file_received(file_path: String, team_index: int)
+signal game_file_received(file_data: PackedByteArray, team_index: int)
 # Game upload
 signal game_upload_requested(peer_id: int, file_data: PackedByteArray)
 signal game_upload_result_received(success: bool)
@@ -71,6 +71,8 @@ func query_server_info(ip: String) -> String:
 
 ## Client side callback functions
 func connect_to_server(ip: String = "wss://gridmaster-server.calmmeadow-c81c2c38.northeurope.azurecontainerapps.io") -> void:
+	# Increase inbound buffer so the large game file sent by the server can be received.
+	client_peer.inbound_buffer_size = 10 * 1024 * 1024  # 10 MB
 	var err = client_peer.create_client(ip)
 	if err == OK:
 		multiplayer.multiplayer_peer = client_peer
@@ -159,8 +161,8 @@ func request_game_file(team_index: int = 0) -> void:
 		game_file_requested.emit(multiplayer.get_remote_sender_id(), team_index)
 
 @rpc("authority", "call_remote", "reliable")
-func receive_game_file(file_path: String, team_index: int) -> void:
-	game_file_received.emit(file_path, team_index)
+func receive_game_file(file_data: PackedByteArray, team_index: int) -> void:
+	game_file_received.emit(file_data, team_index)
 
 @rpc("any_peer", "call_remote", "reliable")
 func upload_game_file(file_data: PackedByteArray) -> void:

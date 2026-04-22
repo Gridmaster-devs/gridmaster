@@ -216,19 +216,6 @@ func _set_load_game_status(text: String):
 	if gui_scene is LoadGameGUI:
 		gui_scene.set_connection_status(text)
 
-# WARNING This is apparently redundant since the one used is actually in networking.gd
-#func connect_to_server():
-	#_set_load_game_status("Attempting to connect to server...")
-	## FIXME: Hardcoded server IP address and port
-	#var err = client_peer.create_client("ws://127.0.0.1:55555")
-	#if err == OK:
-		#multiplayer.multiplayer_peer = client_peer
-		#multiplayer.connected_to_server.connect(_on_connected_to_server)
-		#multiplayer.connection_failed.connect(_on_connection_failed)
-		#multiplayer.server_disconnected.connect(_on_server_disconnected)
-	#else:
-		#_set_load_game_status("Failed to create client peer. Error code: %d" % err)
-
 func _on_connected_to_server():
 	_set_load_game_status("Successfully connected to the server!")
 	_set_load_game_status("Loading game..")
@@ -242,22 +229,31 @@ func _on_server_disconnected():
 	_set_load_game_status("Disconnected from the server.")
 
 
-func _on_game_file_received(file_path: String, team_id: int):
-	print("Received game file from server: %s, team_id: %d" % [file_path, team_id])
-	var game_definition_resource = load(file_path)
+func _on_game_file_received(file_data: PackedByteArray, team_id: int):
+	GML.log("Received game file from server: %d bytes, team_id: %d" % [file_data.size(), team_id], GML.LogLevel.DEBUG)
+	const LOCAL_PATH := "user://server_game.tres"
+	var file := FileAccess.open(LOCAL_PATH, FileAccess.WRITE)
+	if file == null:
+		GML.log("Failed to write received game file locally.", GML.LogLevel.ERROR)
+		if gui_scene is TeamSelectGUI:
+			gui_scene.set_status("Failed to load game file!")
+		return
+	file.store_buffer(file_data)
+	file.close()
+	var game_definition_resource := ResourceLoader.load(LOCAL_PATH, "", ResourceLoader.CACHE_MODE_IGNORE) as GameDefinitionResource
 	if game_definition_resource != null:
 		initGameDataFromGameDefinition(game_definition_resource)
-		# Set the client player ID based on team selection
 		for player in data_manager.get_players().values():
 			if player.team != null and player.team.team_id == team_id:
 				data_manager.get_client_attributes().client_player_id = player.player_id
-				print("Set client_player_id to %d (team %d)" % [player.player_id, team_id])
+				GML.log("Set client_player_id to %d (team %d)" % [player.player_id, team_id], GML.LogLevel.DEBUG)
 				break
 		switch_gui_scene(IN_GAME_DEFAULT_GUI, data_manager.get_game_name())
 		ui_state = UIState.IN_GAME_DEFAULT
 		initGraphics()
 		MessageDispatcher.broadcast_message("Game \"%s\" loaded." % data_manager.get_game_name())
 	else:
+		GML.log("Failed to parse received game file as GameDefinitionResource.", GML.LogLevel.ERROR)
 		if gui_scene is TeamSelectGUI:
 			gui_scene.set_status("Failed to load game file!")
 
