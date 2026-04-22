@@ -17,3 +17,7 @@ services:
     build: 
       context: .
       dockerfile: server.Dockerfile
+    ports:
+      - 8082:80
+    stdin_open: true
+    tty: true
