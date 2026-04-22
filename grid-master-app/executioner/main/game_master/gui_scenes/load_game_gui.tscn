@@ -31,7 +31,7 @@ offset_top = 100.0
 offset_right = 161.5
 offset_bottom = 259.0
 theme_override_font_sizes/font_size = 32
-text = "Connect to server"
+text = "Multiplayer"
 
 [node name="ConnectionStatusLabel" type="Label" parent="."]
 anchors_preset = 3

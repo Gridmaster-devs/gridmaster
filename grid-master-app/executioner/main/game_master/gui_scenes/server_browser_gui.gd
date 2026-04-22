@@ -56,7 +56,7 @@ func _populate_servers() -> void:
 
 func _ping_all_servers() -> void:
 	for i in range(SERVERS.size()):
-		_ping_server(i)
+		await _ping_server(i)
 
 
 func _ping_server(index: int) -> void:
