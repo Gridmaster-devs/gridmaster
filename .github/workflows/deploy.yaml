@@ -46,6 +46,13 @@ jobs:
           push: true
           tags: gridmasterprivate.azurecr.io/gridmaster/client:${{ github.sha }}
           file: ./client.Dockerfile
+      - name: Build and push server image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: gridmasterprivate.azurecr.io/gridmaster/server:${{ github.sha }}
+          file: ./server.Dockerfile
   Deploy:
     name: Deploy image(s) from ACR to Azure Container Apps
     runs-on: ubuntu-latest
