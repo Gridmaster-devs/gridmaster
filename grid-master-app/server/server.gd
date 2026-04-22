@@ -88,8 +88,10 @@ func _ready():
 	Networking.game_file_requested.connect(_on_game_file_requested)
 	Networking.game_state_requested.connect(_on_game_state_requested)
 	Networking.request_peer_turn_end.connect(_on_team_turn_end)
+
 	Networking.server_info_requested.connect(_on_server_info_requested)
 	Networking.game_upload_requested.connect(_on_game_upload_requested)
+
 	# Connect message dispatcher to local callback that collects all
 	# event messages that are sent to all players when the turn ends.
 	MessageDispatcher.message_broadcast.connect(_on_message_broadcast)
