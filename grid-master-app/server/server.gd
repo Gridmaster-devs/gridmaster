@@ -9,7 +9,7 @@ extends Node
 const EXIT_FAILURE = 1
 
 ## Configurable server variables
-const PORT = 80
+const PORT = 443
 const GAME_FILE_PATH = "res://game_cats_dogs_with_vision.tres"
 
 ## The core game server instance
