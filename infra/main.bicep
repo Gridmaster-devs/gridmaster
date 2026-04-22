@@ -192,6 +192,7 @@ resource containerapps_gridmaster_client_server_name_resource 'Microsoft.App/con
         }
       ]
       scale: {
+        minReplicas: 1
         maxReplicas: 1
         cooldownPeriod: 300
         pollingInterval: 30

@@ -85,7 +85,13 @@ func _ready():
 	Networking.game_file_requested.connect(_on_game_file_requested)
 	Networking.game_state_requested.connect(_on_game_state_requested)
 	Networking.request_peer_turn_end.connect(_on_team_turn_end)
+	# Connect message dispatcher to local callback that collects all
+	# event messages that are sent to all players when the turn ends.
+	MessageDispatcher.message_broadcast.connect(_on_message_broadcast)
 	start_server()
+
+func _on_message_broadcast(message: String) -> void:
+	server_state.push_message(message)
 
 # TODO: In order to continue an existing game, we can just set the clients
 #		to load the game file and then send the saved game state, which
@@ -139,7 +145,8 @@ func _create_state_update_dict() -> Dictionary:
 			"hp": unit.hp
 		})
 	return {
-		"turn_number": server_state.data_manager.get_turn_number() ,
+		"turn_number": server_state.data_manager.get_turn_number(),
+		"message_queue": server_state.get_message_queue(),
 		"units": units_state
 	}
 
@@ -242,6 +249,9 @@ func _on_team_turn_end(peer_id: int, action_queue: Array) -> void:
 
 	# Send the state update dict to all the clients.
 	Networking.end_turn.rpc(_create_state_update_dict())
+
+	# Clear the action message queue
+	server_state.clear_message_queue()
 
 ## Called when a peer connects to the server
 func _peer_connected(peer_id):
