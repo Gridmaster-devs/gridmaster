@@ -9,9 +9,10 @@ signal units_changed
 # where each subclass has a reference to the gamestate and handles the given input differently.
 # This might end up being a lot cleaner as the amount of possible UI states expands, and might
 # be needed to prevent the game master file being enormous.
-enum UIState {LOAD_GAME, TEAM_SELECT, IN_GAME_DEFAULT, UNIT_MOVE}
+enum UIState {LOAD_GAME, SERVER_BROWSER, TEAM_SELECT, IN_GAME_DEFAULT, UNIT_MOVE}
 
 const LOAD_GAME_GUI : PackedScene = preload("res://executioner/main/game_master/gui_scenes/load_game_gui.tscn")
+const SERVER_BROWSER_GUI : PackedScene = preload("res://executioner/main/game_master/gui_scenes/server_browser_gui.tscn")
 const TEAM_SELECT_GUI : PackedScene = preload("res://executioner/main/game_master/gui_scenes/team_select_gui.tscn")
 const IN_GAME_DEFAULT_GUI : PackedScene = preload("res://executioner/main/game_master/gui_scenes/in_game_default_gui.tscn")
 
@@ -341,6 +342,9 @@ func receive_ui_event(event : StateMachineEvent):
 		UIState.LOAD_GAME:
 			_handle_event_load_game(event)
 		
+		UIState.SERVER_BROWSER:
+			_handle_event_server_browser(event)
+		
 		UIState.TEAM_SELECT:
 			_handle_event_team_select(event)
 		
@@ -358,8 +362,21 @@ func _handle_event_load_game(event : StateMachineEvent):
 		if button_press.button_type == ButtonPressedEvent.ButtonType.LOAD_GAME:
 			load_game_from_file()
 		elif button_press.button_type == ButtonPressedEvent.ButtonType.CONNECT_TO_SERVER:
-			_set_load_game_status("Connecting to server...")
-			Networking.connect_to_server()
+			switch_gui_scene(SERVER_BROWSER_GUI, null)
+			ui_state = UIState.SERVER_BROWSER
+
+
+## Handles input when in the server browser screen
+func _handle_event_server_browser(event : StateMachineEvent):
+	if event is ButtonPressedEvent:
+		var button_press := event as ButtonPressedEvent
+		if button_press.button_type == ButtonPressedEvent.ButtonType.PLAY_ON_SERVER:
+			var ip := button_press.additional_args as String
+			if gui_scene is ServerBrowserGUI:
+				gui_scene.set_status("Connecting...")
+			Networking.connect_to_server(ip)
+		elif button_press.button_type == ButtonPressedEvent.ButtonType.UPLOAD_GAME:
+			pass # TODO: implement upload game to server
 
 
 ## Handles input when in the team selection screen
