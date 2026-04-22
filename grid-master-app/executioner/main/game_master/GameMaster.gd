@@ -213,17 +213,18 @@ func _set_load_game_status(text: String):
 	if gui_scene is LoadGameGUI:
 		gui_scene.set_connection_status(text)
 
-func connect_to_server():
-	_set_load_game_status("Attempting to connect to server...")
-	# FIXME: Hardcoded server IP address and port
-	var err = client_peer.create_client("ws://127.0.0.1:8082")
-	if err == OK:
-		multiplayer.multiplayer_peer = client_peer
-		multiplayer.connected_to_server.connect(_on_connected_to_server)
-		multiplayer.connection_failed.connect(_on_connection_failed)
-		multiplayer.server_disconnected.connect(_on_server_disconnected)
-	else:
-		_set_load_game_status("Failed to create client peer. Error code: %d" % err)
+# WARNING This is apparently redundant since the one used is actually in networking.gd
+#func connect_to_server():
+	#_set_load_game_status("Attempting to connect to server...")
+	## FIXME: Hardcoded server IP address and port
+	#var err = client_peer.create_client("ws://127.0.0.1:55555")
+	#if err == OK:
+		#multiplayer.multiplayer_peer = client_peer
+		#multiplayer.connected_to_server.connect(_on_connected_to_server)
+		#multiplayer.connection_failed.connect(_on_connection_failed)
+		#multiplayer.server_disconnected.connect(_on_server_disconnected)
+	#else:
+		#_set_load_game_status("Failed to create client peer. Error code: %d" % err)
 
 func _on_connected_to_server():
 	_set_load_game_status("Successfully connected to the server!")
