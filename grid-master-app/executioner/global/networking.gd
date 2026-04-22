@@ -117,6 +117,8 @@ func connect_for_upload(ip: String) -> void:
 	_uploading = false
 	GML.log("Upload connection timed out.", GML.LogLevel.ERROR)
 	multiplayer.multiplayer_peer = null
+	client_peer.close()
+	client_peer = WebSocketMultiplayerPeer.new()
 
 
 func select_team(team_index: int) -> void:

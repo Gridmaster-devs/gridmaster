@@ -430,12 +430,19 @@ func _on_game_upload_result(success: bool) -> void:
 		gui_scene.set_status("Upload successful! Refreshing..." if success else "Upload failed.")
 	Networking._uploading = false
 	multiplayer.multiplayer_peer = null
+	# Close the upload socket and replace client_peer with a fresh object so
+	# any subsequent connect_to_server / connect_for_upload starts clean.
+	Networking.client_peer.close()
+	Networking.client_peer = WebSocketMultiplayerPeer.new()
 	# Restore local game-loading signal now that upload is complete.
 	if not ftm.resource_uploaded.is_connected(local_init_game):
 		ftm.resource_uploaded.connect(local_init_game)
 	if success:
-		# Re-query the server so the name updates in the browser
-		gui_scene.refresh_servers()
+		# Wait one frame for the socket close to flush before reloading the browser.
+		await get_tree().process_frame
+		GML.log("Reloading server browser after upload.", GML.LogLevel.DEBUG)
+		switch_gui_scene(SERVER_BROWSER_GUI, null)
+		ui_state = UIState.SERVER_BROWSER
 
 
 ## Handles input when in the team selection screen

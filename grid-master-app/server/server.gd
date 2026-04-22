@@ -10,7 +10,7 @@ const EXIT_FAILURE = 1
 
 ## Configurable server variables
 const PORT = 55555
-const GAME_FILE_PATH = "res://game_cats_dogs_with_vision.tres"
+var GAME_FILE_PATH = "res://game_cats_dogs_with_vision.tres"
 
 ## The core game server instance
 var server = WebSocketMultiplayerPeer.new()
@@ -108,7 +108,9 @@ func _on_game_upload_requested(peer_id: int, file_data: PackedByteArray) -> void
 	file.store_buffer(file_data)
 	file.close()
 	GML.log("[Upload] File written, attempting to load as GameDefinitionResource.", GML.LogLevel.DEBUG)
-	var game_def := load(UPLOAD_PATH) as GameDefinitionResource
+	# CACHE_MODE_IGNORE forces Godot to re-read from disk rather than returning
+	# a cached resource from a prior load() of the same path.
+	var game_def := ResourceLoader.load(UPLOAD_PATH, "", ResourceLoader.CACHE_MODE_IGNORE) as GameDefinitionResource
 	if game_def == null:
 		GML.log("[Upload] Loaded resource is null or not a GameDefinitionResource.", GML.LogLevel.ERROR)
 		Networking.receive_upload_result.rpc_id(peer_id, false)
@@ -116,7 +118,8 @@ func _on_game_upload_requested(peer_id: int, file_data: PackedByteArray) -> void
 	GML.log("[Upload] GameDefinitionResource loaded: '%s'. Reinitializing server state." % game_def.game_name, GML.LogLevel.INFO)
 	server_state = ServerState.new(game_def)
 	GameArgs.initialize(server_state.data_manager, game_def.game_rules)
-	GML.log("[Upload] Game updated to: %s" % game_def.game_name, GML.LogLevel.INFO)
+	GAME_FILE_PATH = UPLOAD_PATH
+	GML.log("[Upload] Game updated to: %s (GAME_FILE_PATH -> %s)" % [game_def.game_name, GAME_FILE_PATH], GML.LogLevel.INFO)
 	Networking.receive_upload_result.rpc_id(peer_id, true)
 
 # TODO: In order to continue an existing game, we can just set the clients
