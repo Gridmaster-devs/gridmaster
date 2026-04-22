@@ -22,19 +22,20 @@ func populate_teams(teams: Array):
 	# TODO: Don't use iterator
 	for i in range(teams.size()):
 		var team = teams[i]
-		var button = Button.new()
-		button.text = team.get("name", "Team %d" % i)
-		button.custom_minimum_size = Vector2(300, 60)
-		
-		# Set button color based on team color
-		var color_str = team.get("color", "#FFFFFF")
-		var color = Color.from_string(color_str, Color.WHITE)
-		button.add_theme_color_override("font_color", color)
-		
-		# Connect button press
-		button.pressed.connect(_on_team_button_pressed.bind(team.get("id")))
-		
-		_teams_container.add_child(button)
+		if team.id != -1:
+			var button = Button.new()
+			button.text = team.get("name", "Team %d" % i)
+			button.custom_minimum_size = Vector2(300, 60)
+			
+			# Set button color based on team color
+			var color_str = team.get("color", "#FFFFFF")
+			var color = Color.from_string(color_str, Color.WHITE)
+			button.add_theme_color_override("font_color", color)
+			
+			# Connect button press
+			button.pressed.connect(_on_team_button_pressed.bind(team.get("id")))
+			
+			_teams_container.add_child(button)
 	
 	set_status("Select your team")
 

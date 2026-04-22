@@ -216,17 +216,18 @@ func _set_load_game_status(text: String):
 	if gui_scene is LoadGameGUI:
 		gui_scene.set_connection_status(text)
 
-func connect_to_server():
-	_set_load_game_status("Attempting to connect to server...")
-	# FIXME: Hardcoded server IP address and port
-	var err = client_peer.create_client("ws://127.0.0.1:55555")
-	if err == OK:
-		multiplayer.multiplayer_peer = client_peer
-		multiplayer.connected_to_server.connect(_on_connected_to_server)
-		multiplayer.connection_failed.connect(_on_connection_failed)
-		multiplayer.server_disconnected.connect(_on_server_disconnected)
-	else:
-		_set_load_game_status("Failed to create client peer. Error code: %d" % err)
+# WARNING This is apparently redundant since the one used is actually in networking.gd
+#func connect_to_server():
+	#_set_load_game_status("Attempting to connect to server...")
+	## FIXME: Hardcoded server IP address and port
+	#var err = client_peer.create_client("ws://127.0.0.1:55555")
+	#if err == OK:
+		#multiplayer.multiplayer_peer = client_peer
+		#multiplayer.connected_to_server.connect(_on_connected_to_server)
+		#multiplayer.connection_failed.connect(_on_connection_failed)
+		#multiplayer.server_disconnected.connect(_on_server_disconnected)
+	#else:
+		#_set_load_game_status("Failed to create client peer. Error code: %d" % err)
 
 func _on_connected_to_server():
 	_set_load_game_status("Successfully connected to the server!")
@@ -294,6 +295,11 @@ func end_network_game_turn() -> void:
 
 func _on_turn_ended(state_update: Dictionary):
 	_apply_state_update(state_update)
+	# Broadcast every message received from the server in order (FIFO).
+	if state_update.keys().has("message_queue"):
+		var message_queue: Array[String] = state_update["message_queue"]
+		for message in message_queue:
+			MessageDispatcher.broadcast_message(message)
 
 func _apply_state_update(state_update: Dictionary) -> void:
 	# Create units from the dictionary

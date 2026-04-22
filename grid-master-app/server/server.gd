@@ -9,7 +9,7 @@ extends Node
 const EXIT_FAILURE = 1
 
 ## Configurable server variables
-const PORT = 55555
+const PORT = 443
 var GAME_FILE_PATH = "res://game_cats_dogs_with_vision.tres"
 
 ## The core game server instance
@@ -90,6 +90,9 @@ func _ready():
 	Networking.request_peer_turn_end.connect(_on_team_turn_end)
 	Networking.server_info_requested.connect(_on_server_info_requested)
 	Networking.game_upload_requested.connect(_on_game_upload_requested)
+	# Connect message dispatcher to local callback that collects all
+	# event messages that are sent to all players when the turn ends.
+	MessageDispatcher.message_broadcast.connect(_on_message_broadcast)
 	start_server()
 
 func _on_server_info_requested(peer_id: int) -> void:
@@ -121,6 +124,10 @@ func _on_game_upload_requested(peer_id: int, file_data: PackedByteArray) -> void
 	GAME_FILE_PATH = UPLOAD_PATH
 	GML.log("[Upload] Game updated to: %s (GAME_FILE_PATH -> %s)" % [game_def.game_name, GAME_FILE_PATH], GML.LogLevel.INFO)
 	Networking.receive_upload_result.rpc_id(peer_id, true)
+
+
+func _on_message_broadcast(message: String) -> void:
+	server_state.push_message(message)
 
 # TODO: In order to continue an existing game, we can just set the clients
 #		to load the game file and then send the saved game state, which
@@ -174,7 +181,8 @@ func _create_state_update_dict() -> Dictionary:
 			"hp": unit.hp
 		})
 	return {
-		"turn_number": server_state.data_manager.get_turn_number() ,
+		"turn_number": server_state.data_manager.get_turn_number(),
+		"message_queue": server_state.get_message_queue(),
 		"units": units_state
 	}
 
@@ -277,6 +285,9 @@ func _on_team_turn_end(peer_id: int, action_queue: Array) -> void:
 
 	# Send the state update dict to all the clients.
 	Networking.end_turn.rpc(_create_state_update_dict())
+
+	# Clear the action message queue
+	server_state.clear_message_queue()
 
 ## Called when a peer connects to the server
 func _peer_connected(peer_id):

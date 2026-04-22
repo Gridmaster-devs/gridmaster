@@ -69,8 +69,9 @@ func query_server_info(ip: String) -> String:
 	return result[0]
 
 
-func connect_to_server(ip: String = "ws://127.0.0.1:55555") -> void:
-	var err := client_peer.create_client(ip)
+## Client side callback functions
+func connect_to_server(ip: String = "wss://gridmaster-server.calmmeadow-c81c2c38.northeurope.azurecontainerapps.io") -> void:
+	var err = client_peer.create_client(ip)
 	if err == OK:
 		multiplayer.multiplayer_peer = client_peer
 		multiplayer.connected_to_server.connect(_on_connected_to_server)
