@@ -1,0 +1,31 @@
+[gd_scene load_steps=2 format=3 uid="uid://ba37au1v7xvw6"]
+
+[ext_resource type="Script" uid="uid://ble5l0n44eq4r" path="res://executioner/main/game_master/gui_scenes/gui_elements/unit_information/unit_information_item.gd" id="1_4e8sx"]
+
+[node name="UnitInformationItem" type="Control"]
+layout_mode = 3
+anchor_right = 0.16800001
+anchor_bottom = 0.034
+offset_right = -0.5600281
+offset_bottom = 0.27999878
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_4e8sx")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label2" type="Label" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
