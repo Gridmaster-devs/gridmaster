@@ -11,6 +11,7 @@ extends GUIScene
 
 const SERVERS: Array = [
 	{"ip": "wss://gridmaster-server.calmmeadow-c81c2c38.northeurope.azurecontainerapps.io"},
+	{"ip": "ws://127.0.0.1:8082"},
 	{"ip": "ws://127.0.0.1:443"},
 ]
 
