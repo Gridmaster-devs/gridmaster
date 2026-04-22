@@ -216,7 +216,7 @@ func _set_load_game_status(text: String):
 func connect_to_server():
 	_set_load_game_status("Attempting to connect to server...")
 	# FIXME: Hardcoded server IP address and port
-	var err = client_peer.create_client("ws://127.0.0.1:55555")
+	var err = client_peer.create_client("ws://127.0.0.1:8082")
 	if err == OK:
 		multiplayer.multiplayer_peer = client_peer
 		multiplayer.connected_to_server.connect(_on_connected_to_server)
