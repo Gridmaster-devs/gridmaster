@@ -8,6 +8,9 @@ var type : UnitType
 
 var unit_id : int ## The ID of the unit
 
+## Indicates the number of the unit. Is used when displaying unique unit names
+var unit_number: int 
+
 var player : Player ## The player that owns the unit
 var team : Team:
 	get:
@@ -96,6 +99,20 @@ func get_damage() -> int:
 func get_move_speed() -> int:
 	return type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.MOVEMENT_SPEED)
 	
+
+## Returns the unique name of the unit
+func get_unit_name() -> String:
+	var n = unit_number
+	
+	var suffix := "th"
+	if n % 10 == 1 and n % 100 != 11:
+		suffix = "st"
+	elif n % 10 == 2 and n % 100 != 12:
+		suffix = "nd"
+	elif n % 10 == 3 and n % 100 != 13:
+		suffix = "rd"
+	
+	return str(n) + suffix + " " + type.unit_name
 
 ## Returns whether the unit has stopped moving for this turn or not
 func has_stopped() -> bool:
@@ -194,4 +211,5 @@ func _init(unit_type : UnitType, unit_id_p : int, player_p : Player, position : 
 	unit_id = unit_id_p
 	player = player_p
 	type = unit_type
+	unit_number = player.increment_unit_count(type)
 	initFromUnitType()
