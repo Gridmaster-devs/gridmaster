@@ -46,7 +46,9 @@ func _populate_servers() -> void:
 		row.add_child(indicator)
 
 		var btn := Button.new()
-		btn.text = "%s | ..." % server_name
+		var ip: String = server["ip"]
+		var ip_display := ip.left(20) + ("..." if ip.length() > 20 else "")
+		btn.text = "%s | %s" % [server_name, ip_display]
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		btn.pressed.connect(_on_server_selected.bind(server, server_name))
 		_server_buttons.append(btn)
