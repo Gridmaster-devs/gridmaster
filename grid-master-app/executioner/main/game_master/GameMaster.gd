@@ -287,10 +287,15 @@ func end_network_game_turn() -> void:
 
 	Networking.end_peer_turn.rpc_id(Networking.SERVER_PEER_ID, outgoing_actions)
 
+	if gui_scene is InGameDefaultGUI:
+		gui_scene.set_waiting()
+
 	print("[Client] Turn ended, waiting for server...")
 
 func _on_turn_ended(state_update: Dictionary):
 	_apply_state_update(state_update)
+	if gui_scene is InGameDefaultGUI:
+		gui_scene.set_turn_active()
 	# Broadcast every message received from the server in order (FIFO).
 	if state_update.keys().has("message_queue"):
 		var message_queue: Array[String] = state_update["message_queue"]

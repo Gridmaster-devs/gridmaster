@@ -11,6 +11,14 @@ func _ready():
 func _end_turn_button_pressed() -> void:
 	send_gm_signal(ButtonPressedEvent.new(ButtonPressedEvent.ButtonType.END_TURN))
 
+func set_waiting() -> void:
+	_end_turn_button.text = "Waiting for others..."
+	_end_turn_button.disabled = true
+
+func set_turn_active() -> void:
+	_end_turn_button.text = "End Turn"
+	_end_turn_button.disabled = false
+
 # Normal _init() does not work when you are instantiating
 # a scene from a file
 func initialize(game_name : Variant) -> void:
