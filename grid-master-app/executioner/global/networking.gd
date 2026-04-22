@@ -4,7 +4,7 @@ var client_peer = WebSocketMultiplayerPeer.new()
 
 
 ## Client side callback functions
-func connect_to_server(ip: String = "ws://127.0.0.1:8082") -> void:
+func connect_to_server(ip: String = "wss://gridmaster-server.calmmeadow-c81c2c38.northeurope.azurecontainerapps.io") -> void:
 	var err = client_peer.create_client(ip)
 	if err == OK:
 		multiplayer.multiplayer_peer = client_peer
