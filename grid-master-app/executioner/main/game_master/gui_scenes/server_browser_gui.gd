@@ -7,6 +7,7 @@ extends GUIScene
 @onready var _play_button: Button = $ActionPanel/PlayButton
 @onready var _upload_button: Button = $ActionPanel/UploadNewGameButton
 @onready var _status_label: Label = $StatusLabel
+@onready var _back_button: Button = $BackButton
 
 const SERVERS: Array = [
 	{"ip": "ws://127.0.0.1:55555"},
@@ -23,6 +24,7 @@ func _ready() -> void:
 	_populate_servers()
 	_play_button.pressed.connect(_on_play_pressed)
 	_upload_button.pressed.connect(_on_upload_pressed)
+	_back_button.pressed.connect(_on_back_pressed)
 	_ping_all_servers()
 
 
@@ -86,6 +88,10 @@ func _on_upload_pressed() -> void:
 	if _selected_server.is_empty():
 		return
 	send_gm_signal(ButtonPressedEvent.new(ButtonPressedEvent.ButtonType.UPLOAD_GAME, _selected_server["ip"]))
+
+
+func _on_back_pressed() -> void:
+	send_gm_signal(ButtonPressedEvent.new(ButtonPressedEvent.ButtonType.BACK))
 
 
 func set_status(status_text: String) -> void:

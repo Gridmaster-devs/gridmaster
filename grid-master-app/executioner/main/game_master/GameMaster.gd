@@ -372,7 +372,10 @@ func _handle_event_load_game(event : StateMachineEvent):
 func _handle_event_server_browser(event : StateMachineEvent):
 	if event is ButtonPressedEvent:
 		var button_press := event as ButtonPressedEvent
-		if button_press.button_type == ButtonPressedEvent.ButtonType.PLAY_ON_SERVER:
+		if button_press.button_type == ButtonPressedEvent.ButtonType.BACK:
+			switch_gui_scene(LOAD_GAME_GUI, null)
+			ui_state = UIState.LOAD_GAME
+		elif button_press.button_type == ButtonPressedEvent.ButtonType.PLAY_ON_SERVER:
 			var ip := button_press.additional_args as String
 			if gui_scene is ServerBrowserGUI:
 				gui_scene.set_status("Connecting...")
