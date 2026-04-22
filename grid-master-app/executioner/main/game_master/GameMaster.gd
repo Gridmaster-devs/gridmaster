@@ -252,6 +252,7 @@ func _on_game_file_received(file_data: PackedByteArray, team_id: int):
 		ui_state = UIState.IN_GAME_DEFAULT
 		initGraphics()
 		MessageDispatcher.broadcast_message("Game \"%s\" loaded." % data_manager.get_game_name())
+		# The server will follow immediately with a game_state_received to sync the current turn.
 	else:
 		GML.log("Failed to parse received game file as GameDefinitionResource.", GML.LogLevel.ERROR)
 		if gui_scene is TeamSelectGUI:

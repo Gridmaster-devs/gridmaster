@@ -140,6 +140,7 @@ func _on_game_file_requested(peer_id: int, team_id: int):
 		return
 	GML.log("Sending game file to peer %d (%d bytes)" % [peer_id, file_data.size()], GML.LogLevel.INFO)
 	Networking.receive_game_file.rpc_id(peer_id, file_data, team_id)
+	Networking.receive_game_state.rpc_id(peer_id, _create_state_update_dict())
 
 func _on_teams_requested(peer_id: int):
 	GML.log("Peer %d requested teams list" % peer_id, GML.LogLevel.INFO)
