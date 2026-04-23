@@ -5,6 +5,7 @@ class_name TeamUi
 @onready var _color_button: Button = $EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer/ColorButton
 @onready var _team_color_rect: TextureRect = $EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer/TeamColor
 @onready var _team_name_ui: LineEdit = $EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Name/TeamName
+@onready var _computer_checkbox: CheckBox = $EditorPanel/TopVBox/ScrollContainer/ContentsVBox/ComputerContainer/ComputerCheckBox
 @onready var _content_vbox: VBoxContainer = $EditorPanel/TopVBox/ScrollContainer/ContentsVBox
 
 
@@ -98,13 +99,14 @@ func _unit_unchecked(unit_name: String) -> void:
 ##IMPORT / EXPORT
 func export() -> TeamUiRes: 
 	var res: TeamUiRes = TeamUiRes.new()
-	res.init(_units, _team_name_ui.text, _color)
+	res.init(_units, _team_name_ui.text, _color, _computer_checkbox.button_pressed)
 	return res
 
 func import(res: TeamUiRes) -> void: 
 	_units = res.get_units()
 	_color = res.get_team_color()
 	_team_name_ui.text = res.get_team_name()
+	_computer_checkbox.button_pressed = res.get_is_computer()
 	
 	name_changed.emit(res.get_team_name())
 	color_changed.emit(_color)
