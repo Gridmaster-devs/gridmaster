@@ -237,7 +237,8 @@ func _on_teams_requested(peer_id: int):
 		teams_data.append({
 			"id": team_id,
 			"name": team.team_name,
-			"color": team.color.to_html()
+			"color": team.color.to_html(),
+			"is_computer": team.is_computer
 		})
 
 	GML.log("Sending %d teams: %s" % [teams_data.size(), teams_data], GML.LogLevel.INFO)

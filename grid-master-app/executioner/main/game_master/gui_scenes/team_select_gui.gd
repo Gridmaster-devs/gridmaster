@@ -22,7 +22,7 @@ func populate_teams(teams: Array):
 	# TODO: Don't use iterator
 	for i in range(teams.size()):
 		var team = teams[i]
-		if team.id != -1:
+		if team.id != -1 and not team.get("is_computer", false):
 			var button = Button.new()
 			button.text = team.get("name", "Team %d" % i)
 			button.custom_minimum_size = Vector2(300, 60)

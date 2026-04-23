@@ -45,7 +45,7 @@ static func initFromGameDefinition(game_definition_resource : GameDefinitionReso
 			if unit_names[unit_name]:
 				var cur_unit_type_id = unit_name_type_dict[unit_name]
 				team_units.append(new_game_definition.unit_types[cur_unit_type_id])
-		var team_id = new_game_definition.add_team(team_name, team.get_team_color(), team_units)
+		var team_id = new_game_definition.add_team(team_name, team.get_team_color(), team_units, team.get_is_computer())
 		team_id_dict[team_name] = team_id
 	
 	var client_player_added: bool = false

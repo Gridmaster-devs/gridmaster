@@ -4673,8 +4673,8 @@ _tactical_maps = Dictionary[String, ExtResource("2_0sasl")]({
 [sub_resource type="Resource" id="Resource_icl2s"]
 script = ExtResource("4_okif0")
 _team_information = Dictionary[String, bool]({
-"cats AI": false,
-"dogs AI": false,
+"cats": false,
+"dogs": false,
 "humans": true
 })
 _player_name = "Client"
@@ -4682,8 +4682,8 @@ _player_name = "Client"
 [sub_resource type="Resource" id="Resource_p0x87"]
 script = ExtResource("4_okif0")
 _team_information = Dictionary[String, bool]({
-"cats AI": false,
-"dogs AI": false,
+"cats": true,
+"dogs": false,
 "humans": false
 })
 _player_name = "Cat"
@@ -4691,8 +4691,8 @@ _player_name = "Cat"
 [sub_resource type="Resource" id="Resource_fi6d2"]
 script = ExtResource("4_okif0")
 _team_information = Dictionary[String, bool]({
-"cats AI": false,
-"dogs AI": false,
+"cats": false,
+"dogs": true,
 "humans": false
 })
 _player_name = "Dog"
@@ -4714,7 +4714,7 @@ _unit_information = Dictionary[String, bool]({
 "infantry": false,
 "soldier cat": true
 })
-_team_name = "cats AI"
+_team_name = "cats"
 _team_color = Color(0.9337118, 0.3689328, 0.3689328, 1)
 _is_computer = true
 
@@ -4725,7 +4725,7 @@ _unit_information = Dictionary[String, bool]({
 "infantry": false,
 "soldier cat": false
 })
-_team_name = "dogs AI"
+_team_name = "dogs"
 _team_color = Color(0.8506746, 0.96716076, 0.38619477, 1)
 _is_computer = true
 
@@ -5169,7 +5169,7 @@ attribute_value = 0.0
 script = ExtResource("9_bxbfy")
 attribute_name = "vision_range"
 type = 2
-attribute_value = 0.0
+attribute_value = 10.0
 
 [sub_resource type="Resource" id="Resource_ji606"]
 script = ExtResource("7_6bd56")
@@ -5301,7 +5301,7 @@ attribute_value = 0.0
 script = ExtResource("9_bxbfy")
 attribute_name = "vision_range"
 type = 2
-attribute_value = 0.0
+attribute_value = 5.0
 
 [sub_resource type="Resource" id="Resource_h3t8c"]
 script = ExtResource("7_6bd56")
@@ -5433,7 +5433,7 @@ attribute_value = 0.0
 script = ExtResource("9_bxbfy")
 attribute_name = "vision_range"
 type = 2
-attribute_value = 0.0
+attribute_value = 5.0
 
 [sub_resource type="Resource" id="Resource_k7cip"]
 script = ExtResource("7_6bd56")
@@ -5459,7 +5459,7 @@ attributes = {
 
 [resource]
 script = ExtResource("5_8naew")
-game_name = "Cats and Dogs"
+game_name = "Cats and Dogs (Vision)"
 units = Array[ExtResource("7_6bd56")]([SubResource("Resource_ji606"), SubResource("Resource_h3t8c"), SubResource("Resource_k7cip")])
 map = SubResource("Resource_ya5fv")
 unit_layer = SubResource("Resource_finld")

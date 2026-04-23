@@ -15,6 +15,9 @@ var team_id : int
 ## The color of the team. Used in, for example, unit outlines.
 var color : Color
 
+## Whether this team is controlled by the computer rather than a human player.
+var is_computer: bool = false
+
 # This will determine what types of units the team can produce throughout the game
 ## An array of unit types available to the team
 var unit_types : Array[UnitType]
@@ -24,8 +27,9 @@ static func DEBUG_new_team() -> Team:
 	return Team.new("Debug team", -1, Color(1,1,1), [])
 
 
-func _init(team_name_p : String, team_id_p : int, color_p : Color, units_p : Array[UnitType]) -> void:
+func _init(team_name_p : String, team_id_p : int, color_p : Color, units_p : Array[UnitType], is_computer_p: bool = false) -> void:
 	team_name = team_name_p
 	team_id = team_id_p
 	color = color_p
+	is_computer = is_computer_p
 	unit_types = units_p

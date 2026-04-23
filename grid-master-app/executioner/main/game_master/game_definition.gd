@@ -39,9 +39,10 @@ func initUnitTypesFromResource(game_definition : GameDefinitionResource,
 		type_count += 1
 		
 ## Adds a team to the game.
-func add_team(team_name : String, color : Color, team_units : Array[UnitType]) -> int:
+func add_team(team_name : String, color : Color, team_units : Array[UnitType], is_computer: bool = false) -> int:
 	var team_id : int = get_new_team_id()
-	teams.set(team_id, Team.new(team_name, team_id, color, team_units))
+	var team: Team = Team.new(team_name, team_id, color, team_units, is_computer)
+	teams.set(team_id, team)
 	return team_id
 
 
