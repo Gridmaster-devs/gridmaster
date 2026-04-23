@@ -53,6 +53,7 @@ func _save_game_state() -> void:
 		return
 	var state := _create_state_update_dict()
 	state["game_name"] = server_state.data_manager.get_game_name()
+	state["message_log"] = server_state.get_message_log()
 	# Vector2i doesn't serialize cleanly to JSON — convert to plain dicts.
 	for u in state["units"]:
 		u["position"] = {"x": u["position"].x, "y": u["position"].y}
@@ -104,7 +105,10 @@ func _restore_saved_state() -> void:
 		var pos := Vector2i(int(u_data["position"]["x"]), int(u_data["position"]["y"]))
 		dm.move_unit(id, pos)
 		unit._hp = int(u_data["hp"])
-	GML.log("Game state restored: turn %d, %d units." % [dm.get_turn_number(), dm.get_units().size()], GML.LogLevel.INFO)
+	# Restore message log
+	for msg in data.get("message_log", []):
+		server_state._message_log.push_back(msg)
+	GML.log("Game state restored: turn %d, %d units, %d messages." % [dm.get_turn_number(), dm.get_units().size(), server_state._message_log.size()], GML.LogLevel.INFO)
 
 ## Create and initialize the server object
 func start_server():
@@ -216,7 +220,9 @@ func _on_game_file_requested(peer_id: int, team_id: int):
 		return
 	GML.log("Sending game file to peer %d (%d bytes)" % [peer_id, file_data.size()], GML.LogLevel.INFO)
 	Networking.receive_game_file.rpc_id(peer_id, file_data, team_id)
-	Networking.receive_game_state.rpc_id(peer_id, _create_state_update_dict())
+	var rejoin_state := _create_state_update_dict()
+	rejoin_state["message_log"] = server_state.get_message_log()
+	Networking.receive_game_state.rpc_id(peer_id, rejoin_state)
 
 func _on_teams_requested(peer_id: int):
 	GML.log("Peer %d requested teams list" % peer_id, GML.LogLevel.INFO)

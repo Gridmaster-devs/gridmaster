@@ -266,6 +266,10 @@ func _on_teams_received(teams: Array):
 func _on_game_state_received(state_update: Dictionary):
 	_apply_state_update(state_update)
 	switch_gui_scene(IN_GAME_DEFAULT_GUI, data_manager.get_game_name())
+	# Replay the full message history after the scene (and its MessageWindow) is ready.
+	if state_update.has("message_log"):
+		for msg in state_update["message_log"]:
+			MessageDispatcher.broadcast_message(msg)
 	
 func end_network_game_turn() -> void:
 	_custom_graphics.clear()
