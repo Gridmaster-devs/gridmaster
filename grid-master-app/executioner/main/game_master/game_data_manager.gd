@@ -185,5 +185,8 @@ func replace_game_state(new_game_state: GameState) -> void:
 func increment_turn_number() -> void:
 	_game_state.increment_turn_number()
 
+func set_turn_number(n: int) -> void:
+	_game_state._turn_number = n
+
 func remove_unit(unit: Unit) -> void:
 	_game_state.remove_unit(unit)
