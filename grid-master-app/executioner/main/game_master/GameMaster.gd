@@ -377,6 +377,9 @@ func receive_ui_event(event : StateMachineEvent):
 		
 		UIState.UNIT_MOVE:
 			_handle_event_unit_move(event)
+		
+		UIState.WAITING_FOR_TURN:
+			_handle_event_waiting_for_turn(event)
 
 
 ## Handles input when in the load game screen
@@ -477,6 +480,22 @@ func _handle_event_team_select(event : StateMachineEvent):
 		if button_press.button_type == ButtonPressedEvent.ButtonType.SELECT_TEAM:
 			var team_index = button_press.additional_args as int
 			Networking.select_team(team_index)
+
+
+## Handler for when the turn has been submitted and we're waiting for other teams.
+## Units can still be clicked to view info, but movement is disabled.
+func _handle_event_waiting_for_turn(event : StateMachineEvent) -> void:
+	if event is GridTileClickedEvent:
+		if event.mouse_button == MOUSE_BUTTON_LEFT:
+			if event.grid_pos == Vector2i(-1, -1): return
+			var unit = data_manager.get_unit_by_position_nullable(event.grid_pos)
+			if unit == null: return
+			if unit.get_player_id() != data_manager.get_client_attributes().client_player_id: return
+			if _unit_information_popup != null:
+				_unit_information_popup.remove_from_tree()
+			_unit_information_popup = preload("res://executioner/main/game_master/gui_scenes/gui_elements/unit_information/unit_information_popup.tscn").instantiate()
+			_unit_information_popup.add_to_tree()
+			_unit_information_popup.set_unit_info(unit)
 
 
 ## Default handler for in-game
