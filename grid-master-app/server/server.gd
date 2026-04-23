@@ -51,13 +51,13 @@ var players_ended_turn: Array[int] = []
 func _save_game_state() -> void:
 	if server_state == null:
 		return
-	var state := _create_state_update_dict()
+	var state: Dictionary = _create_state_update_dict()
 	state["game_name"] = server_state.data_manager.get_game_name()
 	state["message_log"] = server_state.get_message_log()
 	# Vector2i doesn't serialize cleanly to JSON — convert to plain dicts.
 	for u in state["units"]:
 		u["position"] = {"x": u["position"].x, "y": u["position"].y}
-	var file := FileAccess.open(GAME_STATE_FILE_PATH, FileAccess.WRITE)
+	var file: FileAccess = FileAccess.open(GAME_STATE_FILE_PATH, FileAccess.WRITE)
 	if file == null:
 		GML.log("Failed to save game state: %s" % FileAccess.get_open_error(), GML.LogLevel.ERROR)
 		return
@@ -71,7 +71,7 @@ func _restore_saved_state() -> void:
 	if not FileAccess.file_exists(GAME_STATE_FILE_PATH):
 		GML.log("No saved game state found, starting fresh.", GML.LogLevel.INFO)
 		return
-	var json := JSON.new()
+	var json: JSON = JSON.new()
 	if json.parse(FileAccess.get_file_as_string(GAME_STATE_FILE_PATH)) != OK:
 		GML.log("Failed to parse saved game state.", GML.LogLevel.WARN)
 		return
@@ -81,11 +81,11 @@ func _restore_saved_state() -> void:
 	if saved_name != current_name:
 		GML.log("Saved state is for '%s', current game is '%s'. Ignoring." % [saved_name, current_name], GML.LogLevel.WARN)
 		return
-	var dm := server_state.data_manager
+	var dm: GameDataManager = server_state.data_manager
 	# Apply turn number
 	dm.set_turn_number(int(data.get("turn_number", 0)))
 	# Build a set of alive unit IDs from the saved state
-	var saved_ids := {}
+	var saved_ids: Dictionary = {}
 	for u in data.get("units", []):
 		saved_ids[int(u["id"])] = u
 	# Remove units not present in the saved state (died in a previous session)
@@ -102,7 +102,7 @@ func _restore_saved_state() -> void:
 			GML.log("Saved state references unit %d which does not exist in the game definition. Skipping." % id, GML.LogLevel.WARN)
 			continue
 		var u_data: Dictionary = saved_ids[id]
-		var pos := Vector2i(int(u_data["position"]["x"]), int(u_data["position"]["y"]))
+		var pos: Vector2i = Vector2i(int(u_data["position"]["x"]), int(u_data["position"]["y"]))
 		dm.move_unit(id, pos)
 		unit._hp = int(u_data["hp"])
 	# Restore message log
@@ -128,7 +128,7 @@ func start_server():
 
 	# If a game file was persisted from a previous run, resume it automatically.
 	if FileAccess.file_exists(GAME_FILE_PATH):
-		var game_def := ResourceLoader.load(GAME_FILE_PATH, "", ResourceLoader.CACHE_MODE_IGNORE) as GameDefinitionResource
+		var game_def: GameDefinitionResource = ResourceLoader.load(GAME_FILE_PATH, "", ResourceLoader.CACHE_MODE_IGNORE) as GameDefinitionResource
 		if game_def != null:
 			server_state = ServerState.new(game_def)
 			GameArgs.initialize(server_state.data_manager, game_def.game_rules)
@@ -162,14 +162,14 @@ func _on_game_upload_requested(peer_id: int, file_data: PackedByteArray) -> void
 		Networking.receive_upload_result.rpc_id(peer_id, false)
 		return
 	GML.log("[Upload] Writing to: %s" % ProjectSettings.globalize_path(GAME_FILE_PATH), GML.LogLevel.DEBUG)
-	var file := FileAccess.open(GAME_FILE_PATH, FileAccess.WRITE)
+	var file: FileAccess = FileAccess.open(GAME_FILE_PATH, FileAccess.WRITE)
 	if file == null:
 		GML.log("[Upload] Failed to open game file path for writing. Error: %s" % FileAccess.get_open_error(), GML.LogLevel.ERROR)
 		Networking.receive_upload_result.rpc_id(peer_id, false)
 		return
 	file.store_buffer(file_data)
 	file.close()
-	var written := FileAccess.get_file_as_bytes(GAME_FILE_PATH)
+	var written: PackedByteArray = FileAccess.get_file_as_bytes(GAME_FILE_PATH)
 	if written.size() != file_data.size():
 		GML.log("[Upload] Size mismatch after write: expected %d bytes, got %d bytes." % [file_data.size(), written.size()], GML.LogLevel.ERROR)
 		Networking.receive_upload_result.rpc_id(peer_id, false)
@@ -177,7 +177,7 @@ func _on_game_upload_requested(peer_id: int, file_data: PackedByteArray) -> void
 	GML.log("[Upload] File verified on disk (%d bytes). Attempting to load as GameDefinitionResource." % written.size(), GML.LogLevel.DEBUG)
 	# CACHE_MODE_IGNORE forces Godot to re-read from disk rather than returning
 	# a cached resource from a prior load() of the same path.
-	var game_def := ResourceLoader.load(GAME_FILE_PATH, "", ResourceLoader.CACHE_MODE_IGNORE) as GameDefinitionResource
+	var game_def: GameDefinitionResource = ResourceLoader.load(GAME_FILE_PATH, "", ResourceLoader.CACHE_MODE_IGNORE) as GameDefinitionResource
 	if game_def == null:
 		GML.log("[Upload] Loaded resource is null or not a GameDefinitionResource.", GML.LogLevel.ERROR)
 		Networking.receive_upload_result.rpc_id(peer_id, false)
@@ -214,13 +214,13 @@ func _on_game_file_requested(peer_id: int, team_id: int):
 		)
 		return
 
-	var file_data := FileAccess.get_file_as_bytes(GAME_FILE_PATH)
+	var file_data: PackedByteArray = FileAccess.get_file_as_bytes(GAME_FILE_PATH)
 	if file_data.is_empty():
 		GML.log("Failed to read game file bytes from: %s" % GAME_FILE_PATH, GML.LogLevel.ERROR)
 		return
 	GML.log("Sending game file to peer %d (%d bytes)" % [peer_id, file_data.size()], GML.LogLevel.INFO)
 	Networking.receive_game_file.rpc_id(peer_id, file_data, team_id)
-	var rejoin_state := _create_state_update_dict()
+	var rejoin_state: Dictionary = _create_state_update_dict()
 	rejoin_state["message_log"] = server_state.get_message_log()
 	Networking.receive_game_state.rpc_id(peer_id, rejoin_state)
 

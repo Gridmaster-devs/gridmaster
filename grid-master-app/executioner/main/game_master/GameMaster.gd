@@ -24,7 +24,7 @@ const RAW_INPUT_FUNC_NAME : String = "receive_raw_input"
 @onready var grid_graphics : GridGraphics = $"Grid Graphics"
 
 var _custom_graphics : CustomGraphics
-var _click_tracker := ClickTracker.new()
+var _click_tracker: ClickTracker = ClickTracker.new()
 var ui_state : UIState = UIState.LOAD_GAME
 var gui_scene : GUIScene
 
@@ -232,7 +232,7 @@ func _on_server_disconnected():
 func _on_game_file_received(file_data: PackedByteArray, team_id: int):
 	GML.log("Received game file from server: %d bytes, team_id: %d" % [file_data.size(), team_id], GML.LogLevel.DEBUG)
 	const LOCAL_PATH := "user://server_game.tres"
-	var file := FileAccess.open(LOCAL_PATH, FileAccess.WRITE)
+	var file: FileAccess = FileAccess.open(LOCAL_PATH, FileAccess.WRITE)
 	if file == null:
 		GML.log("Failed to write received game file locally.", GML.LogLevel.ERROR)
 		if gui_scene is TeamSelectGUI:
@@ -240,7 +240,7 @@ func _on_game_file_received(file_data: PackedByteArray, team_id: int):
 		return
 	file.store_buffer(file_data)
 	file.close()
-	var game_definition_resource := ResourceLoader.load(LOCAL_PATH, "", ResourceLoader.CACHE_MODE_IGNORE) as GameDefinitionResource
+	var game_definition_resource: GameDefinitionResource = ResourceLoader.load(LOCAL_PATH, "", ResourceLoader.CACHE_MODE_IGNORE) as GameDefinitionResource
 	if game_definition_resource != null:
 		initGameDataFromGameDefinition(game_definition_resource)
 		for player in data_manager.get_players().values():
@@ -372,7 +372,7 @@ func receive_ui_event(event : StateMachineEvent):
 ## Handles input when in the load game screen
 func _handle_event_load_game(event : StateMachineEvent):
 	if event is ButtonPressedEvent:
-		var button_press := event as ButtonPressedEvent
+		var button_press: ButtonPressedEvent = event as ButtonPressedEvent
 		if button_press.button_type == ButtonPressedEvent.ButtonType.LOAD_GAME:
 			load_game_from_file()
 		elif button_press.button_type == ButtonPressedEvent.ButtonType.CONNECT_TO_SERVER:
@@ -383,12 +383,12 @@ func _handle_event_load_game(event : StateMachineEvent):
 ## Handles input when in the server browser screen
 func _handle_event_server_browser(event : StateMachineEvent):
 	if event is ButtonPressedEvent:
-		var button_press := event as ButtonPressedEvent
+		var button_press: ButtonPressedEvent = event as ButtonPressedEvent
 		if button_press.button_type == ButtonPressedEvent.ButtonType.BACK:
 			switch_gui_scene(LOAD_GAME_GUI, null)
 			ui_state = UIState.LOAD_GAME
 		elif button_press.button_type == ButtonPressedEvent.ButtonType.PLAY_ON_SERVER:
-			var ip := button_press.additional_args as String
+			var ip: String = button_press.additional_args as String
 			if gui_scene is ServerBrowserGUI:
 				gui_scene.set_status("Connecting...")
 			Networking.connect_to_server(ip)
@@ -433,7 +433,7 @@ func _on_connected_for_upload() -> void:
 		gui_scene.set_status("Uploading game file...")
 	const TEMP_PATH := "user://upload_temp.tres"
 	ResourceSaver.save(_pending_upload_resource, TEMP_PATH)
-	var file_data := FileAccess.get_file_as_bytes(TEMP_PATH)
+	var file_data: PackedByteArray = FileAccess.get_file_as_bytes(TEMP_PATH)
 	GML.log("Sending %d bytes to server." % file_data.size(), GML.LogLevel.DEBUG)
 	Networking.upload_game_file.rpc_id(Networking.SERVER_PEER_ID, file_data)
 	_pending_upload_resource = null
@@ -463,7 +463,7 @@ func _on_game_upload_result(success: bool) -> void:
 ## Handles input when in the team selection screen
 func _handle_event_team_select(event : StateMachineEvent):
 	if event is ButtonPressedEvent:
-		var button_press := event as ButtonPressedEvent
+		var button_press: ButtonPressedEvent = event as ButtonPressedEvent
 		if button_press.button_type == ButtonPressedEvent.ButtonType.SELECT_TEAM:
 			var team_index = button_press.additional_args as int
 			Networking.select_team(team_index)
