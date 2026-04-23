@@ -39,6 +39,7 @@ var current_possible_tiles : Array[Vector2i] = [] # Which tiles the unit can mov
 var current_path : Array[Vector2i] = [] # The cumulative path of the unit
 var movement_left : int # How many points of movement the unit still has left
 
+var _unit_information_popup: UnitInformationPopup = null
 
 # ---
 # INFO OVERRIDDEN GODOT ENGINE VIRTUAL METHODS
@@ -497,6 +498,14 @@ func _handle_event_default_in_game(event : StateMachineEvent):
 			moved_unit.current_action = null # clear the current action
 			_custom_graphics.clear_id(moved_unit.getId())
 			
+			#TEMPORARY#
+			if _unit_information_popup != null: 
+				_unit_information_popup.remove_from_tree()
+			_unit_information_popup = preload("res://executioner/main/game_master/gui_scenes/gui_elements/unit_information/unit_information_popup.tscn").instantiate()
+			_unit_information_popup.add_to_tree()
+			_unit_information_popup.set_unit_info(unit)
+			#TEMPORARY#
+			
 			current_possible_tiles = _pathfinder.tiles_from_position(unit.getPosition(), unit.get_move_speed(), unit)
 			movement_left = moved_unit.get_move_speed()
 			
@@ -591,6 +600,8 @@ func _handle_event_unit_move(event : StateMachineEvent) -> void:
 
 
 func _exit_unit_move() -> void:
+	#TODO: 
+	_unit_information_popup.remove_from_tree()
 	_custom_graphics.clear_id(moved_unit.getId())
 	
 	# If the movement action was confirmed, draw the small path for the unit

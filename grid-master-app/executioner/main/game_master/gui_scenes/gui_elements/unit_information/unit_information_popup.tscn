@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3 uid="uid://cfgtwy5m7uo2f"]
+
+[ext_resource type="Script" uid="uid://dnjp4sakgqkbp" path="res://executioner/main/game_master/gui_scenes/gui_elements/unit_information/unit_information_popup.gd" id="1_pnbxe"]
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="2_2vyo1"]
+
+[node name="UnitInformationPopup" type="Control"]
+layout_mode = 3
+anchor_right = 0.18
+anchor_bottom = 0.37300003
+offset_right = -0.6000061
+offset_bottom = 0.15997314
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_pnbxe")
+
+[node name="EditorPanel" parent="." instance=ExtResource("2_2vyo1")]
+layout_mode = 1
+
+[node name="TopLabel" parent="EditorPanel/TopVBox" index="0"]
+text = "Unit Information"
+
+[editable path="EditorPanel"]
