@@ -9,7 +9,7 @@ signal units_changed
 # where each subclass has a reference to the gamestate and handles the given input differently.
 # This might end up being a lot cleaner as the amount of possible UI states expands, and might
 # be needed to prevent the game master file being enormous.
-enum UIState {LOAD_GAME, SERVER_BROWSER, TEAM_SELECT, IN_GAME_DEFAULT, UNIT_MOVE}
+enum UIState {LOAD_GAME, SERVER_BROWSER, TEAM_SELECT, IN_GAME_DEFAULT, UNIT_MOVE, WAITING_FOR_TURN}
 
 const LOAD_GAME_GUI : PackedScene = preload("res://executioner/main/game_master/gui_scenes/load_game_gui.tscn")
 const SERVER_BROWSER_GUI : PackedScene = preload("res://executioner/main/game_master/gui_scenes/server_browser_gui.tscn")
@@ -273,6 +273,7 @@ func _on_game_state_received(state_update: Dictionary):
 		if client_player != null and client_player.team != null:
 			if state_update["teams_ended_turn"].has(client_player.team.team_id):
 				gui_scene.set_waiting()
+				ui_state = UIState.WAITING_FOR_TURN
 	# Replay the full message history after the scene (and its MessageWindow) is ready.
 	if state_update.has("message_log"):
 		for msg in state_update["message_log"]:
@@ -301,6 +302,7 @@ func end_network_game_turn() -> void:
 
 	if gui_scene is InGameDefaultGUI:
 		gui_scene.set_waiting()
+	ui_state = UIState.WAITING_FOR_TURN
 
 	print("[Client] Turn ended, waiting for server...")
 
