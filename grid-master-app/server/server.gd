@@ -287,6 +287,7 @@ func _on_team_turn_end(peer_id: int, action_queue: Array) -> void:
 		# Auto-submit any computer-controlled teams that haven't ended yet.
 		for team in server_state.data_manager.get_teams().values():
 			if team.is_computer and not server_state.team_has_ended_turn(team.team_id):
+				_process_computer_team_actions(team)
 				server_state.end_team_turn(team.team_id)
 				GML.log("Auto-submitted turn for computer team '%s'." % team.team_name, GML.LogLevel.INFO)
 
@@ -379,6 +380,12 @@ func _on_team_turn_end(peer_id: int, action_queue: Array) -> void:
 
 	# Clear the action message queue
 	server_state.clear_message_queue()
+
+## Placeholder for computer-controlled team AI.
+## Called once per computer team per turn before the turn is processed.
+## [param team] is the Team object for the computer team whose turn is being submitted.
+func _process_computer_team_actions(team: Team) -> void:
+	GML.log("Computer team '%s' taking no action (AI not yet implemented)." % team.team_name, GML.LogLevel.INFO)
 
 ## Called when a peer connects to the server
 func _peer_connected(peer_id):
