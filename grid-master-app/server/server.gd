@@ -222,6 +222,7 @@ func _on_game_file_requested(peer_id: int, team_id: int):
 	Networking.receive_game_file.rpc_id(peer_id, file_data, team_id)
 	var rejoin_state: Dictionary = _create_state_update_dict()
 	rejoin_state["message_log"] = server_state.get_message_log()
+	rejoin_state["teams_ended_turn"] = server_state.teams_ended_turn.duplicate()
 	Networking.receive_game_state.rpc_id(peer_id, rejoin_state)
 
 func _on_teams_requested(peer_id: int):

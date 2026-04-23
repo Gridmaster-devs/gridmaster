@@ -266,6 +266,13 @@ func _on_teams_received(teams: Array):
 func _on_game_state_received(state_update: Dictionary):
 	_apply_state_update(state_update)
 	switch_gui_scene(IN_GAME_DEFAULT_GUI, data_manager.get_game_name())
+	# Restore waiting state if this client's team already submitted this turn.
+	if state_update.has("teams_ended_turn") and gui_scene is InGameDefaultGUI:
+		var client_player_id: int = data_manager.get_client_player_id()
+		var client_player: Player = data_manager.get_players().get(client_player_id)
+		if client_player != null and client_player.team != null:
+			if state_update["teams_ended_turn"].has(client_player.team.team_id):
+				gui_scene.set_waiting()
 	# Replay the full message history after the scene (and its MessageWindow) is ready.
 	if state_update.has("message_log"):
 		for msg in state_update["message_log"]:
