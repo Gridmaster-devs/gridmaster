@@ -284,6 +284,12 @@ func _on_team_turn_end(peer_id: int, action_queue: Array) -> void:
 		server_state.end_team_turn(player_team.team_id)
 		GML.log("Validated turn end for peer team %s." % [player_team.team_name], GML.LogLevel.INFO)
 
+		# Auto-submit any computer-controlled teams that haven't ended yet.
+		for team in server_state.data_manager.get_teams().values():
+			if team.is_computer and not server_state.team_has_ended_turn(team.team_id):
+				server_state.end_team_turn(team.team_id)
+				GML.log("Auto-submitted turn for computer team '%s'." % team.team_name, GML.LogLevel.INFO)
+
 		if typeof(action_queue) == TYPE_ARRAY:
 			for dict_action in action_queue:
 				if typeof(dict_action) == TYPE_DICTIONARY and dict_action.get("path") != null and dict_action.get("unit_id") != null:

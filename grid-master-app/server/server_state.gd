@@ -49,7 +49,11 @@ func join_team(peer_id: int, team_id: int) -> void:
 		clients[peer_id] = team_id
 
 func total_teams() -> int:
-	return game_definition_resource.team_uis.size()
+	var count: int = 0
+	for team in data_manager.get_teams().values():
+		if not team.is_computer:
+			count += 1
+	return count
 
 func teams_ended() -> int:
 	return teams_ended_turn.size()
