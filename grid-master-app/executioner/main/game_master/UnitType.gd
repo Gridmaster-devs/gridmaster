@@ -54,6 +54,13 @@ var unit_name : String ## Name of the unit type
 var description : String ## Description of the unit type
 var texture : Texture2D ## Texture used to draw the unit
 
+# These are used for production units and units that can be produced
+var is_production_unit: bool = false
+var producible_units: Array[UnitType] = []
+var is_producible_unit: bool = false
+var production_cost: int = 0
+
+
 
 ## Dictionary containing the value of each attribute
 var attributes : Dictionary[UNIT_ATTRIBUTE_TYPE, Variant]
