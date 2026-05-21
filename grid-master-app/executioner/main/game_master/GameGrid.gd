@@ -43,6 +43,10 @@ func setTileType(x : int, y : int, tile_type : TileType) -> void:
 func is_empty(pos : Vector2i) -> bool:
 	return get_tile_vec(pos).is_empty()
 
+# Checks if given position is within the bounds of the grid
+func is_in_bounds(pos: Vector2i) -> bool:
+	return 0 <= pos.x and pos.x < getWidth() and 0 <= pos.y and pos.y < getHeight()
+
 
 func initTileTypesFromMapResource(attribute_grid: Array2D) -> void:
 	for x in attribute_grid.width: 
