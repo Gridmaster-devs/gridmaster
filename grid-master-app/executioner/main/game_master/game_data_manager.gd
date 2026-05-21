@@ -149,7 +149,7 @@ func get_grid() -> GameGrid:
 	return _game_definition.grid
 
 # Used for visibility logic. Checks if the target unit is visible to the given player
-## TODO probably should not be here, could be moved to Player if the player knows its own units
+## TODO probably should not be here, could be moved to Team if the team knows its own units
 func _is_unit_visible(target_unit: Unit, player_id: int) -> bool:
 	var player: Player = _game_definition.players.get(player_id)
 	
@@ -187,3 +187,6 @@ func increment_turn_number() -> void:
 
 func remove_unit(unit: Unit) -> void:
 	_game_state.remove_unit(unit)
+
+func add_unit(unit_type : UnitType, position : Vector2i, player : Player) -> void:
+	_game_state.addUnit(unit_type, position, player)
