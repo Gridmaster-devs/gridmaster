@@ -127,9 +127,18 @@ func process_end_turn_local() -> void:
 			unit_array.erase(unit)
 			data_manager.remove_unit(unit)
 	
+	# Go through other actions. Only production actions at this time
+	for unit : Unit in unit_array:
+		if unit.current_action is ProductionAction:
+			(unit.current_action as ProductionAction).handle_turn()
+	
 	# Clear actions
 	for unit : Unit in unit_array:
-		unit.current_action = null
+		if unit.current_action is ProductionAction:
+			if unit.current_action.finished:
+				unit.current_action = null
+		else:
+			unit.current_action = null
 		
 	
 	data_manager.increment_turn_number()
@@ -174,9 +183,18 @@ func process_end_turn_local_builder() -> GameState:
 			unit_array.erase(unit)
 			new_game_state.remove_unit(unit)
 	
+	# Go through other actions. Only production actions at this time
+	for unit : Unit in unit_array:
+		if unit.current_action is ProductionAction:
+			(unit.current_action as ProductionAction).handle_turn()
+	
 	# Clear actions
 	for unit : Unit in unit_array:
-		unit.current_action = null
+		if unit.current_action is ProductionAction:
+			if unit.current_action.finished:
+				unit.current_action = null
+		else:
+			unit.current_action = null
 
 
 	new_game_state.increment_turn_number()
