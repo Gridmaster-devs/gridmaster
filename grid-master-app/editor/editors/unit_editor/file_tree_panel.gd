@@ -9,7 +9,7 @@ extends PanelContainer
 signal units_changed
 
 var unit_resources : Array[UnitResource] = []
-#var tree_id_to_unit_resource_id: Dictionary[int, int]
+var unit_ids: Array[int]
 var units : int = 0
 
 var unit_editor : UnitEditor
@@ -20,6 +20,23 @@ var unit_editor : UnitEditor
 var tree_root : TreeItem
 
 var state = unit_resources
+
+func add_to_tree(unit: UnitResource):
+	var item : TreeItem = tree.create_item(null, units)
+	item.set_text(0, "Unnamed unit")
+	unit_ids.append(unit.id)
+	units += 1
+	
+func remove_selected_from_tree():
+	var selected : TreeItem = tree.get_selected()
+	var index = 0
+	if (selected != null):
+		index = selected.get_index()
+		unit_ids.remove_at(index)
+		tree_root.remove_child(selected)
+		units -= 1
+	return index
+
 
 func reset_units():
 	units = 0
@@ -36,14 +53,11 @@ func reset_units():
 
 # adds a new unit to the tree and to the unit array
 func add_unit():
-	var item : TreeItem = tree.create_item(null, units)
-	item.set_text(0, "Unnamed unit")
-	
 	var new_unit_resource = UnitResource.new()
 	unit_resources.append(new_unit_resource)
 	
-	#tree_id_to_unit_resource_id[units] = new_unit_resource.id
-	units += 1
+	add_to_tree(new_unit_resource)
+	
 	units_changed.emit()
 
 
@@ -68,17 +82,10 @@ func add_unit_from_resource(unit_resource : UnitResource):
 
 # removes a unit from the tree and the array
 func remove_unit():
-	var selected : TreeItem = tree.get_selected()
-	if (selected != null):
-		var index = selected.get_index()
-		unit_resources.remove_at(index) # this does not check for out of bounds
-		tree_root.remove_child(selected)
-		
-		#tree_id_to_unit_resource_id.erase(index)
-		units -= 1
-		
-		unit_editor.unit_resource_removed()
-		units_changed.emit()
+	var index = remove_selected_from_tree()
+	unit_resources.remove_at(index) # this does not check for out of bounds
+	unit_editor.unit_resource_removed()
+	units_changed.emit()
 
 
 # called by the unit editor when the user changes the unit's name
