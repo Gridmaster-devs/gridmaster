@@ -21,7 +21,6 @@ var tree_root : TreeItem
 
 var state = unit_resources
 
-
 func reset_units():
 	units = 0
 	#tree_id_to_unit_resource_id = {}

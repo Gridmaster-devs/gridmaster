@@ -4,11 +4,12 @@ extends Resource
 
 # holds string : Attribute pairs
 @export var attributes : Dictionary
+
+## @experimental these aren't anything right now
 @export var actions : Array[Action]
 
 ## specifically meant to be used only in editor and not in the exported resource.
 var id: int
-
 static var _next_id: int
 
 var name: String:

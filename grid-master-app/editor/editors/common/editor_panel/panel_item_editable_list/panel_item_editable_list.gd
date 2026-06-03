@@ -42,6 +42,7 @@ func options_changed():
 			_remove_chosen(chosen_option.id)
 
 func _remove_chosen(id: int):
+	#FIXME this is kind of unsafe
 	for hbox in self.get_children().slice(2):
 		if hbox.get_children()[1].id == id:
 			hbox.queue_free()
@@ -80,7 +81,6 @@ func _chosen_item_added():
 			chosen_item_added.emit(chosen_option.id)
 	
 func _chosen_item_removed(id: int):
-	#FIXME this is kind of unsafe
 	_remove_chosen(id)
 	
 func _on_visibility_changed(is_hidden: bool):
