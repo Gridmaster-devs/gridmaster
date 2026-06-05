@@ -20,6 +20,9 @@ var editor_main : EditorMain
 @onready var action_panel : ActionPanel = $HBoxContainer/ActionPanel
 @onready var ftm : FileTransferManager = $Dialogs/FileTransferManager
 
+@onready var production_options = $HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Production/PanelItemEditableList
+
+
 # called when the user changes the name of the unit in the editor
 func update_name_in_tree(new_name : String):
 	if (unit_resource != null):
@@ -93,3 +96,10 @@ func _ready() -> void:
 	action_panel.link_unit_editor(self)
 	info_panel.link_unit_editor(self)
 	tree_panel.link_unit_editor(self)
+	
+	# TODO move other signal connections here as well, signals should be connected by parents not in the child itself (do away with all of
+	# these "child.link(parent)" calls like above that enforce tight coupling)
+	
+	tree_panel.units_changed.connect(production_options.options_changed)
+	save_to_resource.connect(production_options._save_to_unit_resource)
+	load_from_resource.connect(production_options._load_from_unit_resource)

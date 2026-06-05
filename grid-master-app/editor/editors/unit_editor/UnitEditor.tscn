@@ -184,6 +184,7 @@ size_flags_horizontal = 3
 layout_mode = 2
 options_list_provider = NodePath("../../../../../../../../UnitTreePanel")
 label_text = "Producible units "
+attribute_name = "producible_units "
 
 [node name="ResourcesPanel" parent="HBoxContainer/VBoxContainer/HBoxContainer" instance=ExtResource("2_7lyne")]
 layout_mode = 2
@@ -433,8 +434,6 @@ vertical_alignment = 1
 [node name="ActionPanel" parent="HBoxContainer" instance=ExtResource("7_ip3j4")]
 layout_mode = 2
 size_flags_horizontal = 3
-
-[connection signal="units_changed" from="HBoxContainer/UnitTreePanel" to="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Production/PanelItemEditableList" method="options_changed"]
 
 [editable path="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel"]
 [editable path="HBoxContainer/VBoxContainer/HBoxContainer/ResourcesPanel"]
