@@ -8,6 +8,7 @@ extends PopupWindow
 var _data_information_item_map: Dictionary[String, UnitInformationItem]
 
 @onready var unit_info_item = preload("res://executioner/main/game_master/gui_scenes/gui_elements/unit_information/unit_information_item.tscn")
+@onready var production_control_item = preload("res://executioner/main/game_master/gui_scenes/gui_elements/unit_information/production_control_item.tscn")
 
 func _init() -> void: 
 	super.set_popup_name("unit information popup")
@@ -15,7 +16,7 @@ func _init() -> void:
 
 
 
-func set_unit_info(unit: Unit) -> void: 
+func set_unit_info(unit: Unit, game_data_manager: GameDataManager) -> void: 
 	# Add the unit name first
 	var name_item: UnitInformationItem = unit_info_item.instantiate()
 	_contents.add_child(name_item)
@@ -45,3 +46,10 @@ func set_unit_info(unit: Unit) -> void:
 			_contents.add_child(information_item)
 			information_item.set_information(attribute_name, str(attribute_value))
 			_data_information_item_map[attribute_name] = information_item
+	
+	# Add the production_control_item if the unit is a production unit
+	if unit.type.is_production_unit and unit.current_action == null:
+		var item: ProductionControlItem = production_control_item.instantiate()
+		_contents.add_child(item)
+		item.custom_minimum_size = Vector2(0, 100)
+		item.setup(unit, game_data_manager)
