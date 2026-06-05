@@ -20,7 +20,7 @@ var editor_main : EditorMain
 @onready var action_panel : ActionPanel = $HBoxContainer/ActionPanel
 @onready var ftm : FileTransferManager = $Dialogs/FileTransferManager
 
-@onready var production_options = $HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Production/PanelItemEditableList
+@onready var production_options = $"HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Production/Producible units"
 
 
 # called when the user changes the name of the unit in the editor
