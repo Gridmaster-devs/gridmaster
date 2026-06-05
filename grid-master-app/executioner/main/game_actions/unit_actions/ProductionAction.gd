@@ -39,6 +39,8 @@ func _finish_production():
 		_game_data_provider.add_unit(producible_unit, producible_unit_pos, unit.player)
 		MessageDispatcher.broadcast_message("[Unit %s : %s] produced [Unit %s]" % [unit.unit_id, unit.team_name,
 		_game_data_provider.get_game_state().getUnits().back().getId()])
+	
+	finished = true
 
 
 # Helper function to check if a given position is valid
@@ -70,4 +72,4 @@ func _init(p_id : int, unit_p : Unit, game_data_provider: GameDataManager, produ
 	unit = unit_p
 	_game_data_provider = game_data_provider
 	producible_unit = producible_unit_p
-	remaining_turns = unit.production_cost
+	remaining_turns = producible_unit.production_cost
