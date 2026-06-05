@@ -29,7 +29,7 @@ func add_to_tree(unit: UnitResource):
 	
 func remove_selected_from_tree():
 	var selected : TreeItem = tree.get_selected()
-	var index = 0
+	var index = null
 	if (selected != null):
 		index = selected.get_index()
 		unit_ids.remove_at(index)
@@ -55,6 +55,7 @@ func reset_units():
 func add_unit():
 	var new_unit_resource = UnitResource.new()
 	unit_resources.append(new_unit_resource)
+	
 	
 	add_to_tree(new_unit_resource)
 	
@@ -83,9 +84,10 @@ func add_unit_from_resource(unit_resource : UnitResource):
 # removes a unit from the tree and the array
 func remove_unit():
 	var index = remove_selected_from_tree()
-	unit_resources.remove_at(index) # this does not check for out of bounds
-	unit_editor.unit_resource_removed()
-	units_changed.emit()
+	if index != null:
+		unit_resources.remove_at(index) # this does not check for out of bounds
+		unit_editor.unit_resource_removed()
+		units_changed.emit()
 
 
 # called by the unit editor when the user changes the unit's name
