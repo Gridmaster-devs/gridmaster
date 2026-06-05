@@ -508,7 +508,7 @@ func _handle_event_default_in_game(event : StateMachineEvent):
 				_unit_information_popup.remove_from_tree()
 			_unit_information_popup = preload("res://executioner/main/game_master/gui_scenes/gui_elements/unit_information/unit_information_popup.tscn").instantiate()
 			_unit_information_popup.add_to_tree()
-			_unit_information_popup.set_unit_info(unit)
+			_unit_information_popup.set_unit_info(unit, data_manager)
 			#TEMPORARY#
 			
 			current_possible_tiles = _pathfinder.tiles_from_position(unit.getPosition(), unit.get_move_speed(), unit)
