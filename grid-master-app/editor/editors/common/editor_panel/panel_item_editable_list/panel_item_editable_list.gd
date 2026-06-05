@@ -1,3 +1,4 @@
+class_name PanelItemEditableList
 extends VBoxContainer
 
 ## Assumes option_list_provider has interface:
