@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://cfgtwy5m7uo2f"]
 
-[ext_resource type="Script" uid="uid://dnjp4sakgqkbp" path="res://executioner/main/game_master/gui_scenes/gui_elements/unit_information/unit_information_popup.gd" id="1_pnbxe"]
+[ext_resource type="Script" uid="uid://c1n7vlij0x03" path="res://executioner/main/game_master/gui_scenes/gui_elements/unit_information/unit_information_popup.gd" id="1_pnbxe"]
 [ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="2_2vyo1"]
 
 [node name="UnitInformationPopup" type="Control"]
