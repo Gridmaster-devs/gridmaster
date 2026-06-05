@@ -180,7 +180,7 @@ text = "Production unit"
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="PanelItemEditableList" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Production" node_paths=PackedStringArray("options_list_provider") instance=ExtResource("8_8onv2")]
+[node name="Producible units" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Production" node_paths=PackedStringArray("options_list_provider") instance=ExtResource("8_8onv2")]
 layout_mode = 2
 options_list_provider = NodePath("../../../../../../../../UnitTreePanel")
 label_text = "Producible units "
