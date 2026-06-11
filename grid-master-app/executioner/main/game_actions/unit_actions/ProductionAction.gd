@@ -17,6 +17,9 @@ func handle_turn():
 	
 	if remaining_turns == 0:
 		_finish_production()
+	else:
+		MessageDispatcher.broadcast_message("[Unit %s] producing [%s] (%s turns remaining)" % [unit.unit_id,
+		producible_unit.unit_name, remaining_turns])
 
 
 # Finishes production of the unit and places it on the map
@@ -30,15 +33,20 @@ func _finish_production():
 		Vector2i(0, -1)
 	]
 	
+	# Try different tiles near unit
 	for dir in direction:
 		var new_pos: Vector2i = producing_unit_pos + dir
 		if _is_valid_spawn_pos(new_pos):
 			producible_unit_pos = new_pos
 	
+	# Produce unit and inform player
 	if producible_unit_pos != null:
 		_game_data_provider.add_unit(producible_unit, producible_unit_pos, unit.player)
-		MessageDispatcher.broadcast_message("[Unit %s : %s] produced [Unit %s]" % [unit.unit_id, unit.team_name,
+		MessageDispatcher.broadcast_message("[Unit %s] produced [Unit %s]" % [unit.unit_id,
 		_game_data_provider.get_game_state().getUnits().back().getId()])
+	else:
+		# If there is no free tiles near the unit, production fails
+		MessageDispatcher.broadcast_message("[Unit %s] failed to produce [%s]" % [unit.unit_id, producible_unit.unit_name])
 	
 	finished = true
 
@@ -63,9 +71,15 @@ func _is_tile_free(pos: Vector2i) -> bool:
 	
 	return true
 
+func is_interruptible() -> bool:
+	return false
+
 
 func deep_copy(new_unit: Unit) -> ProductionAction:
-	return ProductionAction.new(player_id, new_unit, _game_data_provider, producible_unit)
+	var copy = ProductionAction.new(player_id, new_unit, _game_data_provider, producible_unit)
+	copy.remaining_turns = self.remaining_turns
+	
+	return copy
 
 func _init(p_id : int, unit_p : Unit, game_data_provider: GameDataManager, producible_unit_p: UnitType):
 	player_id = p_id
