@@ -53,3 +53,7 @@ func set_unit_info(unit: Unit, game_data_manager: GameDataManager) -> void:
 		_contents.add_child(item)
 		item.custom_minimum_size = Vector2(0, 100)
 		item.setup(unit, game_data_manager)
+		item.production_selected.connect(_on_production_selected)
+
+func _on_production_selected():
+	hide()
