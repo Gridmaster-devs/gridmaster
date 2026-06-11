@@ -491,7 +491,11 @@ func _handle_event_default_in_game(event : StateMachineEvent):
 			if event.grid_pos == Vector2i(-1, -1): return # The user clicked outside the map
 			
 			var unit = data_manager.get_unit_by_position_nullable(event.grid_pos)
-			if unit == null: return # There is no unit on the tile
+			
+			if unit == null or moved_unit == unit: 
+				_unit_information_popup.remove_from_tree()
+				moved_unit = null
+				return 
 			
 			
 			# The unit doesn't belong to the current player
@@ -500,8 +504,9 @@ func _handle_event_default_in_game(event : StateMachineEvent):
 			# The user clicked on a tile in the map limits and there is a unit on the tile
 			
 			moved_unit = unit
-			moved_unit.current_action = null # clear the current action
-			_custom_graphics.clear_id(moved_unit.getId())
+			if moved_unit.current_action != null and moved_unit.current_action.is_interruptible():
+				moved_unit.current_action = null # clear the current action
+				_custom_graphics.clear_id(moved_unit.getId())
 			
 			#TEMPORARY#
 			if _unit_information_popup != null: 
@@ -511,11 +516,18 @@ func _handle_event_default_in_game(event : StateMachineEvent):
 			_unit_information_popup.set_unit_info(unit, data_manager)
 			#TEMPORARY#
 			
+			if moved_unit.current_action != null and not moved_unit.current_action.is_interruptible():
+				return
+			
 			current_possible_tiles = _pathfinder.tiles_from_position(unit.getPosition(), unit.get_move_speed(), unit)
 			movement_left = moved_unit.get_move_speed()
 			
 			_custom_graphics.draw_movement_tiles(current_possible_tiles, unit.getId())
 			ui_state = UIState.UNIT_MOVE
+		
+		elif event.mouse_button == MOUSE_BUTTON_RIGHT:
+			if _unit_information_popup != null:
+				_unit_information_popup.remove_from_tree()
 	
 	elif event is ButtonPressedEvent:
 		if event.button_type == ButtonPressedEvent.ButtonType.END_TURN:
