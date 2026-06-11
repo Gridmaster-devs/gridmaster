@@ -75,6 +75,7 @@ func deep_copy() -> Unit:
 	var new_unit = Unit.new(self.type, self.unit_id, self.player, self.grid_position)
 	new_unit._hp = self._hp
 	new_unit._morale = self._morale
+	new_unit.unit_number = self.unit_number
 	var old_action = self.current_action
 	if old_action == null:
 		new_unit.current_action = null

@@ -58,7 +58,7 @@ var texture : Texture2D ## Texture used to draw the unit
 var is_production_unit: bool = false
 var producible_units: Array[UnitType] = []
 var is_producible_unit: bool = false
-var production_cost: int = 0
+var production_cost: int = 1
 
 
 
