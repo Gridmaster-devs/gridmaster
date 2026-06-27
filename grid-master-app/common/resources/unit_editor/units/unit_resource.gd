@@ -8,9 +8,8 @@ extends Resource
 ## @experimental these aren't anything right now
 @export var actions : Array[Action]
 
-## specifically meant to be used only in editor and not in the exported resource.
 var id: int
-static var _next_id: int
+static var _next_id: int = 0
 
 var name: String:
 	get:
@@ -23,6 +22,7 @@ var name: String:
 	
 func _init():
 	id = _next_id
+	set_attribute("id", id)
 	_next_id += 1
 
 ## takes an attribute of a certain name and puts its value in the dictionary
