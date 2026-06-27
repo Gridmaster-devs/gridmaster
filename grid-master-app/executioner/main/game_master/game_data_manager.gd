@@ -78,7 +78,7 @@ static func initFromGameDefinition(game_definition_resource : GameDefinitionReso
 				var unit_name = cur_attributes[MapAttributes.UNIT_UNIT_LIB_ITEM_ID]
 				var player_name = cur_attributes[MapAttributes.UNIT_PLAYER_ID]
 				new_game_state.addUnit(new_game_definition.unit_types.get(unit_name_type_dict[unit_name]), Vector2i(x, y), new_game_definition.get_player_by_id(player_name_id_dict[player_name])) # FIXME redundant way to get unittype in first argument 
-	
+
 	# Initialize GameDataManager with initialized game data objects
 	return GameDataManager.new(new_game_state, new_game_definition, new_client_attributes)
 

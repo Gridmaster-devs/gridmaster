@@ -11,7 +11,10 @@ extends VBoxContainer
 ## {
 ##		name: string
 ## 		id: int
+##		is_producible_unit: bool
 ## }
+
+## WARNING: This was supposed to be a more general purpose component but now relies on an interface specific to UnitType. 
 
 signal chosen_item_added(chosen_option_id: int)
 signal chosen_item_removed(chosen_option_id: int)
@@ -39,7 +42,8 @@ func _ready() -> void:
 func options_changed():
 	drop_down.clear()
 	for option in options_list:
-		drop_down.add_item(option.name, option.id)
+		if option.get_attribute("is_producible_unit"):
+			drop_down.add_item(option.name, option.id)
 	# NOTE sub-optimal but works for now
 	for chosen_option in chosen_list.values():
 		var found = false
@@ -105,7 +109,7 @@ func _on_visibility_changed(is_hidden: bool):
 
 func _save_to_unit_resource(resource_p : UnitResource):
 	if (resource_p != null):
-		resource_p.set_attribute(attribute_name, chosen_list.values())
+		resource_p.set_attribute(attribute_name, chosen_list.values().map(func(unitType): return unitType.id))
 		
 func _load_from_unit_resource(resource_p : UnitResource):
 	if (resource_p != null):
@@ -115,7 +119,7 @@ func _load_from_unit_resource(resource_p : UnitResource):
 			# this obviously means that if the value type of an attribute changes between versions their units
 			# won't be compatible with each other
 			_reset_chosen()
-			for unit_type in value:
-				add_chosen(unit_type.id)
+			for unit_type_id in value:
+				add_chosen(unit_type_id)
 			return
 	_reset_chosen()

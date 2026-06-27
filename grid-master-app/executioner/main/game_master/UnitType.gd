@@ -57,6 +57,7 @@ var texture : Texture2D ## Texture used to draw the unit
 # These are used for production units and units that can be produced
 var is_production_unit: bool = false
 var producible_units: Array[UnitType] = []
+var producible_units_ids: Array[int] = []
 var is_producible_unit: bool = false
 var production_cost: int = 1
 
@@ -84,16 +85,27 @@ func checkAttributes() -> void:
 # Problems may occur with attributes like capturable
 # Might be a good idea to check that each attribute's value is of the correct type and makes sense
 ## Initializes a unit type from a unit resource
-static func initFromUnitResource(unit_resource : UnitResource, unit_type_id : int) -> UnitType:
+static func initFromUnitResource(unit_resource : UnitResource) -> UnitType:
+
+	# TODO: Tidy up whatever mess of importing attributes this method is.
+
 	var unit_type = UnitType.new()
-	unit_type.type_id = unit_type_id
+	unit_type.type_id = unit_resource.get_attribute_value("id")
 	var resource_attributes = unit_resource.getAttributes()
 	unit_type.unit_name = unit_resource.get_attribute_value("name")
 	unit_type.description = unit_resource.get_attribute_value("description")
 	unit_type.texture = unit_resource.get_attribute_value("texture")
+
+	unit_type.is_production_unit = unit_resource.get_attribute_value("is_production_unit")
+	unit_type.is_producible_unit = unit_resource.get_attribute_value("is_producible_unit")
+	unit_type.production_cost = unit_resource.get_attribute_value("production_cost")
+	var producible_units_from_resource = unit_resource.get_attribute_value("producible_units")
+	if producible_units_from_resource != null and producible_units_from_resource != []:
+		unit_type.producible_units_ids = producible_units_from_resource
 	
 	for key in resource_attributes.keys():
-		if (key == "name" or key == "description" or key == "texture"):
+		if (key == "name" or key == "description" or key == "texture" or key == "is_production_unit" 
+			or key == "is_producible_unit" or key == "production_cost" or key == "producible_units" or key == "id"):
 			continue
 			
 		var value = unit_resource.get_attribute_value(key)
@@ -109,6 +121,12 @@ static func initFromUnitResource(unit_resource : UnitResource, unit_type_id : in
 	
 	return unit_type
 
+func populate_producible_units(unit_types_dict: Dictionary[int, UnitType]) -> void:
+	for unit_id in producible_units_ids:
+		if unit_types_dict.has(unit_id):
+			producible_units.append(unit_types_dict[unit_id])
+		else:
+			push_error("UnitType with ID %d not found in unit_types_dict!" % unit_id)
 
 static func debugType() -> UnitType:
 	var type = UnitType.new()
