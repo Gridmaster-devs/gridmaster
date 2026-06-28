@@ -19,6 +19,14 @@ func set_turn_active() -> void:
 	_end_turn_button.text = "End Turn"
 	_end_turn_button.disabled = false
 
+func set_eliminated() -> void:
+	_end_turn_button.text = "Eliminated"
+	_end_turn_button.disabled = true
+
+func set_game_over() -> void:
+	_end_turn_button.text = "Game Over"
+	_end_turn_button.disabled = true
+
 # Normal _init() does not work when you are instantiating
 # a scene from a file
 func initialize(game_name : Variant) -> void:
