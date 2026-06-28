@@ -1,6 +1,7 @@
-extends Control
+extends Node
 class_name PlayerUi
 
+const KEY_UNIT_OPTION_PATH := "EditorPanel/TopVBox/ScrollContainer/ContentsVBox/KeyUnitHBox/OptionButton"
 
 @onready var _teams_vbox = $EditorPanel/TopVBox/ScrollContainer/ContentsVBox/TeamsVbox
 @onready var _player_name_ui = $EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer/LineEdit
@@ -85,16 +86,69 @@ func _team_unchecked(team_name: String) -> void:
 func _on_name_changed(new_name: String) -> void:
 	name_changed.emit(new_name)
 
+func get_selected_team_name() -> String:
+	for team_name in _teams.keys():
+		if _teams[team_name]:
+			return team_name
+	return ""
+
+func _get_key_unit_option() -> OptionButton:
+	return get_node_or_null(KEY_UNIT_OPTION_PATH) as OptionButton
+
+func sync_key_units(unit_names: Array) -> void:
+	if not is_node_ready():
+		call_deferred("sync_key_units", unit_names)
+		return
+	var option := _get_key_unit_option()
+	if option == null:
+		return
+	var selected_name := _get_selected_key_unit_name()
+	option.clear()
+	option.add_item("")
+	for unit_name in unit_names:
+		if unit_name == "" or _option_has_item(option, unit_name):
+			continue
+		option.add_item(unit_name)
+	_set_selected_key_unit_name(selected_name)
+
+func _option_has_item(option: OptionButton, item_text: String) -> bool:
+	for i in range(option.item_count):
+		if option.get_item_text(i) == item_text:
+			return true
+	return false
+
+func _get_selected_key_unit_name() -> String:
+	var option := _get_key_unit_option()
+	if option == null or option.item_count == 0:
+		return ""
+	var index := option.selected
+	if index < 0:
+		return ""
+	return option.get_item_text(index)
+
+func _set_selected_key_unit_name(unit_name: String) -> void:
+	var option := _get_key_unit_option()
+	if option == null:
+		return
+	for i in range(option.item_count):
+		if option.get_item_text(i) == unit_name:
+			option.select(i)
+			return
+	option.select(0)
+
 ##IMPORT / EXPORT
 func import(res: PlayerUiRes) -> void: 
 	reload_teams(res.get_teams())
 	_player_name_ui.text = res.get_player_name()
 	name_changed.emit(res.get_player_name())
-	
+	call_deferred("_apply_imported_key_unit", res.get_key_unit_type_name())
+
+func _apply_imported_key_unit(unit_name: String) -> void:
+	_set_selected_key_unit_name(unit_name)
 
 func export() -> PlayerUiRes: 
 	var res = PlayerUiRes.new()
-	res.init(_teams, _player_name_ui.text)
+	res.init(_teams, _player_name_ui.text, _get_selected_key_unit_name())
 	return res
 
 

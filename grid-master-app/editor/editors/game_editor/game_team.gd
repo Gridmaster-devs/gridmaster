@@ -18,6 +18,8 @@ func set_units(new_units: Array) -> void:
 	_units = new_units
 
 func add_unit(unit_name: String) -> void: 
+	if _units.has(unit_name):
+		return
 	_units.append(unit_name)
 	
 func remove_unit(unit_name: String) -> void: 

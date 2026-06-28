@@ -68,6 +68,31 @@ func _reload() -> void:
 func _sync_ui() -> void: 
 	_sync_team_uis()
 	_sync_player_uis()
+	_sync_player_key_units()
+
+func _sync_player_key_units() -> void:
+	for player_ui in _player_uis:
+		_sync_player_key_units_for(player_ui)
+
+func _sync_player_key_units_for(player_ui: PlayerUi) -> void:
+	var team_name: String = player_ui.get_selected_team_name()
+	if team_name == "":
+		player_ui.sync_key_units([])
+	else:
+		player_ui.sync_key_units(_get_team_unit_names(team_name))
+
+func _get_team_unit_names(team_name: String) -> Array:
+	var team_units: Array = []
+	for team_ui in _team_uis:
+		if team_ui.get_team_name() == team_name:
+			team_units = team_ui.get_team_units()
+			break
+	if team_units.is_empty():
+		for team in _teams:
+			if team.get_name() == team_name:
+				team_units = team.get_units()
+				break
+	return _order_unit_names(team_units)
 
 #update map based on map editor
 func _sync_map() -> void:
@@ -157,17 +182,23 @@ func _sync_team_uis() -> void:
 			continue
 		arr.append(unit_name)
 	#sync units
-	for team_ui in _team_uis:
-		team_ui.sync_units(arr)
+	for i in range(_team_uis.size()):
+		_team_uis[i].sync_units(arr)
+		if i < _teams.size():
+			_teams[i].set_units(_team_uis[i].get_team_units())
 
 #players#
 func _add_new_player() -> PlayerUi: 
 	var team_names: Array = []
 	for team in _teams:
 		team_names.append(team.get_name())
-	var new_player_ui: PlayerUi = preload("res://editor/editors/game_editor/player_ui.tscn").instantiate()
+	var new_player_ui: PlayerUi = preload("res://editor/editors/game_editor/player_ui.tscn").instantiate() as PlayerUi
+	if new_player_ui == null:
+		push_error("Failed to instantiate PlayerUi.")
+		return null
 	_players_container.add_child(new_player_ui)
 	new_player_ui.init_teams(team_names)
+	_sync_player_key_units_for(new_player_ui)
 	_player_uis.append(new_player_ui)
 	#signals
 	new_player_ui.team_selected.connect(_on_player_team_selected.bind(new_player_ui))
@@ -217,6 +248,7 @@ func _on_team_name_changed(new_team_name: String, sender: TeamUi) -> void:
 		return
 	_teams[indx].set_name(new_team_name)
 	_sync_player_uis()
+	_sync_player_key_units()
 
 func _on_team_color_changed(new_team_color: Color, sender: TeamUi) -> void: 
 	var indx = _team_uis.find(sender)
@@ -231,6 +263,10 @@ func _on_team_units_changed(new_units: Array, sender: TeamUi) -> void:
 		print("untracked team's signal catched")
 		return
 	_teams[indx].set_units(new_units)
+	var team_name: String = sender.get_team_name()
+	for player_ui in _player_uis:
+		if player_ui.get_selected_team_name() == team_name:
+			_sync_player_key_units_for(player_ui)
 
 #player#
 func _on_player_team_selected(team_name: String, sender: PlayerUi) -> void: 
@@ -241,6 +277,7 @@ func _on_player_team_selected(team_name: String, sender: PlayerUi) -> void:
 	for team in _teams: 
 		if team.get_name() == team_name:
 			_players[indx].set_team(team)
+	_sync_player_key_units_for(sender)
 
 func _on_player_team_unselected(team_name: String, sender: PlayerUi) -> void: 
 	var indx = _player_uis.find(sender)
@@ -249,6 +286,7 @@ func _on_player_team_unselected(team_name: String, sender: PlayerUi) -> void:
 		return
 	if _players[indx].get_team() != null and _players[indx].get_team().get_name() == team_name:
 		_players[indx].set_team(null)
+	_sync_player_key_units_for(sender)
 func _on_player_name_changed(new_player_name: String, sender: PlayerUi) -> void: 
 	var indx = _player_uis.find(sender)
 	if indx == -1 or indx >= _players.size():
@@ -360,6 +398,16 @@ func _get_unit_names() -> Array:
 		var unit_name: String = unit.get_attribute("name").attribute_value
 		data.append(unit_name)
 	return data
+
+func _order_unit_names(unit_names: Array) -> Array:
+	var ordered: Array = []
+	for unit_name in _get_unit_names():
+		if unit_names.has(unit_name) and not ordered.has(unit_name):
+			ordered.append(unit_name)
+	for unit_name in unit_names:
+		if not ordered.has(unit_name):
+			ordered.append(unit_name)
+	return ordered
 
 func _generate_colored_unit_texture(color: Color, unit: Texture2D, alpha_threshold: float = 0.5) -> Texture2D:
 	var img = unit.get_image().duplicate(true)
