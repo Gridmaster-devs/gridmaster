@@ -8,6 +8,7 @@ var player_name : String ## The name of the player
 var player_id : int ## The ID of the player
 var team : Team ## The ID of the team the player is part of
 var computer : bool ## Whether the player is computer or human controlled
+var key_unit_type : UnitType = null ## Losing all living units of this type eliminates the player
 
 # Keeps track of how many of each UnitTypes the player has
 var unit_type_counts: Dictionary[UnitType, int] = {}
