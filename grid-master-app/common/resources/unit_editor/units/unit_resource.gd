@@ -8,7 +8,10 @@ extends Resource
 ## @experimental these aren't anything right now
 @export var actions : Array[Action]
 
-var id: int
+var id: int:
+	get:
+		return get_attribute_value("id")
+	set(v): return
 static var _next_id: int = 0
 
 var name: String:
@@ -21,8 +24,7 @@ var name: String:
 	set(v): return
 	
 func _init():
-	id = _next_id
-	set_attribute("id", id)
+	set_attribute("id", _next_id)
 	_next_id += 1
 
 ## takes an attribute of a certain name and puts its value in the dictionary

@@ -214,3 +214,6 @@ func _init(unit_type : UnitType, unit_id_p : int, player_p : Player, position : 
 	type = unit_type
 	unit_number = player.increment_unit_count(type)
 	initFromUnitType()
+
+func debug_print() -> void:
+	print("Unit ID: ", unit_id, " Type: ", type.unit_name, " Player: ", player.player_id, " Team: ", team.team_id, " Position: ", grid_position, " HP: ", _hp, " Morale: ", _morale)
