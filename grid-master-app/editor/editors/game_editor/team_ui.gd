@@ -90,10 +90,12 @@ func _on_color_picker_texture(tex: Texture2D) -> void:
 func _unit_checked(unit_name: String) -> void:
 	_units[unit_name] = true
 	unit_added.emit(unit_name)
+	units_changed.emit(get_team_units())
 
 func _unit_unchecked(unit_name: String) -> void:
 	_units[unit_name] = false
 	unit_removed.emit(unit_name)
+	units_changed.emit(get_team_units())
 
 ##IMPORT / EXPORT
 func export() -> TeamUiRes: 

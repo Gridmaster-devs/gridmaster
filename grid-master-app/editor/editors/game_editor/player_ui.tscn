@@ -35,4 +35,15 @@ size_flags_horizontal = 3
 layout_mode = 2
 size_flags_vertical = 3
 
+[node name="KeyUnitHBox" type="HBoxContainer" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="2"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/KeyUnitHBox"]
+layout_mode = 2
+text = "Key unit: "
+
+[node name="OptionButton" type="OptionButton" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/KeyUnitHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
 [editable path="EditorPanel"]
