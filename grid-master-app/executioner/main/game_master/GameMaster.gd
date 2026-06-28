@@ -40,6 +40,12 @@ var current_path : Array[Vector2i] = [] # The cumulative path of the unit
 var movement_left : int # How many points of movement the unit still has left
 
 var _unit_information_popup: UnitInformationPopup = null
+var _game_over_popup: GameOverPopup = null
+var _game_over := false
+var _client_player_eliminated := false
+var _eliminated_players: Array[int] = []
+
+const GAME_OVER_POPUP_SCENE := preload("res://executioner/main/game_master/gui_scenes/gui_elements/game_over_popup.tscn")
 
 # ---
 # INFO OVERRIDDEN GODOT ENGINE VIRTUAL METHODS
@@ -69,6 +75,7 @@ func _ready() -> void:
 # TODO Make initial execution path clearer (e.g. who the heck calls this?)
 ## Initializes the data  when a [GameDefinitionResource] is available
 func initGameDataFromGameDefinition(game_definition_resource : GameDefinitionResource) -> void:
+	_reset_game_over_state()
 	
 	#Initialize state
 	data_manager = GameDataManager.initFromGameDefinition(game_definition_resource)
@@ -212,13 +219,17 @@ func load_game_from_file() -> void:
 
 
 func end_turn_local() -> void:
+	if _game_over:
+		return
 	_custom_graphics.clear()
-	#process_end_turn_local()
 	var new_state = process_end_turn_local_builder()
 	data_manager.replace_game_state(new_state)
 	units_changed.emit()
+	_process_post_turn_elimination()
 
 func end_turn() -> void:
+	if _game_over:
+		return
 	if Global.game_type == Global.GameType.SINGLEPLAYER:
 		end_turn_local()
 	elif Global.game_type == Global.GameType.MULTIPLAYER:
@@ -288,6 +299,8 @@ func _on_game_state_received(state_update: Dictionary):
 	switch_gui_scene(IN_GAME_DEFAULT_GUI, data_manager.get_game_name())
 	
 func end_network_game_turn() -> void:
+	if _game_over:
+		return
 	_custom_graphics.clear()
 
 	# Compile locally assigned actions into the queue for server to process
@@ -315,13 +328,140 @@ func end_network_game_turn() -> void:
 
 func _on_turn_ended(state_update: Dictionary):
 	_apply_state_update(state_update)
-	if gui_scene is InGameDefaultGUI:
+	_broadcast_server_messages(state_update)
+	_apply_eliminated_players_from_state(state_update)
+
+	if state_update.get("game_over", false):
+		_finish_game_from_state(state_update)
+		return
+
+	_detect_local_player_elimination(state_update)
+
+	if _should_auto_pass_turn(state_update):
+		_mark_client_player_eliminated()
+		if gui_scene is InGameDefaultGUI:
+			gui_scene.set_eliminated()
+		_auto_pass_turn()
+	elif gui_scene is InGameDefaultGUI:
 		gui_scene.set_turn_active()
-	# Broadcast every message received from the server in order (FIFO).
+
+func _broadcast_server_messages(state_update: Dictionary) -> void:
 	if state_update.keys().has("message_queue"):
 		var message_queue: Array[String] = state_update["message_queue"]
 		for message in message_queue:
 			MessageDispatcher.broadcast_message(message)
+
+func _apply_eliminated_players_from_state(state_update: Dictionary) -> void:
+	if not state_update.has("eliminated_players"):
+		return
+	for player_id in state_update["eliminated_players"]:
+		if not _eliminated_players.has(player_id):
+			_eliminated_players.append(player_id)
+
+func _should_auto_pass_turn(state_update: Dictionary) -> bool:
+	if _game_over:
+		return true
+	if _client_player_eliminated:
+		return true
+	if data_manager == null:
+		return false
+	var my_player_id := data_manager.get_client_player_id()
+	var my_player = data_manager.get_players().get(my_player_id)
+	if my_player == null:
+		return false
+	if state_update.has("eliminated_players") and state_update["eliminated_players"].has(my_player_id):
+		return true
+	return not GameElimination.player_has_key_units(my_player, data_manager.get_units())
+
+func _mark_client_player_eliminated() -> void:
+	if _client_player_eliminated:
+		return
+	_client_player_eliminated = true
+
+func _auto_pass_turn() -> void:
+	if _game_over:
+		return
+	print("[Client] Auto-passing turn (player eliminated or has no key units).")
+	Networking.end_peer_turn.rpc_id(Networking.SERVER_PEER_ID, [])
+	if gui_scene is InGameDefaultGUI:
+		gui_scene.set_waiting()
+
+func _process_post_turn_elimination() -> void:
+	if _game_over or data_manager == null:
+		return
+	var players := data_manager.get_players()
+	var units := data_manager.get_units()
+	for player_id in GameElimination.get_newly_eliminated(players, units, _eliminated_players):
+		_eliminated_players.append(player_id)
+		var player: Player = players[player_id]
+		MessageDispatcher.broadcast_message("%s has been eliminated." % player.player_name)
+		if player_id == data_manager.get_client_player_id():
+			_on_local_player_eliminated()
+	_check_for_victory()
+
+func _on_local_player_eliminated() -> void:
+	if _client_player_eliminated:
+		return
+	_client_player_eliminated = true
+	_display_result_popup("You lost!")
+	if gui_scene is InGameDefaultGUI:
+		gui_scene.set_eliminated()
+
+func _check_for_victory() -> void:
+	if _game_over or data_manager == null:
+		return
+	var players := data_manager.get_players()
+	var units := data_manager.get_units()
+	var winner_id := GameElimination.get_winner_player_id(players, units, _eliminated_players)
+	if winner_id < 0:
+		if GameElimination.get_players_with_key_units(players, units, _eliminated_players).is_empty():
+			_end_game("Draw!")
+		return
+	var winner: Player = players[winner_id]
+	MessageDispatcher.broadcast_message("%s wins!" % winner.player_name)
+	if winner_id == data_manager.get_client_player_id():
+		_end_game("You won!")
+	else:
+		_end_game("You lost!")
+
+func _detect_local_player_elimination(_state_update: Dictionary) -> void:
+	if _client_player_eliminated:
+		return
+	if _eliminated_players.has(data_manager.get_client_player_id()):
+		_on_local_player_eliminated()
+
+func _finish_game_from_state(state_update: Dictionary) -> void:
+	var my_player_id := data_manager.get_client_player_id()
+	var winner_id: int = state_update.get("winner_player_id", -1)
+	if winner_id == my_player_id:
+		_end_game("You won!")
+	elif _eliminated_players.has(my_player_id) or state_update.get("eliminated_players", []).has(my_player_id):
+		if not _client_player_eliminated:
+			_on_local_player_eliminated()
+		_end_game("You lost!", false)
+	else:
+		_end_game("Game over.")
+
+func _end_game(message: String, show_popup: bool = true) -> void:
+	_game_over = true
+	if show_popup:
+		_display_result_popup(message)
+	if gui_scene is InGameDefaultGUI:
+		gui_scene.set_game_over()
+
+func _display_result_popup(message: String) -> void:
+	if _game_over_popup != null:
+		_game_over_popup.remove_from_tree()
+	_game_over_popup = GAME_OVER_POPUP_SCENE.instantiate()
+	_game_over_popup.show_result(message)
+
+func _reset_game_over_state() -> void:
+	_game_over = false
+	_client_player_eliminated = false
+	_eliminated_players.clear()
+	if _game_over_popup != null:
+		_game_over_popup.remove_from_tree()
+		_game_over_popup = null
 
 func _apply_state_update(state_update: Dictionary) -> void:
 	# Create units from the dictionary
@@ -364,6 +504,8 @@ func _apply_state_update(state_update: Dictionary) -> void:
 ## Called by the graphics element or its children via a group.
 ## Calls the appropriate input handler based on the UI state.
 func receive_ui_event(event : StateMachineEvent):
+	if _game_over or _client_player_eliminated:
+		return
 	
 	if (event is MouseMovedToTileEvent):
 		_custom_graphics.draw_tile_cursor(event.new_pos)
