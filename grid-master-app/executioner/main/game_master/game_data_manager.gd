@@ -59,8 +59,12 @@ static func initFromGameDefinition(game_definition_resource : GameDefinitionReso
 				player_team = t_name
 		if player_team == null:
 			continue
+		var key_unit_type: UnitType = null
+		var key_unit_name := player.get_key_unit_type_name()
+		if key_unit_name != "" and unit_name_type_dict.has(key_unit_name):
+			key_unit_type = new_game_definition.unit_types[unit_name_type_dict[key_unit_name]]
 		#add the player 
-		var p_id = new_game_definition.add_player(player_name, team_id_dict[player_team], false)
+		var p_id = new_game_definition.add_player(player_name, team_id_dict[player_team], false, key_unit_type)
 		player_name_id_dict[player_name] = p_id
 		#add the client player as the first one
 		if !client_player_added: 

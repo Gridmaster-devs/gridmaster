@@ -46,9 +46,11 @@ func add_team(team_name : String, color : Color, team_units : Array[UnitType]) -
 
 
 ## Adds a player to the game.
-func add_player(player_name : String, team_id : int, computer : bool) -> int:
+func add_player(player_name : String, team_id : int, computer : bool, key_unit_type: UnitType = null) -> int:
 	var player_id = get_new_player_id()
-	players.set(player_id, Player.new(player_name, player_id, teams.get(team_id), computer))
+	var player = Player.new(player_name, player_id, teams.get(team_id), computer)
+	player.key_unit_type = key_unit_type
+	players.set(player_id, player)
 	return player_id
 
 
