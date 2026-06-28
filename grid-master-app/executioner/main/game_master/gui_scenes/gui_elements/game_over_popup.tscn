@@ -1,0 +1,29 @@
+[gd_scene load_steps=3 format=3 uid="uid://cgameoverpopup01"]
+
+[ext_resource type="Script" path="res://executioner/main/game_master/gui_scenes/gui_elements/game_over_popup.gd" id="1_popup"]
+[ext_resource type="PackedScene" uid="uid://duyxluc3ja031" path="res://editor/editors/common/editor_panel/EditorPanel.tscn" id="2_panel"]
+
+[node name="GameOverPopup" type="Control"]
+layout_mode = 3
+anchor_right = 0.2
+anchor_bottom = 0.1
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_popup")
+
+[node name="EditorPanel" parent="." instance=ExtResource("2_panel")]
+layout_mode = 1
+section_headers = Array[String](["HBoxContainer"])
+
+[node name="TopLabel" parent="EditorPanel/TopVBox" index="0"]
+text = "Game Over"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="0"]
+layout_mode = 2
+
+[node name="Ok" type="Button" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "OK"
+
+[editable path="EditorPanel"]
