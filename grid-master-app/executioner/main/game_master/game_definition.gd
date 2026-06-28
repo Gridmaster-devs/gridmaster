@@ -35,7 +35,6 @@ func initUnitTypesFromResource(game_definition : GameDefinitionResource,
 		var cur_unit_type = UnitType.initFromUnitResource(unit)
 		unit_types.set(cur_unit_type.type_id, cur_unit_type)
 		unit_name_type_dict[ cur_unit_type.unit_name] = cur_unit_type.type_id
-		print(cur_unit_type.type_id)
 	for unit_type in unit_types.values():
 		unit_type.populate_producible_units(unit_types)
 		

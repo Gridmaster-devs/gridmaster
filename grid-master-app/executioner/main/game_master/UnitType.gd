@@ -57,7 +57,7 @@ var texture : Texture2D ## Texture used to draw the unit
 # These are used for production units and units that can be produced
 var is_production_unit: bool = false
 var producible_units: Array[UnitType] = []
-var producible_units_ids: Array[int] = []
+var producible_units_ids: Array = []
 var is_producible_unit: bool = false
 var production_cost: int = 1
 
@@ -100,6 +100,7 @@ static func initFromUnitResource(unit_resource : UnitResource) -> UnitType:
 	unit_type.is_producible_unit = unit_resource.get_attribute_value("is_producible_unit")
 	unit_type.production_cost = unit_resource.get_attribute_value("production_cost")
 	var producible_units_from_resource = unit_resource.get_attribute_value("producible_units")
+	print(producible_units_from_resource)
 	if producible_units_from_resource != null and producible_units_from_resource != []:
 		unit_type.producible_units_ids = producible_units_from_resource
 	
@@ -107,7 +108,7 @@ static func initFromUnitResource(unit_resource : UnitResource) -> UnitType:
 		if (key == "name" or key == "description" or key == "texture" or key == "is_production_unit" 
 			or key == "is_producible_unit" or key == "production_cost" or key == "producible_units" or key == "id"):
 			continue
-			
+
 		var value = unit_resource.get_attribute_value(key)
 		
 		assert(value != null, "Attribute %s value in unit resource should not be null!" % key)
@@ -126,7 +127,7 @@ func populate_producible_units(unit_types_dict: Dictionary[int, UnitType]) -> vo
 		if unit_types_dict.has(unit_id):
 			producible_units.append(unit_types_dict[unit_id])
 		else:
-			push_error("UnitType with ID %d not found in unit_types_dict!" % unit_id)
+			print("UnitType with ID %d not found in unit_types_dict!" % unit_id)
 
 static func debugType() -> UnitType:
 	var type = UnitType.new()
