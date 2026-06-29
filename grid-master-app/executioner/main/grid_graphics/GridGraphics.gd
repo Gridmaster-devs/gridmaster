@@ -96,7 +96,6 @@ func _clearUnits():
 func _getUnits():
 	if (_game_data_provider != null):
 		var units = _game_data_provider.get_visible_units()
-		#var units = _game_data_provider._game_state.getUnits()
 		if (!units.is_empty()):
 			_clearUnits()
 			for unit : Unit in units:

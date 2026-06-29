@@ -100,7 +100,6 @@ static func initFromUnitResource(unit_resource : UnitResource) -> UnitType:
 	unit_type.is_producible_unit = unit_resource.get_attribute_value("is_producible_unit")
 	unit_type.production_cost = unit_resource.get_attribute_value("production_cost")
 	var producible_units_from_resource = unit_resource.get_attribute_value("producible_units")
-	print(producible_units_from_resource)
 	if producible_units_from_resource != null and producible_units_from_resource != []:
 		unit_type.producible_units_ids = producible_units_from_resource
 	
