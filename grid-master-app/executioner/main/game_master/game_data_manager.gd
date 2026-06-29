@@ -136,8 +136,6 @@ func get_visible_units() -> Array[Unit]:
 	var client_team_id: int = client_player.team.team_id
 	# Goes over each unit in the game and checks whther the client player sees it or not
 	for unit in _game_state.getUnits():
-		print(unit.type.producible_units_ids)
-	for unit in _game_state.getUnits():
 		var unit_team_id: int = unit.get_team_id()
 		
 		# Always sees units on the same team

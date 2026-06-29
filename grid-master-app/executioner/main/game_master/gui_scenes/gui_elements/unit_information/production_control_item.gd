@@ -12,9 +12,9 @@ var _unit_options: Array[UnitType]
 var _game_data_manager: GameDataManager
 
 # Setups the optionbutton and the produce
-func setup(unit: Unit, game_data_manager: GameDataManager):
+func setup(unitID: int, game_data_manager: GameDataManager):
 	_selector.clear()
-	_unit = unit
+	_unit = game_data_manager.get_unit_by_id(unitID)
 	_unit_options = _unit.type.producible_units
 	_game_data_manager = game_data_manager
 	
