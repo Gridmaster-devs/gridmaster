@@ -315,6 +315,15 @@ func end_network_game_turn() -> void:
 					"player_id": action.player_id,
 					"unit_id": action.unit.getId()
 				})
+			if action is ProductionAction:
+				# Only send production actions to the server if they are just starting. Otherwise, the server will handle the turn countdown.
+				if action.remaining_turns == action.producible_unit.production_cost:
+					outgoing_actions.append({
+						"type": "ProductionAction",
+						"player_id": action.player_id,
+						"unit_id": action.unit.getId(),
+						"producible_unit_id": action.producible_unit.type_id,
+					})
 			# TODO: Implement other actions as well in addition to the MoveAction..
 
 	print("[Client] Packing end_turn actions. Checked %d units. Found %d valid actions for player %d." % [data_manager.get_units().size(), outgoing_actions.size(), data_manager.get_client_player_id()])
@@ -488,8 +497,16 @@ func _apply_state_update(state_update: Dictionary) -> void:
 					data_manager.move_unit(unit.getId(), u_state["position"])
 				if u_state.has("hp"):
 					unit._hp = u_state["hp"]
-				unit.current_action = null
-
+				# Don't clear the action if it's an unfinished production action because this is used for UI checks.
+				# TODO: This isn't the most robust solution. Rethink how actions that carry over turns are handled in the future.
+				if unit.current_action is ProductionAction:
+					unit.current_action.remaining_turns -= 1
+					if unit.current_action.remaining_turns == 0:
+						unit.current_action = null
+				else:
+					unit.current_action = null
+			else:	
+				data_manager.addUnitWithId(data_manager.get_unit_type_by_id(u_state["type_id"]), u_state["position"], data_manager.get_player_by_id(u_state["player_id"]), unit_id)
 		units_changed.emit()
 		# NOTE: most likely redundant call. Left since there is small possibility
 		#		that some functions might change it in between calls to this function?

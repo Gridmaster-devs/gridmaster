@@ -82,6 +82,8 @@ func getGridWidth() -> int:
 func getGridHeight() -> int: 
 	return grid.getWidth()
 
+func get_unit_type_by_id(id: int) -> UnitType:
+	return unit_types[id]
 
 # ---
 # INFO DEBUG methods

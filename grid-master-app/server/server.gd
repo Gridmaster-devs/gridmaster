@@ -176,7 +176,9 @@ func _create_state_update_dict() -> Dictionary:
 		units_state.append({
 			"id": unit.getId(),
 			"position": unit.grid_position,
-			"hp": unit.hp
+			"hp": unit.hp,
+			"player_id": unit.player.player_id,
+			"type_id": unit.type.type_id
 		})
 	return {
 		"turn_number": server_state.data_manager.get_turn_number(),
@@ -211,26 +213,42 @@ func _on_team_turn_end(peer_id: int, action_queue: Array) -> void:
 
 			if typeof(action_queue) == TYPE_ARRAY:
 				for dict_action in action_queue:
-					if typeof(dict_action) == TYPE_DICTIONARY and dict_action.get("path") != null and dict_action.get("unit_id") != null:
+					if typeof(dict_action) == TYPE_DICTIONARY != null and dict_action.get("unit_id") != null:
 						var unit_id = dict_action.get("unit_id")
 						var real_unit = server_state.data_manager.get_unit_by_id(unit_id)
 
 						GML.log("Action queued for unit_id: %d (player %d)" % [unit_id, peer_id], GML.LogLevel.INFO)
 
+						# Use team id instead of player id
 						if real_unit != null and real_unit.get_team_id() == player_team.team_id:
-							var path_raw = dict_action.get("path")
-							var typed_path: Array[Vector2i] = []
-							for p in path_raw:
-								typed_path.append(p)
+							if dict_action.get("type") == "MoveAction" and dict_action.get("path") != null:
+								var path_raw = dict_action.get("path")
+								var typed_path: Array[Vector2i] = []
+								for p in path_raw:
+									typed_path.append(p)
 
-							GML.log("Resolving path %s for unit %d" % [typed_path, unit_id], GML.LogLevel.INFO)
+								GML.log("Resolving path %s for unit %d" % [typed_path, unit_id], GML.LogLevel.INFO)
 
-							real_unit.current_action = MoveAction.new(
-								typed_path,
-								peer_id,
-								real_unit,
-								server_state.data_manager
-							)
+								## Create actions for units.
+								# MoveAction
+								real_unit.current_action = MoveAction.new(
+									typed_path,
+									peer_id,  # Seems that this is not used, so shouldn't matter even if we move units as teams and not as players.
+									real_unit,
+									server_state.data_manager
+								)
+							elif dict_action.get("type") == "ProductionAction":
+								GML.log("Processing ProductionAction", GML.LogLevel.INFO)
+								if real_unit.current_action == null:
+									var producible_unit_id = dict_action.get("producible_unit_id")
+									var producible_unit = server_state.data_manager.get_unit_type_by_id(producible_unit_id)
+									if producible_unit != null:
+										real_unit.current_action = ProductionAction.new(
+											peer_id,
+											real_unit,
+											server_state.data_manager,
+											producible_unit
+										)
 						elif !real_unit:
 							GML.log("Could not find unit with id %d" % unit_id, GML.LogLevel.ERROR)
 						else:
@@ -283,11 +301,23 @@ func _on_team_turn_end(peer_id: int, action_queue: Array) -> void:
 	# Check for eliminated players (no key units left) and victory.
 	server_state.process_eliminations_and_victory()
 
+	# Go through other actions. Only production actions at this time
+	for unit : Unit in unit_array:
+		if unit.current_action is ProductionAction:
+			(unit.current_action as ProductionAction).handle_turn()
+
 	## Clear turn related information and increment the turn number
 	# Clear actions
 	for unit : Unit in unit_array:
-		unit.current_action = null
+		if unit.current_action is ProductionAction:
+			if unit.current_action.finished:
+				unit.current_action = null
+		else:
+			unit.current_action = null
+	
 	server_state.data_manager.increment_turn_number()
+
+	GML.log("Turn completed. Server state has %d units." % server_state.data_manager.get_units().values().size(), GML.LogLevel.INFO)
 
 	# Send the state update dict to all the clients.
 	Networking.end_turn.rpc(_create_state_update_dict())

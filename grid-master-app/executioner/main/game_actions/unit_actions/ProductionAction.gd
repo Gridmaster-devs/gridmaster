@@ -17,9 +17,11 @@ func handle_turn():
 	
 	if remaining_turns == 0:
 		_finish_production()
+		GML.log("[Unit %s] finished producing [%s]" % [unit.unit_id, producible_unit.unit_name], GML.LogLevel.DEBUG)
 	else:
 		MessageDispatcher.broadcast_message("[Unit %s] producing [%s] (%s turns remaining)" % [unit.unit_id,
 		producible_unit.unit_name, remaining_turns])
+		GML.log("[Unit %s] producing [%s] (%s turns remaining)" % [unit.unit_id, producible_unit.unit_name, remaining_turns], GML.LogLevel.DEBUG)
 
 
 # Finishes production of the unit and places it on the map
@@ -65,8 +67,8 @@ func _is_valid_spawn_pos(pos: Vector2i) -> bool:
 # Helper function to the check if given tile position is free of units
 func _is_tile_free(pos: Vector2i) -> bool:
 	var units: Array[Unit] = _game_data_provider.get_game_state().getUnits()
-	for unit in units:
-		if unit.getPosition() == pos:
+	for unit_l in units:
+		if unit_l.getPosition() == pos:
 			return false
 	
 	return true
