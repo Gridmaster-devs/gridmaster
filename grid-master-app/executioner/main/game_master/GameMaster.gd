@@ -175,8 +175,8 @@ func process_end_turn_local_builder() -> GameState:
 		# We can't erase units while iterating over the array or it will break
 		for unit : Unit in unit_array:
 			if (unit.is_dead()):
-				units_to_be_removed.append(unit)
-		
+				units_to_be_removed.append(unit)		
+
 		# NOTE: Possible to improve efficiency by using indices of the units in the
 		# unit array so that it doesn't have to search for the position each time
 		for unit in units_to_be_removed:
@@ -214,7 +214,8 @@ func load_game_from_file() -> void:
 func end_turn_local() -> void:
 	_custom_graphics.clear()
 	#process_end_turn_local()
-	data_manager.replace_game_state(process_end_turn_local_builder())
+	var new_state = process_end_turn_local_builder()
+	data_manager.replace_game_state(new_state)
 	units_changed.emit()
 
 func end_turn() -> void:

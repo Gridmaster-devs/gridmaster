@@ -702,47 +702,12 @@ internal_array = [Dictionary[String, Variant]({}), Dictionary[String, Variant]({
 "team": "Team1",
 "unit": "Production Unit",
 "unit_texture": SubResource("ImageTexture_cikyb")
-}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({
+}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({
 "player": "Player2",
 "team": "Team2",
 "unit": "Production Unit",
 "unit_texture": SubResource("ImageTexture_cikyb")
-}), Dictionary[String, Variant]({
-"player": "Player2",
-"team": "Team2",
-"unit": "Production Unit",
-"unit_texture": SubResource("ImageTexture_cikyb")
-}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({
-"player": "Player2",
-"team": "Team2",
-"unit": "Production Unit",
-"unit_texture": SubResource("ImageTexture_cikyb")
-}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({
-"player": "Player2",
-"team": "Team2",
-"unit": "Production Unit",
-"unit_texture": SubResource("ImageTexture_cikyb")
-}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({
-"player": "Player2",
-"team": "Team2",
-"unit": "Production Unit",
-"unit_texture": SubResource("ImageTexture_cikyb")
-}), Dictionary[String, Variant]({
-"player": "Player2",
-"team": "Team2",
-"unit": "Production Unit",
-"unit_texture": SubResource("ImageTexture_cikyb")
-}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({
-"player": "Player2",
-"team": "Team2",
-"unit": "Production Unit",
-"unit_texture": SubResource("ImageTexture_cikyb")
-}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({
-"player": "Player2",
-"team": "Team2",
-"unit": "Production Unit",
-"unit_texture": SubResource("ImageTexture_cikyb")
-}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({})]
+}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({}), Dictionary[String, Variant]({})]
 width = 10
 height = 10
 
@@ -796,7 +761,7 @@ attribute_value = 0.0
 script = ExtResource("9_ulw76")
 attribute_name = "health"
 type = 2
-attribute_value = 0.0
+attribute_value = 10.0
 
 [sub_resource type="Resource" id="Resource_xnbgx"]
 script = ExtResource("9_ulw76")
@@ -824,7 +789,7 @@ attribute_value = 0.0
 script = ExtResource("9_ulw76")
 attribute_name = "movement_speed"
 type = 2
-attribute_value = 0.0
+attribute_value = 1.0
 
 [sub_resource type="Resource" id="Resource_1nl23"]
 script = ExtResource("9_ulw76")
@@ -960,7 +925,7 @@ attribute_value = 0.0
 script = ExtResource("9_ulw76")
 attribute_name = "health"
 type = 2
-attribute_value = 0.0
+attribute_value = 10.0
 
 [sub_resource type="Resource" id="Resource_ob3io"]
 script = ExtResource("9_ulw76")
@@ -988,7 +953,7 @@ attribute_value = 0.0
 script = ExtResource("9_ulw76")
 attribute_name = "movement_speed"
 type = 2
-attribute_value = 0.0
+attribute_value = 2.0
 
 [sub_resource type="Resource" id="Resource_xl3cg"]
 script = ExtResource("9_ulw76")
