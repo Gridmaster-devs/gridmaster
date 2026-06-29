@@ -326,14 +326,14 @@ func end_network_game_turn() -> void:
 					})
 			# TODO: Implement other actions as well in addition to the MoveAction..
 
-	print("[Client] Packing end_turn actions. Checked %d units. Found %d valid actions for player %d." % [data_manager.get_units().size(), outgoing_actions.size(), data_manager.get_client_player_id()])
+	GML.log("[Client] Packing end_turn actions. Checked %d units. Found %d valid actions for player %d." % [data_manager.get_units().size(), outgoing_actions.size(), data_manager.get_client_player_id()], GML.LogLevel.DEBUG)
 
 	Networking.end_peer_turn.rpc_id(Networking.SERVER_PEER_ID, outgoing_actions)
 
 	if gui_scene is InGameDefaultGUI:
 		gui_scene.set_waiting()
 
-	print("[Client] Turn ended, waiting for server...")
+	GML.log("[Client] Turn ended, waiting for server...", GML.LogLevel.DEBUG)
 
 func _on_turn_ended(state_update: Dictionary):
 	_apply_state_update(state_update)

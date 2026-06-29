@@ -48,11 +48,11 @@ func set_unit_info(unit: Unit, game_data_manager: GameDataManager) -> void:
 			_data_information_item_map[attribute_name] = information_item
 	
 	# Add the production_control_item if the unit is a production unit
-	if unit.type.is_production_unit and unit.current_action == null:
+	if unit.type.is_production_unit and game_data_manager.get_unit_by_id(unit.getId()).current_action == null:
 		var item: ProductionControlItem = production_control_item.instantiate()
 		_contents.add_child(item)
 		item.custom_minimum_size = Vector2(0, 100)
-		item.setup(unit, game_data_manager)
+		item.setup(unit.getId(), game_data_manager)
 		item.production_selected.connect(_on_production_selected)
 
 func _on_production_selected():
