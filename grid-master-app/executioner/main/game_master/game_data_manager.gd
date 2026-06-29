@@ -110,6 +110,9 @@ func get_teams() -> Dictionary[int, Team]:
 	
 func get_players() -> Dictionary[int, Player]:
 	return _game_definition.players
+
+func get_player_by_id(player_id: int) -> Player:
+	return _game_definition.get_player_by_id(player_id)
 	
 func get_client_player_id() -> int:
 	return _client_attributes.client_player_id
@@ -150,6 +153,9 @@ func get_unit_by_position_nullable(pos: Vector2i) -> Unit:
 	
 func get_unit_by_id(id: int) -> Unit:
 	return _game_state.get_unit_by_id(id)
+
+func get_unit_type_by_id(id: int) -> UnitType:
+	return _game_definition.get_unit_type_by_id(id)
 
 func get_grid() -> GameGrid:
 	return _game_definition.grid
@@ -196,3 +202,6 @@ func remove_unit(unit: Unit) -> void:
 
 func add_unit(unit_type : UnitType, position : Vector2i, player : Player) -> void:
 	_game_state.addUnit(unit_type, position, player)
+
+func addUnitWithId(unit_type: UnitType, position : Vector2i, player_p: Player, unit_id_p: int) -> void:
+	_game_state.addUnitWithId(unit_type, position, player_p, unit_id_p)
