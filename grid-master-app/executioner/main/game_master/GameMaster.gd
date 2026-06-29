@@ -493,8 +493,9 @@ func _handle_event_default_in_game(event : StateMachineEvent):
 			
 			var unit = data_manager.get_unit_by_position_nullable(event.grid_pos)
 			
-			if unit == null or moved_unit == unit: 
-				_unit_information_popup.remove_from_tree()
+			if (unit == null or moved_unit == unit):
+				if _unit_information_popup != null: 
+					_unit_information_popup.remove_from_tree()
 				moved_unit = null
 				return 
 			
