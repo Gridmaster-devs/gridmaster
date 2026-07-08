@@ -66,7 +66,7 @@ func create_strategic_painter() -> MapPainter:
 								MapAttributes.STRATEGIC_TACTICAL_LIB_ADD, 
 								MapAttributes.STRATEGIC_TACTICAL_LIB_TEXTURE_ID, 
 								MapAttributes.STRATEGIC_TACTICAL_LIB_ITEM_ID, base_layer_id, true,
-								true, _change_map_mode)
+								true, true, _change_map_mode)
 	return _painter
 
 #changes the painter active

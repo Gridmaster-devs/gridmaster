@@ -133,7 +133,7 @@ func _sync_player_libraries() -> void:
 		else: 
 			_unit_painter.add_library(player_name, MapAttributes.UNIT_UNIT_LIB_OVERWRITE, MapAttributes.UNIT_UNIT_LIB_ADD,
 									MapAttributes.UNIT_UNIT_LIB_TEXTURE_ID,
-									MapAttributes.UNIT_UNIT_LIB_ITEM_ID, _unit_layer_id, false, true)
+									MapAttributes.UNIT_UNIT_LIB_ITEM_ID, _unit_layer_id, false, true, false)
 			_unit_painter.sync_library(player_lib_data, player_name)
 		new_lib_names.append(player_name)
 	#remove libs that are in the painter but not in teams
