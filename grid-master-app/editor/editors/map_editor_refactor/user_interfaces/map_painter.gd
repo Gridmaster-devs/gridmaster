@@ -166,13 +166,13 @@ func add_new_lib_item(data: Dictionary[String, Variant], lib_name: String):
 #adds a new library to the map painter (look up PaintLibrary)
 func add_library(lib_name: String, overwrite_data: Dictionary[String, Variant], 
 				addable_data: Dictionary[String, Variant], preview_texture_id: String, name_id: String, layer_id: int,
-				new_button: bool = false, highlight: bool = false, lib_new_button_callback: Callable = Callable()) -> void: 
+				new_button: bool = false, highlight: bool = false, sync_tiles: bool = true, lib_new_button_callback: Callable = Callable()) -> void: 
 	var _tile_library: PaintLibrary = preload("res://editor/editors/map_editor_refactor/user_interfaces/paint_library/paint_library.tscn").instantiate()
 	_content_vbox.add_child(_tile_library)
 	##CAN USE AFTER ADDED TO TREE
 	#init the library
 	_tile_library.init(lib_name, preview_texture_id, name_id, 
-						overwrite_data, addable_data, layer_id, new_button, highlight, lib_new_button_callback)
+						overwrite_data, addable_data, layer_id, new_button, highlight, lib_new_button_callback, sync_tiles)
 	#add the library to the library map, so we can refrence it later
 	_paint_libraries[lib_name] = (_tile_library)
 	#connect library signals
@@ -213,8 +213,9 @@ func sync_library(data: Array, lib_name: String) -> void:
 		var data_item_indx = _find_dictionary_item(data, item_id, item[item_id])
 		if data_item_indx == -1:
 			to_be_removed.append(item)
-		else: 
-			layers[layer_id].sync_attributes(data[data_item_indx], item_id, item[item_id])
+		else:
+			if _paint_libraries[lib_name].get_sync_tiles():
+				layers[layer_id].sync_attributes(data[data_item_indx], item_id, item[item_id])
 			_lib_items_data[lib_name][item_indx] = data[data_item_indx]
 			#sync_lib_item(lib_name, item_id, item[item_id], layer_id)
 	for item in to_be_removed: 

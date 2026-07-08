@@ -33,12 +33,14 @@ var _layer_id: int
 #tracking which item is active
 var _cur_item_data: Dictionary
 
+var _sync_tiles: bool
+
 
 
 func init(lib_name: String, preview_texture_id: String, item_id: String,
 				overwrite_data: Dictionary[String, Variant], addable_data: Dictionary[String, Variant], 
 				layer_id: int, new_button: bool = false, highlight: bool = false, 
-				new_button_callback: Callable = Callable()) -> void: 
+				new_button_callback: Callable = Callable(), sync_tiles: bool = true) -> void: 
 	if !new_button: 
 		_new_button_container.visible = false
 	_highlight = highlight
@@ -48,6 +50,7 @@ func init(lib_name: String, preview_texture_id: String, item_id: String,
 	_overwrite_data = overwrite_data
 	_addable_data = addable_data
 	_layer_id = layer_id
+	_sync_tiles = sync_tiles
 	
 	#Ui
 	_name_ui.text = " " + _name
@@ -132,6 +135,9 @@ func get_item_id() -> String:
 
 func get_layer_id() -> int: 
 	return _layer_id
+
+func get_sync_tiles() -> bool: 
+	return _sync_tiles
 
 func _open_remove_confirm_popup() -> void: 
 	var confirm_popup: ConfirmPopup = preload("res://common/popups/confirm_popup.tscn").instantiate()
