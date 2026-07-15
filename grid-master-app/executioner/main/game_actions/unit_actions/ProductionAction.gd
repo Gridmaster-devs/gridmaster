@@ -11,6 +11,11 @@ var remaining_turns: int
 # Whether the action is finished
 var finished: bool = false
 
+## Progress of the production in percentage (0.0 to 1.0)
+var progress: float:
+	get:
+		return (1.0 - float(remaining_turns) / float(producible_unit.production_cost))
+
 # The main function which is called every turn and produces a unit at the end
 func handle_turn():
 	remaining_turns -= 1

@@ -1,0 +1,20 @@
+[gd_scene load_steps=2 format=3 uid="uid://djaouu8qyusdl"]
+
+[ext_resource type="Script" uid="uid://cb6tlwuu66lgg" path="res://executioner/main/game_master/gui_scenes/gui_elements/unit_information/production_progress_item.gd" id="1_gc071"]
+
+[node name="ProductionProgressItem" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_gc071")
+
+[node name="Producing Unit" type="Label" parent="."]
+layout_mode = 2
+text = "Producing unit"
+
+[node name="ProgressBar" type="ProgressBar" parent="."]
+custom_minimum_size = Vector2(0, 25)
+layout_mode = 2
+show_percentage = false
