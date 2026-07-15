@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://dmbjttupvttm8"]
+[gd_scene load_steps=2 format=3 uid="uid://c2hdc03xvn5ei"]
 
 [ext_resource type="Script" uid="uid://7gdmoyjq6qpa" path="res://executioner/main/game_master/gui_scenes/gui_elements/unit_information/production_control_item.gd" id="1_c8ubc"]
 

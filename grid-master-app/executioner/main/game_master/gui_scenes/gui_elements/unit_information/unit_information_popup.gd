@@ -9,6 +9,7 @@ var _data_information_item_map: Dictionary[String, UnitInformationItem]
 
 @onready var unit_info_item = preload("res://executioner/main/game_master/gui_scenes/gui_elements/unit_information/unit_information_item.tscn")
 @onready var production_control_item = preload("res://executioner/main/game_master/gui_scenes/gui_elements/unit_information/production_control_item.tscn")
+@onready var production_progress_item = preload("res://executioner/main/game_master/gui_scenes/gui_elements/unit_information/production_progress_item.tscn")
 
 func _init() -> void: 
 	super.set_popup_name("unit information popup")
@@ -47,13 +48,22 @@ func set_unit_info(unit: Unit, game_data_manager: GameDataManager) -> void:
 			information_item.set_information(attribute_name, str(attribute_value))
 			_data_information_item_map[attribute_name] = information_item
 	
-	# Add the production_control_item if the unit is a production unit
-	if unit.type.is_production_unit and game_data_manager.get_unit_by_id(unit.getId()).current_action == null:
-		var item: ProductionControlItem = production_control_item.instantiate()
-		_contents.add_child(item)
-		item.custom_minimum_size = Vector2(0, 100)
-		item.setup(unit.getId(), game_data_manager)
-		item.production_selected.connect(_on_production_selected)
+	
+	if unit.type.is_production_unit:
+		# Add the production_control_item if the unit is a production unit 
+		if game_data_manager.get_unit_by_id(unit.getId()).current_action == null:
+			var item: ProductionControlItem = production_control_item.instantiate()
+			_contents.add_child(item)
+			item.custom_minimum_size = Vector2(0, 100)
+			item.setup(unit.getId(), game_data_manager)
+			item.production_selected.connect(_on_production_selected)
+		# Add the production_progress_item if the unit is currently producing something
+		elif game_data_manager.get_unit_by_id(unit.getId()).current_action is ProductionAction:
+			var item: ProductionProgressItem = production_progress_item.instantiate()
+			item.init_params(game_data_manager.get_unit_by_id(unit.getId()).current_action.progress * 100.0, game_data_manager.get_unit_by_id(unit.getId()).current_action.producible_unit.unit_name)
+			_contents.add_child(item)
+			#item.custom_minimum_size = Vector2(0, 100)
+	
 
 func _on_production_selected():
 	hide()
