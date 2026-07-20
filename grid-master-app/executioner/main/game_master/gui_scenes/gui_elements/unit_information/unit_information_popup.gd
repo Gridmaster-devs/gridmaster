@@ -23,6 +23,12 @@ func set_unit_info(unit: Unit, game_data_manager: GameDataManager) -> void:
 	_contents.add_child(name_item)
 	name_item.set_information("Name", unit.get_unit_name())
 	_data_information_item_map["Name"] = name_item
+
+	var is_key_unit := unit.player.key_unit_type != null and unit.type.unit_name == unit.player.key_unit_type.unit_name
+	var key_unit_item: UnitInformationItem = unit_info_item.instantiate()
+	_contents.add_child(key_unit_item)
+	key_unit_item.set_information("Key unit", "Yes" if is_key_unit else "No")
+	_data_information_item_map["Key unit"] = key_unit_item
 	
 	var unit_type_attribute_names = unit.type.attribute_conversion_table.keys()
 	
