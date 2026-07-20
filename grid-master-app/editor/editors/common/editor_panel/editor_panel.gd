@@ -6,6 +6,8 @@ extends PanelContainer
 ## The tool script allows one to easily add, remove, and reorder subheaders
 ## of the panel, as well as change the name of the panel.
 
+signal close_button_pressed
+
 ## The title of the panel.
 @export var title : String
 
@@ -15,9 +17,15 @@ extends PanelContainer
 @export var section_headers : Array[String]
 @export_group("")
 
+@export var has_close_button: bool = false
+
 @export_category("Update")
 ## The action triggered by the "Update Panel" button in the Inspector panel.
 @export_tool_button("Update Panel", "Callable") var update_action : Callable = update_panel
+
+@onready var header_node = $TopVBox/TopLabel
+
+var close_button_scene = preload("res://editor/editors/common/editor_panel/editor_panel_close_button.tscn")
 
 ## A dictionary storing the subheader nodes by their display text.
 var sub_sections : Dictionary[String, Node] = {}
@@ -61,6 +69,9 @@ func update_headers():
 		var removed = content_box.get_child(i)
 		sub_sections.erase(removed.name)
 		content_box.remove_child(removed)
+		
+func _on_close_button_pressed():
+	close_button_pressed.emit()
 
 # Called on loading the scene tree (or when the node enters the scene tree).
 # Gives the panel its pre-existing subheaders, as var sub_sections is reset between
@@ -73,3 +84,7 @@ func _ready() -> void:
 		section_headers.append(header.name)
 		sub_sections.get_or_add(header.name, header)
 		print("Added header " + header.name)
+	if has_close_button:
+		var close_button = close_button_scene.instantiate()
+		header_node.add_child(close_button)
+		close_button.pressed.connect(_on_close_button_pressed)

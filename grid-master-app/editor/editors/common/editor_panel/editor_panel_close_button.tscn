@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://bmjecrser1emm"]
+
+[ext_resource type="Texture2D" uid="uid://bker1bfyjcbb6" path="res://assets/mdi--remove-bold.svg" id="1_p33yl"]
+
+[sub_resource type="GDScript" id="GDScript_p33yl"]
+script/source = "extends Button
+"
+
+[node name="Button" type="Button"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -25.0
+offset_bottom = 25.0
+grow_horizontal = 0
+icon = ExtResource("1_p33yl")
+flat = true
+expand_icon = true
+script = SubResource("GDScript_p33yl")

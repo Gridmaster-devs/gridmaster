@@ -5,6 +5,7 @@ const KEY_UNIT_OPTION_PATH := "EditorPanel/TopVBox/ScrollContainer/ContentsVBox/
 
 @onready var _teams_vbox = $EditorPanel/TopVBox/ScrollContainer/ContentsVBox/TeamsVbox
 @onready var _player_name_ui = $EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer/LineEdit
+@onready var _panel = $EditorPanel
 
 
 var _teams: Dictionary[String, bool] = {}
@@ -14,10 +15,13 @@ var _team_uis: Dictionary[String, LabelCheckbox] = {}
 signal team_unselected(team_name: String)
 signal team_selected(team_name: String)
 signal name_changed(new_name: String)
+signal player_removed()
+
 
 ##State functions
 func _ready() -> void:
 	_player_name_ui.text_changed.connect(_on_name_changed)
+	_panel.close_button_pressed.connect(_on_close_button_pressed)
 
 
 func sync_teams(teams: Array) -> void: 
@@ -135,6 +139,9 @@ func _set_selected_key_unit_name(unit_name: String) -> void:
 			option.select(i)
 			return
 	option.select(0)
+	
+func _on_close_button_pressed():
+	player_removed.emit()
 
 ##IMPORT / EXPORT
 func import(res: PlayerUiRes) -> void: 

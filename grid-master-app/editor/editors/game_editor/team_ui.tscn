@@ -20,6 +20,7 @@ script = ExtResource("1_5j0j3")
 [node name="EditorPanel" parent="." instance=ExtResource("1_wk6yx")]
 layout_mode = 1
 section_headers = Array[String](["Name", "HBoxContainer"])
+has_close_button = true
 
 [node name="TopLabel" parent="EditorPanel/TopVBox" index="0"]
 text = ""

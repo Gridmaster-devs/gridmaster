@@ -12,6 +12,7 @@ grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("1_38p7f")
 script = ExtResource("2_ifgyv")
+has_close_button = null
 
 [node name="TopVBox" type="VBoxContainer" parent="."]
 layout_mode = 2

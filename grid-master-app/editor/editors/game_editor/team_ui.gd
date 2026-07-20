@@ -6,6 +6,7 @@ class_name TeamUi
 @onready var _team_color_rect: TextureRect = $EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer/TeamColor
 @onready var _team_name_ui: LineEdit = $EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Name/TeamName
 @onready var _content_vbox: VBoxContainer = $EditorPanel/TopVBox/ScrollContainer/ContentsVBox
+@onready var _panel: EditorPanel = $EditorPanel
 
 
 
@@ -18,6 +19,7 @@ signal unit_added(unit: String)
 signal unit_removed(unit: String)
 signal name_changed(new_name: String)
 signal color_changed(new_color: Color)
+signal team_removed
 
 signal units_changed(units: Array)
 
@@ -26,6 +28,7 @@ signal units_changed(units: Array)
 func _ready() -> void:
 	_color_button.pressed.connect(_open_color_picker)
 	_team_name_ui.text_changed.connect(_on_name_changed)
+	_panel.close_button_pressed.connect(_on_close_button_pressed)
 
 func reload_units(units: Dictionary) -> void:
 	_units = units
@@ -96,6 +99,9 @@ func _unit_unchecked(unit_name: String) -> void:
 	_units[unit_name] = false
 	unit_removed.emit(unit_name)
 	units_changed.emit(get_team_units())
+	
+func _on_close_button_pressed():
+	team_removed.emit()
 
 ##IMPORT / EXPORT
 func export() -> TeamUiRes: 
