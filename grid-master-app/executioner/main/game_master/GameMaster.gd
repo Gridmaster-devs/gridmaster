@@ -9,7 +9,7 @@ signal units_changed
 # where each subclass has a reference to the gamestate and handles the given input differently.
 # This might end up being a lot cleaner as the amount of possible UI states expands, and might
 # be needed to prevent the game master file being enormous.
-enum UIState {LOAD_GAME, SERVER_BROWSER, TEAM_SELECT, IN_GAME_DEFAULT, UNIT_MOVE}
+enum UIState {LOAD_GAME, SERVER_BROWSER, TEAM_SELECT, IN_GAME_DEFAULT, UNIT_MOVE, WAITING_FOR_TURN}
 
 const LOAD_GAME_GUI : PackedScene = preload("res://executioner/main/game_master/gui_scenes/load_game_gui.tscn")
 const SERVER_BROWSER_GUI : PackedScene = preload("res://executioner/main/game_master/gui_scenes/server_browser_gui.tscn")
@@ -24,7 +24,7 @@ const RAW_INPUT_FUNC_NAME : String = "receive_raw_input"
 @onready var grid_graphics : GridGraphics = $"Grid Graphics"
 
 var _custom_graphics : CustomGraphics
-var _click_tracker := ClickTracker.new()
+var _click_tracker: ClickTracker = ClickTracker.new()
 var ui_state : UIState = UIState.LOAD_GAME
 var gui_scene : GUIScene
 
@@ -263,7 +263,7 @@ func _on_server_disconnected():
 func _on_game_file_received(file_data: PackedByteArray, team_id: int):
 	GML.log("Received game file from server: %d bytes, team_id: %d" % [file_data.size(), team_id], GML.LogLevel.DEBUG)
 	const LOCAL_PATH := "user://server_game.tres"
-	var file := FileAccess.open(LOCAL_PATH, FileAccess.WRITE)
+	var file: FileAccess = FileAccess.open(LOCAL_PATH, FileAccess.WRITE)
 	if file == null:
 		GML.log("Failed to write received game file locally.", GML.LogLevel.ERROR)
 		if gui_scene is TeamSelectGUI:
@@ -271,7 +271,7 @@ func _on_game_file_received(file_data: PackedByteArray, team_id: int):
 		return
 	file.store_buffer(file_data)
 	file.close()
-	var game_definition_resource := ResourceLoader.load(LOCAL_PATH, "", ResourceLoader.CACHE_MODE_IGNORE) as GameDefinitionResource
+	var game_definition_resource: GameDefinitionResource = ResourceLoader.load(LOCAL_PATH, "", ResourceLoader.CACHE_MODE_IGNORE) as GameDefinitionResource
 	if game_definition_resource != null:
 		initGameDataFromGameDefinition(game_definition_resource)
 		for player in data_manager.get_players().values():
@@ -297,6 +297,18 @@ func _on_teams_received(teams: Array):
 func _on_game_state_received(state_update: Dictionary):
 	_apply_state_update(state_update)
 	switch_gui_scene(IN_GAME_DEFAULT_GUI, data_manager.get_game_name())
+	# Restore waiting state if this client's team already submitted this turn.
+	if state_update.has("teams_ended_turn") and gui_scene is InGameDefaultGUI:
+		var client_player_id: int = data_manager.get_client_player_id()
+		var client_player: Player = data_manager.get_players().get(client_player_id)
+		if client_player != null and client_player.team != null:
+			if state_update["teams_ended_turn"].has(client_player.team.team_id):
+				gui_scene.set_waiting()
+				ui_state = UIState.WAITING_FOR_TURN
+	# Replay the full message history after the scene (and its MessageWindow) is ready.
+	if state_update.has("message_log"):
+		for msg in state_update["message_log"]:
+			MessageDispatcher.broadcast_message(msg)
 	
 func end_network_game_turn() -> void:
 	if _game_over:
@@ -332,6 +344,7 @@ func end_network_game_turn() -> void:
 
 	if gui_scene is InGameDefaultGUI:
 		gui_scene.set_waiting()
+	ui_state = UIState.WAITING_FOR_TURN
 
 	GML.log("[Client] Turn ended, waiting for server...", GML.LogLevel.DEBUG)
 
@@ -542,12 +555,15 @@ func receive_ui_event(event : StateMachineEvent):
 		
 		UIState.UNIT_MOVE:
 			_handle_event_unit_move(event)
+		
+		UIState.WAITING_FOR_TURN:
+			_handle_event_waiting_for_turn(event)
 
 
 ## Handles input when in the load game screen
 func _handle_event_load_game(event : StateMachineEvent):
 	if event is ButtonPressedEvent:
-		var button_press := event as ButtonPressedEvent
+		var button_press: ButtonPressedEvent = event as ButtonPressedEvent
 		if button_press.button_type == ButtonPressedEvent.ButtonType.LOAD_GAME:
 			load_game_from_file()
 		elif button_press.button_type == ButtonPressedEvent.ButtonType.CONNECT_TO_SERVER:
@@ -558,12 +574,12 @@ func _handle_event_load_game(event : StateMachineEvent):
 ## Handles input when in the server browser screen
 func _handle_event_server_browser(event : StateMachineEvent):
 	if event is ButtonPressedEvent:
-		var button_press := event as ButtonPressedEvent
+		var button_press: ButtonPressedEvent = event as ButtonPressedEvent
 		if button_press.button_type == ButtonPressedEvent.ButtonType.BACK:
 			switch_gui_scene(LOAD_GAME_GUI, null)
 			ui_state = UIState.LOAD_GAME
 		elif button_press.button_type == ButtonPressedEvent.ButtonType.PLAY_ON_SERVER:
-			var ip := button_press.additional_args as String
+			var ip: String = button_press.additional_args as String
 			if gui_scene is ServerBrowserGUI:
 				gui_scene.set_status("Connecting...")
 			Networking.connect_to_server(ip)
@@ -608,7 +624,7 @@ func _on_connected_for_upload() -> void:
 		gui_scene.set_status("Uploading game file...")
 	const TEMP_PATH := "user://upload_temp.tres"
 	ResourceSaver.save(_pending_upload_resource, TEMP_PATH)
-	var file_data := FileAccess.get_file_as_bytes(TEMP_PATH)
+	var file_data: PackedByteArray = FileAccess.get_file_as_bytes(TEMP_PATH)
 	GML.log("Sending %d bytes to server." % file_data.size(), GML.LogLevel.DEBUG)
 	Networking.upload_game_file.rpc_id(Networking.SERVER_PEER_ID, file_data)
 	_pending_upload_resource = null
@@ -638,10 +654,26 @@ func _on_game_upload_result(success: bool) -> void:
 ## Handles input when in the team selection screen
 func _handle_event_team_select(event : StateMachineEvent):
 	if event is ButtonPressedEvent:
-		var button_press := event as ButtonPressedEvent
+		var button_press: ButtonPressedEvent = event as ButtonPressedEvent
 		if button_press.button_type == ButtonPressedEvent.ButtonType.SELECT_TEAM:
 			var team_index = button_press.additional_args as int
 			Networking.select_team(team_index)
+
+
+## Handler for when the turn has been submitted and we're waiting for other teams.
+## Units can still be clicked to view info, but movement is disabled.
+func _handle_event_waiting_for_turn(event : StateMachineEvent) -> void:
+	if event is GridTileClickedEvent:
+		if event.mouse_button == MOUSE_BUTTON_LEFT:
+			if event.grid_pos == Vector2i(-1, -1): return
+			var unit = data_manager.get_unit_by_position_nullable(event.grid_pos)
+			if unit == null: return
+			if unit.get_player_id() != data_manager.get_client_attributes().client_player_id: return
+			if _unit_information_popup != null:
+				_unit_information_popup.remove_from_tree()
+			_unit_information_popup = preload("res://executioner/main/game_master/gui_scenes/gui_elements/unit_information/unit_information_popup.tscn").instantiate()
+			_unit_information_popup.add_to_tree()
+			_unit_information_popup.set_unit_info(unit)
 
 
 ## Default handler for in-game
