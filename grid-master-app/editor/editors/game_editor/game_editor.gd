@@ -1,6 +1,10 @@
 class_name GameEditor
 extends Control
 
+## Game Editor mega class. Contains the game editor UI and logic for editing game definitions, including teams, players, and map painting.
+
+## FIXME: Refactor for better encapsulation. Rework odd and inconsistent signal passing. Adopt IDs for referencing teams, players, etc. instead of relying on names and array indices.
+
 var editor_main : EditorMain
 var game_resource : GameDefinitionResource
 @onready var game_name_line : LineEdit = $"PanelContainer/VBoxContainer/Game name"
@@ -153,12 +157,23 @@ func _add_new_team() -> TeamUi:
 	team_ui.name_changed.connect(_on_team_name_changed.bind(team_ui))
 	team_ui.color_changed.connect(_on_team_color_changed.bind(team_ui))
 	team_ui.units_changed.connect(_on_team_units_changed.bind(team_ui))
+	team_ui.team_removed.connect(_remove_team.bind(team_ui))
 	_team_uis.append(team_ui)
 	#add GameTeam
 	var new_team: GameTeam = GameTeam.new("", Color.RED, _teams.size(), [])
 	_teams.append(new_team)
 	_sync_player_uis()
 	return team_ui
+
+func _remove_team(team_ui: TeamUi) -> void:
+	var indx = _team_uis.find(team_ui)
+	if indx == -1 or indx >= _teams.size():
+		print("untracked team's signal catched")
+		return
+	_teams_container.remove_child(team_ui)
+	_team_uis.remove_at(indx)
+	_teams.remove_at(indx)
+	_sync_player_uis()
 
 func _clear_players() -> void: 
 	_players.clear()
@@ -204,9 +219,19 @@ func _add_new_player() -> PlayerUi:
 	new_player_ui.team_selected.connect(_on_player_team_selected.bind(new_player_ui))
 	new_player_ui.team_unselected.connect(_on_player_team_unselected.bind(new_player_ui))
 	new_player_ui.name_changed.connect(_on_player_name_changed.bind(new_player_ui))
+	new_player_ui.player_removed.connect(_remove_player.bind(new_player_ui))
 	var new_player: GamePlayer = GamePlayer.new("", _players.size(), null)
 	_players.append(new_player)
 	return new_player_ui
+
+func _remove_player(player_ui: PlayerUi) -> void:
+	var indx = _player_uis.find(player_ui)
+	if indx == -1 or indx >= _players.size():
+		print("untracked player's signal catched")
+		return
+	_players_container.remove_child(player_ui)
+	_player_uis.remove_at(indx)
+	_players.remove_at(indx)
 
 #update player uis based on _teams
 func _sync_player_uis() -> void: 
