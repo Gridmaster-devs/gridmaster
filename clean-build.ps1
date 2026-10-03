@@ -1,3 +1,16 @@
+<#
+.SYNOPSIS
+Removes files from each subdirectory of grid-master-app\build while keeping
+the directory structure and .gitignore files.
+
+.EXAMPLE
+.\clean-build.ps1
+Removes the files.
+
+.EXAMPLE
+.\clean-build.ps1 -WhatIf
+Lists the files that would be removed without deleting them.
+#>
 Param(
     [switch]$WhatIf
 )
@@ -11,11 +24,21 @@ if (-not (Test-Path $buildRoot)) {
     exit 1
 }
 
-Write-Host "Cleaning files under each subdirectory of $buildRoot (preserving directories and .gitignore files)..."
+if ($WhatIf) {
+    Write-Host "WhatIf: Listing files that would be removed under each subdirectory of $buildRoot (preserving directories and .gitignore files)..."
+}
+else {
+    Write-Host "Cleaning files under each subdirectory of $buildRoot (preserving directories and .gitignore files)..."
+}
 
 Get-ChildItem -Path $buildRoot -Directory -Force | ForEach-Object {
     $sub = $_.FullName
-    Write-Host "Cleaning: $sub"
+    if ($WhatIf) {
+        Write-Host "Would clean: $sub"
+    }
+    else {
+        Write-Host "Cleaning: $sub"
+    }
 
     Get-ChildItem -Path $sub -Recurse -Force -File |
         Where-Object { $_.Name.ToLower() -ne '.gitignore' } |
