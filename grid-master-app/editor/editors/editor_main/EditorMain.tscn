@@ -17,11 +17,11 @@ grow_horizontal = 2
 grow_vertical = 2
 current_tab = 0
 
-[node name="Unit editor" parent="TabContainer" instance=ExtResource("2_fi5xj")]
+[node name="Unit Editor" parent="TabContainer" instance=ExtResource("2_fi5xj")]
 layout_mode = 2
 metadata/_tab_index = 0
 
-[node name="MapEditor" parent="TabContainer" instance=ExtResource("3_mnkt7")]
+[node name="Map Editor" parent="TabContainer" instance=ExtResource("3_mnkt7")]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 1
