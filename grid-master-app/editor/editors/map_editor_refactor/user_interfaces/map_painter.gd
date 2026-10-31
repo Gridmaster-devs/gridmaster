@@ -329,6 +329,12 @@ func export_as_resource() -> MapPainterRes:
 func set_to_default_state() -> void: 
 	_change_state(InputState.INTERACT)
 
+## Erases matching tiles on the requested layer so player cleanup leaves terrain intact.
+func erase_tiles_matching(required_attributes: Dictionary, layer_id: int) -> void:
+	if layer_id < 0 or layer_id >= layers.size():
+		return
+	layers[layer_id].erase_tiles_matching(required_attributes)
+
 #simple function to change current input state
 func _change_state(new_state: InputState) -> void:
 	_input_state = new_state

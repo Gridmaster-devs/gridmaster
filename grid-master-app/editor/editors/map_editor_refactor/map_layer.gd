@@ -181,6 +181,23 @@ func erase_tile(hovered_tile: Vector2i) -> void:
 	_attribute_grid.setItem(hovered_tile.x, hovered_tile.y, empty_attribute_list)
 	_tile_map_layer.set_cell(hovered_tile, -1)
 
+## Erases matching tiles so a deleted player's placed units do not remain on the map.
+func erase_tiles_matching(required_attributes: Dictionary) -> void:
+	if required_attributes.is_empty():
+		return
+	for x in _attribute_grid.width:
+		for y in _attribute_grid.height:
+			var tile_attributes = _attribute_grid.getItem(x, y)
+			if not tile_attributes is Dictionary:
+				continue
+			var matches := true
+			for key in required_attributes:
+				if not tile_attributes.has(key) or tile_attributes[key] != required_attributes[key]:
+					matches = false
+					break
+			if matches:
+				erase_tile(Vector2i(x, y))
+
 #removes tile from the map with specific tile_id value
 #updates th _attribute_grid
 #then updates the tile_map based on the attribute grid

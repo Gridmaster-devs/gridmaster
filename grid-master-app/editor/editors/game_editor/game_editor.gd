@@ -229,9 +229,20 @@ func _remove_player(player_ui: PlayerUi) -> void:
 	if indx == -1 or indx >= _players.size():
 		print("untracked player's signal catched")
 		return
-	_players_container.remove_child(player_ui)
+	var player_name: String = _players[indx].get_name()
+	_set_default_state()
 	_player_uis.remove_at(indx)
 	_players.remove_at(indx)
+	_players_container.remove_child(player_ui)
+	_remove_units_for_player_name(player_name)
+	_sync_player_libraries()
+
+## Clears a player's placed units immediately so saving without reopening Map stays consistent.
+func _remove_units_for_player_name(player_name: String) -> void:
+	var required_attributes: Dictionary[String, Variant] = {
+		MapAttributes.UNIT_PLAYER_ID: player_name
+	}
+	_unit_painter.erase_tiles_matching(required_attributes, _unit_layer_id)
 
 #update player uis based on _teams
 func _sync_player_uis() -> void: 

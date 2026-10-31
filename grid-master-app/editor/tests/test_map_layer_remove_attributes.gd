@@ -42,3 +42,15 @@ func test_generic_removal_without_required_attributes_keeps_legacy_matching() ->
 
 	assert_eq(layer._attribute_grid.getItem(0, 0), {})
 	assert_eq(layer._attribute_grid.getItem(1, 0), other)
+
+func test_erase_tiles_matching_clears_only_tiles_with_all_required_attributes() -> void:
+	var player_a_unit := {"unit": "infantry", "player": "A"}
+	var player_b_unit := {"unit": "infantry", "player": "B"}
+	var other_a_tile := {"unit": "cavalry", "player": "A"}
+	var layer := _make_layer([player_a_unit, player_b_unit, other_a_tile])
+
+	layer.erase_tiles_matching({"player": "A"})
+
+	assert_eq(layer._attribute_grid.getItem(0, 0), {})
+	assert_eq(layer._attribute_grid.getItem(1, 0), player_b_unit)
+	assert_eq(layer._attribute_grid.getItem(2, 0), {})
