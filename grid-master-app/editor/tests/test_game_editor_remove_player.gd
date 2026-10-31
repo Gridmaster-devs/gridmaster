@@ -3,6 +3,10 @@ extends GutTest
 const GAME_EDITOR_SCENE: PackedScene = preload("res://editor/editors/game_editor/GameEditor.tscn")
 const EDITOR_MAIN_SCENE: PackedScene = preload("res://editor/editors/editor_main/EditorMain.tscn")
 
+func _edit_player_name(player_ui: PlayerUi, player_name: String) -> void:
+	player_ui._player_name_ui.text = player_name
+	player_ui._player_name_ui.text_changed.emit(player_name)
+
 func test_removing_middle_player_erases_only_their_units_and_keeps_arrays_aligned() -> void:
 	var editor := GAME_EDITOR_SCENE.instantiate() as GameEditor
 	add_child_autofree(editor)
@@ -44,6 +48,149 @@ func test_removing_middle_player_erases_only_their_units_and_keeps_arrays_aligne
 	assert_true(is_instance_valid(player_c_ui))
 	await get_tree().process_frame
 	assert_false(is_instance_valid(player_b_ui))
+
+func test_reject_duplicate_player_name_before_removal_can_erase_survivors_units() -> void:
+	var editor := GAME_EDITOR_SCENE.instantiate() as GameEditor
+	add_child_autofree(editor)
+	var original_player_ui := editor._add_new_player()
+	var duplicate_player_ui := editor._add_new_player()
+	_edit_player_name(original_player_ui, "A")
+	var previous_name: String = editor._players[1].get_name()
+	var unit_layer: MapLayer = editor._unit_painter.layers[editor._unit_layer_id]
+	unit_layer._attribute_grid.setItem(0, 0, {"unit": "infantry", "player": "A"})
+
+	_edit_player_name(duplicate_player_ui, "A")
+
+	assert_eq(editor._players[1].get_name(), previous_name)
+	assert_eq(duplicate_player_ui._player_name_ui.text, previous_name)
+	editor._remove_player(duplicate_player_ui)
+
+	assert_eq(unit_layer._attribute_grid.getItem(0, 0), {"unit": "infantry", "player": "A"})
+	await get_tree().process_frame
+	assert_false(is_instance_valid(duplicate_player_ui))
+
+func test_new_players_have_unique_nonblank_names_and_reject_blank_renames() -> void:
+	var editor := GAME_EDITOR_SCENE.instantiate() as GameEditor
+	add_child_autofree(editor)
+	var first_ui := editor._add_new_player()
+	var first_name: String = editor._players[0].get_name()
+	# A user-chosen name must also be excluded when generating the next default.
+	_edit_player_name(first_ui, "Player 2")
+	var second_ui := editor._add_new_player()
+	var second_name: String = editor._players[1].get_name()
+	assert_false(first_name.strip_edges().is_empty())
+	assert_false(second_name.strip_edges().is_empty())
+	assert_ne(second_name, "Player 2")
+	assert_eq(first_ui.export().get_player_name(), "Player 2")
+	assert_eq(second_ui.export().get_player_name(), second_name)
+	for invalid_name in ["", " ", "\t"]:
+		_edit_player_name(second_ui, invalid_name)
+		assert_eq(editor._players[1].get_name(), second_name)
+		assert_eq(second_ui.export().get_player_name(), second_name)
+	_edit_player_name(second_ui, second_name)
+	assert_eq(editor._players[1].get_name(), second_name, "Keeping one's own name is allowed")
+	editor._remove_player(first_ui)
+	var third_ui := editor._add_new_player()
+	assert_ne(third_ui.export().get_player_name(), second_name)
+	assert_false(third_ui.export().get_player_name().strip_edges().is_empty())
+
+func test_rename_moves_ownership_before_the_old_name_can_be_reused_and_deleted() -> void:
+	var editor_main := EDITOR_MAIN_SCENE.instantiate() as EditorMain
+	add_child_autofree(editor_main)
+	var editor: GameEditor = editor_main.game_editor
+	var image := Image.create_empty(Global.tile_width, Global.tile_height, false, Image.FORMAT_RGBA8)
+	image.fill(Color.WHITE)
+	var unit := UnitResource.new()
+	unit.set_attribute("name", "infantry")
+	unit.set_attribute("texture", ImageTexture.create_from_image(image))
+	editor_main.set_units([unit])
+	var team_ui := editor._add_new_team()
+	team_ui._team_name_ui.text = "T"
+	team_ui._team_name_ui.text_changed.emit("T")
+	team_ui._unit_checked("infantry")
+	var original_ui := editor._add_new_player()
+	_edit_player_name(original_ui, "A")
+	original_ui._team_checked("T")
+	editor._sync_player_libraries()
+	var painter: MapPainter = editor._unit_painter
+	var tile: Dictionary[String, Variant] = painter._lib_items_data["A"][0].duplicate()
+	var unit_layer: MapLayer = painter.layers[editor._unit_layer_id]
+	unit_layer._attribute_grid.setItem(0, 0, tile)
+	unit_layer.update_tile_map()
+	painter.on_lib_item_pressed({}, tile, true, editor._unit_layer_id)
+
+	_edit_player_name(original_ui, "B")
+
+	assert_eq(tile[MapAttributes.UNIT_PLAYER_ID], "B")
+	assert_eq(tile[MapAttributes.UNIT_UNIT_LIB_ITEM_ID], "infantry")
+	assert_true(tile.has(MapAttributes.UNIT_TEXTURE_ID))
+	assert_true(painter._paint_libraries.has("B"))
+	assert_false(painter._paint_libraries.has("A"))
+	assert_eq(painter._input_state, MapPainter.InputState.INTERACT)
+	var replacement_ui := editor._add_new_player()
+	_edit_player_name(replacement_ui, "A")
+	editor._remove_player(replacement_ui)
+	assert_eq(unit_layer._attribute_grid.getItem(0, 0), tile)
+	assert_eq(tile[MapAttributes.UNIT_PLAYER_ID], "B")
+	editor._remove_player(original_ui)
+	assert_eq(unit_layer._attribute_grid.getItem(0, 0), {})
+
+func test_import_rejects_duplicate_or_blank_names_before_changing_editor_state() -> void:
+	var editor := GAME_EDITOR_SCENE.instantiate() as GameEditor
+	add_child_autofree(editor)
+	editor.set_game_name("Keep this game")
+	var original_ui := editor._add_new_player()
+	var original_name: String = editor._players[0].get_name()
+	var unit_grid: Array2D = editor._unit_painter.get_layer(editor._unit_layer_id)
+	unit_grid.setItem(0, 0, {"unit": "infantry", "player": original_name})
+	for names in [["A", "A"], [""], ["   "]]:
+		var resource := GameDefinitionResource.new()
+		resource.game_name = "Invalid import"
+		for player_name in names:
+			var player_resource := PlayerUiRes.new()
+			player_resource.init({}, player_name)
+			resource.player_uis.append(player_resource)
+
+		var error_count_before := get_errors().size()
+		editor.load_from_resource(resource)
+		var import_errors: Array = get_errors().slice(error_count_before)
+		assert_eq(import_errors.size(), 1, "Each rejected import should report one warning")
+		for import_error in import_errors:
+			if import_error.is_engine_error() and import_error.code == "Cannot load game: player names must be nonblank and unique.":
+				import_error.handled = true
+
+		assert_eq(editor.get_game_name(), "Keep this game")
+		assert_eq(editor._player_uis, [original_ui])
+		assert_eq(editor._players[0].get_name(), original_name)
+		assert_eq(unit_grid.getItem(0, 0), {"unit": "infantry", "player": original_name})
+
+func test_import_preserves_saved_ownership_when_names_overlap_generated_defaults() -> void:
+	var editor_main := EDITOR_MAIN_SCENE.instantiate() as EditorMain
+	add_child_autofree(editor_main)
+	var editor: GameEditor = editor_main.game_editor
+	editor._add_new_player()
+	var resource := GameDefinitionResource.new()
+	resource.game_name = "Imported game"
+	resource.map = editor_main.getMap()
+	resource.unit_layer = Array2D.new()
+	resource.unit_layer.init(2, 1)
+	resource.unit_layer.setItem(0, 0, {"unit": "infantry", "player": "A"})
+	resource.unit_layer.setItem(1, 0, {"unit": "infantry", "player": "Player 1"})
+	for player_name in ["A", "Player 1"]:
+		var player_resource := PlayerUiRes.new()
+		player_resource.init({}, player_name)
+		resource.player_uis.append(player_resource)
+
+	editor.load_from_resource(resource)
+
+	assert_eq(editor._players[0].get_name(), "A")
+	assert_eq(editor._players[1].get_name(), "Player 1")
+	assert_eq(editor._player_uis[0].export().get_player_name(), "A")
+	assert_eq(editor._player_uis[1].export().get_player_name(), "Player 1")
+	var unit_grid: Array2D = editor._unit_painter.get_layer(editor._unit_layer_id)
+	assert_eq(unit_grid.getItem(0, 0)["player"], "A")
+	assert_eq(unit_grid.getItem(1, 0)["player"], "Player 1")
+	assert_eq(resource.unit_layer.getItem(1, 0)["player"], "Player 1")
 
 func test_removing_team_unassigns_players_clears_key_units_and_erases_their_units() -> void:
 	var editor_main := EDITOR_MAIN_SCENE.instantiate() as EditorMain

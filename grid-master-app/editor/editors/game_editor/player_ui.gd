@@ -98,6 +98,14 @@ func get_selected_team_name() -> String:
 			return team_name
 	return ""
 
+func set_player_name(player_name: String) -> void:
+	if _player_name_ui.text == player_name:
+		return
+	var signals_were_blocked: bool = _player_name_ui.is_blocking_signals()
+	_player_name_ui.set_block_signals(true)
+	_player_name_ui.text = player_name
+	_player_name_ui.set_block_signals(signals_were_blocked)
+
 func _get_key_unit_option() -> OptionButton:
 	return get_node_or_null(KEY_UNIT_OPTION_PATH) as OptionButton
 

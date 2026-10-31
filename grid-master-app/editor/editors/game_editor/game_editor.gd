@@ -219,7 +219,19 @@ func _sync_team_uis() -> void:
 			_teams[i].set_units(_team_uis[i].get_team_units())
 
 #players#
-func _add_new_player() -> PlayerUi: 
+func _add_new_player(player_name: String = "") -> PlayerUi:
+	# FIXME: Currently player name collision are avoided by enforcing unique player names (same applies for team names).
+	# Unique identifiers should still be adopted for future resilience for all entities, 
+	# stable identifiers should be enforced on data not UI layer
+	if player_name.is_empty():
+		var number := 1
+		player_name = "Player %d" % number
+		while not _is_player_name_available(player_name):
+			number += 1
+			player_name = "Player %d" % number
+	elif not _is_player_name_available(player_name):
+		push_warning("Cannot add player: player names must be nonblank and unique.")
+		return null
 	var team_names: Array = []
 	for team in _teams:
 		team_names.append(team.get_name())
@@ -236,9 +248,18 @@ func _add_new_player() -> PlayerUi:
 	new_player_ui.team_unselected.connect(_on_player_team_unselected.bind(new_player_ui))
 	new_player_ui.name_changed.connect(_on_player_name_changed.bind(new_player_ui))
 	new_player_ui.player_removed.connect(_remove_player.bind(new_player_ui))
-	var new_player: GamePlayer = GamePlayer.new("", _players.size(), null)
+	var new_player: GamePlayer = GamePlayer.new(player_name, _players.size(), null)
 	_players.append(new_player)
+	new_player_ui.set_player_name(player_name)
 	return new_player_ui
+
+func _is_player_name_available(player_name: String, except_index: int = -1) -> bool:
+	if player_name.strip_edges().is_empty():
+		return false
+	for player_index in _players.size():
+		if player_index != except_index and _players[player_index].get_name() == player_name:
+			return false
+	return true
 
 func _remove_player(player_ui: PlayerUi) -> void:
 	var indx = _player_uis.find(player_ui)
@@ -345,7 +366,24 @@ func _on_player_name_changed(new_player_name: String, sender: PlayerUi) -> void:
 	if indx == -1 or indx >= _players.size():
 		print("untracked player's signal catched")
 		return
+	var old_player_name: String = _players[indx].get_name()
+	if not _is_player_name_available(new_player_name, indx):
+		sender.set_player_name(old_player_name)
+		return
+	sender.set_player_name(new_player_name)
+	if old_player_name == new_player_name:
+		return
 	_players[indx].set_name(new_player_name)
+	# Ownership is serialized by name. Move it before retiring the old library so
+	# reusing the old name cannot make deletion erase the renamed player's units.
+	var unit_grid: Array2D = _unit_painter.get_layer(_unit_layer_id)
+	for x in unit_grid.width:
+		for y in unit_grid.height:
+			var attributes: Dictionary = unit_grid.getItem(x, y)
+			if attributes.get(MapAttributes.UNIT_PLAYER_ID) == old_player_name:
+				attributes[MapAttributes.UNIT_PLAYER_ID] = new_player_name
+	_set_default_state()
+	_sync_player_libraries()
 
 func _on_tab_changed(tab_id: int) -> void: 
 	if tab_id == MAP_TAB_ID:
@@ -375,6 +413,18 @@ func load_from_file() -> void:
 	ftm.upload_data("*.tres", true)
 
 func load_from_resource(resource : GameDefinitionResource):
+	# Ambiguous saved ownership cannot safely be assigned to either duplicate.
+	# Validate before changing the map, units, or existing editor panels.
+	var player_names: Dictionary[String, bool] = {}
+	for player_ui_res in resource.player_uis:
+		if player_ui_res == null:
+			push_warning("Cannot load game: player names must be nonblank and unique.")
+			return
+		var player_name: String = player_ui_res.get_player_name()
+		if player_name.strip_edges().is_empty() or player_names.has(player_name):
+			push_warning("Cannot load game: player names must be nonblank and unique.")
+			return
+		player_names[player_name] = true
 	set_game_name(resource.game_name)
 	editor_main.set_units(resource.load_units())
 	editor_main.setMap(resource.loadMap())
@@ -387,7 +437,9 @@ func load_from_resource(resource : GameDefinitionResource):
 	#players
 	_clear_players()
 	for player_ui_res in resource.load_player_uis():
-		_add_new_player().import(player_ui_res)
+		# Start with the saved name so importing does not rename another saved
+		# player's units that happen to use an automatically generated name.
+		_add_new_player(player_ui_res.get_player_name()).import(player_ui_res)
 	_reload()
 
 func _init_unit_painter() -> void: 
