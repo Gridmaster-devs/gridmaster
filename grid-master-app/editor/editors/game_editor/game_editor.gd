@@ -170,10 +170,21 @@ func _remove_team(team_ui: TeamUi) -> void:
 	if indx == -1 or indx >= _teams.size():
 		print("untracked team's signal catched")
 		return
+	var removed_team: GameTeam = _teams[indx]
+	var affected_player_names: Array[String] = []
+	for player in _players:
+		if player.get_team() == removed_team:
+			affected_player_names.append(player.get_name())
+			player.set_team(null)
 	_teams_container.remove_child(team_ui)
 	_team_uis.remove_at(indx)
 	_teams.remove_at(indx)
 	_sync_player_uis()
+	_sync_player_key_units()
+	_set_default_state()
+	for player_name in affected_player_names:
+		_remove_units_for_player_name(player_name)
+	_sync_player_libraries()
 
 func _clear_players() -> void: 
 	_players.clear()
