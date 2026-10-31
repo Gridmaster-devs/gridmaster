@@ -208,9 +208,11 @@ func remove_library(lib_name: String) -> void:
 		var item_id_value = lib_item[item_id]
 		remove_lib_item(lib_name, item_id, item_id_value, layer_id)
 	#remove the lib
-	_content_vbox.remove_child(_paint_libraries[lib_name])
+	var removed_library := _paint_libraries[lib_name]
+	_content_vbox.remove_child(removed_library)
 	_paint_libraries.erase(lib_name)
 	_lib_items_data.erase(lib_name)
+	removed_library.queue_free()
 
 #reloads a library completely from external data
 #item in: 

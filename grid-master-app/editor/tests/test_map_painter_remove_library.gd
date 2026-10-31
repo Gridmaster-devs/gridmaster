@@ -23,7 +23,7 @@ func test_remove_library_clears_zero_to_three_items_and_is_idempotent() -> void:
 	for item_count in range(4):
 		var painter := _make_painter_with_library(item_count)
 		var layer: MapLayer = painter.layers[0]
-		autoqfree(painter._paint_libraries["Test library"])
+		var removed_library: PaintLibrary = painter._paint_libraries["Test library"]
 
 		painter.remove_library("Test library")
 
@@ -34,3 +34,5 @@ func test_remove_library_clears_zero_to_three_items_and_is_idempotent() -> void:
 
 		painter.remove_library("Test library")
 		assert_false(painter._paint_libraries.has("Test library"), "second removal is harmless")
+		await get_tree().process_frame
+		assert_false(is_instance_valid(removed_library), "library node freed for %d items" % item_count)

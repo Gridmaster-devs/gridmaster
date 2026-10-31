@@ -56,9 +56,11 @@ func _sync_ui() -> void:
 	img.fill(_color)
 	_team_color_rect.texture = ImageTexture.create_from_image(img)
 	#units
-	for unit_name in _unit_uis:
-		_content_vbox.remove_child(_unit_uis[unit_name])
+	var unit_uis_to_remove := _unit_uis.values()
 	_unit_uis.clear()
+	for unit_ui in unit_uis_to_remove:
+		_content_vbox.remove_child(unit_ui)
+		unit_ui.queue_free()
 	for unit_name in _units.keys():
 		var new_unit_ui: LabelCheckbox = preload("res://editor/editors/game_editor/label_checkbox.tscn").instantiate()
 		_unit_uis[unit_name] = new_unit_ui

@@ -176,9 +176,10 @@ func _remove_team(team_ui: TeamUi) -> void:
 		if player.get_team() == removed_team:
 			affected_player_names.append(player.get_name())
 			player.set_team(null)
-	_teams_container.remove_child(team_ui)
 	_team_uis.remove_at(indx)
 	_teams.remove_at(indx)
+	_teams_container.remove_child(team_ui)
+	team_ui.queue_free()
 	_sync_player_uis()
 	_sync_player_key_units()
 	_set_default_state()
@@ -187,16 +188,20 @@ func _remove_team(team_ui: TeamUi) -> void:
 	_sync_player_libraries()
 
 func _clear_players() -> void: 
+	var player_uis_to_clear := _player_uis.duplicate()
 	_players.clear()
-	for player_ui in _player_uis:
-		_players_container.remove_child(player_ui)
 	_player_uis.clear()
+	for player_ui in player_uis_to_clear:
+		_players_container.remove_child(player_ui)
+		player_ui.queue_free()
 
 func _clear_teams() -> void: 
+	var team_uis_to_clear := _team_uis.duplicate()
 	_teams.clear()
-	for team_ui in _team_uis: 
-		_teams_container.remove_child(team_ui)
 	_team_uis.clear()
+	for team_ui in team_uis_to_clear:
+		_teams_container.remove_child(team_ui)
+		team_ui.queue_free()
 
 #update team_uis based on unit editor units
 func _sync_team_uis() -> void: 
@@ -245,6 +250,7 @@ func _remove_player(player_ui: PlayerUi) -> void:
 	_player_uis.remove_at(indx)
 	_players.remove_at(indx)
 	_players_container.remove_child(player_ui)
+	player_ui.queue_free()
 	_remove_units_for_player_name(player_name)
 	_sync_player_libraries()
 

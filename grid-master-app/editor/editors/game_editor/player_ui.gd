@@ -49,9 +49,11 @@ func init_teams(teams: Array) -> void:
 
 ##Signal response
 func _sync_ui() -> void:
-	for team_name in _team_uis:
-		_teams_vbox.remove_child(_team_uis[team_name])
+	var team_uis_to_remove := _team_uis.values()
 	_team_uis.clear()
+	for team_ui in team_uis_to_remove:
+		_teams_vbox.remove_child(team_ui)
+		team_ui.queue_free()
 	for team_name in _teams.keys():
 		var new_team_ui: LabelCheckbox = preload("res://editor/editors/game_editor/label_checkbox.tscn").instantiate()
 		_team_uis[team_name] = new_team_ui
