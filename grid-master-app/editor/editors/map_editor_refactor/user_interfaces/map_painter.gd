@@ -134,21 +134,27 @@ func sync_lib_item(lib_name: String, item_id: String, item_id_value: Variant, la
 		layers[layer_id].sync_attributes(lib_items[item_indx], item_id, item_id_value)
 
 func remove_lib_item(lib_name: String, item_id: String, item_id_value: Variant, layer_id: int) -> void:
-	if _lib_items_data.has(lib_name): 
-		var lib_items = _lib_items_data[lib_name]
-		for item in lib_items:
-			if item is Dictionary:
-				if item.has(item_id) and item[item_id] == item_id_value: 
-					#remove the matching tiles from the map
-					var required_attributes: Dictionary[String, Variant] = {}
-					if item.has(MapAttributes.UNIT_PLAYER_ID):
-						required_attributes[MapAttributes.UNIT_PLAYER_ID] = item[MapAttributes.UNIT_PLAYER_ID]
-					if item.has(MapAttributes.UNIT_TEAM_ID):
-						required_attributes[MapAttributes.UNIT_TEAM_ID] = item[MapAttributes.UNIT_TEAM_ID]
-					layers[layer_id].remove_attributes(item, item_id, item_id_value, required_attributes)
-					#remove the item from library
-					lib_items.erase(item)
-					_paint_libraries[lib_name].initialize_lib_items(lib_items)
+	if not _lib_items_data.has(lib_name):
+		return
+	var lib_items: Array = _lib_items_data[lib_name]
+	var matching_item: Dictionary = {}
+	for item in lib_items:
+		if item is Dictionary and item.has(item_id) and item[item_id] == item_id_value:
+			matching_item = item
+			break
+	if matching_item.is_empty():
+		return
+	#remove the matching tiles from the map
+	var required_attributes: Dictionary[String, Variant] = {}
+	if matching_item.has(MapAttributes.UNIT_PLAYER_ID):
+		required_attributes[MapAttributes.UNIT_PLAYER_ID] = matching_item[MapAttributes.UNIT_PLAYER_ID]
+	if matching_item.has(MapAttributes.UNIT_TEAM_ID):
+		required_attributes[MapAttributes.UNIT_TEAM_ID] = matching_item[MapAttributes.UNIT_TEAM_ID]
+	layers[layer_id].remove_attributes(matching_item, item_id, item_id_value, required_attributes)
+	#remove the item from library after searching
+	lib_items.erase(matching_item)
+	if _paint_libraries.has(lib_name):
+		_paint_libraries[lib_name].initialize_lib_items(lib_items)
 
 
 ##State incrementing / decremeneting functions
@@ -190,15 +196,21 @@ func add_library(lib_name: String, overwrite_data: Dictionary[String, Variant],
 
 #function to remove a library
 func remove_library(lib_name: String) -> void: 
+	if not _paint_libraries.has(lib_name) or not _lib_items_data.has(lib_name):
+		return
 	var item_id = _paint_libraries[lib_name].get_item_id()
 	var layer_id = _paint_libraries[lib_name].get_layer_id()
 	#remove every lib_item
-	for lib_item in _lib_items_data[lib_name]:
+	var items_to_remove: Array = _lib_items_data[lib_name].duplicate()
+	for lib_item in items_to_remove:
+		if not lib_item is Dictionary or not lib_item.has(item_id):
+			continue
 		var item_id_value = lib_item[item_id]
 		remove_lib_item(lib_name, item_id, item_id_value, layer_id)
 	#remove the lib
 	_content_vbox.remove_child(_paint_libraries[lib_name])
 	_paint_libraries.erase(lib_name)
+	_lib_items_data.erase(lib_name)
 
 #reloads a library completely from external data
 #item in: 
