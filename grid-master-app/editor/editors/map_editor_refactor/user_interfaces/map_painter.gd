@@ -140,7 +140,12 @@ func remove_lib_item(lib_name: String, item_id: String, item_id_value: Variant, 
 			if item is Dictionary:
 				if item.has(item_id) and item[item_id] == item_id_value: 
 					#remove the matching tiles from the map
-					layers[layer_id].remove_attributes(item, item_id, item_id_value)
+					var required_attributes: Dictionary[String, Variant] = {}
+					if item.has(MapAttributes.UNIT_PLAYER_ID):
+						required_attributes[MapAttributes.UNIT_PLAYER_ID] = item[MapAttributes.UNIT_PLAYER_ID]
+					if item.has(MapAttributes.UNIT_TEAM_ID):
+						required_attributes[MapAttributes.UNIT_TEAM_ID] = item[MapAttributes.UNIT_TEAM_ID]
+					layers[layer_id].remove_attributes(item, item_id, item_id_value, required_attributes)
 					#remove the item from library
 					lib_items.erase(item)
 					_paint_libraries[lib_name].initialize_lib_items(lib_items)

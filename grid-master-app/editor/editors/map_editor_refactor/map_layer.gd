@@ -127,13 +127,19 @@ func reset_from_data(data: Array2D) -> void:
 #removes every attribute from a tile that is in data
 #only removes from tiles that match item_id with item_id_value
 #TODO: refactor this function to be more clear
-func remove_attributes(data: Dictionary[String, Variant], item_id: String, item_id_value: Variant) -> void: 
+func remove_attributes(data: Dictionary[String, Variant], item_id: String, item_id_value: Variant,
+		required_attributes: Dictionary = {}) -> void:
 	for x in get_width():
 		for y in get_height():
 			var tile_attributes = _attribute_grid.getItem(x, y)
 			if tile_attributes is Dictionary:
 				#if the tile is identified as the tile type in question
-				if (tile_attributes.has(item_id) and 
+				var required_attributes_match := true
+				for key in required_attributes:
+					if not tile_attributes.has(key) or tile_attributes[key] != required_attributes[key]:
+						required_attributes_match = false
+						break
+				if (required_attributes_match and tile_attributes.has(item_id) and
 					(tile_attributes[item_id] is Array and tile_attributes[item_id].has(item_id_value) or 
 					tile_attributes[item_id] is not Array and tile_attributes[item_id] == item_id_value)):
 						#remove every key that exists in the data from the tile
