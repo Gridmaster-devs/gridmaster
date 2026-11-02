@@ -1,9 +1,9 @@
 class_name EditorMain
 extends Node
 
-@onready var unit_editor : UnitEditor = $"TabContainer/Unit editor"
+@onready var unit_editor : UnitEditor = $"TabContainer/Unit Editor"
 @onready var game_editor : GameEditor = $"TabContainer/Game Editor"
-@onready var map_editor : MapEditor =  $TabContainer/MapEditor
+@onready var map_editor : MapEditor =  $"TabContainer/Map Editor"
 
 
 # gets the units from the unit editor
