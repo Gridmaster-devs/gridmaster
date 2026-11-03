@@ -8,8 +8,9 @@ extends Node
 ## Constants
 const EXIT_FAILURE = 1
 
-## Configurable server variables
-const PORT = 443
+## Port the server listens on unless overridden. 443 is what the Docker
+## image and Azure Container Apps ingress expect.
+const DEFAULT_PORT = 443
 
 ## The file path to the game definition resource that the server uses always
 const GAME_FILE_PATH = "user://game.tres"
@@ -52,15 +53,49 @@ func start_server():
 	# Increase buffers to handle large game file transfers (default is 65536 = 64KB)
 	server.inbound_buffer_size = 10 * 1024 * 1024   # 10 MB — for receiving uploads
 	server.outbound_buffer_size = 10 * 1024 * 1024  # 10 MB — for sending game file to clients
-	var err = server.create_server(PORT)
+	var port := get_port()
+	if port <= 0:
+		get_tree().quit(EXIT_FAILURE)
+		return
+	var bind_address := get_bind_address()
+	var err = server.create_server(port, bind_address)
 	if err != OK:
-		GML.log("Failed to create the server instance. Error code: %d" % err, GML.LogLevel.FATAL)
-		exit(EXIT_FAILURE)
+		var hint := "Ports below 1024 need root on Linux; pass --port=8082 or set GRIDMASTER_PORT." if port < 1024 \
+			else "Is another server already running on this port?"
+		GML.log("Failed to listen on port %d (error: %s). %s" % [port, error_string(err), hint], GML.LogLevel.FATAL)
+		get_tree().quit(EXIT_FAILURE)
+		return
 	multiplayer.multiplayer_peer = server
 
 	# Ensure user:// directory exists (may be absent on first Docker run).
 	DirAccess.make_dir_recursive_absolute(OS.get_user_data_dir())
-	GML.log("Server started. Upload a game file to begin.", GML.LogLevel.INFO)
+	GML.log("Server listening on port %d (address %s). Upload a game file to begin." % [port, bind_address], GML.LogLevel.INFO)
+
+## Port to listen on: the `--port=N` user argument (after `--` on the Godot
+## command line), else the GRIDMASTER_PORT environment variable, else DEFAULT_PORT.
+## Returns -1 when the given value isn't a valid port.
+static func get_port() -> int:
+	var value := OS.get_environment("GRIDMASTER_PORT")
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--port="):
+			value = arg.trim_prefix("--port=")
+	if value.is_empty():
+		return DEFAULT_PORT
+	if not value.is_valid_int() or int(value) < 1 or int(value) > 65535:
+		GML.log("Invalid server port \"%s\"; expected 1-65535." % value, GML.LogLevel.FATAL)
+		return -1
+	return int(value)
+
+## Address to listen on: the `--bind=ADDR` user argument, else the
+## GRIDMASTER_BIND environment variable, else "*" (all interfaces, which the
+## container needs). Local runs should pass 127.0.0.1 so the server, which
+## accepts uploads without authentication, isn't reachable from the network.
+static func get_bind_address() -> String:
+	var value := OS.get_environment("GRIDMASTER_BIND")
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--bind="):
+			value = arg.trim_prefix("--bind=")
+	return "*" if value.is_empty() else value
 
 func _ready():
 	multiplayer.peer_connected.connect(_peer_connected)
