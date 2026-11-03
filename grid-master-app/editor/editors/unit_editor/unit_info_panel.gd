@@ -63,6 +63,8 @@ func link_unit_editor(ue : UnitEditor):
 		
 func _ready():
 	self.add_to_group("info_panel")
+	if _unit_image_cont.texture == null:
+		_unit_image_cont.texture = _get_default_img()
 	get_viewport().connect("files_dropped", Callable(self, "_on_files_dropped"))
 
 func _on_files_dropped(files: Array) -> void:
