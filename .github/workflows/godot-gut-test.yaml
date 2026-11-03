@@ -1,15 +1,22 @@
 name: GUT Tests
 
 on:
-  push:
-    paths:
-      - 'grid-master-app/**'
+  # Runs on every PR (no path filter) so the required "GUT tests" check
+  # always reports; a path-filtered required check would block PRs that
+  # don't touch grid-master-app.
   pull_request:
+  push:
+    # main is tested by the Deploy workflow, which calls this one.
+    branches-ignore:
+      - main
     paths:
       - 'grid-master-app/**'
+  # Lets Deploy run the tests and gate on them.
+  workflow_call:
 
 jobs:
   test:
+    name: GUT tests
     runs-on: ubuntu-latest
 
     steps:
