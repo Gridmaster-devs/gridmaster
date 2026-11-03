@@ -14,6 +14,8 @@ const DEFAULT_PORT = 443
 
 ## The file path to the game definition resource that the server uses always
 const GAME_FILE_PATH = "user://game.tres"
+## Where an upload is written and checked before it replaces GAME_FILE_PATH
+const UPLOAD_STAGING_PATH = "user://game_upload.tres"
 
 ## The core game server instance
 var server = WebSocketMultiplayerPeer.new()
@@ -119,15 +121,17 @@ func _on_game_upload_requested(peer_id: int, file_data: PackedByteArray) -> void
 		GML.log("[Upload] Received empty file data from peer %d. Rejecting." % peer_id, GML.LogLevel.ERROR)
 		Networking.receive_upload_result.rpc_id(peer_id, false)
 		return
-	GML.log("[Upload] Writing to: %s" % ProjectSettings.globalize_path(GAME_FILE_PATH), GML.LogLevel.DEBUG)
-	var file := FileAccess.open(GAME_FILE_PATH, FileAccess.WRITE)
+	# Write to a staging file first. GAME_FILE_PATH is what joining clients are
+	# sent, so it is only replaced once the upload has produced a working game.
+	GML.log("[Upload] Writing to: %s" % ProjectSettings.globalize_path(UPLOAD_STAGING_PATH), GML.LogLevel.DEBUG)
+	var file := FileAccess.open(UPLOAD_STAGING_PATH, FileAccess.WRITE)
 	if file == null:
 		GML.log("[Upload] Failed to open game file path for writing. Error: %s" % FileAccess.get_open_error(), GML.LogLevel.ERROR)
 		Networking.receive_upload_result.rpc_id(peer_id, false)
 		return
 	file.store_buffer(file_data)
 	file.close()
-	var written := FileAccess.get_file_as_bytes(GAME_FILE_PATH)
+	var written := FileAccess.get_file_as_bytes(UPLOAD_STAGING_PATH)
 	if written.size() != file_data.size():
 		GML.log("[Upload] Size mismatch after write: expected %d bytes, got %d bytes." % [file_data.size(), written.size()], GML.LogLevel.ERROR)
 		Networking.receive_upload_result.rpc_id(peer_id, false)
@@ -135,13 +139,26 @@ func _on_game_upload_requested(peer_id: int, file_data: PackedByteArray) -> void
 	GML.log("[Upload] File verified on disk (%d bytes). Attempting to load as GameDefinitionResource." % written.size(), GML.LogLevel.DEBUG)
 	# CACHE_MODE_IGNORE forces Godot to re-read from disk rather than returning
 	# a cached resource from a prior load() of the same path.
-	var game_def := ResourceLoader.load(GAME_FILE_PATH, "", ResourceLoader.CACHE_MODE_IGNORE) as GameDefinitionResource
+	var game_def := ResourceLoader.load(UPLOAD_STAGING_PATH, "", ResourceLoader.CACHE_MODE_IGNORE) as GameDefinitionResource
 	if game_def == null:
 		GML.log("[Upload] Loaded resource is null or not a GameDefinitionResource.", GML.LogLevel.ERROR)
 		Networking.receive_upload_result.rpc_id(peer_id, false)
 		return
 	GML.log("[Upload] GameDefinitionResource loaded: '%s'. Reinitializing server state." % game_def.game_name, GML.LogLevel.INFO)
-	server_state = ServerState.new(game_def)
+	# A script error during setup (e.g. a game file saved by an older editor
+	# version) aborts GameDataManager.initFromGameDefinition and leaves
+	# data_manager null. Reject the upload and keep the previous game.
+	var new_state := ServerState.new(game_def)
+	if new_state.data_manager == null:
+		GML.log("[Upload] Couldn't set up a game from '%s'. It may be from an older editor version (e.g. units without IDs); use a game made in the current editor." % game_def.game_name, GML.LogLevel.ERROR)
+		Networking.receive_upload_result.rpc_id(peer_id, false)
+		return
+	var move_err := DirAccess.rename_absolute(UPLOAD_STAGING_PATH, GAME_FILE_PATH)
+	if move_err != OK:
+		GML.log("[Upload] Failed to replace %s with the upload (error %s)." % [GAME_FILE_PATH, error_string(move_err)], GML.LogLevel.ERROR)
+		Networking.receive_upload_result.rpc_id(peer_id, false)
+		return
+	server_state = new_state
 	GameArgs.initialize(server_state.data_manager, game_def.game_rules)
 	GML.log("[Upload] Game updated to: %s" % game_def.game_name, GML.LogLevel.INFO)
 	Networking.receive_upload_result.rpc_id(peer_id, true)
