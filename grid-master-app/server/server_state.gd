@@ -28,8 +28,10 @@ var eliminated_players: Array[int] = []
 var game_over: bool = false
 var winner_player_id: int = -1
 
-# FIFO queue for turn messages
+# FIFO queue for turn messages (cleared after each turn broadcast)
 var _message_queue: Array[String] = []
+# Cumulative log of all messages ever sent (never cleared)
+var _message_log: Array[String] = []
 
 func _init(game_definition: GameDefinitionResource) -> void:
 	self.game_definition_resource = game_definition
@@ -153,6 +155,10 @@ func get_message_queue() -> Array[String]:
 
 func push_message(message: String) -> void:
 	_message_queue.push_back(message)
+	_message_log.push_back(message)
+
+func get_message_log() -> Array[String]:
+	return _message_log
 
 func clear_message_queue() -> void:
 	_message_queue.clear()

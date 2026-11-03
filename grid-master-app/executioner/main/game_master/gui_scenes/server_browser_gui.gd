@@ -35,19 +35,19 @@ func _populate_servers() -> void:
 		var server: Dictionary = SERVERS[i]
 		var server_name: String = server.get("name", "Server %d" % (i + 1))
 
-		var row := HBoxContainer.new()
+		var row: HBoxContainer = HBoxContainer.new()
 		row.custom_minimum_size = Vector2(450, 60)
 
-		var indicator := ColorRect.new()
+		var indicator: ColorRect = ColorRect.new()
 		indicator.custom_minimum_size = Vector2(12, 12)
 		indicator.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		indicator.color = Color(0.5, 0.5, 0.5)
 		_status_indicators.append(indicator)
 		row.add_child(indicator)
 
-		var btn := Button.new()
+		var btn: Button = Button.new()
 		var ip: String = server["ip"]
-		var ip_display := ip.left(20) + ("..." if ip.length() > 20 else "")
+		var ip_display: String = ip.left(20) + ("..." if ip.length() > 20 else "")
 		btn.text = "%s | %s" % [server_name, ip_display]
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		btn.pressed.connect(_on_server_selected.bind(server, server_name))

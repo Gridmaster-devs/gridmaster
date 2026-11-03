@@ -24,8 +24,8 @@ signal turn_actions_received(peer_id: int, actions: Array)
 signal request_peer_turn_end(peer_id: int, action_queue: Array)
 signal turn_ended(state_update: Dictionary)
 
-var client_peer := WebSocketMultiplayerPeer.new()
-var _uploading := false
+var client_peer: WebSocketMultiplayerPeer = WebSocketMultiplayerPeer.new()
+var _uploading: bool = false
 
 
 # ---
@@ -62,7 +62,7 @@ func connect_for_upload(ip: String) -> void:
 	client_peer.outbound_buffer_size = 10 * 1024 * 1024  # 10 MB
 	client_peer.inbound_buffer_size = 1 * 1024 * 1024   # 1 MB (for receiving result)
 	GML.log("Upload peer buffer sizes set to 10MB out / 1MB in.", GML.LogLevel.DEBUG)
-	var err := client_peer.create_client(ip)
+	var err: Error = client_peer.create_client(ip)
 	if err != OK:
 		_uploading = false
 		GML.log("Error connecting to server for upload: %s" % err, GML.LogLevel.ERROR)
