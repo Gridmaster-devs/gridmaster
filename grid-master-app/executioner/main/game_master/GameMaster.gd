@@ -97,6 +97,7 @@ func local_init_game(game_definition_resource: GameDefinitionResource):
 	initGraphics()
 	
 	MessageDispatcher.broadcast_message("Game \"%s\" loaded." % data_manager.get_game_name())
+	_log_round_started(data_manager.get_turn_number())
 
 
 ## Ends the turn and processes all the actions that have been queued up.
@@ -226,6 +227,8 @@ func end_turn_local() -> void:
 	data_manager.replace_game_state(new_state)
 	units_changed.emit()
 	_process_post_turn_elimination()
+	if not _game_over:
+		_log_round_started(data_manager.get_turn_number())
 
 func end_turn() -> void:
 	if _game_over:
@@ -297,6 +300,8 @@ func _on_teams_received(teams: Array):
 func _on_game_state_received(state_update: Dictionary):
 	_apply_state_update(state_update)
 	switch_gui_scene(IN_GAME_DEFAULT_GUI, data_manager.get_game_name())
+	if not state_update.get("game_over", false):
+		_log_round_started(int(state_update["turn_number"]))
 	
 func end_network_game_turn() -> void:
 	if _game_over:
@@ -345,6 +350,7 @@ func _on_turn_ended(state_update: Dictionary):
 		return
 
 	_detect_local_player_elimination(state_update)
+	_log_round_started(int(state_update["turn_number"]))
 
 	if _should_auto_pass_turn(state_update):
 		_mark_client_player_eliminated()
@@ -823,6 +829,9 @@ func receive_raw_input(event : InputEvent):
 # ---
 # INFO LOGGING METHODS
 # ---
+
+func _log_round_started(completed_turns: int) -> void:
+	MessageDispatcher.broadcast_message("======= Round %d started ==========" % (completed_turns + 1))
 
 ## Prints the map into a log file
 func printMap() -> void:
