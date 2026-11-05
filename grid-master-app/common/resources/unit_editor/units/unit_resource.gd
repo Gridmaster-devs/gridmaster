@@ -10,7 +10,8 @@ extends Resource
 
 var id: int:
 	get:
-		return get_attribute_value("id")
+		var val = get_attribute_value("id")
+		return int(val) if val != null else -1
 	set(v): return
 static var _next_id: int = 0
 

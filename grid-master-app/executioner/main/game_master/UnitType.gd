@@ -85,22 +85,35 @@ func checkAttributes() -> void:
 # Problems may occur with attributes like capturable
 # Might be a good idea to check that each attribute's value is of the correct type and makes sense
 ## Initializes a unit type from a unit resource
-static func initFromUnitResource(unit_resource : UnitResource) -> UnitType:
+static func initFromUnitResource(unit_resource : UnitResource, fallback_id: int = 0) -> UnitType:
 
 	# TODO: Tidy up whatever mess of importing attributes this method is.
 
 	var unit_type = UnitType.new()
-	unit_type.type_id = unit_resource.get_attribute_value("id")
+	var raw_id = unit_resource.get_attribute_value("id")
+	if raw_id != null:
+		unit_type.type_id = int(raw_id)
+	else:
+		unit_type.type_id = fallback_id
+
 	var resource_attributes = unit_resource.getAttributes()
-	unit_type.unit_name = unit_resource.get_attribute_value("name")
-	unit_type.description = unit_resource.get_attribute_value("description")
+	var raw_name = unit_resource.get_attribute_value("name")
+	unit_type.unit_name = str(raw_name) if raw_name != null else ""
+	var raw_desc = unit_resource.get_attribute_value("description")
+	unit_type.description = str(raw_desc) if raw_desc != null else ""
 	unit_type.texture = unit_resource.get_attribute_value("texture")
 
-	unit_type.is_production_unit = unit_resource.get_attribute_value("is_production_unit")
-	unit_type.is_producible_unit = unit_resource.get_attribute_value("is_producible_unit")
-	unit_type.production_cost = unit_resource.get_attribute_value("production_cost")
+	var is_prod = unit_resource.get_attribute_value("is_production_unit")
+	unit_type.is_production_unit = bool(is_prod) if is_prod != null else false
+
+	var is_producible = unit_resource.get_attribute_value("is_producible_unit")
+	unit_type.is_producible_unit = bool(is_producible) if is_producible != null else false
+
+	var prod_cost = unit_resource.get_attribute_value("production_cost")
+	unit_type.production_cost = int(prod_cost) if prod_cost != null else 1
+
 	var producible_units_from_resource = unit_resource.get_attribute_value("producible_units")
-	if producible_units_from_resource != null and producible_units_from_resource != []:
+	if producible_units_from_resource != null and producible_units_from_resource is Array:
 		unit_type.producible_units_ids = producible_units_from_resource
 	
 	for key in resource_attributes.keys():
