@@ -25,6 +25,7 @@ const UNIT_CONTAINER : PackedScene = preload("res://executioner/main/grid_graphi
 var _game_data_provider : GameDataManager
 var _grid_width : int
 var _grid_height : int
+var fog_of_war_overlay : FogOfWarOverlay
 
 
 ## array of the currently drawn units, should only be used for drawing purposes 
@@ -47,6 +48,7 @@ func initFromGameGrid(game_grid : GameGrid, game_data_provider):
 	grid_graphics_viewport.resize(self.size)
 	_initTileGrid(game_grid)
 	_initBackgroundGrid(game_grid)
+	_updateFogOfWar()
 	_getUnits()
 
 
@@ -54,6 +56,8 @@ func initFromGameGrid(game_grid : GameGrid, game_data_provider):
 ## should only be called from initTileGrid
 func _initTileSources(game_grid: GameGrid) -> void: 
 	for tile_type in game_grid.strategic_tile_types.values():
+		if ui_map_grid.tile_set.has_source(tile_type.type_id):
+			ui_map_grid.tile_set.remove_source(tile_type.type_id)
 		var source = TileSetAtlasSource.new()
 		source.texture = tile_type.texture
 		source.texture_region_size = Vector2i(64, 64)
@@ -114,7 +118,21 @@ func addNewUnitContainer(unit_cont: UnitContainer):
 ## Called when the Game Master emits the units_changed signal
 func _unitsChanged() -> void:
 	_clearUnits()
+	_updateFogOfWar()
 	_getUnits()
+
+
+## Updates the fog of war overlay based on the client player's current vision
+func _updateFogOfWar() -> void:
+	if fog_of_war_overlay != null and _game_data_provider != null:
+		fog_of_war_overlay.update_fog(_grid_width, _grid_height, _game_data_provider)
+
+
+## Returns whether a tile is currently covered by fog of war
+func is_tile_fogged(pos: Vector2i) -> bool:
+	if fog_of_war_overlay == null:
+		return false
+	return fog_of_war_overlay.is_tile_fogged(pos)
 
 
 ## Returns the coordinates of the tile that 
@@ -138,4 +156,48 @@ func get_custom_graphics() -> CustomGraphics:
 
 
 func _ready() -> void:
-	pass
+	fog_of_war_overlay = FogOfWarOverlay.new()
+	fog_of_war_overlay.name = "FogOfWarOverlay"
+	grid_graphics_viewport.add_child(fog_of_war_overlay)
+
+
+## Overlay node that darkens tiles outside the client player's vision range
+## and draws a subtle contour edge along the boundary of visible terrain.
+class FogOfWarOverlay extends Node2D:
+	const FOG_COLOR := Color(0.05, 0.07, 0.12, 0.55)
+	const FOG_EDGE_COLOR := Color(0.02, 0.03, 0.06, 0.35)
+	const EDGE_WIDTH := 4.0
+
+	var _fogged_tiles: Dictionary[Vector2i, bool] = {}
+	var _width: int = 0
+	var _height: int = 0
+
+	func update_fog(width: int, height: int, data_provider: GameDataManager) -> void:
+		_width = width
+		_height = height
+		_fogged_tiles.clear()
+		if data_provider != null:
+			for x in range(width):
+				for y in range(height):
+					var pos := Vector2i(x, y)
+					if not data_provider.is_tile_visible(pos):
+						_fogged_tiles[pos] = true
+		queue_redraw()
+
+	func is_tile_fogged(pos: Vector2i) -> bool:
+		return _fogged_tiles.has(pos)
+
+	func _draw() -> void:
+		for pos: Vector2i in _fogged_tiles.keys():
+			var rect := Rect2(pos.x * TILE_SIZE, pos.y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+			draw_rect(rect, FOG_COLOR, true)
+
+			# Draw a darker contour strip along any edge bordering a visible tile
+			if pos.y > 0 and not _fogged_tiles.has(Vector2i(pos.x, pos.y - 1)):
+				draw_rect(Rect2(rect.position.x, rect.position.y, TILE_SIZE, EDGE_WIDTH), FOG_EDGE_COLOR, true)
+			if pos.y < _height - 1 and not _fogged_tiles.has(Vector2i(pos.x, pos.y + 1)):
+				draw_rect(Rect2(rect.position.x, rect.position.y + TILE_SIZE - EDGE_WIDTH, TILE_SIZE, EDGE_WIDTH), FOG_EDGE_COLOR, true)
+			if pos.x > 0 and not _fogged_tiles.has(Vector2i(pos.x - 1, pos.y)):
+				draw_rect(Rect2(rect.position.x, rect.position.y, EDGE_WIDTH, TILE_SIZE), FOG_EDGE_COLOR, true)
+			if pos.x < _width - 1 and not _fogged_tiles.has(Vector2i(pos.x + 1, pos.y)):
+				draw_rect(Rect2(rect.position.x + TILE_SIZE - EDGE_WIDTH, rect.position.y, EDGE_WIDTH, TILE_SIZE), FOG_EDGE_COLOR, true)
