@@ -5167,7 +5167,7 @@ attribute_value = 0.0
 script = ExtResource("8_thh66")
 attribute_name = "vision_range"
 type = 2
-attribute_value = 0.0
+attribute_value = 2.0
 
 [sub_resource type="Resource" id="Resource_qv3pb"]
 script = ExtResource("6_d0s1v")
@@ -5299,7 +5299,7 @@ attribute_value = 0.0
 script = ExtResource("8_thh66")
 attribute_name = "vision_range"
 type = 2
-attribute_value = 0.0
+attribute_value = 2.0
 
 [sub_resource type="Resource" id="Resource_6tpdn"]
 script = ExtResource("6_d0s1v")
@@ -5431,7 +5431,7 @@ attribute_value = 0.0
 script = ExtResource("8_thh66")
 attribute_name = "vision_range"
 type = 2
-attribute_value = 0.0
+attribute_value = 2.0
 
 [sub_resource type="Resource" id="Resource_dfr1b"]
 script = ExtResource("6_d0s1v")
