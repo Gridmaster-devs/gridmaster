@@ -284,18 +284,7 @@ func _on_team_turn_end(peer_id: int, action_queue: Array) -> void:
 				done = false
 				(unit.current_action as MoveAction).step()
 
-		# Remove dead units from the unit_array and from the server state
-		var write_index := 0
-
-		for read_index in range(unit_array.size()):
-			var unit: Unit = unit_array[read_index]
-			if unit.is_dead():
-				server_state.data_manager.remove_unit(unit)
-			else:
-				unit_array[write_index] = unit
-				write_index += 1
-
-		unit_array.resize(write_index)
+		server_state.data_manager.remove_dead_units(unit_array)
 		
 	# Check for eliminated players (no key units left) and victory.
 	server_state.process_eliminations_and_victory()

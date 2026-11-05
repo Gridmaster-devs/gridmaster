@@ -120,19 +120,7 @@ func process_end_turn_local() -> void:
 				done = false
 				(unit.current_action as MoveAction).step()
 		
-		var units_to_be_removed : Array[Unit] = []
-		
-		# If any units have died we remove them from the array
-		# We can't erase units while iterating over the array or it will break
-		for unit : Unit in unit_array:
-			if (unit.is_dead()):
-				units_to_be_removed.append(unit)
-		
-		# NOTE: Possible to improve efficiency by using indices of the units in the
-		# unit array so that it doesn't have to search for the position each time
-		for unit in units_to_be_removed:
-			unit_array.erase(unit)
-			data_manager.remove_unit(unit)
+		data_manager.remove_dead_units(unit_array)
 	
 	# Go through other actions. Only production actions at this time
 	for unit : Unit in unit_array:
@@ -176,19 +164,7 @@ func process_end_turn_local_builder() -> GameState:
 				done = false
 				(unit.current_action as MoveAction).step()
 		
-		var units_to_be_removed : Array[Unit] = []
-		
-		# If any units have died we remove them from the array
-		# We can't erase units while iterating over the array or it will break
-		for unit : Unit in unit_array:
-			if (unit.is_dead()):
-				units_to_be_removed.append(unit)		
-
-		# NOTE: Possible to improve efficiency by using indices of the units in the
-		# unit array so that it doesn't have to search for the position each time
-		for unit in units_to_be_removed:
-			unit_array.erase(unit)
-			new_game_state.remove_unit(unit)
+		data_manager.remove_dead_units(unit_array)
 	
 	# Go through other actions. Only production actions at this time
 	for unit : Unit in unit_array:
