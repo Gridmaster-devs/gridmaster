@@ -198,6 +198,22 @@ func increment_turn_number() -> void:
 func remove_unit(unit: Unit) -> void:
 	_game_state.remove_unit(unit)
 
+
+## Removes dead units from both the supplied array and the currently mounted state.
+## Compacts the array in place, preserving survivor references and their order.
+## All supplied units must belong to the mounted state.
+func remove_dead_units(unit_array: Array[Unit]) -> void:
+	var write_index: int = 0
+	for read_index: int in range(unit_array.size()):
+		var unit: Unit = unit_array[read_index]
+		if unit.is_dead():
+			remove_unit(unit)
+		else:
+			unit_array[write_index] = unit
+			write_index += 1
+	unit_array.resize(write_index)
+
+
 func add_unit(unit_type : UnitType, position : Vector2i, player : Player) -> void:
 	_game_state.addUnit(unit_type, position, player)
 

@@ -10,7 +10,13 @@ The full documentation can be found at: https://gut.readthedocs.io/en/v9.5.0
 
 ## Where to place tests
 
-There are currently two different directories for where tests must be located. One is for the executioner in `res://executioner/tests` the other is for the editor in `res://editor/tests` You can also add subdirectories if needed and add tests under them.
+Place tests in the directory for the component they exercise:
+
+- `res://executioner/tests` for executioner logic, including shared game data and local turn processing.
+- `res://editor/tests` for editor logic.
+- `res://server/tests` for server state and snapshot serialization.
+
+All three directories are configured in `.gutconfig.json`. Subdirectories are included automatically.
 
 ## Creating tests
 
@@ -80,7 +86,21 @@ From the root of the project, in this case `grid-master-app` run
 
 `godot --headless -s addons/gut/gut_cmdln.gd`
 
-This runs all unit tests in `editor/tests` and `executioner/tests`
+This runs all GUT suites in `editor/tests`, `executioner/tests`, and `server/tests`.
+Use Godot **4.5-stable** to match the CI job. Before the first run, import the project with
+`godot --headless --import` from `grid-master-app`.
+
+To run a focused suite, append a filter, for example:
+
+`godot --headless -s addons/gut/gut_cmdln.gd '-gselect=test_game_data_manager.gd'`
+
+The existing configuration treats engine, GUT, and `push_error` errors as failures.
+The post-run validator also rejects warnings and runs that execute no tests.
+
+The server cleanup tests construct an in-memory game definition and instantiate the
+server outside the scene tree. They verify cleanup and outgoing snapshots without
+calling `_ready()`, opening sockets, or sending RPCs; network turn integration is
+outside their scope.
 
 Optional flags can be found at: https://gut.readthedocs.io/en/v9.5.0/Command-Line.html 
 
@@ -91,4 +111,4 @@ Optional flags can be found at: https://gut.readthedocs.io/en/v9.5.0/Command-Lin
 3. Configure the test directories in the GUT panel settings.
 4. Now you can run all tests or individual test files and functions from the GUT panel
 
-You can find the full guide with pictures in the Run Tests part at: https://gut.readthedocs.io/en/v9.5.0/Quick-Start.html 
+You can find the full guide with pictures in the Run Tests part at: https://gut.readthedocs.io/en/v9.5.0/Quick-Start.html

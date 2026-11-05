@@ -1,5 +1,5 @@
 {
-	"dirs": ["res://executioner/tests", "res://editor/tests"],
+	"dirs": ["res://executioner/tests", "res://editor/tests", "res://server/tests"],
 	"include_subdirs": true,
 	"prefix": "test_",
 	"suffix": ".gd",

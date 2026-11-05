@@ -31,6 +31,6 @@ jobs:
     - name: Import Godot project
       run: godot --headless --path grid-master-app --import
     
-    - name: Run executioner Tests
+    - name: Run all GUT suites
       shell: bash
       run: godot --headless --path grid-master-app -s addons/gut/gut_cmdln.gd
