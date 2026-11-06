@@ -30,6 +30,7 @@ size_flags_horizontal = 3
 
 [node name="SaveButton" type="Button" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="1"]
 layout_mode = 2
+theme_type_variation = &"PrimaryButton"
 text = "SAVE"
 
 [editable path="EditorPanel"]
