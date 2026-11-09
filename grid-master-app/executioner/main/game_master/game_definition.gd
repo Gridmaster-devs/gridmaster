@@ -31,10 +31,12 @@ var players_index = 0 # Count for how many players there are
 func initUnitTypesFromResource(game_definition : GameDefinitionResource, 
 								unit_name_type_dict: Dictionary[String, int]) -> void:
 	var gd_units : Array[UnitResource] = game_definition.load_units()
+	var fallback_id: int = 0
 	for unit in gd_units:
-		var cur_unit_type = UnitType.initFromUnitResource(unit)
+		var cur_unit_type = UnitType.initFromUnitResource(unit, fallback_id)
 		unit_types.set(cur_unit_type.type_id, cur_unit_type)
 		unit_name_type_dict[ cur_unit_type.unit_name] = cur_unit_type.type_id
+		fallback_id += 1
 	for unit_type in unit_types.values():
 		unit_type.populate_producible_units(unit_types)
 		

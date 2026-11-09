@@ -158,12 +158,17 @@ func get_unit_type_by_id(id: int) -> UnitType:
 func get_grid() -> GameGrid:
 	return _game_definition.grid
 
-# Used for visibility logic. Checks if the target unit is visible to the given player
-## TODO probably should not be here, could be moved to Team if the team knows its own units
-func _is_unit_visible(target_unit: Unit, player_id: int) -> bool:
-	var player: Player = _game_definition.players.get(player_id)
+# Checks if the target tile is visible to the given player (defaults to client player)
+func is_tile_visible(tile_pos: Vector2i, player_id: int = -2) -> bool:
+	if _game_state == null or _game_definition == null:
+		return false
+	if player_id == -2:
+		if _client_attributes == null:
+			return false
+		player_id = _client_attributes.client_player_id
 	
-	if player == null:
+	var player: Player = _game_definition.players.get(player_id)
+	if player == null or player.team == null:
 		return false
 	
 	var team_id: int = player.team.team_id
@@ -172,14 +177,19 @@ func _is_unit_visible(target_unit: Unit, player_id: int) -> bool:
 	for unit in _game_state.getUnits():
 		if unit.get_team_id() == team_id:
 			# Compute using Chebyshev distance
-			var dx: int = abs(unit.getPosition().x - target_unit.getPosition().x)
-			var dy: int = abs(unit.getPosition().y - target_unit.getPosition().y)
+			var dx: int = abs(unit.getPosition().x - tile_pos.x)
+			var dy: int = abs(unit.getPosition().y - tile_pos.y)
 			
-			# If the target is within vision range of this unit means it is visible 
+			# If the tile is within vision range of this unit, it is visible
 			if max(dx, dy) <= unit.vision_range:
 				return true
 		
 	return false
+
+# Used for visibility logic. Checks if the target unit is visible to the given player
+## TODO probably should not be here, could be moved to Team if the team knows its own units
+func _is_unit_visible(target_unit: Unit, player_id: int) -> bool:
+	return is_tile_visible(target_unit.getPosition(), player_id)
 	
 # ---
 # INFO mutating methods
