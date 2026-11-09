@@ -1,0 +1,14 @@
+[remap]
+
+importer="image"
+type="Image"
+uid="uid://dn5bvm1krcecu"
+path="res://.godot/imported/placeholder_light.jpg-0b087b243ad9dac24534827a91bd85d2.image"
+
+[deps]
+
+source_file="res://editor/editors/unit_editor/placeholder_light.jpg"
+dest_files=["res://.godot/imported/placeholder_light.jpg-0b087b243ad9dac24534827a91bd85d2.image"]
+
+[params]
+

@@ -4,6 +4,7 @@ extends Node
 @onready var unit_editor : UnitEditor = $"TabContainer/Unit Editor"
 @onready var game_editor : GameEditor = $"TabContainer/Game Editor"
 @onready var map_editor : MapEditor =  $"TabContainer/Map Editor"
+@onready var dark_mode_switch : CheckButton = $"TabContainer/Settings/Options/DarkModeSwitch"
 
 
 # gets the units from the unit editor
@@ -31,3 +32,12 @@ func _ready() -> void:
 	unit_editor.link_editor_main(self)
 	game_editor.link_editor_main(self) 
 	# TODO: ADD MAP EDITOR LINK
+	var light_mode := EditorThemes.load_light_mode()
+	EditorThemes.apply(light_mode)
+	dark_mode_switch.set_pressed_no_signal(not light_mode)
+	dark_mode_switch.toggled.connect(_on_dark_mode_toggled)
+
+
+func _on_dark_mode_toggled(dark_mode : bool) -> void:
+	EditorThemes.apply(not dark_mode)
+	EditorThemes.save_light_mode(not dark_mode)

@@ -22,7 +22,8 @@ func save_to_resource(unit_resource : UnitResource):
 			
 		var unit_description = description_box.text
 		unit_resource.set_attribute("description", unit_description)
-		unit_resource.set_attribute("texture", _unit_image_cont.texture)
+		var texture = _unit_image_cont.texture
+		unit_resource.set_attribute("texture", EditorThemes.saved_placeholder() if EditorThemes.is_placeholder(texture) else texture)
 
 func load_from_resource(unit_resource : UnitResource):
 	if (unit_resource != null):
@@ -39,7 +40,7 @@ func load_from_resource(unit_resource : UnitResource):
 			description_box.text = unit_description
 		
 		var unit_texture = unit_resource.get_attribute_value("texture")
-		if (unit_texture == null):
+		if (unit_texture == null or EditorThemes.is_placeholder(unit_texture)):
 			_unit_image_cont.texture = _get_default_img()
 		else:
 			_unit_image_cont.texture = unit_texture
@@ -67,6 +68,10 @@ func _ready():
 		_unit_image_cont.texture = _get_default_img()
 	get_viewport().connect("files_dropped", Callable(self, "_on_files_dropped"))
 
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_THEME_CHANGED and is_node_ready() and EditorThemes.is_placeholder(_unit_image_cont.texture):
+		_unit_image_cont.texture = EditorThemes.placeholder()
+
 func _on_files_dropped(files: Array) -> void:
 	for path in files:
 		if _is_valid_image_file(path):
@@ -85,12 +90,7 @@ func _handle_file(path: String) -> void:
 	_unit_image_cont.texture = ImageTexture.create_from_image(img)
 
 func _get_default_img() -> Texture2D: 
-	var img: Image = preload("res://editor/editors/unit_editor/placeholder.jpg")
-	if not img or img.get_size() == Vector2i.ZERO:
-		var backup_img = Image.create_empty(Global.tile_width, Global.tile_height, false, Image.FORMAT_RGBA8)
-		backup_img.fill(Color(0.822, 0.001, 0.871, 1.0))
-		img = backup_img
-	return ImageTexture.create_from_image(img)
+	return EditorThemes.placeholder()
 
 
 

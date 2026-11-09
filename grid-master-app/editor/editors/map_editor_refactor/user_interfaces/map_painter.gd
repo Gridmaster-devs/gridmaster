@@ -68,6 +68,14 @@ var _dragging_previous: Vector2i = Vector2i(-1, -1)
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	_connect_ui()
+	_apply_canvas_theme()
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_THEME_CHANGED and is_node_ready():
+		_apply_canvas_theme()
+
+func _apply_canvas_theme() -> void:
+	_background_grid.modulate = get_theme_color("grid_color", "MapCanvas")
 
 #UI CONNECTION
 func _connect_ui() -> void: 
