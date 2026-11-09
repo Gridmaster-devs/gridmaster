@@ -24,6 +24,7 @@ layout_mode = 2
 
 [node name="Save" type="Button" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/VBoxContainer"]
 layout_mode = 2
+theme_type_variation = &"PrimaryButton"
 text = "Save"
 
 [node name="Cancel" type="Button" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/VBoxContainer"]
