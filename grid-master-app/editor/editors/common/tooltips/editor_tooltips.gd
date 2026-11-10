@@ -6,8 +6,8 @@ const TEXT := {
   "unit": {
     "name": "The name shown for this unit type.",
     "texture": "The image used to represent this unit.",
-    "movement_type": "How far the unit can move each turn. Different terrain costs different amounts of movement points, and faster units move first.",
-    "movement_speed": "How many movement points the unit has and when it acts each turn.",
+    "movement_type": "How this unit moves across the map.",
+    "movement_speed": "How far the unit can move each turn. Different terrain costs different amounts of movement points, and faster units move first",
     "capturable": "Whether this unit can be captured by another player.",
     "is_producible_unit": "Whether this unit can be produced by other units.",
     "production_cost": "How many turns it takes to produce this unit.",
