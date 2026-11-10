@@ -13,7 +13,7 @@ func test_registry_and_warning_set() -> void:
 			if EditorTooltips.has_warning(context, key):
 				warnings += 1
 	assert_eq(count, 77)
-	assert_eq(warnings, 11)
+	assert_eq(warnings, 14)
 	assert_eq(EditorTooltips.WARNING_TEXT, "Not yet used in gameplay")
 	assert_eq(EditorTooltips.get_tooltip("unit", "health"), "How much damage the unit can take before being destroyed.")
 	assert_eq(EditorTooltips.get_tooltip("game", "player_key_unit"), "The unit type this player must keep alive to avoid elimination. Leave blank to count any surviving unit.")
@@ -65,7 +65,7 @@ func test_generated_team_and_player_rows_use_context() -> void:
 	var team_label: Label = team._unit_uis["Infantry"].get_node("TeamUnitType/HBoxContainer/Label")
 	var player_label: Label = player._team_uis["Blue"].get_node("TeamUnitType/HBoxContainer/Label")
 	assert_eq(team_label.tooltip_text, EditorTooltips.get_tooltip("game", "team_unit_selection"))
-	assert_true(team_label.has_node("UnusedFeatureWarning"))
+	assert_false(team_label.has_node("UnusedFeatureWarning"))
 	assert_eq(player_label.tooltip_text, EditorTooltips.get_tooltip("game", "player_team"))
 	assert_false(player_label.has_node("UnusedFeatureWarning"))
 
@@ -89,7 +89,7 @@ func test_editor_scenes_instantiate() -> void:
 		assert_not_null(editor)
 
 func test_warning_keys() -> void:
-	assert_eq(EditorTooltips.WARNINGS, {"unit": ["is_producible_unit", "action_name", "action_type", "consumed_resource", "consumed_amount", "produced_resource", "produced_amount"], "map": ["tile.hiding", "tactical_map"], "painter": ["crop_image"], "game": ["team_unit_selection"]})
+	assert_eq(EditorTooltips.WARNINGS, {"unit": ["movement_type", "capturable", "victory_points", "perception", "is_producible_unit", "action_name", "action_type", "consumed_resource", "consumed_amount", "produced_resource", "produced_amount"], "map": ["tile.hiding", "tactical_map"], "painter": ["crop_image"]})
 
 func test_unit_description_has_no_added_label_or_tooltip() -> void:
 	var panel = load("res://editor/editors/unit_editor/UnitInfoPanel.tscn").instantiate()

@@ -91,10 +91,9 @@ const TEXT := {
 }
 
 const WARNINGS := {
- "unit": ["is_producible_unit", "action_name", "action_type", "consumed_resource", "consumed_amount", "produced_resource", "produced_amount"],
+ "unit": ["movement_type", "capturable", "victory_points", "perception", "is_producible_unit", "action_name", "action_type", "consumed_resource", "consumed_amount", "produced_resource", "produced_amount"],
  "map": ["tile.hiding", "tactical_map"],
  "painter": ["crop_image"],
- "game": ["team_unit_selection"],
 }
 const WARNING_TEXT := "Not yet used in gameplay"
 
