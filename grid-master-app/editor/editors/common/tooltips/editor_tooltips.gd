@@ -24,6 +24,7 @@ const TEXT := {
     "evasion": "How likely this unit is to dodge an attack.",
     "vision_range": "How far the unit will see (in tiles).",
     "perception": "How well this unit can detect hidden enemies.",
+    "actions": "Define actions for this unit.",
     "action_name": "The name of this action.",
     "action_type": "The kind of action this unit can perform.",
     "consumed_resource": "Which resource this action consumes.",
@@ -91,7 +92,7 @@ const TEXT := {
 }
 
 const WARNINGS := {
- "unit": ["movement_type", "capturable", "victory_points", "perception", "is_producible_unit", "action_name", "action_type", "consumed_resource", "consumed_amount", "produced_resource", "produced_amount"],
+ "unit": ["movement_type", "capturable", "victory_points", "perception", "is_producible_unit", "actions"],
  "map": ["tile.hiding", "tactical_map"],
  "painter": ["crop_image"],
 }

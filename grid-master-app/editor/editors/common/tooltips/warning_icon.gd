@@ -21,10 +21,13 @@ func _update_appearance() -> void:
 	var label := get_parent() as Label
 	if label:
 		var width := label.get_theme_font("font").get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, label.get_theme_font_size("font_size")).x
-		var start := 0.0
+		var style := label.get_theme_stylebox("normal")
+		var left := style.get_content_margin(SIDE_LEFT)
+		var available_width := label.size.x - left - style.get_content_margin(SIDE_RIGHT)
+		var start := left
 		if label.horizontal_alignment == HORIZONTAL_ALIGNMENT_CENTER:
-			start = maxf(0.0, (label.size.x - width) / 2)
+			start += maxf(0.0, (available_width - width) / 2)
 		elif label.horizontal_alignment == HORIZONTAL_ALIGNMENT_RIGHT:
-			start = maxf(0.0, label.size.x - width)
+			start += maxf(0.0, available_width - width)
 		position = Vector2(start + width + 4, maxf(0.0, (label.size.y - 14) / 2))
 	queue_redraw()

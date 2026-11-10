@@ -65,5 +65,6 @@ func link_unit_editor(ue : UnitEditor):
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	TooltipHelper.apply($VBoxContainer/Label, "unit", "actions")
 	TooltipHelper.apply(add_action_button, "unit", "add_action")
 	add_action_button.button_up.connect(add_action)

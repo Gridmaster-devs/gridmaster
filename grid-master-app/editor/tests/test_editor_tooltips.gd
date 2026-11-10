@@ -12,8 +12,8 @@ func test_registry_and_warning_set() -> void:
 				assert_false(status in tip)
 			if EditorTooltips.has_warning(context, key):
 				warnings += 1
-	assert_eq(count, 77)
-	assert_eq(warnings, 14)
+	assert_eq(count, 78)
+	assert_eq(warnings, 9)
 	assert_eq(EditorTooltips.WARNING_TEXT, "Not yet used in gameplay")
 	assert_eq(EditorTooltips.get_tooltip("unit", "health"), "How much damage the unit can take before being destroyed.")
 	assert_eq(EditorTooltips.get_tooltip("game", "player_key_unit"), "The unit type this player must keep alive to avoid elimination. Leave blank to count any surviving unit.")
@@ -60,19 +60,33 @@ func test_game_name_and_unit_placement_keep_original_layout() -> void:
 	assert_eq(canvas.tooltip_text, EditorTooltips.get_tooltip("game", "unit_placement"))
 	assert_eq(canvas.mouse_filter, canvas_filter)
 
+func test_actions_header_has_one_warning() -> void:
+	var panel = load("res://editor/editors/unit_editor/ActionPanel.tscn").instantiate()
+	add_child_autofree(panel)
+	var label = panel.get_node("VBoxContainer/Label")
+	assert_eq(label.tooltip_text, "Define actions for this unit.")
+	assert_eq(label.get_child_count(), 1)
+	assert_eq(label.get_child(0).name, "UnusedFeatureWarning")
+	assert_eq(label.get_child(0).tooltip_text, EditorTooltips.WARNING_TEXT)
+	var text_width = label.get_theme_font("font").get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, label.get_theme_font_size("font_size")).x
+	var text_left = label.get_theme_stylebox("normal").get_content_margin(SIDE_LEFT)
+	assert_almost_eq(label.get_child(0).position.x, text_left + text_width + 4, 0.01)
+
 func test_action_name_keeps_original_layout() -> void:
 	var panel = load("res://editor/editors/unit_editor/Action panels/ActionPanelItem.tscn").instantiate()
 	var children: Array = panel.get_children()
 	add_child_autofree(panel)
 	assert_eq(panel.get_children(), children)
 	assert_eq(panel.action_name_line.placeholder_text, "Action name")
-	assert_eq(panel.action_name_line.tooltip_text, EditorTooltips.get_tooltip("unit", "action_name") + "\n" + EditorTooltips.WARNING_TEXT)
-	assert_true(panel.get_node("HBoxContainer/Label").has_node("UnusedFeatureWarning"))
+	assert_eq(panel.action_name_line.tooltip_text, EditorTooltips.get_tooltip("unit", "action_name"))
+	assert_false(panel.get_node("HBoxContainer/Label").has_node("UnusedFeatureWarning"))
+	assert_eq(panel.get_node("HBoxContainer/Label").tooltip_text, EditorTooltips.get_tooltip("unit", "action_type"))
+	assert_false(panel.action_name_line.has_node("UnusedFeatureWarning"))
 	TooltipHelper.apply(panel.action_name_line, "unit", "action_name", false)
 	assert_eq(panel.get_children(), children)
-	assert_eq(panel.action_name_line.tooltip_text, EditorTooltips.get_tooltip("unit", "action_name") + "\n" + EditorTooltips.WARNING_TEXT)
+	assert_eq(panel.action_name_line.tooltip_text, EditorTooltips.get_tooltip("unit", "action_name"))
 
-func test_action_fields_keep_original_rows_and_warning_text() -> void:
+func test_action_fields_keep_original_rows_without_warnings() -> void:
 	var panel = load("res://editor/editors/unit_editor/Action panels/ConsumeProducePanel.tscn").instantiate()
 	add_child_autofree(panel)
 	for fields in [["Consumes", "consumed_amount", "consumed_resource"], ["Produces", "produced_amount", "produced_resource"]]:
@@ -81,9 +95,10 @@ func test_action_fields_keep_original_rows_and_warning_text() -> void:
 		assert_eq(row.get_child(0), row.get_node(fields[0]))
 		for field in [["ResourceAmount", fields[1]], ["ResourceName", fields[2]]]:
 			var input = row.get_node(field[0])
-			assert_eq(input.tooltip_text, EditorTooltips.get_tooltip("unit", field[1]) + "\n" + EditorTooltips.WARNING_TEXT)
+			assert_eq(input.tooltip_text, EditorTooltips.get_tooltip("unit", field[1]))
+			assert_false(input.has_node("UnusedFeatureWarning"))
 			TooltipHelper.apply(input, "unit", field[1], false)
-			assert_eq(input.tooltip_text, EditorTooltips.get_tooltip("unit", field[1]) + "\n" + EditorTooltips.WARNING_TEXT)
+			assert_eq(input.tooltip_text, EditorTooltips.get_tooltip("unit", field[1]))
 		assert_eq(row.get_child(1), row.get_node("ResourceAmount"))
 		assert_eq(row.get_child(2), row.get_node("ResourceName"))
 		assert_eq(row.get_child_count(), 3)
@@ -134,7 +149,7 @@ func test_editor_scenes_instantiate() -> void:
 		assert_not_null(editor)
 
 func test_warning_keys() -> void:
-	assert_eq(EditorTooltips.WARNINGS, {"unit": ["movement_type", "capturable", "victory_points", "perception", "is_producible_unit", "action_name", "action_type", "consumed_resource", "consumed_amount", "produced_resource", "produced_amount"], "map": ["tile.hiding", "tactical_map"], "painter": ["crop_image"]})
+	assert_eq(EditorTooltips.WARNINGS, {"unit": ["movement_type", "capturable", "victory_points", "perception", "is_producible_unit", "actions"], "map": ["tile.hiding", "tactical_map"], "painter": ["crop_image"]})
 
 func test_unit_description_has_no_added_label_or_tooltip() -> void:
 	var panel = load("res://editor/editors/unit_editor/UnitInfoPanel.tscn").instantiate()

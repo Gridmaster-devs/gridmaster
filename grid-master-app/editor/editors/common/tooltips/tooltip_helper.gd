@@ -21,8 +21,9 @@ static func apply(control: Control, context: String, key: String, show_warning_i
 		if control is Label:
 			control.add_child(warning)
 			var width := control.get_theme_font("font").get_string_size(control.text, HORIZONTAL_ALIGNMENT_LEFT, -1, control.get_theme_font_size("font_size")).x
-			control.custom_minimum_size.x = maxf(control.custom_minimum_size.x, width + (36 if control.horizontal_alignment != HORIZONTAL_ALIGNMENT_LEFT else 18))
-			warning.position = Vector2(width + 4, 0)
+			var style := control.get_theme_stylebox("normal")
+			var margins := style.get_content_margin(SIDE_LEFT) + style.get_content_margin(SIDE_RIGHT)
+			control.custom_minimum_size.x = maxf(control.custom_minimum_size.x, width + margins + (36 if control.horizontal_alignment != HORIZONTAL_ALIGNMENT_LEFT else 18))
 			warning.size = Vector2(14, 14)
 		elif control is Button:
 			for state in ["normal", "hover", "pressed", "disabled"]:
