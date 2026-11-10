@@ -22,6 +22,18 @@ static func apply(control: Control, context: String, key: String) -> void:
 			control.custom_minimum_size.x = maxf(control.custom_minimum_size.x, width + (36 if control.horizontal_alignment != HORIZONTAL_ALIGNMENT_LEFT else 18))
 			warning.position = Vector2(width + 4, 0)
 			warning.size = Vector2(14, 14)
+		elif control is Button:
+			for state in ["normal", "hover", "pressed", "disabled"]:
+				var style := control.get_theme_stylebox(state).duplicate() as StyleBox
+				style.content_margin_right = style.get_content_margin(SIDE_RIGHT) + 18
+				control.add_theme_stylebox_override(state, style)
+			control.add_child(warning)
+			var text_width := control.get_theme_font("font").get_string_size(control.text, HORIZONTAL_ALIGNMENT_LEFT, -1, control.get_theme_font_size("font_size")).x
+			warning.set_anchors_preset(Control.PRESET_CENTER)
+			warning.offset_left = text_width / 2 - 5
+			warning.offset_top = -7
+			warning.offset_right = text_width / 2 + 9
+			warning.offset_bottom = 7
 		else:
 			control.get_parent().add_child(warning)
 			control.get_parent().move_child(warning, control.get_index() + 1)
