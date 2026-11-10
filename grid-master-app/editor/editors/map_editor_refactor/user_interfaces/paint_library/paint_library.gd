@@ -54,6 +54,9 @@ func init(lib_name: String, preview_texture_id: String, item_id: String,
 	
 	#Ui
 	_name_ui.text = " " + _name
+	TooltipHelper.apply(_name_ui, "painter", "library_tile")
+	TooltipHelper.apply(_new_button, "painter", "new_library_tile")
+	TooltipHelper.apply(_remove_button, "painter", "remove_library_tile")
 	#new button callback:
 	if new_button_callback.is_null():
 		_new_button.pressed.connect(_on_new_tile_button_pressed)
@@ -92,6 +95,9 @@ func _add_lib_item(datapoint: Dictionary[String, Variant]) -> void:
 		var new_item: LibraryItem = preload("res://editor/editors/map_editor_refactor/user_interfaces/paint_library/library_item.tscn").instantiate()
 		_buttons_container.add_child(new_item)
 		new_item.set_data(datapoint[_item_id], datapoint[_preview_texture_id])
+		if _item_id == MapAttributes.STRATEGIC_TACTICAL_LIB_ITEM_ID:
+			TooltipHelper.apply(new_item.get_node("Label"), "map", "tactical_map")
+			TooltipHelper.apply(new_item.get_button(), "map", "tactical_map_thumbnail")
 		new_item.get_button().pressed.connect(_button_callback.bind(datapoint))
 		_items.append(new_item)
 		

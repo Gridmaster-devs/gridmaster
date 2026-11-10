@@ -63,6 +63,10 @@ func save_to_action() -> ConsumeProduce:
 	
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	TooltipHelper.add_label_before(consumes_amount, "Amount", "unit", "consumed_amount")
+	TooltipHelper.add_label_before(consumes_name, "Resource", "unit", "consumed_resource")
+	TooltipHelper.add_label_before(produces_amount, "Amount", "unit", "produced_amount")
+	TooltipHelper.add_label_before(produces_name, "Resource", "unit", "produced_resource")
 	pass # Replace with function body.
 
 	

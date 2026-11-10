@@ -19,7 +19,8 @@ func update(tile_attribute_types: Dictionary[String, Variant]) -> void:
 		tile_attribute_hbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		
 		var tile_attribute_name_ui = Label.new()
-		tile_attribute_name_ui.text = key 
+		tile_attribute_name_ui.text = key
+		TooltipHelper.apply(tile_attribute_name_ui, "painter", "tile_description_value")
 		tile_attribute_name_ui.custom_minimum_size = Vector2(80, 0)
 		
 		var tile_attribute_value_ui: Node

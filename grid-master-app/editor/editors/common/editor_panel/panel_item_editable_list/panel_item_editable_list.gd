@@ -35,6 +35,8 @@ var chosen_list: Dictionary[int, Variant]
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	TooltipHelper.apply(get_child(0), "unit", "producible_units")
+	TooltipHelper.apply(add_button, "unit", "producible_units_add")
 	options_list = options_list_provider.state
 	add_button.pressed.connect(_chosen_item_added)
 	return
@@ -88,6 +90,7 @@ func add_chosen(id):
 		
 		var remove_chosen_item_button = PanelItemEditableListButton.new(chosen_option.id)
 		remove_chosen_item_button.text = "x"
+		TooltipHelper.apply(remove_chosen_item_button, "unit", "producible_units_remove")
 		remove_chosen_item_button.pressed_with_id.connect(_chosen_item_removed)
 		
 		self.add_child(hbox)

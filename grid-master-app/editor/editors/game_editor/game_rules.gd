@@ -11,6 +11,7 @@ signal rules_changed(rules: Dictionary[String, Variant])
 
 
 func _ready() -> void: 
+	TooltipHelper.apply($"EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Combat speed/Label", "game", "combat_rounds")
 	#combat speed
 	_combat_speed_ui.text_changed.connect(_integer_rule_changed.bind("combat_rounds"))
 	_rule_uis["combat_rounds"] = _combat_speed_ui

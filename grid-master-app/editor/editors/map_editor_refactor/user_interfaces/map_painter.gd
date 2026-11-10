@@ -67,6 +67,10 @@ var _dragging_previous: Vector2i = Vector2i(-1, -1)
 ##Ready function and UI signal connections
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	TooltipHelper.apply(_erase_button, "painter", "erase")
+	TooltipHelper.apply(_interact_button, "painter", "interact")
+	TooltipHelper.apply(_settings_button, "painter", "settings")
+	TooltipHelper.apply($HBoxContainer/RightPanel/TopVBox/ScrollContainer/ContentsVBox/TileDescriptorContainer/Label, "painter", "tile_description_value")
 	_connect_ui()
 	_apply_canvas_theme()
 

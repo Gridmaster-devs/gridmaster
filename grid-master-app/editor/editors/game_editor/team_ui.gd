@@ -24,6 +24,8 @@ signal units_changed(units: Array)
 
 ##State functions
 func _ready() -> void:
+	TooltipHelper.apply($EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Name/Label, "game", "team_name")
+	TooltipHelper.apply(_color_button, "game", "team_color")
 	_color_button.pressed.connect(_open_color_picker)
 	_team_name_ui.text_changed.connect(_on_name_changed)
 
@@ -66,6 +68,7 @@ func _sync_ui() -> void:
 		new_unit_ui.box_unchecked.connect(_unit_unchecked.bind(unit_name))
 		#set name and state
 		new_unit_ui.set_label_text(unit_name)
+		TooltipHelper.apply(new_unit_ui.get_node("TeamUnitType/HBoxContainer/Label"), "game", "team_unit_selection")
 		if _units[unit_name]:
 			new_unit_ui.set_box_on()
 

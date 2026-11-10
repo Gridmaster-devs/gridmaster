@@ -13,6 +13,8 @@ signal saved(data: Dictionary[String, Variant])
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	TooltipHelper.apply(_save_button, "painter", "settings_save")
+	TooltipHelper.apply(_cancel_button, "painter", "settings_cancel")
 	_save_button.pressed.connect(on_save)
 	_cancel_button.pressed.connect(on_cancel)
 	center()
@@ -33,7 +35,8 @@ func _init_ui(settings_types: Dictionary[String, Variant]) -> void:
 		tile_attribute_hbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		
 		var tile_attribute_name_ui = Label.new()
-		tile_attribute_name_ui.text = key 
+		tile_attribute_name_ui.text = key
+		TooltipHelper.apply(tile_attribute_name_ui, "map", key)
 		tile_attribute_name_ui.custom_minimum_size = Vector2(80, 0)
 		
 		var tile_attribute_value_ui: Node

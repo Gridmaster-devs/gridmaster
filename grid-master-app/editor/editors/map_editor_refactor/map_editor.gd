@@ -22,6 +22,9 @@ var _tactical_maps: Dictionary[String, MapPainterRes]
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	TooltipHelper.apply(_save_button, "map", "save_map")
+	TooltipHelper.apply(_load_button, "map", "load_map")
+	TooltipHelper.apply(_map_mode_button, "map", "map_mode")
 	_tactical_painter = create_tactical_painter()
 	_strategic_painter = create_strategic_painter()
 	_tactical_painter.visible = false

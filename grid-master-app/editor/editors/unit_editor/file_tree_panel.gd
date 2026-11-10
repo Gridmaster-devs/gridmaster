@@ -125,6 +125,9 @@ func set_units(units_p : Array[UnitResource]):
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	TooltipHelper.apply(tree, "unit", "unit_list")
+	TooltipHelper.apply(add_button, "unit", "add_unit")
+	TooltipHelper.apply(remove_button, "unit", "remove_unit")
 	tree_root = tree.create_item(null, 0)
 	tree.hide_root = true
 	tree.item_selected.connect(new_selection)

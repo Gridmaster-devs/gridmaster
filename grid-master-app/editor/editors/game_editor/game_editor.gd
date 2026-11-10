@@ -38,6 +38,15 @@ var _unit_layer_id: int
 
 ##State functions
 func _ready() -> void:
+	TooltipHelper.add_label_before(game_name_line, "Game name", "game", "game_name")
+	TooltipHelper.apply(save_game_button, "game", "save_game")
+	TooltipHelper.apply(load_game_button, "game", "load_game")
+	TooltipHelper.apply(_new_team_button, "game", "new_team")
+	TooltipHelper.apply(_new_player_button, "game", "new_player")
+	var placement_label := Label.new()
+	placement_label.text = "Unit placement"
+	_unit_painter.get_node("HBoxContainer/RightPanel/TopVBox/ScrollContainer/ContentsVBox").add_child(placement_label)
+	TooltipHelper.apply(placement_label, "game", "unit_placement")
 	ftm.resource_uploaded.connect(load_from_resource)
 	save_game_button.button_up.connect(save_to_file)
 	load_game_button.button_up.connect(load_from_file)

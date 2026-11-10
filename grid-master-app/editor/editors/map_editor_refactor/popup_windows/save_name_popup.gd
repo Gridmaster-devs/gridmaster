@@ -9,6 +9,8 @@ signal save_confirmed(name: String)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	TooltipHelper.apply($EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer/Label, "map", "save_name")
+	TooltipHelper.apply($EditorPanel/TopVBox/ScrollContainer/ContentsVBox/SaveButton, "map", "save_name_confirm")
 	_save_button.pressed.connect(_on_save)
 	center()
 
