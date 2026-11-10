@@ -37,6 +37,3 @@ static func apply(control: Control, context: String, key: String, show_warning_i
 			warning.offset_top = -7
 			warning.offset_right = text_width / 2 + 9
 			warning.offset_bottom = 7
-		else:
-			control.get_parent().add_child(warning)
-			control.get_parent().move_child(warning, control.get_index() + 1)
