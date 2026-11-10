@@ -20,8 +20,12 @@ func update(tile_attribute_types: Dictionary[String, Variant]) -> void:
 		
 		var tile_attribute_name_ui = Label.new()
 		tile_attribute_name_ui.text = key
-		TooltipHelper.apply(tile_attribute_name_ui, "painter", "tile_description_value")
 		tile_attribute_name_ui.custom_minimum_size = Vector2(80, 0)
+		var tooltip_key: String = key if key in ["tactical_map", "tactical_map_thumbnail"] else "tile." + key
+		if EditorTooltips.get_tooltip("map", tooltip_key).is_empty():
+			TooltipHelper.apply(tile_attribute_name_ui, "painter", "tile_description_value")
+		else:
+			TooltipHelper.apply(tile_attribute_name_ui, "map", tooltip_key)
 		
 		var tile_attribute_value_ui: Node
 		
