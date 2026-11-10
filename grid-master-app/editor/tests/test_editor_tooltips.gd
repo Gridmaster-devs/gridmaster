@@ -13,7 +13,7 @@ func test_registry_and_warning_set() -> void:
 			if EditorTooltips.has_warning(context, key):
 				warnings += 1
 	assert_eq(count, 78)
-	assert_eq(warnings, 9)
+	assert_eq(warnings, 10)
 	assert_eq(EditorTooltips.WARNING_TEXT, "Not yet used in gameplay")
 	assert_eq(EditorTooltips.get_tooltip("unit", "health"), "How much damage the unit can take before being destroyed.")
 	assert_eq(EditorTooltips.get_tooltip("game", "player_key_unit"), "The unit type this player must keep alive to avoid elimination. Leave blank to count any surviving unit.")
@@ -149,7 +149,7 @@ func test_editor_scenes_instantiate() -> void:
 		assert_not_null(editor)
 
 func test_warning_keys() -> void:
-	assert_eq(EditorTooltips.WARNINGS, {"unit": ["movement_type", "capturable", "victory_points", "perception", "is_producible_unit", "actions"], "map": ["tile.hiding", "tactical_map"], "painter": ["crop_image"]})
+	assert_eq(EditorTooltips.WARNINGS, {"unit": ["movement_type", "capturable", "victory_points", "perception", "is_producible_unit", "actions", "attack_range"], "map": ["tile.hiding", "tactical_map"], "painter": ["crop_image"]})
 
 func test_unit_description_has_no_added_label_or_tooltip() -> void:
 	var panel = load("res://editor/editors/unit_editor/UnitInfoPanel.tscn").instantiate()
