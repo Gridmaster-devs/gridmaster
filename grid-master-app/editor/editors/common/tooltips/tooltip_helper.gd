@@ -4,14 +4,16 @@ extends RefCounted
 
 const WarningIcon = preload("res://editor/editors/common/tooltips/warning_icon.gd")
 
-static func apply(control: Control, context: String, key: String) -> void:
+static func apply(control: Control, context: String, key: String, show_warning_icon: bool = true) -> void:
 	var description := EditorTooltips.get_tooltip(context, key)
 	if description.is_empty():
 		return
+	if not show_warning_icon and EditorTooltips.has_warning(context, key):
+		description += "\n" + EditorTooltips.WARNING_TEXT
 	control.tooltip_text = description
 	if control.mouse_filter == Control.MOUSE_FILTER_IGNORE:
 		control.mouse_filter = Control.MOUSE_FILTER_PASS
-	if EditorTooltips.has_warning(context, key) and not control.has_meta("unused_warning"):
+	if show_warning_icon and EditorTooltips.has_warning(context, key) and not control.has_meta("unused_warning"):
 		control.set_meta("unused_warning", true)
 		var warning := Control.new()
 		warning.name = "UnusedFeatureWarning"
@@ -37,11 +39,3 @@ static func apply(control: Control, context: String, key: String) -> void:
 		else:
 			control.get_parent().add_child(warning)
 			control.get_parent().move_child(warning, control.get_index() + 1)
-
-static func add_label_before(input: Control, text: String, context: String, key: String) -> Label:
-	var label := Label.new()
-	label.text = text
-	input.get_parent().add_child(label)
-	input.get_parent().move_child(label, input.get_index())
-	apply(label, context, key)
-	return label
