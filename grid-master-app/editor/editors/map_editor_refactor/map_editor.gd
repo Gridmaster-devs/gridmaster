@@ -84,6 +84,7 @@ func _change_map_mode() -> void:
 		_map_mode_button.text = "STRATEGIC"
 		_tactical_painter.visible = false
 		_strategic_painter.visible = true
+	TooltipHelper.apply(_save_button, "tactical" if _map_mode == MapMode.TACTICAL else "map", "save_map")
 
 
 
@@ -93,6 +94,7 @@ func _open_save_popup() -> void:
 	var save_popup: SaveNamePopup = preload("res://editor/editors/map_editor_refactor/popup_windows/save_name_popup.tscn").instantiate()
 	save_popup.save_confirmed.connect(_on_save_popup_confirmed)
 	save_popup.add_to_tree()
+	save_popup.set_tooltip_context("tactical" if _map_mode == MapMode.TACTICAL else "map")
 	
 
 #when save_tactical_popup is finished with a named tactical map

@@ -38,6 +38,8 @@ var _unit_layer_id: int
 
 ##State functions
 func _ready() -> void:
+	_unit_painter.settings_tooltip_context = "game_painter"
+	TooltipHelper.apply(_unit_painter.get_node("HBoxContainer/LeftPanel/TopVBox/ScrollContainer/ContentsVBox/SSLVbox/SettingsButton"), "game_painter", "settings")
 	TooltipHelper.apply(game_name_line, "game", "game_name")
 	TooltipHelper.apply(save_game_button, "game", "save_game")
 	TooltipHelper.apply(load_game_button, "game", "load_game")
