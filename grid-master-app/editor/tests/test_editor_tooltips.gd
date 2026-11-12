@@ -153,6 +153,28 @@ func test_warning_button_preserves_theme_variation() -> void:
 	await _check_warning_theme_switches([false, true, false], &"PrimaryButton")
 
 
+func test_warning_button_preserves_custom_style_on_theme_refresh() -> void:
+	var button := _themed_button()
+	var original := _themed_button()
+	var custom := StyleBoxFlat.new()
+	custom.bg_color = Color.CORAL
+	custom.border_color = Color.DARK_RED
+	custom.set_border_width_all(3)
+	custom.content_margin_right = 11.0
+	button.add_theme_stylebox_override("normal", custom)
+	original.add_theme_stylebox_override("normal", custom)
+	TooltipHelper.apply(button, "unit", "movement_type")
+	for mode in [false, true, false, true]:
+		_assert_warning_styles(button, original)
+		var actual := button.get_theme_stylebox("normal") as StyleBoxFlat
+		assert_eq(actual.border_color, custom.border_color)
+		assert_eq(actual.border_width_left, 3)
+		assert_eq(custom.content_margin_right, 11.0, "The original style must stay unchanged")
+		EditorThemes.apply(mode)
+		await wait_process_frames(2)
+	_assert_warning_styles(button, original)
+
+
 func test_warning_button_apply_is_idempotent() -> void:
 	var button := _themed_button()
 	var original := _themed_button()
