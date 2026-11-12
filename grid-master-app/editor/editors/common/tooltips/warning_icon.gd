@@ -3,7 +3,8 @@ extends Control
 
 func _ready() -> void:
 	custom_minimum_size = Vector2(14, 14)
-	mouse_filter = Control.MOUSE_FILTER_STOP
+	# Keep our hover tooltip while letting clicks bubble to the parent button.
+	mouse_filter = Control.MOUSE_FILTER_PASS
 	tooltip_text = EditorTooltips.WARNING_TEXT
 	theme_changed.connect(_update_appearance)
 	if get_parent() is Label:

@@ -19,6 +19,11 @@ func _init() -> void:
 	set_popup_name("save_name_popup")
 
 
+func set_tooltip_context(context: String) -> void:
+	TooltipHelper.apply($EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer/Label, context, "save_name")
+	TooltipHelper.apply(_save_button, context, "save_name_confirm")
+
+
 func _on_save() -> void: 
 	save_confirmed.emit(_tact_map_name_ui.text)
 	remove_from_tree()

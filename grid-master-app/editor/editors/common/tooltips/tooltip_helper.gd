@@ -3,6 +3,7 @@ class_name TooltipHelper
 extends RefCounted
 
 const WarningIcon = preload("res://editor/editors/common/tooltips/warning_icon.gd")
+const WARNING_BUTTON_STATES := ["normal", "hover", "pressed", "disabled", "hover_pressed"]
 
 static func apply(control: Control, context: String, key: String, show_warning_icon: bool = true) -> void:
 	var description := EditorTooltips.get_tooltip(context, key)
@@ -26,10 +27,13 @@ static func apply(control: Control, context: String, key: String, show_warning_i
 			control.custom_minimum_size.x = maxf(control.custom_minimum_size.x, width + margins + (36 if control.horizontal_alignment != HORIZONTAL_ALIGNMENT_LEFT else 18))
 			warning.size = Vector2(14, 14)
 		elif control is Button:
-			for state in ["normal", "hover", "pressed", "disabled"]:
-				var style := control.get_theme_stylebox(state).duplicate() as StyleBox
-				style.content_margin_right = style.get_content_margin(SIDE_RIGHT) + 18
-				control.add_theme_stylebox_override(state, style)
+			var button_ref: WeakRef = weakref(control)
+			var original_styles: Dictionary = {}
+			for state in WARNING_BUTTON_STATES:
+				if control.has_theme_stylebox_override(state):
+					original_styles[state] = control.get_theme_stylebox(state)
+			control.theme_changed.connect(_queue_warning_button_styles.bind(button_ref, original_styles))
+			_refresh_warning_button_styles(button_ref, original_styles)
 			control.add_child(warning)
 			var text_width := control.get_theme_font("font").get_string_size(control.text, HORIZONTAL_ALIGNMENT_LEFT, -1, control.get_theme_font_size("font_size")).x
 			warning.set_anchors_preset(Control.PRESET_CENTER)
@@ -37,3 +41,31 @@ static func apply(control: Control, context: String, key: String, show_warning_i
 			warning.offset_top = -7
 			warning.offset_right = text_width / 2 + 9
 			warning.offset_bottom = 7
+
+
+static func _queue_warning_button_styles(button_ref: WeakRef, original_styles: Dictionary) -> void:
+	var button := button_ref.get_ref() as Button
+	if button == null or button.has_meta("unused_warning_refresh_pending"):
+		return
+	# Coalesce notifications and wait for EditorThemes.apply() to finish merging.
+	button.set_meta("unused_warning_refresh_pending", true)
+	_refresh_warning_button_styles.call_deferred(button_ref, original_styles)
+
+
+static func _refresh_warning_button_styles(button_ref: WeakRef, original_styles: Dictionary) -> void:
+	var button := button_ref.get_ref() as Button
+	if button == null:
+		return
+	# Override edits emit theme_changed themselves; ignore only our own edits.
+	var on_theme_changed := _queue_warning_button_styles.bind(button_ref, original_styles)
+	button.theme_changed.disconnect(on_theme_changed)
+	for state in WARNING_BUTTON_STATES:
+		button.remove_theme_stylebox_override(state)
+	for state in WARNING_BUTTON_STATES:
+		# Keep button-specific styles; resolve other states from the current theme.
+		var original: StyleBox = original_styles.get(state, button.get_theme_stylebox(state))
+		var style := original.duplicate() as StyleBox
+		style.content_margin_right = style.get_content_margin(SIDE_RIGHT) + 18
+		button.add_theme_stylebox_override(state, style)
+	button.remove_meta("unused_warning_refresh_pending")
+	button.theme_changed.connect(on_theme_changed)

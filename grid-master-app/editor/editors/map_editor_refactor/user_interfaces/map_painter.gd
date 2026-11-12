@@ -41,6 +41,7 @@ var _paint_libraries: Dictionary[String, PaintLibrary]
 
 var _width: int
 var _height: int
+var settings_tooltip_context: String = "map"
 
 
 ##Variables used for painting 
@@ -443,6 +444,7 @@ func _paint_tile(hovered_tile: Vector2i) -> void:
 func open_settings_popup() -> void: 
 	var settings_popup: SettingsPopup = preload("res://editor/editors/map_editor_refactor/popup_windows/settings_popup.tscn").instantiate()
 	settings_popup.add_to_tree()
+	settings_popup.tooltip_context = settings_tooltip_context
 	settings_popup.init(_generate_settigns_dict())
 	settings_popup.saved.connect(update_settings)
 

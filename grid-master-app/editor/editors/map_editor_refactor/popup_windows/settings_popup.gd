@@ -8,6 +8,7 @@ class_name SettingsPopup
 
 var _tiledata_ui_map: Dictionary[String, Node]
 var _settings_types: Dictionary[String, Variant]
+var tooltip_context: String = "map"
 
 signal saved(data: Dictionary[String, Variant])
 
@@ -25,6 +26,9 @@ func _init() -> void:
 #initializes the settings popup based on the types given
 func init(settings_types: Dictionary[String, Variant]) -> void: 
 	_settings_types = settings_types
+	if tooltip_context == "game_painter":
+		TooltipHelper.apply(_save_button, tooltip_context, "settings_save")
+		TooltipHelper.apply($EditorPanel/TopVBox/TopLabel, tooltip_context, "settings")
 	_init_ui(settings_types)
 
 #generates the UI based on the datatypes in "settings_types"
@@ -36,7 +40,7 @@ func _init_ui(settings_types: Dictionary[String, Variant]) -> void:
 		
 		var tile_attribute_name_ui = Label.new()
 		tile_attribute_name_ui.text = key
-		TooltipHelper.apply(tile_attribute_name_ui, "map", key)
+		TooltipHelper.apply(tile_attribute_name_ui, tooltip_context, key)
 		tile_attribute_name_ui.custom_minimum_size = Vector2(80, 0)
 		
 		var tile_attribute_value_ui: Node

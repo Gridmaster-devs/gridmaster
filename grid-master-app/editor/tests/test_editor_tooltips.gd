@@ -1,5 +1,239 @@
 extends GutTest
 
+const BUTTON_STATES := ["normal", "hover", "pressed", "disabled", "hover_pressed"]
+
+
+func after_each() -> void:
+	EditorThemes.apply(false)
+	await wait_process_frames(2)
+
+
+func _themed_button(variation: StringName = &"") -> Button:
+	var button := Button.new()
+	button.theme = EditorThemes.ACTIVE
+	button.theme_type_variation = variation
+	button.text = "Movement"
+	add_child_autofree(button)
+	return button
+
+
+func _assert_warning_styles(button: Button, original: Button) -> void:
+	for state in BUTTON_STATES:
+		var expected := original.get_theme_stylebox(state) as StyleBoxFlat
+		var actual := button.get_theme_stylebox(state) as StyleBoxFlat
+		assert_not_null(actual, state)
+		if actual == null:
+			continue
+		assert_true(button.has_theme_stylebox_override(state), state)
+		assert_ne(actual, expected, "%s must duplicate the theme resource" % state)
+		assert_eq(actual.bg_color, expected.bg_color, "%s background" % state)
+		assert_eq(actual.get_content_margin(SIDE_RIGHT), expected.get_content_margin(SIDE_RIGHT) + 18.0, "%s padding" % state)
+	assert_false(button.has_theme_stylebox_override("focus"))
+	assert_same(button.get_theme_stylebox("focus"), original.get_theme_stylebox("focus"))
+
+
+func _check_warning_theme_switches(modes: Array, variation: StringName = &"") -> void:
+	EditorThemes.apply(modes[0])
+	var button := _themed_button(variation)
+	var original := _themed_button(variation)
+	TooltipHelper.apply(button, "unit", "movement_type")
+	var warning := button.get_node("UnusedFeatureWarning") as Control
+	assert_not_null(warning)
+	assert_eq(warning.tooltip_text, EditorTooltips.WARNING_TEXT)
+	assert_eq(button.tooltip_text, EditorTooltips.get_tooltip("unit", "movement_type"))
+	var text_width := button.get_theme_font("font").get_string_size(button.text, HORIZONTAL_ALIGNMENT_LEFT, -1, button.get_theme_font_size("font_size")).x
+	assert_eq(warning.anchor_left, 0.5)
+	assert_eq(warning.anchor_top, 0.5)
+	assert_eq(warning.offset_left, text_width / 2 - 5)
+	assert_eq(warning.offset_right, text_width / 2 + 9)
+	assert_eq(warning.offset_top, -7.0)
+	assert_eq(warning.offset_bottom, 7.0)
+	_assert_warning_styles(button, original)
+	for mode in modes:
+		EditorThemes.apply(mode)
+		await wait_process_frames(2)
+		_assert_warning_styles(button, original)
+		# A refresh must settle rather than keep replacing overrides every frame.
+		var settled := button.get_theme_stylebox("normal")
+		await wait_process_frames(2)
+		assert_same(button.get_theme_stylebox("normal"), settled)
+
+
+# Isolate GUI hit testing from the GUT runner's own controls.
+func _warning_input_viewport(control: Control) -> SubViewport:
+	var viewport := SubViewport.new()
+	viewport.size = Vector2i(640, 240)
+	viewport.gui_embed_subwindows = true
+	add_child_autofree(viewport)
+	control.theme = EditorThemes.ACTIVE
+	control.position = Vector2(40, 40)
+	control.size = Vector2(260, 44)
+	viewport.add_child(control)
+	TooltipHelper.apply(control, "unit", "movement_type")
+	viewport.notify_mouse_entered()
+	return viewport
+
+
+func _move_mouse(viewport: SubViewport, point: Vector2) -> void:
+	var motion := InputEventMouseMotion.new()
+	motion.position = point
+	motion.global_position = point
+	viewport.push_input(motion, true)
+
+
+func _assert_hover_tooltip(viewport: SubViewport, control: Control, expected: String) -> void:
+	_move_mouse(viewport, control.get_global_rect().get_center())
+	assert_same(viewport.gui_get_hovered_control(), control)
+	# Wait for the engine's tooltip timer, rather than calling show_tooltip().
+	await wait_seconds(float(ProjectSettings.get_setting("gui/timers/tooltip_delay_sec")) + 0.1)
+	var popups := control.find_children("*", "PopupPanel", false, false)
+	assert_eq(popups.size(), 1, "Hover must display a tooltip popup")
+	if popups.size() == 1:
+		var popup := popups[0] as PopupPanel
+		assert_true(popup.visible)
+		var labels := popup.find_children("*", "Label", false, false)
+		assert_eq(labels.size(), 1)
+		if labels.size() == 1:
+			assert_eq(labels[0].text, expected)
+
+
+func test_warning_hover_displays_new_text_on_buttons_and_labels() -> void:
+	for control in [Button.new(), Label.new()]:
+		control.text = "Movement"
+		var viewport := _warning_input_viewport(control)
+		var warning := control.get_node("UnusedFeatureWarning") as Control
+		for light_mode in [false, true, false]:
+			EditorThemes.apply(light_mode)
+			await wait_process_frames(2)
+			await _assert_hover_tooltip(viewport, warning, "This feature is not fully implemented yet.")
+			# Moving off the triangle must still show the feature description.
+			_move_mouse(viewport, Vector2(41, 41))
+			await wait_process_frames(2)
+			await _assert_hover_tooltip(viewport, control, EditorTooltips.get_tooltip("unit", "movement_type"))
+		viewport.queue_free()
+		await wait_process_frames(2)
+
+
+func test_clicking_warning_activates_parent_button_exactly_once() -> void:
+	var button := Button.new()
+	button.text = "Movement"
+	var viewport := _warning_input_viewport(button)
+	var warning := button.get_node("UnusedFeatureWarning") as Control
+	watch_signals(button)
+	var clicks := 0
+	for light_mode in [false, true, false]:
+		EditorThemes.apply(light_mode)
+		await wait_process_frames(2)
+		var point := warning.get_global_rect().get_center()
+		assert_true(button.get_global_rect().has_point(point))
+		_move_mouse(viewport, point)
+		viewport.push_input(GutInputFactory.mouse_left_button_down(point, point), true)
+		assert_signal_emit_count(button, "pressed", clicks, "Default buttons activate on release")
+		assert_true(button.is_pressed(), "The parent button must receive the press")
+		viewport.push_input(GutInputFactory.mouse_left_button_up(point, point), true)
+		await wait_process_frames(2)
+		clicks += 1
+		assert_signal_emit_count(button, "pressed", clicks, "One activation per click on the triangle")
+		assert_false(button.is_pressed())
+
+
+func test_warning_button_dark_to_light() -> void:
+	await _check_warning_theme_switches([false, true])
+
+
+func test_warning_button_light_to_dark() -> void:
+	await _check_warning_theme_switches([true, false])
+
+
+func test_warning_button_repeated_theme_switches_keep_padding() -> void:
+	await _check_warning_theme_switches([false, true, false, true, false])
+
+
+func test_warning_button_preserves_theme_variation() -> void:
+	await _check_warning_theme_switches([false, true, false], &"PrimaryButton")
+
+
+func test_warning_button_preserves_custom_style_on_theme_refresh() -> void:
+	var button := _themed_button()
+	var original := _themed_button()
+	var custom := StyleBoxFlat.new()
+	custom.bg_color = Color.CORAL
+	custom.border_color = Color.DARK_RED
+	custom.set_border_width_all(3)
+	custom.content_margin_right = 11.0
+	button.add_theme_stylebox_override("normal", custom)
+	original.add_theme_stylebox_override("normal", custom)
+	TooltipHelper.apply(button, "unit", "movement_type")
+	for mode in [false, true, false, true]:
+		_assert_warning_styles(button, original)
+		var actual := button.get_theme_stylebox("normal") as StyleBoxFlat
+		assert_eq(actual.border_color, custom.border_color)
+		assert_eq(actual.border_width_left, 3)
+		assert_eq(custom.content_margin_right, 11.0, "The original style must stay unchanged")
+		EditorThemes.apply(mode)
+		await wait_process_frames(2)
+	_assert_warning_styles(button, original)
+
+
+func test_warning_button_apply_is_idempotent() -> void:
+	var button := _themed_button()
+	var original := _themed_button()
+	var initial_connections := button.theme_changed.get_connections().size()
+	TooltipHelper.apply(button, "unit", "movement_type")
+	var connections := button.theme_changed.get_connections().size()
+	assert_eq(connections, initial_connections + 1)
+	TooltipHelper.apply(button, "unit", "movement_type")
+	assert_eq(button.theme_changed.get_connections().size(), connections)
+	var warnings := button.find_children("UnusedFeatureWarning", "", false, false)
+	assert_eq(warnings.size(), 1)
+	_assert_warning_styles(button, original)
+	for mode in [true, false]:
+		EditorThemes.apply(mode)
+		await wait_process_frames(2)
+		_assert_warning_styles(button, original)
+		assert_eq(button.theme_changed.get_connections().size(), connections)
+
+
+func test_ordinary_button_keeps_theme_styles_and_padding() -> void:
+	var button := _themed_button()
+	TooltipHelper.apply(button, "unit", "health")
+	assert_false(button.has_node("UnusedFeatureWarning"))
+	assert_eq(button.tooltip_text, EditorTooltips.get_tooltip("unit", "health"))
+	for mode in [false, true, false]:
+		EditorThemes.apply(mode)
+		await wait_process_frames(2)
+		for state in BUTTON_STATES:
+			assert_false(button.has_theme_stylebox_override(state), state)
+			assert_same(button.get_theme_stylebox(state), EditorThemes.ACTIVE.get_stylebox(state, "Button"), state)
+
+
+func test_warning_button_coalesces_theme_changes() -> void:
+	var button := _themed_button()
+	var original := _themed_button()
+	TooltipHelper.apply(button, "unit", "movement_type")
+	await wait_process_frames(2)
+	var before := button.get_theme_stylebox("normal")
+	for mode in [true, false, true]:
+		EditorThemes.apply(mode)
+	assert_same(button.get_theme_stylebox("normal"), before, "Refresh waits for the completed theme")
+	await wait_process_frames(2)
+	_assert_warning_styles(button, original)
+	var settled := button.get_theme_stylebox("normal")
+	await wait_process_frames(2)
+	assert_same(button.get_theme_stylebox("normal"), settled)
+
+
+func test_warning_button_freed_before_deferred_refresh() -> void:
+	var button := Button.new()
+	button.theme = EditorThemes.ACTIVE
+	add_child(button)
+	TooltipHelper.apply(button, "unit", "movement_type")
+	EditorThemes.apply(true)
+	button.free()
+	await wait_process_frames(2)
+	# GUT's error tracking also catches invalid deferred calls.
+	assert_false(is_instance_valid(button))
+
 func test_registry_and_warning_set() -> void:
 	var count := 0
 	var warnings := 0
@@ -12,9 +246,9 @@ func test_registry_and_warning_set() -> void:
 				assert_false(status in tip)
 			if EditorTooltips.has_warning(context, key):
 				warnings += 1
-	assert_eq(count, 78)
-	assert_eq(warnings, 10)
-	assert_eq(EditorTooltips.WARNING_TEXT, "Not yet used in gameplay")
+	assert_eq(count, 91)
+	assert_eq(warnings, 14)
+	assert_eq(EditorTooltips.WARNING_TEXT, "This feature is not fully implemented yet.")
 	assert_eq(EditorTooltips.get_tooltip("unit", "health"), "How much damage the unit can take before being destroyed.")
 	assert_eq(EditorTooltips.get_tooltip("game", "player_key_unit"), "The unit type this player must keep alive to avoid elimination. Leave blank to count any surviving unit.")
 	assert_eq(EditorTooltips.get_tooltip("unit", "missing"), "")
@@ -149,7 +383,67 @@ func test_editor_scenes_instantiate() -> void:
 		assert_not_null(editor)
 
 func test_warning_keys() -> void:
-	assert_eq(EditorTooltips.WARNINGS, {"unit": ["movement_type", "capturable", "victory_points", "perception", "is_producible_unit", "actions", "attack_range"], "map": ["tile.hiding", "tactical_map"], "painter": ["crop_image"]})
+	assert_eq(EditorTooltips.WARNINGS, {"unit": ["movement_type", "capturable", "victory_points", "perception", "is_producible_unit", "actions", "attack_range", "production_cost", "producible_units_add"], "map": ["tile.hiding", "tactical_map"], "painter": ["crop_image"], "tactical_library": ["tactical_map"], "game_painter": ["settings"]})
+
+
+func test_save_tooltips_follow_map_mode() -> void:
+	var editor = load("res://editor/editors/map_editor_refactor/map_editor.tscn").instantiate()
+	var popup = load("res://editor/editors/map_editor_refactor/popup_windows/save_name_popup.tscn").instantiate()
+	add_child_autofree(editor)
+	add_child_autofree(popup)
+	var name_label = popup.get_node("EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer/Label")
+	for context in ["map", "tactical", "map"]:
+		popup.set_tooltip_context(context)
+		assert_eq(editor._save_button.tooltip_text, EditorTooltips.get_tooltip(context, "save_map"))
+		assert_eq(name_label.tooltip_text, EditorTooltips.get_tooltip(context, "save_name"))
+		assert_eq(popup._save_button.tooltip_text, EditorTooltips.get_tooltip(context, "save_name_confirm"))
+		assert_false(editor._save_button.has_node("UnusedFeatureWarning"))
+		editor._change_map_mode()
+
+
+func test_game_settings_warning_and_context_stay_in_popup() -> void:
+	var editor = load("res://editor/editors/game_editor/GameEditor.tscn").instantiate()
+	add_child_autofree(editor)
+	var painter = editor._unit_painter
+	assert_eq(painter.settings_tooltip_context, "game_painter")
+	assert_eq(painter._settings_button.tooltip_text, EditorTooltips.get_tooltip("game_painter", "settings"))
+	assert_true(painter._settings_button.has_node("UnusedFeatureWarning"))
+	for context in ["map", painter.settings_tooltip_context]:
+		var popup = load("res://editor/editors/map_editor_refactor/popup_windows/settings_popup.tscn").instantiate()
+		add_child_autofree(popup)
+		popup.tooltip_context = context
+		var settings: Dictionary[String, Variant] = {"width": 10, "height": 10, "map_name": "Test"}
+		popup.init(settings)
+		var header = popup.get_node("EditorPanel/TopVBox/TopLabel")
+		assert_eq(header.has_node("UnusedFeatureWarning"), context == "game_painter")
+		var rows = popup.get_node("EditorPanel/TopVBox/ScrollContainer/ContentsVBox/SettingsVbox")
+		for row in rows.get_children():
+			var label = row.get_child(0)
+			assert_eq(label.tooltip_text, EditorTooltips.get_tooltip(context, label.text))
+			assert_false(label.has_node("UnusedFeatureWarning"))
+		assert_eq(popup._save_button.tooltip_text, EditorTooltips.get_tooltip("painter" if context == "map" else context, "settings_save"))
+		assert_false(popup._save_button.has_node("UnusedFeatureWarning"))
+
+
+func test_library_tooltips_use_item_kind() -> void:
+	for kind in ["name", "tactical_map", "unit"]:
+		var library = load("res://editor/editors/map_editor_refactor/user_interfaces/paint_library/paint_library.tscn").instantiate()
+		add_child_autofree(library)
+		var attributes: Dictionary[String, Variant] = {}
+		library.init("Test", "texture", kind, attributes, attributes, 0, true)
+		var context = {"name": "painter", "tactical_map": "tactical_library", "unit": "game_painter"}[kind]
+		assert_eq(library._remove_button.tooltip_text, EditorTooltips.get_tooltip(context, "remove_library_tile"))
+		assert_false(library._remove_button.has_node("UnusedFeatureWarning"))
+		if kind == "tactical_map":
+			assert_eq(library._new_button.tooltip_text, EditorTooltips.get_tooltip(context, "new_library_tile"))
+			assert_false(library._new_button.has_node("UnusedFeatureWarning"))
+			var item_data: Dictionary[String, Variant] = {"tactical_map": "Test", "texture": GradientTexture2D.new()}
+			library._add_lib_item(item_data)
+			var item = library._items[0]
+			assert_eq(item.get_node("Label").tooltip_text, EditorTooltips.get_tooltip(context, "tactical_map"))
+			assert_true(item.get_node("Label").has_node("UnusedFeatureWarning"))
+			assert_eq(item.get_button().tooltip_text, EditorTooltips.get_tooltip(context, "tactical_map_thumbnail"))
+			assert_false(item.get_button().has_node("UnusedFeatureWarning"))
 
 func test_unit_description_has_no_added_label_or_tooltip() -> void:
 	var panel = load("res://editor/editors/unit_editor/UnitInfoPanel.tscn").instantiate()
