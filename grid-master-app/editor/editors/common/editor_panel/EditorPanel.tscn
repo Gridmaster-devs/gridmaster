@@ -28,6 +28,7 @@ text = "EditorPanel"
 [node name="ScrollContainer" type="ScrollContainer" parent="TopVBox"]
 layout_mode = 2
 size_flags_vertical = 3
+theme_type_variation = &"PaddedScrollContainer"
 
 [node name="ContentsVBox" type="VBoxContainer" parent="TopVBox/ScrollContainer"]
 layout_mode = 2

@@ -41,6 +41,7 @@ var _paint_libraries: Dictionary[String, PaintLibrary]
 
 var _width: int
 var _height: int
+var settings_tooltip_context: String = "map"
 
 
 ##Variables used for painting 
@@ -67,6 +68,10 @@ var _dragging_previous: Vector2i = Vector2i(-1, -1)
 ##Ready function and UI signal connections
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	TooltipHelper.apply(_erase_button, "painter", "erase")
+	TooltipHelper.apply(_interact_button, "painter", "interact")
+	TooltipHelper.apply(_settings_button, "painter", "settings")
+	TooltipHelper.apply($HBoxContainer/RightPanel/TopVBox/ScrollContainer/ContentsVBox/TileDescriptorContainer/Label, "painter", "tile_description_value")
 	_connect_ui()
 	_apply_canvas_theme()
 
@@ -439,6 +444,7 @@ func _paint_tile(hovered_tile: Vector2i) -> void:
 func open_settings_popup() -> void: 
 	var settings_popup: SettingsPopup = preload("res://editor/editors/map_editor_refactor/popup_windows/settings_popup.tscn").instantiate()
 	settings_popup.add_to_tree()
+	settings_popup.tooltip_context = settings_tooltip_context
 	settings_popup.init(_generate_settigns_dict())
 	settings_popup.saved.connect(update_settings)
 

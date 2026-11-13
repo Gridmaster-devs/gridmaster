@@ -76,3 +76,16 @@ func test_reloaded_copy_of_placeholder_is_recognised() -> void:
 func test_custom_image_is_not_a_placeholder() -> void:
 	var image := Image.create_empty(8, 8, false, Image.FORMAT_RGB8)
 	assert_false(EditorThemes.is_placeholder(ImageTexture.create_from_image(image)))
+
+
+func test_light_tooltip_uses_light_text() -> void:
+	EditorThemes.apply(true)
+	assert_eq(EditorThemes.ACTIVE.get_color("font_color", "TooltipLabel"), Color(0.96, 0.96, 0.96, 1))
+
+
+func test_tooltip_background_opacity_in_both_modes() -> void:
+	for light_mode in [false, true]:
+		EditorThemes.apply(light_mode)
+		var background := EditorThemes.ACTIVE.get_stylebox("panel", "TooltipPanel") as StyleBoxFlat
+		assert_not_null(background)
+		assert_almost_eq(background.bg_color.a, 0.9, 0.001)

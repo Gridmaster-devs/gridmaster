@@ -93,9 +93,10 @@ text = "Load"
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+theme_type_variation = &"PaddedScrollContainer"
 
 [node name="Description" type="TextEdit" parent="TopVBox/PanelContainer/ContentsVBox/HBoxContainer/ScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-placeholder_text = "Enter description"
+placeholder_text = "Add a short description of this unit."

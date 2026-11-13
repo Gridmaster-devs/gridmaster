@@ -7,6 +7,17 @@
 [ext_resource type="Texture2D" uid="uid://b5owkmlqcgy0e" path="res://editor/themes/icons/checkbox_unchecked.svg" id="icon_unchecked"]
 [ext_resource type="Texture2D" uid="uid://fwdsedxsifxf" path="res://editor/themes/icons/checkbox_unchecked_disabled.svg" id="icon_unchecked_disabled"]
 
+[sub_resource type="StyleBoxFlat" id="tooltip_panel"]
+content_margin_left = 8.0
+content_margin_top = 2.0
+content_margin_right = 8.0
+content_margin_bottom = 2.0
+bg_color = Color(0, 0, 0, 0.9)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
 [sub_resource type="StyleBoxFlat" id="bg_panel"]
 content_margin_left = 10.0
 content_margin_top = 10.0
@@ -607,7 +618,8 @@ SaveLoadButton/font_sizes/font_size = 24
 SaveLoadButton/styles/hover = SubResource("sl_hover")
 SaveLoadButton/styles/normal = SubResource("sl_normal")
 SaveLoadButton/styles/pressed = SubResource("sl_pressed")
-ScrollContainer/styles/panel = SubResource("scroll_panel")
+PaddedScrollContainer/base_type = &"ScrollContainer"
+PaddedScrollContainer/styles/panel = SubResource("scroll_panel")
 SectionLabel/base_type = &"Label"
 SectionLabel/colors/font_color = Color(1, 1, 1, 1)
 SectionLabel/styles/normal = SubResource("section_label")
@@ -647,6 +659,7 @@ Tree/colors/font_color = Color(0.8314, 0.8314, 0.8314, 1)
 Tree/colors/font_selected_color = Color(1, 1, 1, 1)
 Tree/styles/focus = SubResource("tree_focus")
 Tree/styles/hovered = SubResource("tree_hovered")
+TooltipPanel/styles/panel = SubResource("tooltip_panel")
 Tree/styles/panel = SubResource("tree_panel")
 Tree/styles/selected = SubResource("tree_selected")
 Tree/styles/selected_focus = SubResource("tree_selected_focus")

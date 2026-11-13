@@ -38,6 +38,18 @@ var _unit_layer_id: int
 
 ##State functions
 func _ready() -> void:
+	_unit_painter.settings_tooltip_context = "game_painter"
+	TooltipHelper.apply(_unit_painter.get_node("HBoxContainer/LeftPanel/TopVBox/ScrollContainer/ContentsVBox/SSLVbox/SettingsButton"), "game_painter", "settings")
+	TooltipHelper.apply(game_name_line, "game", "game_name")
+	TooltipHelper.apply(save_game_button, "game", "save_game")
+	TooltipHelper.apply(load_game_button, "game", "load_game")
+	TooltipHelper.apply(_new_team_button, "game", "new_team")
+	TooltipHelper.apply(_new_player_button, "game", "new_player")
+	TooltipHelper.apply(
+		_unit_painter.get_node("HBoxContainer/SubViewControl/SubViewportContainer"),
+		"game",
+		"unit_placement"
+	)
 	ftm.resource_uploaded.connect(load_from_resource)
 	save_game_button.button_up.connect(save_to_file)
 	load_game_button.button_up.connect(load_from_file)

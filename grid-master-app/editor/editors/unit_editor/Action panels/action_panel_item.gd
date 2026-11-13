@@ -70,6 +70,9 @@ func initiate(resource_array : Array[String], save_action : Signal):
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	TooltipHelper.apply(action_name_line, "unit", "action_name", false)
+	TooltipHelper.apply($HBoxContainer/Label, "unit", "action_type")
+	TooltipHelper.apply(remove_action_button, "unit", "remove_action")
 	remove_action_button.button_up.connect(self_destruct)
 	panel_type_box.item_selected.connect(update_panel_type)
 	self.add_to_group("action_panel_items")

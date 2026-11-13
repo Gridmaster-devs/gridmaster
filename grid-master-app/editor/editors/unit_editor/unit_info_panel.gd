@@ -63,6 +63,10 @@ func link_unit_editor(ue : UnitEditor):
 	name_line.text_changed.connect(unit_name_changed)
 		
 func _ready():
+	TooltipHelper.apply(name_line, "unit", "name")
+	TooltipHelper.apply(_unit_image_cont, "unit", "texture")
+	TooltipHelper.apply(save_button, "unit", "save_unit")
+	TooltipHelper.apply(load_button, "unit", "load_unit")
 	self.add_to_group("info_panel")
 	if _unit_image_cont.texture == null:
 		_unit_image_cont.texture = _get_default_img()
