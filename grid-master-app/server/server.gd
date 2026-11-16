@@ -232,13 +232,17 @@ func _create_state_update_dict() -> Dictionary:
 			"player_id": unit.player.player_id,
 			"type_id": unit.type.type_id
 		})
+	var resources_state = {}
+	for player_id in server_state.data_manager.get_players().keys():
+		resources_state[player_id] = server_state.data_manager.get_player_resources(player_id)
 	return {
 		"turn_number": server_state.data_manager.get_turn_number(),
 		"message_queue": server_state.get_message_queue(),
 		"eliminated_players": server_state.eliminated_players.duplicate(),
 		"game_over": server_state.game_over,
 		"winner_player_id": server_state.winner_player_id,
-		"units": units_state
+		"units": units_state,
+		"player_resources": resources_state
 	}
 
 # End the player turn
@@ -352,6 +356,9 @@ func _on_team_turn_end(peer_id: int, action_queue: Array) -> void:
 		
 	# Check for eliminated players (no key units left) and victory.
 	server_state.process_eliminations_and_victory()
+
+	# Units consume and produce global resources
+	server_state.data_manager.process_resources()
 
 	# Go through other actions. Only production actions at this time
 	for unit : Unit in unit_array:

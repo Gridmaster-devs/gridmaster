@@ -8,6 +8,8 @@ extends Resource
 @export var team_uis: Array[TeamUiRes]
 @export var player_uis: Array[PlayerUiRes]
 @export var game_rules: Dictionary[String, Variant]
+## Names of the global resources. Empty in games made before resources existed.
+@export var resources: Array[String] = []
 
 func save_units(unit_array : Array[UnitResource]):
 	if (unit_array != null):
@@ -19,6 +21,12 @@ func save_rules(rules: Dictionary[String, Variant]) -> void:
 
 func load_rules() -> Dictionary[String, Variant]:
 	return game_rules
+
+func save_resources(resources_p: Array[String]) -> void:
+	resources = resources_p
+
+func load_resources() -> Array[String]:
+	return resources.duplicate()
 
 func load_units() -> Array[UnitResource]:
 	return units.duplicate_deep()

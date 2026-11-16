@@ -35,5 +35,15 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "4"
 
+[node name="Resources" type="VBoxContainer" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="1"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Resources"]
+layout_mode = 2
+theme_type_variation = &"SectionLabel"
+text = "Resources"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [editable path="EditorPanel"]
 [editable path="EditorPanel/TopVBox/ScrollContainer/ContentsVBox/Combat speed"]

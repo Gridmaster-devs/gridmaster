@@ -61,6 +61,8 @@ var producible_units_ids: Array = []
 var is_producible_unit: bool = false
 var production_cost: int = 1
 
+## The global resources the unit consumes and produces every turn
+var consume_produce_actions: Array[ConsumeProduce] = []
 
 
 ## Dictionary containing the value of each attribute
@@ -102,6 +104,11 @@ static func initFromUnitResource(unit_resource : UnitResource) -> UnitType:
 	var producible_units_from_resource = unit_resource.get_attribute_value("producible_units")
 	if producible_units_from_resource != null and producible_units_from_resource != []:
 		unit_type.producible_units_ids = producible_units_from_resource
+	
+	if unit_resource.load_actions() != null:
+		for action in unit_resource.load_actions():
+			if action is ConsumeProduce:
+				unit_type.consume_produce_actions.append(action)
 	
 	for key in resource_attributes.keys():
 		if (key == "name" or key == "description" or key == "texture" or key == "is_production_unit" 

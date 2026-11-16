@@ -22,6 +22,8 @@ var unit_types : Dictionary[int, UnitType] = {} ## All the types of units in the
 var players : Dictionary[int, Player] = {-1 : Player.NEUTRAL_PLAYER} ## All the players in the game
 var teams : Dictionary[int, Team] = {-1 : Team.NEUTRAL_TEAM} ## All the teams in the game
 
+var resources : Array[String] = [] ## The names of the global resources in the game
+
 # These are used for generating team and player ids
 var teams_index = 0 # Count for how many teams there are
 var players_index = 0 # Count for how many players there are
@@ -31,8 +33,20 @@ var players_index = 0 # Count for how many players there are
 func initUnitTypesFromResource(game_definition : GameDefinitionResource, 
 								unit_name_type_dict: Dictionary[String, int]) -> void:
 	var gd_units : Array[UnitResource] = game_definition.load_units()
+
+	# Games made with older editors can have several unit types with the same ID.
+	# The duplicates are given unused IDs so they don't overwrite each other.
+	var next_free_id : int = 0
+	for unit in gd_units:
+		if unit.get_attribute_value("id") != null:
+			next_free_id = max(next_free_id, unit.get_attribute_value("id") + 1)
+
 	for unit in gd_units:
 		var cur_unit_type = UnitType.initFromUnitResource(unit)
+		if unit_types.has(cur_unit_type.type_id):
+			GML.log("Unit type %s has a duplicate ID %d, using ID %d instead." % [cur_unit_type.unit_name, cur_unit_type.type_id, next_free_id], GML.LogLevel.WARN)
+			cur_unit_type.type_id = next_free_id
+			next_free_id += 1
 		unit_types.set(cur_unit_type.type_id, cur_unit_type)
 		unit_name_type_dict[ cur_unit_type.unit_name] = cur_unit_type.type_id
 	for unit_type in unit_types.values():

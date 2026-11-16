@@ -14,6 +14,15 @@ offset_bottom = 23.0
 grow_horizontal = 2
 horizontal_alignment = 1
 
+[node name="ResourcesLabel" type="Label" parent="."]
+visible = false
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 23.0
+offset_bottom = 46.0
+grow_horizontal = 2
+horizontal_alignment = 1
+
 [node name="EndTurnButton" parent="." instance=ExtResource("2_arvn5")]
 anchors_preset = 3
 anchor_left = 1.0

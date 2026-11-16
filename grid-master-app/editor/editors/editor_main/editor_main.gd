@@ -18,6 +18,11 @@ func set_units(units_p : Array[UnitResource]):
 	unit_editor.set_units(units_p)
 
 
+# tells the unit editor which resources units can consume or produce
+func set_resources(resources_p : Array[String]):
+	unit_editor.set_resources(resources_p)
+
+
 func getMap() -> MapResource:
 	return map_editor.get_map_as_resource()
 

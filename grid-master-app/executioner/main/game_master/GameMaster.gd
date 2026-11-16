@@ -54,6 +54,7 @@ const GAME_OVER_POPUP_SCENE := preload("res://executioner/main/game_master/gui_s
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	units_changed.connect(grid_graphics._unitsChanged)
+	units_changed.connect(_update_resources_gui)
 	_click_tracker.clicked.connect(_clicked)
 	_custom_graphics = grid_graphics.get_custom_graphics()
 	ftm.resource_uploaded.connect(local_init_game)
@@ -133,7 +134,10 @@ func process_end_turn_local() -> void:
 		for unit in units_to_be_removed:
 			unit_array.erase(unit)
 			data_manager.remove_unit(unit)
-	
+
+	# Units consume and produce global resources
+	data_manager.process_resources()
+
 	# Go through other actions. Only production actions at this time
 	for unit : Unit in unit_array:
 		if unit.current_action is ProductionAction:
@@ -189,7 +193,10 @@ func process_end_turn_local_builder() -> GameState:
 		for unit in units_to_be_removed:
 			unit_array.erase(unit)
 			new_game_state.remove_unit(unit)
-	
+
+	# Units consume and produce global resources
+	data_manager.process_resources()
+
 	# Go through other actions. Only production actions at this time
 	for unit : Unit in unit_array:
 		if unit.current_action is ProductionAction:
@@ -505,8 +512,15 @@ func _apply_state_update(state_update: Dictionary) -> void:
 						unit.current_action = null
 				else:
 					unit.current_action = null
-			else:	
+			else:
 				data_manager.addUnitWithId(data_manager.get_unit_type_by_id(u_state["type_id"]), u_state["position"], data_manager.get_player_by_id(u_state["player_id"]), unit_id)
+
+		# Global resources of each player
+		if state_update.has("player_resources"):
+			for player_id in state_update["player_resources"].keys():
+				var amounts: Dictionary = state_update["player_resources"][player_id]
+				for resource_name in amounts.keys():
+					data_manager.set_resource_amount(player_id, resource_name, amounts[resource_name])
 		units_changed.emit()
 		# NOTE: most likely redundant call. Left since there is small possibility
 		#		that some functions might change it in between calls to this function?
@@ -805,6 +819,13 @@ func switch_gui_scene(new_scene : PackedScene, args : Variant):
 	gui_scene = new_scene.instantiate()
 	self.add_child(gui_scene)
 	gui_scene.initialize(args)
+	_update_resources_gui()
+
+
+## Shows the client player's global resources in the in-game toolbar
+func _update_resources_gui() -> void:
+	if gui_scene is InGameDefaultGUI and data_manager != null:
+		gui_scene.set_resources(data_manager.get_player_resources(data_manager.get_client_player_id()))
 
 
 func _clicked(button : MouseButton):

@@ -27,6 +27,7 @@ static func initFromGameDefinition(game_definition_resource : GameDefinitionReso
 	var new_client_attributes = ClientAttributes.new()
 	new_game_definition.initUnitTypesFromResource(game_definition_resource, unit_name_type_dict)
 	new_game_definition.game_name = game_definition_resource.game_name
+	new_game_definition.resources = game_definition_resource.load_resources()
 	new_game_definition._grid = GameGrid.initFromMapResource(game_definition_resource.loadMap())
 	
 	var game_def_teams: Array[TeamUiRes] = game_definition_resource.team_uis
@@ -158,6 +159,13 @@ func get_unit_type_by_id(id: int) -> UnitType:
 func get_grid() -> GameGrid:
 	return _game_definition.grid
 
+## Returns the amount of each global resource the player has, in the order the game defines them
+func get_player_resources(player_id: int) -> Dictionary[String, int]:
+	var amounts: Dictionary[String, int] = {}
+	for resource_name in _game_definition.resources:
+		amounts[resource_name] = _game_state.get_resource_amount(player_id, resource_name)
+	return amounts
+
 # Used for visibility logic. Checks if the target unit is visible to the given player
 ## TODO probably should not be here, could be moved to Team if the team knows its own units
 func _is_unit_visible(target_unit: Unit, player_id: int) -> bool:
@@ -203,3 +211,25 @@ func add_unit(unit_type : UnitType, position : Vector2i, player : Player) -> voi
 
 func addUnitWithId(unit_type: UnitType, position : Vector2i, player_p: Player, unit_id_p: int) -> void:
 	_game_state.addUnitWithId(unit_type, position, player_p, unit_id_p)
+
+func set_resource_amount(player_id: int, resource_name: String, amount: int) -> void:
+	_game_state.set_resource_amount(player_id, resource_name, amount)
+
+## Applies the consume / produce actions of every unit to the resources of the unit's owner.
+## A unit only produces if its owner can pay for what it consumes. Resources the game
+## doesn't define (e.g. None) are neither consumed nor produced.
+func process_resources() -> void:
+	for unit in _game_state.getUnits():
+		var player_id: int = unit.get_player_id()
+		for action in unit.type.consume_produce_actions:
+			var consumed: String = action.get_consumed_name()
+			if _game_definition.resources.has(consumed):
+				var available: int = _game_state.get_resource_amount(player_id, consumed)
+				if available < action.get_consumed_amount():
+					continue
+				_game_state.set_resource_amount(player_id, consumed, available - action.get_consumed_amount())
+
+			var produced: String = action.get_produced_name()
+			if _game_definition.resources.has(produced):
+				var amount: int = _game_state.get_resource_amount(player_id, produced)
+				_game_state.set_resource_amount(player_id, produced, amount + action.get_produced_amount())
