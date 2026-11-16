@@ -39,12 +39,14 @@ func create_move_cost(resource_name: String, amount: int, mode: MoveCost.Mode) -
 	return cost
 
 #Helper function to add a unit with a move cost (null for none) and a queued move one tile right
-func add_moving_unit(cost: MoveCost, position: Vector2i = Vector2i(0, 0)) -> Unit:
+func add_moving_unit(cost: MoveCost, position: Vector2i = Vector2i(0, 0), owner_id: int = -2) -> Unit:
+	if owner_id == -2:
+		owner_id = player_id
 	var unit_type: UnitType = UnitType.debugType()
 	unit_type.move_cost = cost
-	var unit: Unit = game_state.addUnit(unit_type, position, game_def.players.get(player_id))
+	var unit: Unit = game_state.addUnit(unit_type, position, game_def.players.get(owner_id))
 	var path: Array[Vector2i] = [position, position + Vector2i(1, 0)]
-	unit.current_action = MoveAction.new(path, player_id, unit, game_manager)
+	unit.current_action = MoveAction.new(path, owner_id, unit, game_manager)
 	return unit
 
 #Helper function to run one whole single-player turn and return the units' positions afterwards
@@ -162,6 +164,11 @@ func test_pay_ignores_resource_named_none():
 	game_manager.pay(player_id, ConsumeProduce.NO_RESOURCE, 2)
 	assert_eq(game_manager.get_game_state().get_resource_amount(player_id, ConsumeProduce.NO_RESOURCE), 0)
 
+func test_pay_ignores_negative_amount():
+	game_manager.set_resource_amount(player_id, "Gold", 5)
+	game_manager.pay(player_id, "Gold", -4)
+	assert_eq(gold(), 5)
+
 
 #Whole single-player turn (the server calls charge_move_costs at the same point)
 func test_turn_moves_paid_unit_and_keeps_refused_unit_in_place():
@@ -203,6 +210,24 @@ func test_hint_allows_move_that_fits():
 	requirer.current_action = null
 	assert_true(game_manager.can_afford_move(requirer))
 	assert_eq(gold(), 8)
+
+func test_hint_ignores_order_that_is_already_refused():
+	game_manager.set_resource_amount(player_id, "Gold", 5)
+	add_moving_unit(create_move_cost("Stone", 1, MoveCost.Mode.CONSUME), Vector2i(0, 0))
+	var unit: Unit = add_moving_unit(create_move_cost("Gold", 3, MoveCost.Mode.CONSUME), Vector2i(0, 2))
+	unit.current_action = null
+	assert_true(game_manager.can_afford_move(unit))
+
+func test_hint_ignores_other_players_spending():
+	var other_team_id: int = game_def.add_team("Team 2", Color(1, 1, 1), [])
+	var other_player_id: int = game_def.add_player("Player 2", other_team_id, false)
+	game_manager.set_resource_amount(player_id, "Gold", 3)
+	game_manager.set_resource_amount(other_player_id, "Gold", 3)
+	add_moving_unit(create_move_cost("Gold", 3, MoveCost.Mode.CONSUME), Vector2i(0, 0), other_player_id)
+	var unit: Unit = add_moving_unit(create_move_cost("Gold", 3, MoveCost.Mode.CONSUME), Vector2i(0, 2))
+	unit.current_action = null
+	assert_true(game_manager.can_afford_move(unit))
+
 func test_can_afford_move_counts_queued_moves():
 	game_manager.set_resource_amount(player_id, "Gold", 5)
 	add_moving_unit(create_move_cost("Gold", 3, MoveCost.Mode.CONSUME))
