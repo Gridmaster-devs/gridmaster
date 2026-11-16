@@ -322,7 +322,11 @@ func _on_team_turn_end(peer_id: int, action_queue: Array) -> void:
 	
 	# Clear the array of all the teams that have ended their turn
 	server_state.clear_player_turns()
-	
+
+	# Moves are paid for before anything moves. See GameDataManager.charge_move_costs for the rules.
+	for refused_unit in server_state.data_manager.charge_move_costs():
+		GML.log("Refused move of unit %d (player %d): %s" % [refused_unit.getId(), refused_unit.get_player_id(), GameDataManager.move_refused_message(refused_unit)], GML.LogLevel.INFO)
+
 	## Finally execute all the actions
 	var unit_array = server_state.data_manager.get_units().values()
 	var sort_func : Callable = GameArgs.args.get(GameArgs.ArgType.UNIT_INITIATIVE_FUNC)

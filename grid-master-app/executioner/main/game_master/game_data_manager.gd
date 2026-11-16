@@ -233,3 +233,84 @@ func process_resources() -> void:
 			if _game_definition.resources.has(produced):
 				var amount: int = _game_state.get_resource_amount(player_id, produced)
 				_game_state.set_resource_amount(player_id, produced, amount + action.get_produced_amount())
+
+## Whether the player holds at least the given amount of a resource.
+##
+## This is the one place that decides affordability, keep other checks calling this.
+## "None" (or an empty name) costs nothing. A name the game doesn't define can never be
+## afforded, so a renamed or deleted resource shows up as a refusal instead of a free action.
+func can_afford(player_id: int, resource_name: String, amount: int) -> bool:
+	if resource_name == "" or resource_name == ConsumeProduce.NO_RESOURCE or amount <= 0:
+		return true
+	if not _game_definition.resources.has(resource_name):
+		GML.log("Resource \"%s\" is not defined in this game, it can't be afforded." % resource_name, GML.LogLevel.WARN)
+		return false
+	return _game_state.get_resource_amount(player_id, resource_name) >= amount
+
+## Subtracts the amount from the player. Does nothing where can_afford counts the cost as free
+## ("None", an empty name, an amount of 0 or less) or for resources the game doesn't define.
+func pay(player_id: int, resource_name: String, amount: int) -> void:
+	if amount <= 0 or resource_name == ConsumeProduce.NO_RESOURCE or not _game_definition.resources.has(resource_name):
+		return
+	_game_state.set_resource_amount(player_id, resource_name, _game_state.get_resource_amount(player_id, resource_name) - amount)
+
+## Charges the move costs of all units that have a move queued and refuses the moves that can't be paid.
+## Returns the units whose moves were refused.
+##
+## Engine rules, the same for the server and single-player (both call this):
+## - Charged once per move order, however far the unit moves (MoveCost.Charge.PER_ORDER).
+## - Called at the start of turn processing, after all players have ended their turn and
+##   before movement and process_resources(). Moves are paid from what the player had at the
+##   end of last turn, so this turn's income can't pay for this turn's moves.
+## - Units are charged in unit order, earlier moves are paid first. Later moves are still checked.
+## - Consume subtracts the amount, Require only checks it without subtracting.
+## - A refused move is dropped and the unit stays put. There's no refund if the unit is stopped early.
+func charge_move_costs() -> Array[Unit]:
+	return _settle_move_costs(true)
+
+## Whether giving the unit a move order now is fine: the unit can pay for its move, and the
+## owner's moves that are already ordered and paid for still are. Only a hint for the client UI,
+## charge_move_costs() decides. It replays the same rules without changing anything.
+func can_afford_move(unit: Unit) -> bool:
+	if unit.type.move_cost == null:
+		return true
+	var refused_now: Array[Unit] = _settle_move_costs(false)
+	for refused_unit in _settle_move_costs(false, unit):
+		if refused_unit == unit or not refused_now.has(refused_unit):
+			return false
+	return true
+
+## Goes through the queued moves in unit order and returns the units whose moves can't be paid.
+## With apply, it pays the costs and drops the refused moves (charge_move_costs).
+## Without it, nothing is changed and the amounts already spent are only counted (can_afford_move).
+## also_queued is treated as if it had a move queued, whatever its current action is.
+func _settle_move_costs(apply: bool, also_queued: Unit = null) -> Array[Unit]:
+	var refused: Array[Unit] = []
+	var spent: Dictionary[String, int] = {} ## "player_id:resource" -> amount spent so far (only without apply)
+	for unit in _game_state.getUnits():
+		var cost: MoveCost = unit.type.move_cost
+		if cost == null or cost.amount <= 0 or not (unit == also_queued or unit.current_action is MoveAction):
+			continue
+		var player_id: int = unit.get_player_id()
+		var key: String = "%d:%s" % [player_id, cost.cost_resource]
+		if not can_afford(player_id, cost.cost_resource, cost.amount + spent.get(key, 0)):
+			refused.append(unit)
+			if apply:
+				unit.current_action = null
+			continue
+		if cost.mode == MoveCost.Mode.CONSUME:
+			if apply:
+				pay(player_id, cost.cost_resource, cost.amount)
+			else:
+				spent[key] = spent.get(key, 0) + cost.amount
+	return refused
+
+## The message shown when a unit can't afford to move
+static func move_refused_message(unit: Unit) -> String:
+	var cost: MoveCost = unit.type.move_cost
+	return "%s can't move: needs %d %s." % [unit.type.unit_name, cost.amount, cost.cost_resource]
+
+## The message shown when the client hint stops a move order
+static func move_hint_message(unit: Unit) -> String:
+	var cost: MoveCost = unit.type.move_cost
+	return "%s can't move: needs %d %s, counting the moves already ordered this turn." % [unit.type.unit_name, cost.amount, cost.cost_resource]
