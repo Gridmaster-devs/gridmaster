@@ -64,6 +64,9 @@ var production_cost: int = 1
 ## The global resources the unit consumes and produces every turn
 var consume_produce_actions: Array[ConsumeProduce] = []
 
+## What moving the unit costs. Null means moving is free (also in games made before move costs existed).
+var move_cost: MoveCost = null
+
 
 ## Dictionary containing the value of each attribute
 var attributes : Dictionary[UNIT_ATTRIBUTE_TYPE, Variant]
@@ -109,7 +112,12 @@ static func initFromUnitResource(unit_resource : UnitResource) -> UnitType:
 		for action in unit_resource.load_actions():
 			if action is ConsumeProduce:
 				unit_type.consume_produce_actions.append(action)
-	
+			elif action is MoveCost:
+				if unit_type.move_cost == null:
+					unit_type.move_cost = action
+				else:
+					GML.log("Unit type %s has more than one move cost, only the first one is used." % unit_type.unit_name, GML.LogLevel.WARN)
+
 	for key in resource_attributes.keys():
 		if (key == "name" or key == "description" or key == "texture" or key == "is_production_unit" 
 			or key == "is_producible_unit" or key == "production_cost" or key == "producible_units" or key == "id"):

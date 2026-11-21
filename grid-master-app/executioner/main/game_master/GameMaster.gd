@@ -163,7 +163,13 @@ func process_end_turn_local_builder() -> GameState:
 	
 	# Have to mount new game state here because actions rely on it right now
 	data_manager.replace_game_state(new_game_state)
-	
+
+	# Moves are paid for before anything moves, the same as on the server.
+	# See GameDataManager.charge_move_costs for the rules.
+	for refused_unit in data_manager.charge_move_costs():
+		if refused_unit.get_player_id() == data_manager.get_client_player_id():
+			MessageDispatcher.broadcast_message(GameDataManager.move_refused_message(refused_unit))
+
 	var unit_array = new_game_state._units.values()
 	var sort_func : Callable = GameArgs.args.get(GameArgs.ArgType.UNIT_INITIATIVE_FUNC)
 	sort_func.call(unit_array)
@@ -679,7 +685,10 @@ func _handle_event_default_in_game(event : StateMachineEvent):
 			# The user clicked on a tile in the map limits and there is a unit on the tile
 			
 			moved_unit = unit
-			if moved_unit.current_action != null and moved_unit.current_action.is_interruptible():
+			# Checked before the unit's queued move is cleared, so a refused click keeps that move.
+			# Only a hint for the player, the turn processing makes the real check.
+			var can_move: bool = data_manager.can_afford_move(moved_unit)
+			if moved_unit.current_action != null and moved_unit.current_action.is_interruptible() and can_move:
 				moved_unit.current_action = null # clear the current action
 				_custom_graphics.clear_id(moved_unit.getId())
 			
@@ -693,7 +702,12 @@ func _handle_event_default_in_game(event : StateMachineEvent):
 			
 			if moved_unit.current_action != null and not moved_unit.current_action.is_interruptible():
 				return
-			
+
+			if not can_move:
+				MessageDispatcher.broadcast_message(GameDataManager.move_hint_message(moved_unit))
+				moved_unit = null
+				return
+
 			current_possible_tiles = _pathfinder.tiles_from_position(unit.getPosition(), unit.get_move_speed(), unit)
 			movement_left = moved_unit.get_move_speed()
 			
