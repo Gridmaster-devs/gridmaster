@@ -247,14 +247,15 @@ func test_registry_and_warning_set() -> void:
 			if EditorTooltips.has_warning(context, key):
 				warnings += 1
 	assert_eq(count, 91)
-	assert_eq(warnings, 14)
+	assert_eq(warnings, 15)
 	assert_eq(EditorTooltips.WARNING_TEXT, "This feature is not fully implemented yet.")
 	assert_eq(EditorTooltips.get_tooltip("unit", "health"), "How much damage the unit can take before being destroyed.")
+	assert_eq(EditorTooltips.get_tooltip("unit", "morale"), "The unit's starting morale.")
 	assert_eq(EditorTooltips.get_tooltip("game", "player_key_unit"), "The unit type this player must keep alive to avoid elimination. Leave blank to count any surviving unit.")
 	assert_eq(EditorTooltips.get_tooltip("unit", "missing"), "")
 	assert_eq(EditorTooltips.get_tooltip("map", "name"), "")
 	assert_false(EditorTooltips.has_warning("unit", "health"))
-	assert_false(EditorTooltips.has_warning("unit", "morale"))
+	assert_true(EditorTooltips.has_warning("unit", "morale"))
 	assert_false(EditorTooltips.has_warning("map", "save_map"))
 
 func test_label_warning_is_separate_and_idempotent() -> void:
@@ -383,7 +384,7 @@ func test_editor_scenes_instantiate() -> void:
 		assert_not_null(editor)
 
 func test_warning_keys() -> void:
-	assert_eq(EditorTooltips.WARNINGS, {"unit": ["movement_type", "capturable", "victory_points", "perception", "is_producible_unit", "actions", "attack_range", "production_cost", "producible_units_add"], "map": ["tile.hiding", "tactical_map"], "painter": ["crop_image"], "tactical_library": ["tactical_map"], "game_painter": ["settings"]})
+	assert_eq(EditorTooltips.WARNINGS, {"unit": ["movement_type", "capturable", "morale", "victory_points", "perception", "is_producible_unit", "actions", "attack_range", "production_cost", "producible_units_add"], "map": ["tile.hiding", "tactical_map"], "painter": ["crop_image"], "tactical_library": ["tactical_map"], "game_painter": ["settings"]})
 
 
 func test_save_tooltips_follow_map_mode() -> void:
