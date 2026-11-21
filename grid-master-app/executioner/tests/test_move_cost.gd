@@ -273,3 +273,12 @@ func test_move_cost_survives_save_and_load():
 	assert_eq(cost.amount, 7)
 	assert_eq(cost.mode, MoveCost.Mode.REQUIRE)
 	assert_eq(cost.charge, MoveCost.Charge.PER_ORDER)
+
+#Test that paid move costs get one combined message per unit type in the log
+func test_paid_move_costs_are_combined_in_one_message():
+	game_manager.set_resource_amount(player_id, "Gold", 5)
+	for i in 2:
+		add_moving_unit(create_move_cost("Gold", 2, MoveCost.Mode.CONSUME), Vector2i(i, 0))
+	watch_signals(MessageDispatcher)
+	game_manager.charge_move_costs()
+	assert_signal_emitted_with_parameters(MessageDispatcher, "message_broadcast", ["[Player 1] Test unit x2: paid 4 Gold to move."])

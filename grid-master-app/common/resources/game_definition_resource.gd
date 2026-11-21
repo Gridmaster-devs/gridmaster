@@ -10,6 +10,8 @@ extends Resource
 @export var game_rules: Dictionary[String, Variant]
 ## Names of the global resources. Empty in games made before resources existed.
 @export var resources: Array[String] = []
+## Icons of the global resources by resource name. Resources without an icon aren't in it.
+@export var resource_icons: Dictionary[String, Texture2D] = {}
 
 func save_units(unit_array : Array[UnitResource]):
 	if (unit_array != null):
@@ -27,6 +29,12 @@ func save_resources(resources_p: Array[String]) -> void:
 
 func load_resources() -> Array[String]:
 	return resources.duplicate()
+
+func save_resource_icons(icons: Dictionary[String, Texture2D]) -> void:
+	resource_icons = icons
+
+func load_resource_icons() -> Dictionary[String, Texture2D]:
+	return resource_icons.duplicate()
 
 func load_units() -> Array[UnitResource]:
 	return units.duplicate_deep()

@@ -839,7 +839,7 @@ func switch_gui_scene(new_scene : PackedScene, args : Variant):
 ## Shows the client player's global resources in the in-game toolbar
 func _update_resources_gui() -> void:
 	if gui_scene is InGameDefaultGUI and data_manager != null:
-		gui_scene.set_resources(data_manager.get_player_resources(data_manager.get_client_player_id()))
+		gui_scene.set_resources(data_manager.get_player_resources(data_manager.get_client_player_id()), data_manager.get_resource_icons())
 
 
 func _clicked(button : MouseButton):

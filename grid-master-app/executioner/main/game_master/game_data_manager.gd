@@ -28,6 +28,7 @@ static func initFromGameDefinition(game_definition_resource : GameDefinitionReso
 	new_game_definition.initUnitTypesFromResource(game_definition_resource, unit_name_type_dict)
 	new_game_definition.game_name = game_definition_resource.game_name
 	new_game_definition.resources = game_definition_resource.load_resources()
+	new_game_definition.resource_icons = game_definition_resource.load_resource_icons()
 	new_game_definition._grid = GameGrid.initFromMapResource(game_definition_resource.loadMap())
 	
 	var game_def_teams: Array[TeamUiRes] = game_definition_resource.team_uis
@@ -166,6 +167,10 @@ func get_player_resources(player_id: int) -> Dictionary[String, int]:
 		amounts[resource_name] = _game_state.get_resource_amount(player_id, resource_name)
 	return amounts
 
+## Returns the icons of the global resources by name. Resources without an icon aren't in it.
+func get_resource_icons() -> Dictionary[String, Texture2D]:
+	return _game_definition.resource_icons
+
 # Used for visibility logic. Checks if the target unit is visible to the given player
 ## TODO probably should not be here, could be moved to Team if the team knows its own units
 func _is_unit_visible(target_unit: Unit, player_id: int) -> bool:
@@ -218,21 +223,73 @@ func set_resource_amount(player_id: int, resource_name: String, amount: int) -> 
 ## Applies the consume / produce actions of every unit to the resources of the unit's owner.
 ## A unit only produces if its owner can pay for what it consumes. Resources the game
 ## doesn't define (e.g. None) are neither consumed nor produced.
+## Sends one message per player and unit type with the totals, see _broadcast_resource_summary.
 func process_resources() -> void:
+	var summary: Dictionary[String, Dictionary] = {}
 	for unit in _game_state.getUnits():
 		var player_id: int = unit.get_player_id()
+		var entry: Dictionary = {}
 		for action in unit.type.consume_produce_actions:
 			var consumed: String = action.get_consumed_name()
+			var produced: String = action.get_produced_name()
+			if not _game_definition.resources.has(consumed) and not _game_definition.resources.has(produced):
+				continue
+			if entry.is_empty():
+				entry = _summary_entry(summary, unit)
+				entry["units"] += 1
 			if _game_definition.resources.has(consumed):
 				var available: int = _game_state.get_resource_amount(player_id, consumed)
 				if available < action.get_consumed_amount():
+					entry["unpaid"][consumed] = entry["unpaid"].get(consumed, 0) + 1
 					continue
 				_game_state.set_resource_amount(player_id, consumed, available - action.get_consumed_amount())
+				entry["consumed"][consumed] = entry["consumed"].get(consumed, 0) + action.get_consumed_amount()
 
-			var produced: String = action.get_produced_name()
 			if _game_definition.resources.has(produced):
 				var amount: int = _game_state.get_resource_amount(player_id, produced)
 				_game_state.set_resource_amount(player_id, produced, amount + action.get_produced_amount())
+				entry["produced"][produced] = entry["produced"].get(produced, 0) + action.get_produced_amount()
+	_broadcast_resource_summary(summary)
+
+## Returns the totals of the unit's owner and type in the summary, adding them if they aren't in it yet.
+## Units of the same type and owner share one entry, so the log gets one message for all of them.
+func _summary_entry(summary: Dictionary[String, Dictionary], unit: Unit) -> Dictionary:
+	var key: String = "%d:%s" % [unit.get_player_id(), unit.type.unit_name]
+	if not summary.has(key):
+		summary[key] = {
+			"player_name": unit.player.player_name,
+			"unit_name": unit.type.unit_name,
+			"units": 0,
+			"consumed": {}, ## resource -> amount
+			"produced": {}, ## resource -> amount
+			"unpaid": {}, ## resource -> how many times a unit couldn't pay it
+			"paid_to_move": {} ## resource -> amount
+		}
+	return summary[key]
+
+## Sends a message for each entry of the summary, e.g.
+## "[Player 1] Pawn x5: consumed 4 Wood, produced 10 Gold, 2 lacked Wood."
+func _broadcast_resource_summary(summary: Dictionary[String, Dictionary]) -> void:
+	for entry in summary.values():
+		var parts: Array[String] = []
+		if not entry["paid_to_move"].is_empty():
+			parts.append("paid %s to move" % _format_amounts(entry["paid_to_move"]))
+		if not entry["consumed"].is_empty():
+			parts.append("consumed %s" % _format_amounts(entry["consumed"]))
+		if not entry["produced"].is_empty():
+			parts.append("produced %s" % _format_amounts(entry["produced"]))
+		for resource_name in entry["unpaid"]:
+			parts.append("%d lacked %s" % [entry["unpaid"][resource_name], resource_name])
+		if parts.is_empty():
+			continue
+		MessageDispatcher.broadcast_message("[%s] %s x%d: %s." % [entry["player_name"], entry["unit_name"], entry["units"], ", ".join(parts)])
+
+## Formats amounts of resources, e.g. "4 Wood + 2 Stone"
+static func _format_amounts(amounts: Dictionary) -> String:
+	var parts: Array[String] = []
+	for resource_name in amounts:
+		parts.append("%d %s" % [amounts[resource_name], resource_name])
+	return " + ".join(parts)
 
 ## Whether the player holds at least the given amount of a resource.
 ##
@@ -265,8 +322,20 @@ func pay(player_id: int, resource_name: String, amount: int) -> void:
 ## - Units are charged in unit order, earlier moves are paid first. Later moves are still checked.
 ## - Consume subtracts the amount, Require only checks it without subtracting.
 ## - A refused move is dropped and the unit stays put. There's no refund if the unit is stopped early.
+## - Sends one message per player and unit type with the amounts paid.
 func charge_move_costs() -> Array[Unit]:
-	return _settle_move_costs(true)
+	var refused: Array[Unit] = _settle_move_costs(true)
+	var summary: Dictionary[String, Dictionary] = {}
+	for unit in _game_state.getUnits():
+		var cost: MoveCost = unit.type.move_cost
+		if cost == null or cost.mode != MoveCost.Mode.CONSUME or cost.amount <= 0 or not unit.current_action is MoveAction \
+				or not _game_definition.resources.has(cost.cost_resource):
+			continue
+		var entry: Dictionary = _summary_entry(summary, unit)
+		entry["units"] += 1
+		entry["paid_to_move"][cost.cost_resource] = entry["paid_to_move"].get(cost.cost_resource, 0) + cost.amount
+	_broadcast_resource_summary(summary)
+	return refused
 
 ## Whether giving the unit a move order now is fine: the unit can pay for its move, and the
 ## owner's moves that are already ordered and paid for still are. Only a hint for the client UI,

@@ -325,6 +325,7 @@ func save_to_file():
 	game_resource.save_player_uis(_get_player_uis_res())
 	game_resource.save_rules(_game_rules.get_rules())
 	game_resource.save_resources(_game_rules.get_resources())
+	game_resource.save_resource_icons(_game_rules.get_resource_icons())
 	ftm.download_data(game_resource, game_name + ".tres", "*.tres", true)
 
 func load_from_file() -> void:
@@ -333,7 +334,7 @@ func load_from_file() -> void:
 func load_from_resource(resource : GameDefinitionResource):
 	set_game_name(resource.game_name)
 	#resources are imported before the units so their actions can find them
-	_game_rules.import_resources(resource.load_resources())
+	_game_rules.import_resources(resource.load_resources(), resource.load_resource_icons())
 	editor_main.set_units(resource.load_units())
 	editor_main.setMap(resource.loadMap())
 	_unit_painter.reload_layer(resource.load_unit_layer(), _unit_layer_id)

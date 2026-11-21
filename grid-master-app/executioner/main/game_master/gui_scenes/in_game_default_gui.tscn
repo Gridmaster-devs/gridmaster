@@ -1,27 +1,54 @@
-[gd_scene load_steps=4 format=3 uid="uid://crctrtjg6y7vu"]
+[gd_scene load_steps=6 format=3 uid="uid://crctrtjg6y7vu"]
 
 [ext_resource type="Script" uid="uid://bn1llmqgxwm5i" path="res://executioner/main/game_master/gui_scenes/in_game_default_gui.gd" id="1_fu532"]
 [ext_resource type="PackedScene" uid="uid://b4s8ownwps16v" path="res://common/gui_elements/gui_button.tscn" id="2_arvn5"]
 [ext_resource type="PackedScene" uid="uid://cc3il70fx6jf8" path="res://executioner/main/game_master/gui_scenes/gui_elements/message_window/message_window.tscn" id="3_5vj1k"]
+[ext_resource type="FontFile" path="res://executioner/media/fonts/rajdhani/Rajdhani-Bold.ttf" id="4_bold"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_topbar"]
+content_margin_left = 20.0
+content_margin_top = 6.0
+content_margin_right = 20.0
+content_margin_bottom = 6.0
+bg_color = Color(0, 0, 0, 0.62)
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.1)
+shadow_color = Color(0, 0, 0, 0.35)
+shadow_size = 8
 
 [node name="InGameDefaultGUI" type="Node"]
 script = ExtResource("1_fu532")
 
-[node name="GameNameLabel" type="Label" parent="."]
+[node name="TopBar" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(0, 58)
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 23.0
 grow_horizontal = 2
-horizontal_alignment = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_topbar")
 
-[node name="ResourcesLabel" type="Label" parent="."]
+[node name="BarContent" type="HBoxContainer" parent="TopBar"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="GameNameLabel" type="Label" parent="TopBar/BarContent"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.95)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.6)
+theme_override_constants/shadow_offset_y = 1
+theme_override_fonts/font = ExtResource("4_bold")
+theme_override_font_sizes/font_size = 26
+
+[node name="Spacer" type="Control" parent="TopBar/BarContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="ResourcesContainer" type="HBoxContainer" parent="TopBar/BarContent"]
 visible = false
-anchors_preset = 10
-anchor_right = 1.0
-offset_top = 23.0
-offset_bottom = 46.0
-grow_horizontal = 2
-horizontal_alignment = 1
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
 
 [node name="EndTurnButton" parent="." instance=ExtResource("2_arvn5")]
 anchors_preset = 3

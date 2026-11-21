@@ -1,0 +1,89 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://executioner/main/game_master/gui_scenes/gui_elements/resource_bar/resource_entry.gd" id="1_entry"]
+[ext_resource type="FontFile" path="res://executioner/media/fonts/rajdhani/Rajdhani-Bold.ttf" id="2_bold"]
+[ext_resource type="FontFile" path="res://executioner/media/fonts/rajdhani/Rajdhani-SemiBold.ttf" id="3_semibold"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_entry"]
+content_margin_left = 10.0
+content_margin_top = 3.0
+content_margin_right = 14.0
+content_margin_bottom = 3.0
+bg_color = Color(1, 1, 1, 0.06)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.08)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fallback"]
+bg_color = Color(1, 1, 1, 0.12)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.25)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[node name="ResourceEntry" type="PanelContainer"]
+theme_override_styles/panel = SubResource("StyleBoxFlat_entry")
+script = ExtResource("1_entry")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="HBoxContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="IconFallback" type="PanelContainer" parent="HBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_fallback")
+
+[node name="InitialLabel" type="Label" parent="HBoxContainer/IconFallback"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.9)
+theme_override_fonts/font = ExtResource("2_bold")
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TextVBox" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = -7
+
+[node name="AmountLabel" type="Label" parent="HBoxContainer/TextVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.6)
+theme_override_constants/shadow_offset_y = 1
+theme_override_fonts/font = ExtResource("2_bold")
+theme_override_font_sizes/font_size = 26
+text = "0"
+
+[node name="NameLabel" type="Label" parent="HBoxContainer/TextVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.85, 0.75, 0.85)
+theme_override_fonts/font = ExtResource("3_semibold")
+theme_override_font_sizes/font_size = 14
+text = "RESOURCE"

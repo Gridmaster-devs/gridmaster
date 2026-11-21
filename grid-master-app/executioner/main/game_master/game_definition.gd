@@ -23,6 +23,7 @@ var players : Dictionary[int, Player] = {-1 : Player.NEUTRAL_PLAYER} ## All the 
 var teams : Dictionary[int, Team] = {-1 : Team.NEUTRAL_TEAM} ## All the teams in the game
 
 var resources : Array[String] = [] ## The names of the global resources in the game
+var resource_icons : Dictionary[String, Texture2D] = {} ## The icons of the global resources by name
 
 # These are used for generating team and player ids
 var teams_index = 0 # Count for how many teams there are
