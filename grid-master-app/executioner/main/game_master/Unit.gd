@@ -40,11 +40,11 @@ var movement_speed : int:
 	get: return type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.MOVEMENT_SPEED)
 	set(v): return
 
-var accuracy : int:
+var accuracy : float:
 	get: return type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.ACCURACY)
 	set(v): return
 
-var dodge : int:
+var dodge : float:
 	get: return type.attributes.get(UnitType.UNIT_ATTRIBUTE_TYPE.DODGE)
 	set(v): return
 

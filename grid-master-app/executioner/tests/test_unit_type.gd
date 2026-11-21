@@ -30,6 +30,15 @@ func test_init_from_unit_resource():
 		var attribute_value: Variant = unit_type.attributes.get(attribute_type)
 		assert_eq(unit_resource.get_attribute(a).get_attribute_value(), attribute_value)
 
+func test_decimal_combat_attributes_from_unit_resource():
+	unit_resource.set_attribute("accuracy", 75.3)
+	unit_resource.set_attribute("evasion", 42.7)
+	var unit_type := UnitType.initFromUnitResource(unit_resource)
+	var unit := Unit.new(unit_type, 1, Player.DEBUG_new_player(), Vector2i.ZERO)
+
+	assert_almost_eq(unit.accuracy, 75.3, 0.0001)
+	assert_almost_eq(unit.dodge, 42.7, 0.0001)
+
 # Test legacy unit resource without 'id' or production attributes
 func test_init_from_legacy_unit_resource():
 	var legacy_res = UnitResource.new()

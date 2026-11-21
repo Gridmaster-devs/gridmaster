@@ -340,6 +340,7 @@ text = "Accuracy"
 [node name="SpinBox" type="SpinBox" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Accuracy"]
 layout_mode = 2
 size_flags_horizontal = 3
+step = 0.1
 
 [node name="Attack range" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
@@ -395,6 +396,7 @@ text = "Evasion"
 [node name="SpinBox" type="SpinBox" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Defensive/Evasion"]
 layout_mode = 2
 size_flags_horizontal = 3
+step = 0.1
 
 [node name="Utility" type="VBoxContainer" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox" index="2"]
 layout_mode = 2
