@@ -329,13 +329,13 @@ size_flags_horizontal = 3
 [node name="Accuracy" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "accuracy"
-text = "Accuracy"
+text = "Accuracy (%)"
 type = 3
 
 [node name="Label" type="Label" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Accuracy"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Accuracy"
+text = "Accuracy (%)"
 
 [node name="SpinBox" type="SpinBox" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Accuracy"]
 layout_mode = 2
@@ -385,13 +385,13 @@ size_flags_horizontal = 3
 [node name="Evasion" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Defensive" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "evasion"
-text = "Evasion"
+text = "Evasion (%)"
 type = 3
 
 [node name="Label" type="Label" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Defensive/Evasion"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Evasion"
+text = "Evasion (%)"
 
 [node name="SpinBox" type="SpinBox" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Defensive/Evasion"]
 layout_mode = 2
