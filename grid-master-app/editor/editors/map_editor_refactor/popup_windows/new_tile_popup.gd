@@ -30,6 +30,8 @@ func _create_line_edit() -> LineEdit:
 		return line_edit
 
 func _ready() -> void: 
+	TooltipHelper.apply(_save_button, "painter", "tile_create_save")
+	TooltipHelper.apply(_cancel_button, "painter", "tile_create_cancel")
 	_save_button.pressed.connect(on_new_tile_save)
 	_cancel_button.pressed.connect(on_new_tile_cancel)
 	center()
@@ -48,8 +50,10 @@ func _init_ui(tile_attribute_types: Dictionary[String, Variant]) -> void:
 		tile_attribute_hbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		
 		var tile_attribute_name_ui = Label.new()
-		tile_attribute_name_ui.text = key 
+		tile_attribute_name_ui.text = key
 		tile_attribute_name_ui.custom_minimum_size = Vector2(80, 0)
+		var tooltip_key: String = key if key in ["tactical_map", "tactical_map_thumbnail"] else "tile." + key
+		TooltipHelper.apply(tile_attribute_name_ui, "map", tooltip_key)
 		
 		var tile_attribute_value_ui: Node
 		
@@ -63,6 +67,7 @@ func _init_ui(tile_attribute_types: Dictionary[String, Variant]) -> void:
 			tile_attribute_value_ui = _create_line_edit()
 		elif value is Texture2D: 
 			tile_attribute_value_ui = preload("res://editor/editors/map_editor_refactor/popup_windows/texture_selecter.tscn").instantiate()
+			TooltipHelper.apply(tile_attribute_value_ui.get_node("Label"), "map", tooltip_key)
 		_tiledata_ui_map[key] = tile_attribute_value_ui
 		tile_attribute_hbox.add_child(tile_attribute_name_ui)
 		tile_attribute_hbox.add_child(tile_attribute_value_ui)

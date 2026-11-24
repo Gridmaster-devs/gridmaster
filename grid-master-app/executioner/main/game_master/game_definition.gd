@@ -35,16 +35,18 @@ func initUnitTypesFromResource(game_definition : GameDefinitionResource,
 								unit_name_type_dict: Dictionary[String, int]) -> void:
 	var gd_units : Array[UnitResource] = game_definition.load_units()
 
-	# Games made with older editors can have several unit types with the same ID.
-	# The duplicates are given unused IDs so they don't overwrite each other.
+	# Games made with older editors can have unit types without an ID, or several with the same ID.
+	# These are given unused IDs so they don't overwrite each other.
 	var next_free_id : int = 0
 	for unit in gd_units:
 		if unit.get_attribute_value("id") != null:
-			next_free_id = max(next_free_id, unit.get_attribute_value("id") + 1)
+			next_free_id = max(next_free_id, int(unit.get_attribute_value("id")) + 1)
 
 	for unit in gd_units:
-		var cur_unit_type = UnitType.initFromUnitResource(unit)
-		if unit_types.has(cur_unit_type.type_id):
+		var cur_unit_type = UnitType.initFromUnitResource(unit, next_free_id)
+		if unit.get_attribute_value("id") == null:
+			next_free_id += 1
+		elif unit_types.has(cur_unit_type.type_id):
 			GML.log("Unit type %s has a duplicate ID %d, using ID %d instead." % [cur_unit_type.unit_name, cur_unit_type.type_id, next_free_id], GML.LogLevel.WARN)
 			cur_unit_type.type_id = next_free_id
 			next_free_id += 1

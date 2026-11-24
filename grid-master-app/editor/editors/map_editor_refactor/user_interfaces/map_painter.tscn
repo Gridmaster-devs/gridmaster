@@ -92,6 +92,16 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
+[node name="CanvasBackground" type="Panel" parent="HBoxContainer/SubViewControl"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_type_variation = &"MapCanvas"
+
 [node name="SubViewportContainer" type="SubViewportContainer" parent="HBoxContainer/SubViewControl"]
 layout_mode = 1
 anchors_preset = 15
@@ -101,6 +111,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="SubViewport" type="SubViewport" parent="HBoxContainer/SubViewControl/SubViewportContainer"]
+transparent_bg = true
 handle_input_locally = false
 size = Vector2i(2, 2)
 render_target_update_mode = 4
@@ -126,6 +137,7 @@ offset_top = -23.0
 offset_right = -23.0
 grow_horizontal = 0
 grow_vertical = 0
+theme_type_variation = &"CanvasLabel"
 text = "Unnamed map"
 
 [node name="RightPanel" parent="HBoxContainer" instance=ExtResource("2_gp3mo")]

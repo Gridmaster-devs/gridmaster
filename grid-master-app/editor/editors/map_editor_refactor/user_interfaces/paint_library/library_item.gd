@@ -29,3 +29,6 @@ func _input(event: InputEvent) -> void:
 
 func get_button() -> Node: 
 	return _button
+
+func _ready() -> void:
+	TooltipHelper.apply(_button_label, "painter", "library_tile")

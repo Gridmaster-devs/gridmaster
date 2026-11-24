@@ -32,6 +32,7 @@ vertical_alignment = 1
 
 [node name="SaveButton" type="Button" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="1"]
 layout_mode = 2
+theme_type_variation = &"PrimaryButton"
 text = "Save"
 
 [node name="CancelButton" type="Button" parent="EditorPanel/TopVBox/ScrollContainer/ContentsVBox" index="2"]

@@ -101,6 +101,43 @@ func test_visibility():
 			#Checks if enemy is within vision range
 			if max(dx, dy) <= vision:
 				assert_true(enemy_unit in visible, "Enemy at %s should be visible" % str(enemy_pos))
+				assert_true(game_manager.is_tile_visible(enemy_pos), "Tile at %s should be visible" % str(enemy_pos))
 			else:
 				assert_false(enemy_unit in visible, "Enemy at %s should not be visible" % str(enemy_pos))
+				assert_false(game_manager.is_tile_visible(enemy_pos), "Tile at %s should not be visible" % str(enemy_pos))
+
+func test_cats_and_dogs_fog_of_war_vs_vision():
+	var cats_dogs_res := load("res://game_cats_dogs.tres") as GameDefinitionResource
+	var cats_dogs_mgr := GameDataManager.initFromGameDefinition(cats_dogs_res)
+	# Client infantry at (17, 2) with vision_range = 2 should see nearby cat at (17, 0) but not middle dog at (10, 10)
+	assert_true(cats_dogs_mgr.is_tile_visible(Vector2i(17, 0)), "Nearby cat tile (17, 0) should be visible in game_cats_dogs.tres")
+	assert_false(cats_dogs_mgr.is_tile_visible(Vector2i(10, 10)), "Middle dog tile (10, 10) should be hidden in fog of war in game_cats_dogs.tres")
+
+	var vision_res := load("res://game_cats_dogs_with_vision.tres") as GameDefinitionResource
+	var vision_mgr := GameDataManager.initFromGameDefinition(vision_res)
+	# In game_cats_dogs_with_vision.tres, client infantry have vision_range = 10 covering the entire 25x25 map
+	for x in range(vision_mgr.get_grid().getWidth()):
+		for y in range(vision_mgr.get_grid().getHeight()):
+			assert_true(vision_mgr.is_tile_visible(Vector2i(x, y)), "Tile (%d, %d) should be visible in game_cats_dogs_with_vision.tres" % [x, y])
+
+func test_grid_graphics_fog_of_war_overlay():
+	var prev_popup_mgr := Global.popup_manager
+	var gm_scene := preload("res://executioner/main/game_master/GameMaster.tscn")
+	var gm: GameMaster = gm_scene.instantiate()
+	add_child(gm)
+	gm.grid_graphics.tile_grid.tile_set = gm.grid_graphics.tile_grid.tile_set.duplicate(true)
+
+	var cats_dogs_res := load("res://game_cats_dogs.tres") as GameDefinitionResource
+	gm.local_init_game(cats_dogs_res)
+	assert_false(gm.grid_graphics.is_tile_fogged(Vector2i(17, 0)), "Visible tile (17, 0) should not be fogged in GridGraphics")
+	assert_true(gm.grid_graphics.is_tile_fogged(Vector2i(10, 10)), "Unseen tile (10, 10) should be fogged in GridGraphics")
+
+	var vision_res := load("res://game_cats_dogs_with_vision.tres") as GameDefinitionResource
+	gm.local_init_game(vision_res)
+	assert_false(gm.grid_graphics.is_tile_fogged(Vector2i(10, 10)), "Tile (10, 10) should not be fogged in game_cats_dogs_with_vision.tres")
+	gm.free()
+	Global.popup_manager = prev_popup_mgr
+
+
+
 				

@@ -40,4 +40,5 @@ layout_mode = 2
 
 [node name="Remove" type="Button" parent="HBoxContainer"]
 layout_mode = 2
+theme_type_variation = &"DangerButton"
 text = "REMOVE"

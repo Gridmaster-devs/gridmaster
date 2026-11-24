@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://bo7oe8477f30h"]
+[gd_scene load_steps=8 format=3 uid="uid://bo7oe8477f30h"]
 
 [ext_resource type="Script" uid="uid://rm27rb7okfxv" path="res://editor/editors/game_editor/game_editor.gd" id="1_rp7ar"]
 [ext_resource type="PackedScene" uid="uid://cehdpht6a7iw8" path="res://common/file_upload_download/file_transfer_manager.tscn" id="2_n3gfw"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://bvqcmq6jvs2j1" path="res://editor/editors/game_editor/game_rules.tscn" id="3_b25p5"]
 [ext_resource type="Script" uid="uid://of14uemmvsm2" path="res://common/popups/popup_manager.gd" id="4_8anuq"]
 [ext_resource type="PackedScene" uid="uid://bkfi6pml23hic" path="res://editor/editors/map_editor_refactor/user_interfaces/map_painter.tscn" id="4_k5c85"]
+[ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://editor/themes/editor-theme.tres" id="5_theme"]
 
 [node name="Game Editor" type="Control"]
 layout_mode = 3
@@ -14,6 +15,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("5_theme")
 script = ExtResource("1_rp7ar")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
@@ -38,6 +40,7 @@ layout_mode = 2
 [node name="Save game" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_type_variation = &"PrimaryButton"
 text = "Save game"
 
 [node name="Load game" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]

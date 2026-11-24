@@ -15,6 +15,18 @@ resource existingEnv 'Microsoft.App/managedEnvironments@2025-10-02-preview' exis
   name: 'production'
 }
 
+// Managed certificates for the custom domains. They were created once by hand
+// (CNAME validation) and live in the environment, not in this template.
+resource editorCert 'Microsoft.App/managedEnvironments/managedCertificates@2025-10-02-preview' existing = {
+  parent: existingEnv
+  name: 'mc-production-gridmaster-gd-cs-3296'
+}
+
+resource clientCert 'Microsoft.App/managedEnvironments/managedCertificates@2025-10-02-preview' existing = {
+  parent: existingEnv
+  name: 'mc-production-gridmaster-clien-4082'
+}
+
 resource containerapps_gridmaster_editor_name_resource 'Microsoft.App/containerapps@2025-10-02-preview' = {
   name: containerapps_gridmaster_editor_name
   location: 'North Europe'
@@ -44,6 +56,15 @@ resource containerapps_gridmaster_editor_name_resource 'Microsoft.App/containera
           }
         ]
         allowInsecure: false
+        // Bound here so each deploy keeps the custom domain; a Bicep deploy
+        // replaces the whole ingress block, so a portal-only binding gets removed.
+        customDomains: [
+          {
+            name: 'gridmaster-gd.cs.aalto.fi'
+            certificateId: editorCert.id
+            bindingType: 'SniEnabled'
+          }
+        ]
       }
       registries: [
         {
@@ -105,6 +126,15 @@ resource containerapps_gridmaster_client_name_resource 'Microsoft.App/containera
           }
         ]
         allowInsecure: false
+        // Bound here so each deploy keeps the custom domain; a Bicep deploy
+        // replaces the whole ingress block, so a portal-only binding gets removed.
+        customDomains: [
+          {
+            name: 'gridmaster-client.cs.aalto.fi'
+            certificateId: clientCert.id
+            bindingType: 'SniEnabled'
+          }
+        ]
       }
       registries: [
         {

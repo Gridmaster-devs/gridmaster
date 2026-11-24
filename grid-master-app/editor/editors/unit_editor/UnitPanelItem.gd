@@ -52,6 +52,8 @@ func update_resources(resources : Array[String]):
 		resources.append(attribute_name)
 	
 func _ready():
+	if not Engine.is_editor_hint():
+		TooltipHelper.apply(get_label(), "unit", attribute_name)
 	if !Engine.is_editor_hint():
 		find_root_unit_editor()
 		if root_editor != null:

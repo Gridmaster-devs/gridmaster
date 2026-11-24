@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://nxldab0hpse0"]
+[gd_scene load_steps=7 format=3 uid="uid://nxldab0hpse0"]
 
 [ext_resource type="Script" uid="uid://1gwvpfoqpqr4" path="res://editor/editors/editor_main/editor_main.gd" id="1_yiakk"]
 [ext_resource type="PackedScene" uid="uid://d1mgyle0o8kx3" path="res://editor/editors/unit_editor/UnitEditor.tscn" id="2_fi5xj"]
 [ext_resource type="PackedScene" uid="uid://bo7oe8477f30h" path="res://editor/editors/game_editor/GameEditor.tscn" id="3_fi5xj"]
 [ext_resource type="PackedScene" uid="uid://gy3engmvk7a8" path="res://editor/editors/map_editor_refactor/map_editor.tscn" id="3_mnkt7"]
 [ext_resource type="Script" uid="uid://of14uemmvsm2" path="res://common/popups/popup_manager.gd" id="5_euyav"]
+[ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://editor/themes/editor-theme.tres" id="6_theme"]
 
 [node name="EditorMain" type="Node"]
 script = ExtResource("1_yiakk")
@@ -15,6 +16,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("6_theme")
 current_tab = 0
 
 [node name="Unit Editor" parent="TabContainer" instance=ExtResource("2_fi5xj")]
@@ -31,6 +33,24 @@ visible = false
 layout_mode = 2
 metadata/_tab_index = 2
 
+[node name="Settings" type="MarginContainer" parent="TabContainer"]
+visible = false
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+metadata/_tab_index = 3
+
+[node name="Options" type="VBoxContainer" parent="TabContainer/Settings"]
+layout_mode = 2
+
+[node name="DarkModeSwitch" type="CheckButton" parent="TabContainer/Settings/Options"]
+layout_mode = 2
+size_flags_horizontal = 0
+button_pressed = true
+text = "Dark mode"
+
 [node name="PopupManager" type="Container" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
@@ -39,4 +59,5 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+theme = ExtResource("6_theme")
 script = ExtResource("5_euyav")

@@ -17,6 +17,8 @@ signal name_changed(new_name: String)
 
 ##State functions
 func _ready() -> void:
+	TooltipHelper.apply($EditorPanel/TopVBox/ScrollContainer/ContentsVBox/HBoxContainer/Label, "game", "player_name")
+	TooltipHelper.apply($EditorPanel/TopVBox/ScrollContainer/ContentsVBox/KeyUnitHBox/Label, "game", "player_key_unit")
 	_player_name_ui.text_changed.connect(_on_name_changed)
 
 
@@ -58,6 +60,7 @@ func _sync_ui() -> void:
 		new_team_ui.box_unchecked.connect(_team_unchecked.bind(team_name))
 		#set name and state
 		new_team_ui.set_label_text(team_name)
+		TooltipHelper.apply(new_team_ui.get_node("TeamUnitType/HBoxContainer/Label"), "game", "player_team")
 		if _teams[team_name]:
 			new_team_ui.set_box_on()
 

@@ -171,12 +171,17 @@ func get_player_resources(player_id: int) -> Dictionary[String, int]:
 func get_resource_icons() -> Dictionary[String, Texture2D]:
 	return _game_definition.resource_icons
 
-# Used for visibility logic. Checks if the target unit is visible to the given player
-## TODO probably should not be here, could be moved to Team if the team knows its own units
-func _is_unit_visible(target_unit: Unit, player_id: int) -> bool:
-	var player: Player = _game_definition.players.get(player_id)
+# Checks if the target tile is visible to the given player (defaults to client player)
+func is_tile_visible(tile_pos: Vector2i, player_id: int = -2) -> bool:
+	if _game_state == null or _game_definition == null:
+		return false
+	if player_id == -2:
+		if _client_attributes == null:
+			return false
+		player_id = _client_attributes.client_player_id
 	
-	if player == null:
+	var player: Player = _game_definition.players.get(player_id)
+	if player == null or player.team == null:
 		return false
 	
 	var team_id: int = player.team.team_id
@@ -185,14 +190,19 @@ func _is_unit_visible(target_unit: Unit, player_id: int) -> bool:
 	for unit in _game_state.getUnits():
 		if unit.get_team_id() == team_id:
 			# Compute using Chebyshev distance
-			var dx: int = abs(unit.getPosition().x - target_unit.getPosition().x)
-			var dy: int = abs(unit.getPosition().y - target_unit.getPosition().y)
+			var dx: int = abs(unit.getPosition().x - tile_pos.x)
+			var dy: int = abs(unit.getPosition().y - tile_pos.y)
 			
-			# If the target is within vision range of this unit means it is visible 
+			# If the tile is within vision range of this unit, it is visible
 			if max(dx, dy) <= unit.vision_range:
 				return true
 		
 	return false
+
+# Used for visibility logic. Checks if the target unit is visible to the given player
+## TODO probably should not be here, could be moved to Team if the team knows its own units
+func _is_unit_visible(target_unit: Unit, player_id: int) -> bool:
+	return is_tile_visible(target_unit.getPosition(), player_id)
 	
 # ---
 # INFO mutating methods
@@ -210,6 +220,22 @@ func increment_turn_number() -> void:
 
 func remove_unit(unit: Unit) -> void:
 	_game_state.remove_unit(unit)
+
+
+## Removes dead units from both the supplied array and the currently mounted state.
+## Compacts the array in place, preserving survivor references and their order.
+## All supplied units must belong to the mounted state.
+func remove_dead_units(unit_array: Array[Unit]) -> void:
+	var write_index: int = 0
+	for read_index: int in range(unit_array.size()):
+		var unit: Unit = unit_array[read_index]
+		if unit.is_dead():
+			remove_unit(unit)
+		else:
+			unit_array[write_index] = unit
+			write_index += 1
+	unit_array.resize(write_index)
+
 
 func add_unit(unit_type : UnitType, position : Vector2i, player : Player) -> void:
 	_game_state.addUnit(unit_type, position, player)

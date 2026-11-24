@@ -10,6 +10,9 @@ var _texture: Texture2D = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	TooltipHelper.apply(_open_color_picker_button, "painter", "choose_color")
+	TooltipHelper.apply(_open_image_drag_and_drop_button, "painter", "choose_image")
+	TooltipHelper.apply($CropButton, "painter", "crop_image")
 	_open_color_picker_button.pressed.connect(_open_color_picker)
 	_open_image_drag_and_drop_button.pressed.connect(_open_dragndrop)
 	
