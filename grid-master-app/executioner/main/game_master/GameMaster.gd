@@ -22,6 +22,7 @@ const RAW_INPUT_FUNC_NAME : String = "receive_raw_input"
 
 @onready var ftm : FileTransferManager = $Dialogs/FileTransferManager
 @onready var grid_graphics : GridGraphics = $"Grid Graphics"
+@onready var developer_console: DeveloperConsole = $DeveloperConsole
 
 var _custom_graphics : CustomGraphics
 var _click_tracker := ClickTracker.new()
@@ -44,6 +45,8 @@ var _game_over_popup: GameOverPopup = null
 var _game_over := false
 var _client_player_eliminated := false
 var _eliminated_players: Array[int] = []
+var _accepts_spawn_updates: bool = false
+var turn_processing_ms: Variant = null
 
 const GAME_OVER_POPUP_SCENE := preload("res://executioner/main/game_master/gui_scenes/gui_elements/game_over_popup.tscn")
 
@@ -66,6 +69,9 @@ func _ready() -> void:
 	Networking.game_state_received.connect(_on_game_state_received)
 	Networking.connected_for_upload_signal.connect(_on_connected_for_upload)
 	Networking.game_upload_result_received.connect(_on_game_upload_result)
+	multiplayer.server_disconnected.connect(_on_server_disconnected)
+	Networking.developer_console_rpc.unit_spawned.connect(_apply_spawned_unit)
+	developer_console.opened.connect(_click_tracker.reset)
 	switch_gui_scene(LOAD_GAME_GUI, null)
 
 # ---
@@ -75,6 +81,11 @@ func _ready() -> void:
 # TODO Make initial execution path clearer (e.g. who the heck calls this?)
 ## Initializes the data  when a [GameDefinitionResource] is available
 func initGameDataFromGameDefinition(game_definition_resource : GameDefinitionResource) -> void:
+	turn_processing_ms = null
+	_accepts_spawn_updates = false
+	if developer_console != null:
+		developer_console.set_session("")
+		Networking.developer_console_rpc.cancel_pending_spawn("session_changed", "A new game was loaded.")
 	_reset_game_over_state()
 	
 	#Initialize state
@@ -87,7 +98,7 @@ func initGameDataFromGameDefinition(game_definition_resource : GameDefinitionRes
 	GameArgs.initialize(data_manager, game_definition_resource.game_rules)
 
 ## Called by FTM when a game is loaded locally
-func local_init_game(game_definition_resource: GameDefinitionResource):
+func local_init_game(game_definition_resource: GameDefinitionResource) -> void:
 	assert(game_definition_resource != null, "Invalid game definition in file!")
 	initGameDataFromGameDefinition(game_definition_resource)
 	
@@ -95,9 +106,37 @@ func local_init_game(game_definition_resource: GameDefinitionResource):
 	ui_state = UIState.IN_GAME_DEFAULT
 	
 	initGraphics()
+	developer_console.set_session("singleplayer")
 	
 	MessageDispatcher.broadcast_message("Game \"%s\" loaded." % data_manager.get_game_name())
 	_log_round_started(data_manager.get_turn_number())
+
+
+func is_game_over() -> bool:
+	return _game_over
+
+
+func spawn_local_unit(type_name: String, x: int, y: int) -> Dictionary:
+	var player: Player = data_manager.get_players().get(data_manager.get_client_player_id(), Player.NEUTRAL_PLAYER)
+	var result: Dictionary = DeveloperCommands.spawn(data_manager, _game_over, player, type_name, x, y)
+	if result["ok"]:
+		_refresh_after_spawn()
+	return result
+
+
+func _apply_spawned_unit(snapshot: Dictionary) -> void:
+	if not _accepts_spawn_updates:
+		return
+	if data_manager.get_unit_by_id(snapshot["id"]) != null:
+		return
+	data_manager.add_unit_from_snapshot(snapshot)
+	_refresh_after_spawn()
+
+
+func _refresh_after_spawn() -> void:
+	if ui_state == UIState.UNIT_MOVE and moved_unit != null:
+		_exit_unit_move()
+	units_changed.emit()
 
 
 ## Ends the turn and processes all the actions that have been queued up.
@@ -199,8 +238,10 @@ func end_turn_local() -> void:
 	if _game_over:
 		return
 	_custom_graphics.clear()
+	var started_usec: int = Time.get_ticks_usec()
 	var new_state = process_end_turn_local_builder()
 	data_manager.replace_game_state(new_state)
+	turn_processing_ms = (Time.get_ticks_usec() - started_usec) / 1000.0
 	units_changed.emit()
 	_process_post_turn_elimination()
 	if not _game_over:
@@ -235,14 +276,19 @@ func _on_connected_to_server():
 func _on_connection_failed():
 	_set_load_game_status("Connection to the server failed.")
 
-func _on_server_disconnected():
+func _on_server_disconnected() -> void:
+	_accepts_spawn_updates = false
+	if developer_console.is_multiplayer_session():
+		developer_console.set_session("")
+	turn_processing_ms = null
 	_set_load_game_status("Disconnected from the server.")
 
 
 func _on_game_file_received(file_data: PackedByteArray, team_id: int):
 	GML.log("Received game file from server: %d bytes, team_id: %d" % [file_data.size(), team_id], GML.LogLevel.DEBUG)
-	const LOCAL_PATH := "user://server_game.tres"
-	var file := FileAccess.open(LOCAL_PATH, FileAccess.WRITE)
+	# Local client windows share user://, so give each process its own file.
+	var local_path: String = "user://server_game_%d.tres" % OS.get_process_id()
+	var file := FileAccess.open(local_path, FileAccess.WRITE)
 	if file == null:
 		GML.log("Failed to write received game file locally.", GML.LogLevel.ERROR)
 		if gui_scene is TeamSelectGUI:
@@ -250,7 +296,8 @@ func _on_game_file_received(file_data: PackedByteArray, team_id: int):
 		return
 	file.store_buffer(file_data)
 	file.close()
-	var game_definition_resource := ResourceLoader.load(LOCAL_PATH, "", ResourceLoader.CACHE_MODE_IGNORE) as GameDefinitionResource
+	var game_definition_resource := ResourceLoader.load(local_path, "", ResourceLoader.CACHE_MODE_IGNORE) as GameDefinitionResource
+	DirAccess.remove_absolute(local_path)
 	if game_definition_resource != null:
 		initGameDataFromGameDefinition(game_definition_resource)
 		for player in data_manager.get_players().values():
@@ -273,10 +320,20 @@ func _on_teams_received(teams: Array):
 	if gui_scene is TeamSelectGUI:
 		gui_scene.populate_teams(teams)
 
-func _on_game_state_received(state_update: Dictionary):
+func _on_game_state_received(state_update: Dictionary) -> void:
+	if data_manager == null:
+		return
 	_apply_state_update(state_update)
 	switch_gui_scene(IN_GAME_DEFAULT_GUI, data_manager.get_game_name())
-	if not state_update.get("game_over", false):
+	if Global.game_type == Global.GameType.MULTIPLAYER:
+		_accepts_spawn_updates = state_update.get("dev_console_revision") == DeveloperConsoleRPC.REVISION
+		var can_open_console: bool = _accepts_spawn_updates and Networking.is_loopback_game_connection()
+		developer_console.set_session("multiplayer" if can_open_console else "")
+	_update_server_turn_sample(state_update)
+	_apply_eliminated_players_from_state(state_update)
+	if state_update.get("game_over", false):
+		_finish_game_from_state(state_update)
+	else:
 		_log_round_started(int(state_update["turn_number"]))
 	
 func end_network_game_turn() -> void:
@@ -316,8 +373,11 @@ func end_network_game_turn() -> void:
 
 	GML.log("[Client] Turn ended, waiting for server...", GML.LogLevel.DEBUG)
 
-func _on_turn_ended(state_update: Dictionary):
-	_apply_state_update(state_update)
+func _on_turn_ended(state_update: Dictionary) -> void:
+	if data_manager == null:
+		return
+	_update_server_turn_sample(state_update)
+	_apply_state_update(state_update, true)
 	_broadcast_server_messages(state_update)
 	_apply_eliminated_players_from_state(state_update)
 
@@ -335,6 +395,10 @@ func _on_turn_ended(state_update: Dictionary):
 		_auto_pass_turn()
 	elif gui_scene is InGameDefaultGUI:
 		gui_scene.set_turn_active()
+
+func _update_server_turn_sample(state_update: Dictionary) -> void:
+	if developer_console.is_multiplayer_session():
+		turn_processing_ms = state_update.get("turn_processing_ms")
 
 func _broadcast_server_messages(state_update: Dictionary) -> void:
 	if state_update.keys().has("message_queue"):
@@ -454,10 +518,10 @@ func _reset_game_over_state() -> void:
 		_game_over_popup.remove_from_tree()
 		_game_over_popup = null
 
-func _apply_state_update(state_update: Dictionary) -> void:
+func _apply_state_update(state_update: Dictionary, turn_ended: bool = false) -> void:
 	# Create units from the dictionary
 	if data_manager != null:
-		data_manager.increment_turn_number()
+		data_manager.sync_turn_number(state_update["turn_number"])
 
 		var alive_unit_ids = []
 		for u_state in state_update["units"]:
@@ -481,6 +545,8 @@ func _apply_state_update(state_update: Dictionary) -> void:
 					unit._hp = u_state["hp"]
 				# Don't clear the action if it's an unfinished production action because this is used for UI checks.
 				# TODO: This isn't the most robust solution. Rethink how actions that carry over turns are handled in the future.
+				if not turn_ended:
+					continue
 				if unit.current_action is ProductionAction:
 					unit.current_action.remaining_turns -= 1
 					if unit.current_action.remaining_turns == 0:
@@ -488,7 +554,7 @@ func _apply_state_update(state_update: Dictionary) -> void:
 				else:
 					unit.current_action = null
 			else:	
-				data_manager.addUnitWithId(data_manager.get_unit_type_by_id(u_state["type_id"]), u_state["position"], data_manager.get_player_by_id(u_state["player_id"]), unit_id)
+				data_manager.add_unit_from_snapshot(u_state)
 		units_changed.emit()
 		# NOTE: most likely redundant call. Left since there is small possibility
 		#		that some functions might change it in between calls to this function?
@@ -503,7 +569,7 @@ func _apply_state_update(state_update: Dictionary) -> void:
 ## Called by the graphics element or its children via a group.
 ## Calls the appropriate input handler based on the UI state.
 func receive_ui_event(event : StateMachineEvent):
-	if _game_over or _client_player_eliminated:
+	if _game_over or _client_player_eliminated or developer_console.visible:
 		return
 	
 	if (event is MouseMovedToTileEvent):
@@ -761,7 +827,9 @@ func _handle_event_unit_move(event : StateMachineEvent) -> void:
 
 func _exit_unit_move() -> void:
 	#TODO: 
-	_unit_information_popup.remove_from_tree()
+	if is_instance_valid(_unit_information_popup):
+		_unit_information_popup.remove_from_tree()
+		_unit_information_popup = null
 	_custom_graphics.clear_id(moved_unit.getId())
 	
 	# If the movement action was confirmed, draw the small path for the unit
@@ -795,6 +863,8 @@ func _clicked(button : MouseButton):
 
 
 func receive_raw_input(event : InputEvent):
+	if developer_console.visible:
+		return
 	if event is InputEventMouseButton:
 		_click_tracker.handle_input(event)
 	else:

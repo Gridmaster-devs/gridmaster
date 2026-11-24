@@ -8,9 +8,10 @@ extends Node
 ## Constants
 const EXIT_FAILURE = 1
 
-## Port the server listens on unless overridden. 443 is what the Docker
-## image and Azure Container Apps ingress expect.
+## Exported servers use the port expected by Docker and Azure ingress.
 const DEFAULT_PORT = 443
+const LOCAL_PORT = 8082
+const LOOPBACK_ADDRESS = "127.0.0.1"
 
 ## The file path to the game definition resource that the server uses always
 const GAME_FILE_PATH = "user://game.tres"
@@ -25,6 +26,7 @@ var server_state: ServerState = null
 
 ## Dictionary that maps network peer IDs (int) to ClientInfo instances
 var clients : Dictionary = {}
+var _dev_console_enabled: bool = false
 
 ## Helpers
 func exit(code: int) -> void:
@@ -68,13 +70,14 @@ func start_server():
 		get_tree().quit(EXIT_FAILURE)
 		return
 	multiplayer.multiplayer_peer = server
+	_dev_console_enabled = allows_developer_console(OS.is_debug_build(), bind_address)
 
 	# Ensure user:// directory exists (may be absent on first Docker run).
 	DirAccess.make_dir_recursive_absolute(OS.get_user_data_dir())
 	GML.log("Server listening on port %d (address %s). Upload a game file to begin." % [port, bind_address], GML.LogLevel.INFO)
 
 ## Port to listen on: the `--port=N` user argument (after `--` on the Godot
-## command line), else the GRIDMASTER_PORT environment variable, else DEFAULT_PORT.
+## command line), else GRIDMASTER_PORT. Source runs use the client's local port.
 ## Returns -1 when the given value isn't a valid port.
 static func get_port() -> int:
 	var value := OS.get_environment("GRIDMASTER_PORT")
@@ -82,22 +85,28 @@ static func get_port() -> int:
 		if arg.begins_with("--port="):
 			value = arg.trim_prefix("--port=")
 	if value.is_empty():
-		return DEFAULT_PORT
+		return LOCAL_PORT if OS.has_feature("editor") else DEFAULT_PORT
 	if not value.is_valid_int() or int(value) < 1 or int(value) > 65535:
 		GML.log("Invalid server port \"%s\"; expected 1-65535." % value, GML.LogLevel.FATAL)
 		return -1
 	return int(value)
 
 ## Address to listen on: the `--bind=ADDR` user argument, else the
-## GRIDMASTER_BIND environment variable, else "*" (all interfaces, which the
-## container needs). Local runs should pass 127.0.0.1 so the server, which
-## accepts uploads without authentication, isn't reachable from the network.
+## GRIDMASTER_BIND environment variable. Source runs bind to loopback by
+## default. Exported servers listen on all interfaces for container ingress.
 static func get_bind_address() -> String:
 	var value := OS.get_environment("GRIDMASTER_BIND")
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--bind="):
 			value = arg.trim_prefix("--bind=")
-	return "*" if value.is_empty() else value
+	if not value.is_empty():
+		return value
+	return LOOPBACK_ADDRESS if OS.has_feature("editor") else "*"
+
+
+static func allows_developer_console(debug_build: bool, bind_address: String) -> bool:
+	return debug_build and bind_address == LOOPBACK_ADDRESS
+
 
 func _ready():
 	multiplayer.peer_connected.connect(_peer_connected)
@@ -107,6 +116,7 @@ func _ready():
 	Networking.game_file_requested.connect(_on_game_file_requested)
 	Networking.game_state_requested.connect(_on_game_state_requested)
 	Networking.request_peer_turn_end.connect(_on_team_turn_end)
+	Networking.developer_console_rpc.spawn_requested.connect(_on_spawn_requested)
 
 	Networking.game_upload_requested.connect(_on_game_upload_requested)
 
@@ -175,15 +185,9 @@ func _on_game_file_requested(peer_id: int, team_id: int):
 	if server_state == null:
 		GML.log("Peer %d requested game file but no game is loaded yet." % peer_id, GML.LogLevel.WARN)
 		return
-	if server_state.clients.keys().has(peer_id) and server_state.clients[peer_id] == server_state.TEAM_ID_NOT_SELECTED:
-		# TODO: Check that the given team_id exists.
-		server_state.assign_peer_to_team(peer_id, team_id)
-		GML.log("Assigned peer %d to team %d" % [peer_id, team_id])
-	else:
-		GML.error(
-			"Failed to assign the peer %d a team (%d). " + 
-			"Client either not connected or is already part of a team." % [peer_id, team_id]
-		)
+	if not server_state.clients.has(peer_id) or server_state.clients[peer_id] != ServerState.TEAM_ID_NOT_SELECTED \
+			or not server_state.data_manager.get_teams().has(team_id):
+		GML.log("Could not assign peer %d to team %d." % [peer_id, team_id], GML.LogLevel.WARN)
 		return
 
 	var file_data := FileAccess.get_file_as_bytes(GAME_FILE_PATH)
@@ -191,8 +195,9 @@ func _on_game_file_requested(peer_id: int, team_id: int):
 		GML.log("Failed to read game file bytes from: %s" % GAME_FILE_PATH, GML.LogLevel.ERROR)
 		return
 	GML.log("Sending game file to peer %d (%d bytes)" % [peer_id, file_data.size()], GML.LogLevel.INFO)
-	Networking.receive_game_file.rpc_id(peer_id, file_data, team_id)
-	Networking.receive_game_state.rpc_id(peer_id, _create_state_update_dict())
+	if Networking.rpc_id(peer_id, &"receive_game_file", file_data, team_id) == OK \
+			and Networking.rpc_id(peer_id, &"receive_game_state", _create_state_update_dict()) == OK:
+		server_state.assign_peer_to_team(peer_id, team_id)
 
 func _on_teams_requested(peer_id: int):
 	GML.log("Peer %d requested teams list" % peer_id, GML.LogLevel.INFO)
@@ -214,25 +219,54 @@ func _on_teams_requested(peer_id: int):
 
 func _on_game_state_requested(peer_id: int) -> void:
 	GML.log("Peer %d requested the game state." % peer_id, GML.LogLevel.INFO)
-	if !server_state.game_state:
-		GML.log("Player requested game state which doesn't exist on server. Check whether initialization of the server failed.", GML.LogLevel.FATAL)
-		exit(EXIT_FAILURE)
-	else:
+	if server_state != null and _get_joined_player(peer_id) != null:
 		Networking.receive_game_state.rpc_id(peer_id, _create_state_update_dict())
+
+
+func _get_joined_player(peer_id: int) -> Player:
+	var player_id: int = server_state.get_peer_player_id(peer_id)
+	if player_id < 0 or not server_state.clients.has(peer_id):
+		return null
+	return server_state.data_manager.get_players().get(player_id)
+
+
+func _process_spawn_request(peer_id: int, type_name: String, x: int, y: int) -> Dictionary:
+	if not _dev_console_enabled:
+		return DeveloperCommands.result("unavailable", "The server has disabled developer commands.")
+	var player: Player = _get_joined_player(peer_id) if server_state != null else null
+	if player == null:
+		return DeveloperCommands.result("not_joined", "Join the match before spawning a unit.")
+	return DeveloperCommands.spawn(server_state.data_manager, server_state.game_over, player, type_name, x, y)
+
+
+func _on_spawn_requested(peer_id: int, request_id: int, type_name: String, x: int, y: int) -> void:
+	var result: Dictionary = _process_spawn_request(peer_id, type_name, x, y)
+	var rpc: DeveloperConsoleRPC = Networking.developer_console_rpc
+	if result["ok"]:
+		var unit: Unit = server_state.data_manager.get_unit_by_id(result["data"]["unit_id"])
+		var snapshot: Dictionary = _unit_snapshot(unit)
+		for joined_peer: int in server_state.peer_player_ids:
+			if _get_joined_player(joined_peer) != null:
+				rpc.receive_spawned_unit.rpc_id(joined_peer, snapshot)
+	rpc.receive_spawn_reply.rpc_id(peer_id, request_id, result)
+
+
+func _unit_snapshot(unit: Unit) -> Dictionary:
+	return {
+		"id": unit.getId(),
+		"position": unit.grid_position,
+		"hp": unit.hp,
+		"player_id": unit.player.player_id,
+		"type_id": unit.type.type_id,
+	}
 
 # Returns the dictionary that is used to update
 # the game state within the client side.
 func _create_state_update_dict() -> Dictionary:
-	var units_state = []
-	for unit in server_state.data_manager.get_units().values():
-		units_state.append({
-			"id": unit.getId(),
-			"position": unit.grid_position,
-			"hp": unit.hp,
-			"player_id": unit.player.player_id,
-			"type_id": unit.type.type_id
-		})
-	return {
+	var units_state: Array[Dictionary] = []
+	for unit: Unit in server_state.data_manager.get_units().values():
+		units_state.append(_unit_snapshot(unit))
+	var update: Dictionary = {
 		"turn_number": server_state.data_manager.get_turn_number(),
 		"message_queue": server_state.get_message_queue(),
 		"eliminated_players": server_state.eliminated_players.duplicate(),
@@ -240,6 +274,10 @@ func _create_state_update_dict() -> Dictionary:
 		"winner_player_id": server_state.winner_player_id,
 		"units": units_state
 	}
+	if _dev_console_enabled:
+		update["dev_console_revision"] = DeveloperConsoleRPC.REVISION
+		update["turn_processing_ms"] = server_state.turn_processing_ms
+	return update
 
 # End the player turn
 func _on_team_turn_end(peer_id: int, action_queue: Array) -> void:
@@ -315,6 +353,7 @@ func _on_team_turn_end(peer_id: int, action_queue: Array) -> void:
 		return
 
 	GML.log("All players have ended their turn. Processing actions..", GML.LogLevel.INFO)
+	var started_usec: int = Time.get_ticks_usec() if _dev_console_enabled else 0
 	
 	# Clear the array of all the teams that have ended their turn
 	server_state.clear_player_turns()
@@ -356,6 +395,8 @@ func _on_team_turn_end(peer_id: int, action_queue: Array) -> void:
 			unit.current_action = null
 	
 	server_state.data_manager.increment_turn_number()
+	if _dev_console_enabled:
+		server_state.turn_processing_ms = (Time.get_ticks_usec() - started_usec) / 1000.0
 
 	GML.log("Turn completed. Server state has %d units." % server_state.data_manager.get_units().values().size(), GML.LogLevel.INFO)
 

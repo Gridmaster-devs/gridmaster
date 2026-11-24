@@ -25,7 +25,30 @@ signal request_peer_turn_end(peer_id: int, action_queue: Array)
 signal turn_ended(state_update: Dictionary)
 
 var client_peer := WebSocketMultiplayerPeer.new()
+var developer_console_rpc: DeveloperConsoleRPC
 var _uploading := false
+var _server_endpoint: String = ""
+
+
+func _ready() -> void:
+	developer_console_rpc = DeveloperConsoleRPC.new()
+	developer_console_rpc.name = "DeveloperConsoleRPC"
+	add_child(developer_console_rpc)
+	multiplayer.server_disconnected.connect(_on_server_disconnected)
+
+
+func is_loopback_game_connection() -> bool:
+	var scheme: String = _server_endpoint.get_slice("://", 0)
+	if scheme != "ws" and scheme != "wss":
+		return false
+	var authority: String = _server_endpoint.substr(scheme.length() + 3).get_slice("/", 0)
+	return authority == "127.0.0.1" or (authority.begins_with("127.0.0.1:") \
+		and authority.trim_prefix("127.0.0.1:").is_valid_int())
+
+
+func _on_server_disconnected() -> void:
+	_server_endpoint = ""
+	developer_console_rpc.cancel_pending_spawn("disconnected", "The server disconnected.")
 
 
 # ---
@@ -34,12 +57,15 @@ var _uploading := false
 
 ## Client side callback functions
 func connect_to_server(ip: String = "wss://gridmaster-server.calmmeadow-c81c2c38.northeurope.azurecontainerapps.io") -> void:
+	_server_endpoint = ""
 	# Increase inbound buffer so the large game file sent by the server can be received.
 	client_peer.inbound_buffer_size = 10 * 1024 * 1024  # 10 MB
 	var err = client_peer.create_client(ip)
 	if err == OK:
+		_server_endpoint = ip
 		multiplayer.multiplayer_peer = client_peer
-		multiplayer.connected_to_server.connect(_on_connected_to_server)
+		if not multiplayer.connected_to_server.is_connected(_on_connected_to_server):
+			multiplayer.connected_to_server.connect(_on_connected_to_server)
 	else:
 		GML.log("Error connecting to server: %s" % err, GML.LogLevel.ERROR)
 
@@ -56,6 +82,7 @@ func _on_connected_to_server() -> void:
 ## Connects to a server solely to upload a game file, without entering team selection.
 ## Uses the same explicit-polling approach as query_server_info so the signal fires reliably.
 func connect_for_upload(ip: String) -> void:
+	_server_endpoint = ""
 	_uploading = true
 	GML.log("Connecting for upload to: %s" % ip, GML.LogLevel.DEBUG)
 	# Increase outbound buffer so 1MB+ game files can be sent in a single packet.

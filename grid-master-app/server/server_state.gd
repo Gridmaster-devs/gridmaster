@@ -27,6 +27,7 @@ var players_ended_turn: Array[int] = []
 var eliminated_players: Array[int] = []
 var game_over: bool = false
 var winner_player_id: int = -1
+var turn_processing_ms: Variant = null
 
 # FIFO queue for turn messages
 var _message_queue: Array[String] = []

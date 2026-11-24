@@ -25,6 +25,7 @@ SMOKE_CLIENT="res://tools/multiplayer_smoke_client.gd"
 mode="clients"
 clients=2
 smoke_game="$DEFAULT_SMOKE_GAME"
+server_args=("--port=$PORT" "--bind=$BIND")
 
 while [[ $# -gt 0 ]]; do
 	case "$1" in
@@ -34,7 +35,7 @@ while [[ $# -gt 0 ]]; do
 			mode="smoke"; shift
 			if [[ $# -gt 0 && "$1" != --* ]]; then smoke_game="$(realpath "$1")"; shift; fi
 			;;
-		-h|--help) sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+		-h|--help) sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
 		*) echo "Unknown option: $1 (see --help)" >&2; exit 2 ;;
 	esac
 done
@@ -56,6 +57,11 @@ if [[ ! -f "$APP_DIR/.godot/global_script_class_cache.cfg" ]]; then
 fi
 
 LOG_DIR="$(mktemp -d "${TMPDIR:-/tmp}/gridmaster-mp.XXXXXX")"
+smoke_client_args=()
+if [[ "$BIND" == "127.0.0.1" ]]; then
+	smoke_client_args+=("--check-dev-console" "--join-ready-file=$LOG_DIR/player1.ready")
+fi
+
 pids=()
 cleanup() {
 	for pid in "${pids[@]}"; do kill "$pid" 2>/dev/null || true; done
@@ -65,7 +71,7 @@ trap cleanup EXIT
 trap 'exit 130' INT TERM
 
 start_server() {
-	"$GODOT" --headless --path "$APP_DIR" res://server/Server.tscn -- "--port=$PORT" "--bind=$BIND" >"$LOG_DIR/server.log" 2>&1 &
+	"$GODOT" --headless --path "$APP_DIR" res://server/Server.tscn -- "${server_args[@]}" >"$LOG_DIR/server.log" 2>&1 &
 	pids+=("$!")
 	local server_pid=$!
 	for _ in $(seq 1 50); do
@@ -98,10 +104,14 @@ smoke_turns() {
 	sed -n 's/^\[smoke\] turns: start=\(-\{0,1\}[0-9]*\) end=\(-\{0,1\}[0-9]*\)$/\1 \2/p' "$LOG_DIR/$1.log"
 }
 
+smoke_console() {
+	sed -n '/^\[smoke\] \(spawned unit\|turn processing ms\): /p' "$LOG_DIR/$1.log"
+}
+
 case "$mode" in
 	server)
 		echo "Starting server on port $PORT (Ctrl-C to stop)"
-		exec "$GODOT" --headless --path "$APP_DIR" res://server/Server.tscn -- "--port=$PORT" "--bind=$BIND"
+		exec "$GODOT" --headless --path "$APP_DIR" res://server/Server.tscn -- "${server_args[@]}"
 		;;
 
 	clients)
@@ -131,9 +141,9 @@ case "$mode" in
 		status=0
 		start_smoke_client upload "--upload=$smoke_game"
 		if wait "$last_pid"; then
-			start_smoke_client player0 --player=0
+			start_smoke_client player0 --player=0 "${smoke_client_args[@]}"
 			p0=$last_pid
-			start_smoke_client player1 --player=1
+			start_smoke_client player1 --player=1 "${smoke_client_args[@]}"
 			p1=$last_pid
 			wait "$p0" || status=1
 			wait "$p1" || status=1
@@ -144,6 +154,13 @@ case "$mode" in
 			if [[ $status -eq 0 && ( -z "$t0" || "$t0" != "$t1" || "$e0" != "$((s0 + 1))" ) ]]; then
 				echo "Players didn't share one turn (player0: ${t0:-none}, player1: ${t1:-none})." >&2
 				status=1
+			fi
+			if [[ $status -eq 0 && ${#smoke_client_args[@]} -gt 0 ]]; then
+				c0="$(smoke_console player0)"; c1="$(smoke_console player1)"
+				if [[ -z "$c0" || "$c0" != "$c1" ]]; then
+					echo "Clients did not agree on the spawned unit and turn duration." >&2
+					status=1
+				fi
 			fi
 		else
 			status=1

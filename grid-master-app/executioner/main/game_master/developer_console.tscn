@@ -1,0 +1,62 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://executioner/main/game_master/developer_console.gd" id="1_console"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_console"]
+content_margin_left = 24.0
+content_margin_top = 20.0
+content_margin_right = 24.0
+content_margin_bottom = 20.0
+bg_color = Color(0.065, 0.078, 0.1, 0.98)
+
+[node name="DeveloperConsole" type="CanvasLayer"]
+layer = 100
+visible = false
+script = ExtResource("1_console")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_force_pass_scroll_events = false
+color = Color(0, 0, 0, 0.35)
+
+[node name="Panel" type="PanelContainer" parent="Backdrop"]
+layout_mode = 1
+anchor_right = 1.0
+anchor_bottom = 0.48
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_console")
+
+[node name="Contents" type="VBoxContainer" parent="Backdrop/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Backdrop/Panel/Contents"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Developer Console"
+
+[node name="Transcript" type="RichTextLabel" parent="Backdrop/Panel/Contents"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 18
+selection_enabled = true
+focus_mode = 0
+scroll_following = true
+
+[node name="CommandLine" type="LineEdit" parent="Backdrop/Panel/Contents"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_neighbor_left = NodePath(".")
+focus_neighbor_top = NodePath(".")
+focus_neighbor_right = NodePath(".")
+focus_neighbor_bottom = NodePath(".")
+focus_next = NodePath(".")
+focus_previous = NodePath(".")
+theme_override_font_sizes/font_size = 20
+placeholder_text = "Type help for commands"
+keep_editing_on_text_submit = true

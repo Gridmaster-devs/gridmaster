@@ -14,6 +14,11 @@ const CLICK_WINDOW = 500
 ## Used to detect whether the user is clicking or dragging.
 var _keypress_times : Dictionary[MouseButton, int]
 
+
+func reset() -> void:
+	_keypress_times.clear()
+
+
 ## Takes in an event and emits clicked if a click is registered
 func handle_input(event : InputEvent) -> void:
 	# Button was just pressed down
@@ -26,7 +31,10 @@ func handle_input(event : InputEvent) -> void:
 		
 		# Button was just released
 		else:
-			var time_diff : int = Time.get_ticks_msec() - _keypress_times.get(button, 0)
+			if not _keypress_times.has(button):
+				return
+			var time_diff : int = Time.get_ticks_msec() - _keypress_times[button]
+			_keypress_times.erase(button)
 			# Time between pressing down and releasing the button is within the specified window
 			if time_diff < CLICK_WINDOW:
 				clicked.emit(button)

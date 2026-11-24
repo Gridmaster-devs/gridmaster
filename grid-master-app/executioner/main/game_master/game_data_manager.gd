@@ -205,6 +205,9 @@ func replace_game_state(new_game_state: GameState) -> void:
 func increment_turn_number() -> void:
 	_game_state.increment_turn_number()
 
+func sync_turn_number(completed_turns: int) -> void:
+	_game_state._turn_number = completed_turns
+
 func remove_unit(unit: Unit) -> void:
 	_game_state.remove_unit(unit)
 
@@ -224,8 +227,16 @@ func remove_dead_units(unit_array: Array[Unit]) -> void:
 	unit_array.resize(write_index)
 
 
-func add_unit(unit_type : UnitType, position : Vector2i, player : Player) -> void:
-	_game_state.addUnit(unit_type, position, player)
+func add_unit(unit_type : UnitType, position : Vector2i, player : Player) -> Unit:
+	return _game_state.addUnit(unit_type, position, player)
+
+func add_unit_from_snapshot(snapshot: Dictionary) -> void:
+	var unit_id: int = snapshot["id"]
+	var unit_type: UnitType = get_unit_type_by_id(snapshot["type_id"])
+	var player: Player = get_player_by_id(snapshot["player_id"])
+	addUnitWithId(unit_type, snapshot["position"], player, unit_id)
+	if snapshot.has("hp"):
+		get_unit_by_id(unit_id)._hp = snapshot["hp"]
 
 func addUnitWithId(unit_type: UnitType, position : Vector2i, player_p: Player, unit_id_p: int) -> void:
 	_game_state.addUnitWithId(unit_type, position, player_p, unit_id_p)
