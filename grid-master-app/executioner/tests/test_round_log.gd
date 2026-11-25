@@ -112,16 +112,26 @@ func test_local_completed_turns_announce_sequential_rounds_once():
 func test_local_action_messages_precede_next_round():
 	game_master.local_init_game(GAME)
 	var producer: Unit = game_master.data_manager.get_units().values()[0]
-	var produced_type := UnitType.new()
-	produced_type.unit_name = "Test unit"
-	produced_type.production_cost = 2
-	producer.current_action = ProductionAction.new(producer.get_player_id(), producer, game_master.data_manager, produced_type)
+	var produced_type := producer.type.producible_units[0]
+	var same_name := UnitType.new()
+	same_name.unit_name = produced_type.unit_name
+	same_name.is_producible_unit = true
+	producer.type.producible_units = [produced_type, same_name]
+	var control: ProductionControlItem = load("res://executioner/main/game_master/gui_scenes/gui_elements/unit_information/production_control_item.tscn").instantiate()
+	add_child_autofree(control)
+	control.setup(producer.getId(), game_master.data_manager)
+	control._selector.select(-1)
+	control._button.pressed.emit()
+	assert_null(producer.current_action)
+	control._selector.select(0)
+	control._button.pressed.emit()
+	assert_same((producer.current_action as ProductionAction).producible_unit, produced_type)
 	messages.clear()
 	game_master.end_turn()
 	# Turn processing copies units; release the action on the original unit too.
 	producer.current_action = null
 	assert_eq(messages, [
-		"[Unit %s] producing [Test unit] (1 turns remaining)" % producer.getId(),
+		"[Unit %s] producing [%s] (1 turns remaining)" % [producer.getId(), produced_type.unit_name],
 		"======= Round 2 started ==========",
 	])
 

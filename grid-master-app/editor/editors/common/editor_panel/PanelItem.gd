@@ -36,7 +36,7 @@ func reset():
 			node.text = ""
 		PanelType.CHECKBOX:
 			var node : CheckBox = get_content() as CheckBox
-			node.set_pressed(false)
+			node.set_pressed_no_signal(false)
 		PanelType.DROPDOWN:
 			var node : OptionButton = get_content() as OptionButton
 			node.selected = 0
@@ -68,7 +68,7 @@ func set_value(val):
 			node.text = val
 		PanelType.CHECKBOX:
 			var node : CheckBox = get_content() as CheckBox
-			node.set_pressed(val)
+			node.set_pressed_no_signal(val)
 		PanelType.DROPDOWN:
 			var node : OptionButton = get_content() as OptionButton
 			node.selected = val

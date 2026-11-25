@@ -29,6 +29,58 @@ func test_mixed_cleanup_preserves_survivor_snapshot_fields() -> void:
 	DEBUG_assert_cleanup_and_snapshot([0, 8, -2, 0, 3, -1])
 
 
+func test_production_requests_require_an_idle_owned_producer_and_eligible_target() -> void:
+	var manager := server_state.data_manager
+	var definition := manager.get_game_defintion()
+	var team_id := definition.add_team("Host", Color.WHITE, [])
+	var enemy_id := definition.add_team("Guest", Color.RED, [])
+	var player := definition.get_player_by_id(definition.add_player("Host", team_id, false))
+	var enemy := definition.get_player_by_id(definition.add_player("Guest", enemy_id, false))
+	for id in range(10, 14):
+		var type := UnitType.debugType()
+		type.type_id = id
+		definition.unit_types[id] = type
+	var producer_type := definition.unit_types[10]
+	var allowed_target := definition.unit_types[11]
+	allowed_target.is_producible_unit = true
+	definition.unit_types[13].is_producible_unit = true
+	producer_type.is_production_unit = true
+	producer_type.producible_units_ids = [11, 12]
+	producer_type.populate_producible_units(definition.unit_types)
+	allowed_target.producible_units = [definition.unit_types[13]]
+	var state := manager.get_game_state()
+	var producer := state.addUnit(producer_type, Vector2i.ZERO, player)
+	var non_producer := state.addUnit(allowed_target, Vector2i.RIGHT, player)
+	var enemy_producer := state.addUnit(producer_type, Vector2i.DOWN, enemy)
+	server_state.join(2)
+	server_state.assign_peer_to_team(2, team_id)
+	server_state.join(3) # Keep the server waiting for another peer after queueing actions.
+
+	var requests: Array = []
+	for target_id in [12, 13, 99, "11", null]:
+		requests.append({"type": "ProductionAction", "unit_id": producer.getId(), "producible_unit_id": target_id})
+	requests.append({"type": "ProductionAction", "unit_id": non_producer.getId(), "producible_unit_id": 13})
+	requests.append({"type": "ProductionAction", "unit_id": enemy_producer.getId(), "producible_unit_id": 11})
+	server_node._on_team_turn_end(2, requests)
+	assert_null(producer.current_action)
+	assert_null(non_producer.current_action)
+	assert_null(enemy_producer.current_action)
+
+	var valid_request := {"type": "ProductionAction", "unit_id": producer.getId(), "producible_unit_id": 11}
+	server_state.clear_player_turns()
+	server_node._on_team_turn_end(2, [valid_request])
+	var action := producer.current_action as ProductionAction
+	assert_not_null(action)
+	if action != null:
+		assert_same(action.producible_unit, allowed_target)
+		server_state.clear_player_turns()
+		server_node._on_team_turn_end(2, [valid_request])
+		assert_same(producer.current_action, action)
+	producer.current_action = null
+	non_producer.current_action = null
+	enemy_producer.current_action = null
+
+
 ## TESTING Builds a small map entirely in memory for real ServerState initialization.
 func DEBUG_create_game_definition() -> GameDefinitionResource:
 	var terrain := Array2D.new()

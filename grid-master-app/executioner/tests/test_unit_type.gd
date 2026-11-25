@@ -54,6 +54,17 @@ func test_init_from_legacy_unit_resource():
 	assert_false(unit_type.is_production_unit)
 	assert_false(unit_type.is_producible_unit)
 
+func test_producible_units_only_resolve_enabled_targets():
+	var producer := UnitType.initFromUnitResource(unit_resource)
+	var enabled := UnitType.initFromUnitResource(unit_resource)
+	unit_resource.set_attribute("is_producible_unit", false)
+	var disabled := UnitType.initFromUnitResource(unit_resource)
+	unit_resource.attributes.erase("is_producible_unit")
+	var legacy := UnitType.initFromUnitResource(unit_resource)
+	producer.producible_units_ids = [1, 2, 3, 99]
+	producer.populate_producible_units({1: enabled, 2: disabled, 3: legacy})
+	assert_eq(producer.producible_units, [enabled])
+
 # Test loading cats and dogs game definition resources
 func test_load_cats_and_dogs_game():
 	var game_res = load("res://game_cats_dogs.tres") as GameDefinitionResource

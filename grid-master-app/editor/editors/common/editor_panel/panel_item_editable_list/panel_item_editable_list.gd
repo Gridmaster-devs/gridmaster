@@ -16,9 +16,6 @@ extends VBoxContainer
 
 ## WARNING: This was supposed to be a more general purpose component but now relies on an interface specific to UnitType. 
 
-signal chosen_item_added(chosen_option_id: int)
-signal chosen_item_removed(chosen_option_id: int)
-
 @onready var add_button = $AddContainer/AddButton
 @onready var drop_down = $AddContainer/DropDown
 
@@ -30,8 +27,9 @@ signal chosen_item_removed(chosen_option_id: int)
 
 ## The list of options available in the drop-down
 var options_list: Array[Variant]
-## The list of options chosen by clicking the add button
-var chosen_list: Dictionary[int, Variant]
+## Saved selections, including target IDs that may be imported later.
+var chosen_list: Array[int]
+var _chosen_rows: Dictionary[int, HBoxContainer] = {}
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -43,76 +41,68 @@ func _ready() -> void:
 
 func options_changed():
 	drop_down.clear()
+	var disabled_ids: Array[int] = []
 	for option in options_list:
-		if option.get_attribute("is_producible_unit"):
+		if option.get_attribute_value("is_producible_unit") == true:
 			drop_down.add_item(option.name, option.id)
-	# NOTE sub-optimal but works for now
-	for chosen_option in chosen_list.values():
-		var found = false
-		for option in options_list:
-			if option.id == chosen_option.id:
-				found = true
-		if !found:
-			_remove_chosen(chosen_option.id)
+		else:
+			disabled_ids.append(option.id)
+	var eligible_choices := chosen_list.filter(func(id): return id not in disabled_ids)
+	_reset_chosen()
+	for id in eligible_choices:
+		add_chosen(id)
+	# A unit imported on its own can reference targets that have yet to be loaded.
+	if not disabled_ids.is_empty():
+		for unit in options_list:
+			var saved_ids = unit.get_attribute_value(attribute_name)
+			if saved_ids is Array:
+				var eligible_ids: Array = saved_ids.filter(func(id): return id not in disabled_ids)
+				if eligible_ids.size() != saved_ids.size():
+					unit.set_attribute(attribute_name, eligible_ids)
 
 func _remove_chosen(id: int):
-	#FIXME this is kind of unsafe
-	for hbox in self.get_children().slice(2):
-		if hbox.get_children()[1].id == id:
-			hbox.queue_free()
-			break
 	chosen_list.erase(id)
-	chosen_item_removed.emit(id)
+	if _chosen_rows.has(id):
+		var row := _chosen_rows[id]
+		_chosen_rows.erase(id)
+		remove_child(row)
+		row.queue_free()
 	
 func _reset_chosen():
-	#FIXME this is kind of unsafe
-	for hbox in self.get_children().slice(2):
-		hbox.queue_free()
-	chosen_list = {}
+	for row in _chosen_rows.values():
+		remove_child(row)
+		row.queue_free()
+	_chosen_rows.clear()
+	chosen_list.clear()
 
-func add_chosen(id):
-	var chosen_option = null
-	# find chosen option in options_list
-	for option in options_list:
-		if option.id == id:
-			chosen_option = option
-	# check that option isn't already added to chosen list
-	if chosen_option != null and chosen_list.get(chosen_option.id) != null:
-		chosen_option = null
-	# if chosen option in option list but not already in chosen list then add it to chosen
-	if chosen_option != null:
-		chosen_list[chosen_option.id] = chosen_option
-		
-		var hbox = HBoxContainer.new()
-		
-		var unit_name_label = Label.new()
-		unit_name_label.text = chosen_option.name
-		
-		var remove_chosen_item_button = PanelItemEditableListButton.new(chosen_option.id)
-		remove_chosen_item_button.text = "x"
-		TooltipHelper.apply(remove_chosen_item_button, "unit", "producible_units_remove")
-		remove_chosen_item_button.pressed_with_id.connect(_chosen_item_removed)
-		
-		self.add_child(hbox)
-		hbox.add_child(unit_name_label)
-		hbox.add_child(remove_chosen_item_button)
-		
-		chosen_item_added.emit(chosen_option.id)
+func add_chosen(id: int):
+	if chosen_list.has(id):
+		return
+	chosen_list.append(id)
+	var index: int = drop_down.get_item_index(id)
+	if index == -1:
+		return
+
+	var hbox = HBoxContainer.new()
+	var unit_name_label = Label.new()
+	unit_name_label.text = drop_down.get_item_text(index)
+	var remove_chosen_item_button = PanelItemEditableListButton.new(id)
+	remove_chosen_item_button.text = "x"
+	TooltipHelper.apply(remove_chosen_item_button, "unit", "producible_units_remove")
+	remove_chosen_item_button.pressed_with_id.connect(_remove_chosen)
+	hbox.add_child(unit_name_label)
+	hbox.add_child(remove_chosen_item_button)
+	_chosen_rows[id] = hbox
+	add_child(hbox)
 	
 func _chosen_item_added():
 	if drop_down.selected != -1:
-		add_chosen(drop_down.selected)
+		add_chosen(drop_down.get_selected_id())
 
 	
-func _chosen_item_removed(id: int):
-	_remove_chosen(id)
-	
-func _on_visibility_changed(is_hidden: bool):
-	self.visible = is_hidden
-
 func _save_to_unit_resource(resource_p : UnitResource):
 	if (resource_p != null):
-		resource_p.set_attribute(attribute_name, chosen_list.values().map(func(unitType): return unitType.id))
+		resource_p.set_attribute(attribute_name, chosen_list.duplicate())
 		
 func _load_from_unit_resource(resource_p : UnitResource):
 	if (resource_p != null):
@@ -123,6 +113,7 @@ func _load_from_unit_resource(resource_p : UnitResource):
 			# won't be compatible with each other
 			_reset_chosen()
 			for unit_type_id in value:
-				add_chosen(unit_type_id)
+				if unit_type_id is int:
+					add_chosen(unit_type_id)
 			return
 	_reset_chosen()

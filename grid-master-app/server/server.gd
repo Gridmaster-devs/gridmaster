@@ -290,17 +290,15 @@ func _on_team_turn_end(peer_id: int, action_queue: Array) -> void:
 									server_state.data_manager
 								)
 							elif dict_action.get("type") == "ProductionAction":
-								GML.log("Processing ProductionAction", GML.LogLevel.INFO)
-								if real_unit.current_action == null:
-									var producible_unit_id = dict_action.get("producible_unit_id")
-									var producible_unit = server_state.data_manager.get_unit_type_by_id(producible_unit_id)
-									if producible_unit != null:
-										real_unit.current_action = ProductionAction.new(
-											peer_id,
-											real_unit,
-											server_state.data_manager,
-											producible_unit
-										)
+								if not real_unit.type.is_production_unit or real_unit.current_action != null:
+									continue
+								var target_id = dict_action.get("producible_unit_id")
+								if not target_id is int:
+									continue
+								for target: UnitType in real_unit.type.producible_units:
+									if target.type_id == target_id:
+										real_unit.current_action = ProductionAction.new(peer_id, real_unit, server_state.data_manager, target)
+										break
 						elif !real_unit:
 							GML.log("Could not find unit with id %d" % unit_id, GML.LogLevel.ERROR)
 						else:

@@ -247,7 +247,7 @@ func test_registry_and_warning_set() -> void:
 			if EditorTooltips.has_warning(context, key):
 				warnings += 1
 	assert_eq(count, 91)
-	assert_eq(warnings, 15)
+	assert_eq(warnings, 13)
 	assert_eq(EditorTooltips.WARNING_TEXT, "This feature is not fully implemented yet.")
 	assert_eq(EditorTooltips.get_tooltip("unit", "health"), "How much damage the unit can take before being destroyed.")
 	assert_eq(EditorTooltips.get_tooltip("unit", "morale"), "The unit's starting morale.")
@@ -262,14 +262,14 @@ func test_label_warning_is_separate_and_idempotent() -> void:
 	var row := HBoxContainer.new()
 	var label := Label.new()
 	var input := LineEdit.new()
-	label.text = "Producible"
+	label.text = "Morale"
 	input.text = "preserved"
 	row.add_child(label)
 	row.add_child(input)
 	add_child_autofree(row)
-	TooltipHelper.apply(label, "unit", "is_producible_unit")
-	TooltipHelper.apply(label, "unit", "is_producible_unit")
-	assert_eq(label.tooltip_text, EditorTooltips.get_tooltip("unit", "is_producible_unit"))
+	TooltipHelper.apply(label, "unit", "morale")
+	TooltipHelper.apply(label, "unit", "morale")
+	assert_eq(label.tooltip_text, EditorTooltips.get_tooltip("unit", "morale"))
 	assert_ne(label.mouse_filter, Control.MOUSE_FILTER_IGNORE)
 	assert_eq(input.tooltip_text, "")
 	assert_eq(input.text, "preserved")
@@ -383,8 +383,79 @@ func test_editor_scenes_instantiate() -> void:
 		add_child_autofree(editor)
 		assert_not_null(editor)
 
+
+func test_unit_editor_refreshes_and_saves_eligible_production_ids() -> void:
+	var editor: UnitEditor = load("res://editor/editors/unit_editor/UnitEditor.tscn").instantiate()
+	add_child_autofree(editor)
+	var producer := UnitResource.new()
+	var disabled := UnitResource.new()
+	var enabled := UnitResource.new()
+	producer.set_attribute("id", 40)
+	producer.set_attribute("is_production_unit", true)
+	disabled.set_attribute("id", 41)
+	enabled.set_attribute("id", 42)
+	disabled.set_attribute("is_producible_unit", false)
+	enabled.set_attribute("is_producible_unit", true)
+	producer.set_attribute("producible_units", [disabled.id, enabled.id])
+	editor.set_units([producer, disabled])
+	var root := editor.tree_panel.tree_root
+	var options: PanelItemEditableList = editor.production_options
+	var unrelated_control := HBoxContainer.new()
+	options.add_child(unrelated_control)
+	var checkbox: CheckBox = editor.producible_item.get_content()
+	var production_checkbox: CheckBox = editor.production_item.get_content()
+	assert_false(editor.producible_item.get_label().has_node("UnusedFeatureWarning"))
+	assert_false(options.add_button.has_node("UnusedFeatureWarning"))
+	assert_eq(options.add_button.tooltip_text, EditorTooltips.get_tooltip("unit", "producible_units_add"))
+	assert_false(options.visible)
+	root.get_child(0).select(0)
+	assert_true(options.visible)
+	editor.get_units()
+	assert_eq(options.drop_down.item_count, 0)
+	assert_eq(producer.get_attribute_value("producible_units"), [enabled.id])
+	editor.load_resource(enabled)
+	assert_eq(producer.get_attribute_value("producible_units"), [enabled.id])
+	assert_eq(options.drop_down.item_count, 1)
+
+	root.get_child(1).select(0)
+	checkbox.button_pressed = true
+	assert_eq(disabled.get_attribute_value("is_producible_unit"), true)
+	assert_false(options.visible)
+	assert_eq(options.drop_down.item_count, 2)
+	root.get_child(0).select(0)
+	options.drop_down.select(options.drop_down.get_item_index(disabled.id))
+	options.add_button.pressed.emit()
+	production_checkbox.button_pressed = false
+	assert_false(options.visible)
+	editor.get_units()
+	assert_eq(producer.get_attribute_value("producible_units"), [enabled.id, disabled.id])
+	production_checkbox.button_pressed = true
+	assert_true(options.visible)
+	assert_eq(disabled.get_attribute_value("is_producible_unit"), true, "Loading a different unit must not change the previous unit")
+
+	var enabled_row := options.get_child(-2)
+	var disabled_row := options.get_child(-1)
+	var remove_button: PanelItemEditableListButton = disabled_row.get_child(-1)
+	remove_button._pressed()
+	editor.get_units()
+	assert_eq(producer.get_attribute_value("producible_units"), [enabled.id])
+	assert_eq(enabled_row.get_parent(), options)
+	assert_null(disabled_row.get_parent())
+	assert_true(disabled_row.is_queued_for_deletion())
+	assert_eq(unrelated_control.get_parent(), options)
+	options.add_button.pressed.emit()
+	assert_eq(options.chosen_list, [enabled.id, disabled.id])
+
+	root.get_child(1).select(0)
+	checkbox.button_pressed = false
+	assert_eq(options.drop_down.item_count, 1)
+	assert_eq(producer.get_attribute_value("producible_units"), [enabled.id])
+	assert_null(enabled_row.get_parent())
+	assert_eq(unrelated_control.get_parent(), options)
+
+
 func test_warning_keys() -> void:
-	assert_eq(EditorTooltips.WARNINGS, {"unit": ["movement_type", "capturable", "morale", "victory_points", "perception", "is_producible_unit", "actions", "attack_range", "production_cost", "producible_units_add"], "map": ["tile.hiding", "tactical_map"], "painter": ["crop_image"], "tactical_library": ["tactical_map"], "game_painter": ["settings"]})
+	assert_eq(EditorTooltips.WARNINGS, {"unit": ["movement_type", "capturable", "morale", "victory_points", "perception", "actions", "attack_range", "production_cost"], "map": ["tile.hiding", "tactical_map"], "painter": ["crop_image"], "tactical_library": ["tactical_map"], "game_painter": ["settings"]})
 
 
 func test_save_tooltips_follow_map_mode() -> void:
