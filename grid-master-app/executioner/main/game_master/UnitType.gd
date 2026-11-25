@@ -108,7 +108,7 @@ static func initFromUnitResource(unit_resource : UnitResource, fallback_id: int 
 
 	unit_type.is_producible_unit = unit_resource.get_attribute_value("is_producible_unit") == true
 
-	var prod_cost = unit_resource.get_attribute_value("production_cost")
+	var prod_cost: Variant = unit_resource.get_attribute_value("production_cost")
 	unit_type.production_cost = maxi(1, int(prod_cost)) if prod_cost != null else 1
 
 	var producible_units_from_resource = unit_resource.get_attribute_value("producible_units")

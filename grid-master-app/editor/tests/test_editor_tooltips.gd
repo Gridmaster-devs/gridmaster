@@ -234,6 +234,7 @@ func test_warning_button_freed_before_deferred_refresh() -> void:
 	# GUT's error tracking also catches invalid deferred calls.
 	assert_false(is_instance_valid(button))
 
+
 func test_registry_and_warning_set() -> void:
 	var count := 0
 	var warnings := 0
@@ -258,6 +259,7 @@ func test_registry_and_warning_set() -> void:
 	assert_true(EditorTooltips.has_warning("unit", "morale"))
 	assert_false(EditorTooltips.has_warning("map", "save_map"))
 
+
 func test_label_warning_is_separate_and_idempotent() -> void:
 	var row := HBoxContainer.new()
 	var label := Label.new()
@@ -277,6 +279,7 @@ func test_label_warning_is_separate_and_idempotent() -> void:
 	assert_eq(label.get_child(0).tooltip_text, EditorTooltips.WARNING_TEXT)
 	assert_eq(row.get_child(1), input)
 
+
 func test_game_name_and_unit_placement_keep_original_layout() -> void:
 	var editor = load("res://editor/editors/game_editor/GameEditor.tscn").instantiate()
 	var name_line: LineEdit = editor.get_node("PanelContainer/VBoxContainer/Game name")
@@ -295,6 +298,7 @@ func test_game_name_and_unit_placement_keep_original_layout() -> void:
 	assert_eq(canvas.tooltip_text, EditorTooltips.get_tooltip("game", "unit_placement"))
 	assert_eq(canvas.mouse_filter, canvas_filter)
 
+
 func test_actions_header_has_one_warning() -> void:
 	var panel = load("res://editor/editors/unit_editor/ActionPanel.tscn").instantiate()
 	add_child_autofree(panel)
@@ -306,6 +310,7 @@ func test_actions_header_has_one_warning() -> void:
 	var text_width = label.get_theme_font("font").get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, label.get_theme_font_size("font_size")).x
 	var text_left = label.get_theme_stylebox("normal").get_content_margin(SIDE_LEFT)
 	assert_almost_eq(label.get_child(0).position.x, text_left + text_width + 4, 0.01)
+
 
 func test_action_name_keeps_original_layout() -> void:
 	var panel = load("res://editor/editors/unit_editor/Action panels/ActionPanelItem.tscn").instantiate()
@@ -320,6 +325,7 @@ func test_action_name_keeps_original_layout() -> void:
 	TooltipHelper.apply(panel.action_name_line, "unit", "action_name", false)
 	assert_eq(panel.get_children(), children)
 	assert_eq(panel.action_name_line.tooltip_text, EditorTooltips.get_tooltip("unit", "action_name"))
+
 
 func test_action_fields_keep_original_rows_without_warnings() -> void:
 	var panel = load("res://editor/editors/unit_editor/Action panels/ConsumeProducePanel.tscn").instantiate()
@@ -338,6 +344,7 @@ func test_action_fields_keep_original_rows_without_warnings() -> void:
 		assert_eq(row.get_child(2), row.get_node("ResourceName"))
 		assert_eq(row.get_child_count(), 3)
 
+
 func test_unit_image_keeps_original_layout() -> void:
 	var panel = load("res://editor/editors/unit_editor/UnitInfoPanel.tscn").instantiate()
 	var column = panel.get_node("TopVBox/PanelContainer/ContentsVBox/HBoxContainer/VBoxContainer")
@@ -349,6 +356,7 @@ func test_unit_image_keeps_original_layout() -> void:
 	assert_eq(image.tooltip_text, EditorTooltips.get_tooltip("unit", "texture"))
 	assert_eq(image.mouse_filter, image_filter)
 	assert_eq(panel.name_line.placeholder_text, "Unit name")
+
 
 func test_generated_team_and_player_rows_use_context() -> void:
 	var team = load("res://editor/editors/game_editor/team_ui.tscn").instantiate()
@@ -364,6 +372,7 @@ func test_generated_team_and_player_rows_use_context() -> void:
 	assert_eq(player_label.tooltip_text, EditorTooltips.get_tooltip("game", "player_team"))
 	assert_false(player_label.has_node("UnusedFeatureWarning"))
 
+
 func test_generated_terrain_hiding_field() -> void:
 	var popup = load("res://editor/editors/map_editor_refactor/popup_windows/new_tile_popup.tscn").instantiate()
 	add_child_autofree(popup)
@@ -376,6 +385,7 @@ func test_generated_terrain_hiding_field() -> void:
 	assert_true(hiding.has_node("UnusedFeatureWarning"))
 	assert_false(movement.has_node("UnusedFeatureWarning"))
 	assert_eq(popup.get_ui_element("hiding").tooltip_text, "")
+
 
 func test_editor_scenes_instantiate() -> void:
 	for path in ["res://editor/editors/unit_editor/UnitEditor.tscn", "res://editor/editors/game_editor/GameEditor.tscn", "res://editor/editors/map_editor_refactor/map_editor.tscn"]:
@@ -429,7 +439,7 @@ func test_unit_editor_refreshes_and_saves_eligible_production_ids() -> void:
 	enabled.set_attribute("is_producible_unit", true)
 	producer.set_attribute("producible_units", [disabled.id, enabled.id])
 	editor.set_units([producer, disabled])
-	var root := editor.tree_panel.tree_root
+	var root: TreeItem = editor.tree_panel.tree_root
 	var options: PanelItemEditableList = editor.production_options
 	var unrelated_control := HBoxContainer.new()
 	options.add_child(unrelated_control)
@@ -464,8 +474,8 @@ func test_unit_editor_refreshes_and_saves_eligible_production_ids() -> void:
 	assert_true(options.visible)
 	assert_eq(disabled.get_attribute_value("is_producible_unit"), true, "Loading a different unit must not change the previous unit")
 
-	var enabled_row := options.get_child(-2)
-	var disabled_row := options.get_child(-1)
+	var enabled_row: Node = options.get_child(-2)
+	var disabled_row: Node = options.get_child(-1)
 	var remove_button: PanelItemEditableListButton = disabled_row.get_child(-1)
 	remove_button._pressed()
 	editor.get_units()
@@ -476,6 +486,9 @@ func test_unit_editor_refreshes_and_saves_eligible_production_ids() -> void:
 	assert_eq(unrelated_control.get_parent(), options)
 	options.add_button.pressed.emit()
 	assert_eq(options.chosen_list, [enabled.id, disabled.id])
+	editor.tree_panel.units_changed.emit()
+	assert_eq(options.chosen_list, [enabled.id, disabled.id])
+	assert_eq(producer.get_attribute_value("producible_units"), [enabled.id])
 
 	root.get_child(1).select(0)
 	checkbox.button_pressed = false
@@ -547,6 +560,7 @@ func test_library_tooltips_use_item_kind() -> void:
 			assert_true(item.get_node("Label").has_node("UnusedFeatureWarning"))
 			assert_eq(item.get_button().tooltip_text, EditorTooltips.get_tooltip(context, "tactical_map_thumbnail"))
 			assert_false(item.get_button().has_node("UnusedFeatureWarning"))
+
 
 func test_unit_description_has_no_added_label_or_tooltip() -> void:
 	var panel = load("res://editor/editors/unit_editor/UnitInfoPanel.tscn").instantiate()

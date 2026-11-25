@@ -292,7 +292,7 @@ func _on_team_turn_end(peer_id: int, action_queue: Array) -> void:
 							elif dict_action.get("type") == "ProductionAction":
 								if not real_unit.type.is_production_unit or real_unit.current_action != null:
 									continue
-								var target_id = dict_action.get("producible_unit_id")
+								var target_id: Variant = dict_action.get("producible_unit_id")
 								if not target_id is int:
 									continue
 								for target: UnitType in real_unit.type.producible_units:

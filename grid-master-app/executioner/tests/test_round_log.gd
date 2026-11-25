@@ -109,10 +109,10 @@ func test_local_completed_turns_announce_sequential_rounds_once():
 	assert_eq(messages, _log_text())
 
 
-func test_local_action_messages_precede_next_round():
+func test_local_action_messages_precede_next_round() -> void:
 	game_master.local_init_game(GAME)
 	var producer: Unit = game_master.data_manager.get_units().values()[0]
-	var produced_type := producer.type.producible_units[0]
+	var produced_type: UnitType = producer.type.producible_units[0]
 	var same_name := UnitType.new()
 	same_name.unit_name = produced_type.unit_name
 	same_name.is_producible_unit = true
