@@ -79,12 +79,13 @@ func add_chosen(id: int) -> void:
 		return
 	chosen_list.append(id)
 	var index: int = drop_down.get_item_index(id)
-	if index == -1:
-		return
 
 	var hbox := HBoxContainer.new()
 	var unit_name_label := Label.new()
-	unit_name_label.text = drop_down.get_item_text(index)
+	if index == -1:
+		unit_name_label.text = "Missing unit (ID: %d)" % id
+	else:
+		unit_name_label.text = drop_down.get_item_text(index)
 	var remove_chosen_item_button := PanelItemEditableListButton.new(id)
 	remove_chosen_item_button.text = "x"
 	TooltipHelper.apply(remove_chosen_item_button, "unit", "producible_units_remove")

@@ -498,6 +498,55 @@ func test_unit_editor_refreshes_and_saves_eligible_production_ids() -> void:
 	assert_eq(unrelated_control.get_parent(), options)
 
 
+func test_missing_production_reference_is_visible_removable_and_resolves_on_import() -> void:
+	var editor: UnitEditor = load("res://editor/editors/unit_editor/UnitEditor.tscn").instantiate()
+	add_child_autofree(editor)
+	var producer := UnitResource.new()
+	producer.set_attribute("id", 60)
+	producer.set_attribute("is_production_unit", true)
+	producer.set_attribute("producible_units", [61, 62])
+	editor.set_units([producer])
+	editor.tree_panel.tree_root.get_child(0).select(0)
+	var options: PanelItemEditableList = editor.production_options
+	var missing_row: HBoxContainer = options._chosen_rows[61]
+	assert_eq(missing_row.get_child(0).text, "Missing unit (ID: 61)")
+	var remove_button: PanelItemEditableListButton = missing_row.get_child(1)
+	remove_button._pressed()
+	editor.get_units()
+	assert_eq(producer.get_attribute_value("producible_units"), [62])
+	var target := UnitResource.new()
+	target.set_attribute("id", 62)
+	target.set_attribute("name", "Tank")
+	target.set_attribute("is_producible_unit", true)
+	editor.load_resource(target)
+	assert_eq(options._chosen_rows[62].get_child(0).text, "Tank")
+	editor.get_units()
+	assert_eq(producer.get_attribute_value("producible_units"), [62])
+
+
+func test_deleting_unit_removes_production_references_but_preserves_unresolved_ids() -> void:
+	var editor: UnitEditor = load("res://editor/editors/unit_editor/UnitEditor.tscn").instantiate()
+	add_child_autofree(editor)
+	var first := UnitResource.new()
+	var second := UnitResource.new()
+	var target := UnitResource.new()
+	first.set_attribute("id", 50)
+	second.set_attribute("id", 51)
+	target.set_attribute("id", 52)
+	target.set_attribute("is_producible_unit", true)
+	first.set_attribute("producible_units", [52, 99, 52])
+	second.set_attribute("producible_units", [99, 52])
+	editor.set_units([first, second, target])
+	editor.tree_panel.tree_root.get_child(2).select(0)
+	editor.tree_panel.remove_unit()
+	assert_eq(first.get_attribute_value("producible_units"), [99])
+	assert_eq(second.get_attribute_value("producible_units"), [99])
+	editor.load_resource(target)
+	editor.get_units()
+	assert_eq(first.get_attribute_value("producible_units"), [99])
+	assert_eq(second.get_attribute_value("producible_units"), [99])
+
+
 func test_warning_keys() -> void:
 	assert_eq(EditorTooltips.WARNINGS, {"unit": ["movement_type", "capturable", "morale", "victory_points", "perception", "actions", "attack_range"], "map": ["tile.hiding", "tactical_map"], "painter": ["crop_image"], "tactical_library": ["tactical_map"], "game_painter": ["settings"]})
 

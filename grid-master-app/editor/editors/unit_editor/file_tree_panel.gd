@@ -9,7 +9,6 @@ extends PanelContainer
 signal units_changed
 
 var unit_resources : Array[UnitResource] = []
-var unit_ids: Array[int]
 var units : int = 0
 
 var unit_editor : UnitEditor
@@ -24,7 +23,6 @@ var state = unit_resources
 func add_to_tree(unit: UnitResource):
 	var item : TreeItem = tree.create_item(null, units)
 	item.set_text(0, "Unnamed unit")
-	unit_ids.append(unit.id)
 	units += 1
 	
 func remove_selected_from_tree():
@@ -32,7 +30,6 @@ func remove_selected_from_tree():
 	var index = null
 	if (selected != null):
 		index = selected.get_index()
-		unit_ids.remove_at(index)
 		tree_root.remove_child(selected)
 		units -= 1
 	return index
@@ -85,7 +82,12 @@ func add_unit_from_resource(unit_resource : UnitResource):
 func remove_unit():
 	var index = remove_selected_from_tree()
 	if index != null:
+		var deleted_id: int = unit_resources[index].id
 		unit_resources.remove_at(index) # this does not check for out of bounds
+		for unit in unit_resources:
+			var saved_ids: Variant = unit.get_attribute_value("producible_units")
+			if saved_ids is Array and deleted_id in saved_ids:
+				unit.set_attribute("producible_units", saved_ids.filter(func(id: Variant) -> bool: return id != deleted_id))
 		unit_editor.unit_resource_removed()
 		units_changed.emit()
 
