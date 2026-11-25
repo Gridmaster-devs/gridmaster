@@ -425,77 +425,65 @@ func test_unit_editor_production_cost_spin_box() -> void:
 	assert_eq(resource.get_attribute_value("production_cost"), 1.0)
 
 
-func test_unit_editor_refreshes_and_saves_eligible_production_ids() -> void:
+func test_unit_editor_preserves_ineligible_production_ids() -> void:
 	var editor: UnitEditor = load("res://editor/editors/unit_editor/UnitEditor.tscn").instantiate()
 	add_child_autofree(editor)
 	var producer := UnitResource.new()
-	var disabled := UnitResource.new()
-	var enabled := UnitResource.new()
+	var target := UnitResource.new()
 	producer.set_attribute("id", 40)
 	producer.set_attribute("is_production_unit", true)
-	disabled.set_attribute("id", 41)
-	enabled.set_attribute("id", 42)
-	disabled.set_attribute("is_producible_unit", false)
-	enabled.set_attribute("is_producible_unit", true)
-	producer.set_attribute("producible_units", [disabled.id, enabled.id])
-	editor.set_units([producer, disabled])
+	producer.set_attribute("producible_units", [41])
+	target.set_attribute("id", 41)
+	target.set_attribute("name", "Tank")
+	target.set_attribute("is_producible_unit", true)
+	editor.set_units([producer, target])
 	var root: TreeItem = editor.tree_panel.tree_root
 	var options: PanelItemEditableList = editor.production_options
-	var unrelated_control := HBoxContainer.new()
-	options.add_child(unrelated_control)
 	var checkbox: CheckBox = editor.producible_item.get_content()
 	var production_checkbox: CheckBox = editor.production_item.get_content()
+	var unrelated_control := HBoxContainer.new()
+	options.add_child(unrelated_control)
 	assert_false(editor.producible_item.get_label().has_node("UnusedFeatureWarning"))
 	assert_false(options.add_button.has_node("UnusedFeatureWarning"))
 	assert_eq(options.add_button.tooltip_text, EditorTooltips.get_tooltip("unit", "producible_units_add"))
-	assert_false(options.visible)
 	root.get_child(0).select(0)
 	assert_true(options.visible)
-	editor.get_units()
-	assert_eq(options.drop_down.item_count, 0)
-	assert_eq(producer.get_attribute_value("producible_units"), [enabled.id])
-	editor.load_resource(enabled)
-	assert_eq(producer.get_attribute_value("producible_units"), [enabled.id])
-	assert_eq(options.drop_down.item_count, 1)
-
-	root.get_child(1).select(0)
-	checkbox.button_pressed = true
-	assert_eq(disabled.get_attribute_value("is_producible_unit"), true)
-	assert_false(options.visible)
-	assert_eq(options.drop_down.item_count, 2)
-	root.get_child(0).select(0)
-	options.drop_down.select(options.drop_down.get_item_index(disabled.id))
-	options.add_button.pressed.emit()
+	assert_eq(options._chosen_rows[41].get_child(0).text, "Tank")
+	options.add_chosen(41)
+	assert_eq(options.chosen_list, [41])
 	production_checkbox.button_pressed = false
 	assert_false(options.visible)
-	editor.get_units()
-	assert_eq(producer.get_attribute_value("producible_units"), [enabled.id, disabled.id])
 	production_checkbox.button_pressed = true
 	assert_true(options.visible)
-	assert_eq(disabled.get_attribute_value("is_producible_unit"), true, "Loading a different unit must not change the previous unit")
-
-	var enabled_row: Node = options.get_child(-2)
-	var disabled_row: Node = options.get_child(-1)
-	var remove_button: PanelItemEditableListButton = disabled_row.get_child(-1)
-	remove_button._pressed()
-	editor.get_units()
-	assert_eq(producer.get_attribute_value("producible_units"), [enabled.id])
-	assert_eq(enabled_row.get_parent(), options)
-	assert_null(disabled_row.get_parent())
-	assert_true(disabled_row.is_queued_for_deletion())
-	assert_eq(unrelated_control.get_parent(), options)
-	options.add_button.pressed.emit()
-	assert_eq(options.chosen_list, [enabled.id, disabled.id])
-	editor.tree_panel.units_changed.emit()
-	assert_eq(options.chosen_list, [enabled.id, disabled.id])
-	assert_eq(producer.get_attribute_value("producible_units"), [enabled.id])
-
 	root.get_child(1).select(0)
 	checkbox.button_pressed = false
-	assert_eq(options.drop_down.item_count, 1)
-	assert_eq(producer.get_attribute_value("producible_units"), [enabled.id])
-	assert_null(enabled_row.get_parent())
+	assert_false(target.get_attribute_value("is_producible_unit"))
+	assert_eq(options.drop_down.get_item_index(41), -1)
+	assert_eq(producer.get_attribute_value("producible_units"), [41])
+	root.get_child(0).select(0)
+	assert_eq(options._chosen_rows[41].get_child(0).text, "Tank (not producible)")
 	assert_eq(unrelated_control.get_parent(), options)
+	editor.get_units()
+	var path := "user://production_reference_test.tres"
+	assert_eq(ResourceSaver.save(producer, path), OK)
+	var reloaded: UnitResource = ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_IGNORE)
+	assert_eq(reloaded.get_attribute_value("producible_units"), [41])
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	root.get_child(1).select(0)
+	editor.info_panel.name_line.text = "Renamed"
+	editor.info_panel.name_line.text_changed.emit("Renamed")
+	assert_eq(producer.get_attribute_value("producible_units"), [41])
+	checkbox.button_pressed = true
+	assert_ne(options.drop_down.get_item_index(41), -1)
+	root.get_child(0).select(0)
+	assert_eq(options._chosen_rows[41].get_child(0).text, "Renamed")
+	root.get_child(1).select(0)
+	checkbox.button_pressed = false
+	root.get_child(0).select(0)
+	var remove_button: PanelItemEditableListButton = options._chosen_rows[41].get_child(1)
+	remove_button._pressed()
+	editor.get_units()
+	assert_eq(producer.get_attribute_value("producible_units"), [])
 
 
 func test_missing_production_reference_is_visible_removable_and_resolves_on_import() -> void:
@@ -517,8 +505,11 @@ func test_missing_production_reference_is_visible_removable_and_resolves_on_impo
 	var target := UnitResource.new()
 	target.set_attribute("id", 62)
 	target.set_attribute("name", "Tank")
-	target.set_attribute("is_producible_unit", true)
+	target.set_attribute("is_producible_unit", false)
 	editor.load_resource(target)
+	assert_eq(options._chosen_rows[62].get_child(0).text, "Tank (not producible)")
+	target.set_attribute("is_producible_unit", true)
+	editor.tree_panel.units_changed.emit()
 	assert_eq(options._chosen_rows[62].get_child(0).text, "Tank")
 	editor.get_units()
 	assert_eq(producer.get_attribute_value("producible_units"), [62])
@@ -581,6 +572,48 @@ func test_new_unit_avoids_existing_and_unresolved_ids() -> void:
 	editor.tree_panel.add_unit()
 	assert_eq(editor.tree_panel.get_units()[1].id, next_id + 2)
 	assert_eq(producer.get_attribute_value("producible_units"), [next_id + 1])
+
+
+func test_legacy_unit_imports_reserve_ids_and_references() -> void:
+	var editor: UnitEditor = load("res://editor/editors/unit_editor/UnitEditor.tscn").instantiate()
+	add_child_autofree(editor)
+	var legacy_a := UnitResource.new()
+	var legacy_b := UnitResource.new()
+	var modern := UnitResource.new()
+	legacy_a.attributes.erase("id")
+	legacy_b.attributes.erase("id")
+	var next_id := UnitResource._next_id
+	modern.set_attribute("id", next_id)
+	legacy_b.set_attribute("producible_units", [next_id + 1])
+	assert_true(editor.set_units([legacy_a, legacy_b, modern]))
+	assert_eq(modern.id, next_id)
+	assert_eq(legacy_a.id, next_id + 2)
+	assert_eq(legacy_b.id, next_id + 3)
+	assert_eq(legacy_b.get_attribute_value("producible_units"), [next_id + 1])
+	var individual := UnitResource.new()
+	individual.attributes.erase("id")
+	var next_individual_id := UnitResource._next_id
+	modern.set_attribute("producible_units", [next_individual_id])
+	assert_true(editor.tree_panel.add_unit_from_resource(individual))
+	assert_eq(individual.id, next_individual_id + 1)
+
+
+func test_cats_and_dogs_legacy_units_import() -> void:
+	var editor: UnitEditor = load("res://editor/editors/unit_editor/UnitEditor.tscn").instantiate()
+	add_child_autofree(editor)
+	var game: GameDefinitionResource = ResourceLoader.load("res://game_cats_dogs.tres", "", ResourceLoader.CACHE_MODE_IGNORE)
+	var imported := game.load_units()
+	assert_gt(imported.size(), 1)
+	var missing_count := 0
+	for unit in imported:
+		if unit.get_attribute_value("id") == null:
+			missing_count += 1
+	assert_gt(missing_count, 1)
+	assert_true(editor.set_units(imported))
+	var ids: Array[int] = []
+	for unit in imported:
+		assert_false(unit.id in ids)
+		ids.append(unit.id)
 
 
 func test_warning_keys() -> void:

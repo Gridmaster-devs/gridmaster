@@ -44,15 +44,12 @@ func _ready() -> void:
 
 func options_changed() -> void:
 	drop_down.clear()
-	var disabled_ids: Array[int] = []
 	for option in options_list:
 		if option.get_attribute_value("is_producible_unit") == true:
 			drop_down.add_item(option.name, option.id)
-		else:
-			disabled_ids.append(option.id)
-	var eligible_choices: Array[int] = chosen_list.filter(func(id: int) -> bool: return id not in disabled_ids)
+	var choices := chosen_list.duplicate()
 	_reset_chosen()
-	for id in eligible_choices:
+	for id in choices:
 		add_chosen(id)
 
 
@@ -78,14 +75,15 @@ func add_chosen(id: int) -> void:
 	if chosen_list.has(id):
 		return
 	chosen_list.append(id)
-	var index: int = drop_down.get_item_index(id)
-
 	var hbox := HBoxContainer.new()
 	var unit_name_label := Label.new()
-	if index == -1:
-		unit_name_label.text = "Missing unit (ID: %d)" % id
-	else:
-		unit_name_label.text = drop_down.get_item_text(index)
+	unit_name_label.text = "Missing unit (ID: %d)" % id
+	for option in options_list:
+		if option.id == id:
+			unit_name_label.text = option.name
+			if option.get_attribute_value("is_producible_unit") != true:
+				unit_name_label.text += " (not producible)"
+			break
 	var remove_chosen_item_button := PanelItemEditableListButton.new(id)
 	remove_chosen_item_button.text = "x"
 	TooltipHelper.apply(remove_chosen_item_button, "unit", "producible_units_remove")

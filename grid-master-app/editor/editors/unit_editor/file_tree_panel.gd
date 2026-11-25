@@ -50,15 +50,8 @@ func reset_units():
 
 # adds a new unit to the tree and to the unit array
 func add_unit():
-	var used_ids: Array = []
-	for unit in unit_resources:
-		used_ids.append(unit.id)
-		var saved_ids: Variant = unit.get_attribute_value("producible_units")
-		if saved_ids is Array:
-			used_ids.append_array(saved_ids)
-	var new_unit_resource = UnitResource.new()
-	while new_unit_resource.id in used_ids:
-		new_unit_resource = UnitResource.new()
+	unit_editor.save_to_resource.emit(unit_editor.unit_resource)
+	var new_unit_resource = _new_unit_with_unused_id(_reserved_ids(unit_resources))
 	unit_resources.append(new_unit_resource)
 	
 	
@@ -69,10 +62,16 @@ func add_unit():
 
 # only called when a unit is loaded from a file
 func add_unit_from_resource(unit_resource : UnitResource) -> bool:
-	for existing in unit_resources:
-		if existing.id == unit_resource.id:
-			_show_duplicate_id_error(unit_resource.id)
-			return false
+	if unit_resource.get_attribute_value("id") == null:
+		unit_editor.save_to_resource.emit(unit_editor.unit_resource)
+		var all_units: Array[UnitResource] = unit_resources.duplicate()
+		all_units.append(unit_resource)
+		unit_resource.set_attribute("id", _new_unit_with_unused_id(_reserved_ids(all_units)).id)
+	else:
+		for existing in unit_resources:
+			if existing.id == unit_resource.id:
+				_show_duplicate_id_error(unit_resource.id)
+				return false
 	var item : TreeItem = tree.create_item(null, units)
 	
 	var unit_name = unit_resource.get_attribute_value("name")
@@ -136,14 +135,40 @@ func get_units() -> Array[UnitResource]:
 func set_units(units_p : Array[UnitResource]) -> bool:
 	var ids: Array[int] = []
 	for unit in units_p:
+		if unit.get_attribute_value("id") == null:
+			continue
 		if unit.id in ids:
 			_show_duplicate_id_error(unit.id)
 			return false
 		ids.append(unit.id)
+	var reserved_ids := _reserved_ids(units_p)
+	for unit in units_p:
+		if unit.get_attribute_value("id") == null:
+			var id := _new_unit_with_unused_id(reserved_ids).id
+			unit.set_attribute("id", id)
+			reserved_ids.append(id)
 	reset_units()
 	for unit in units_p:
 		add_unit_from_resource(unit)
 	return true
+
+
+func _reserved_ids(resources: Array[UnitResource]) -> Array:
+	var ids: Array = []
+	for unit in resources:
+		if unit.get_attribute_value("id") != null:
+			ids.append(unit.id)
+		var saved_ids: Variant = unit.get_attribute_value("producible_units")
+		if saved_ids is Array:
+			ids.append_array(saved_ids)
+	return ids
+
+
+func _new_unit_with_unused_id(reserved_ids: Array) -> UnitResource:
+	var unit := UnitResource.new()
+	while unit.id in reserved_ids:
+		unit = UnitResource.new()
+	return unit
 
 
 func _show_duplicate_id_error(id: int) -> void:

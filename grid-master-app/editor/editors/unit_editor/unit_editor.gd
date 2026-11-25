@@ -99,24 +99,6 @@ func new_unit_resource(unit_resource_p : UnitResource) -> void:
 	unit_resource = unit_resource_p
 	_update_production_options_visibility(production_item.get_value())
 
-## Remove references to known ineligible units, retaining IDs not imported yet.
-
-
-func _on_units_changed() -> void:
-	var units: Array[UnitResource] = tree_panel.get_units()
-	var disabled_ids: Array[int] = []
-	for unit in units:
-		if unit.get_attribute_value("is_producible_unit") != true:
-			disabled_ids.append(unit.id)
-	for unit in units:
-		var saved_ids: Variant = unit.get_attribute_value("producible_units")
-		if saved_ids is Array:
-			var eligible_ids: Array = saved_ids.filter(func(id: Variant) -> bool: return id not in disabled_ids)
-			if eligible_ids.size() != saved_ids.size():
-				unit.set_attribute("producible_units", eligible_ids)
-	production_options.options_changed()
-
-
 func _update_production_options_visibility(enabled: bool) -> void:
 	production_options.visible = unit_resource != null and enabled
 
@@ -152,7 +134,7 @@ func _ready() -> void:
 	# TODO move other signal connections here as well, signals should be connected by parents not in the child itself (do away with all of
 	# these "child.link(parent)" calls like above that enforce tight coupling)
 	
-	tree_panel.units_changed.connect(_on_units_changed)
+	tree_panel.units_changed.connect(production_options.options_changed)
 	producible_item.get_content().toggled.connect(_on_producible_toggled)
 	production_item.get_content().toggled.connect(_update_production_options_visibility)
 	save_to_resource.connect(production_options._save_to_unit_resource)
