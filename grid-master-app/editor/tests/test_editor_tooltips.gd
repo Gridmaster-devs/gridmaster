@@ -247,7 +247,7 @@ func test_registry_and_warning_set() -> void:
 			if EditorTooltips.has_warning(context, key):
 				warnings += 1
 	assert_eq(count, 91)
-	assert_eq(warnings, 13)
+	assert_eq(warnings, 12)
 	assert_eq(EditorTooltips.WARNING_TEXT, "This feature is not fully implemented yet.")
 	assert_eq(EditorTooltips.get_tooltip("unit", "health"), "How much damage the unit can take before being destroyed.")
 	assert_eq(EditorTooltips.get_tooltip("unit", "morale"), "The unit's starting morale.")
@@ -384,6 +384,37 @@ func test_editor_scenes_instantiate() -> void:
 		assert_not_null(editor)
 
 
+func test_unit_editor_production_cost_spin_box() -> void:
+	var editor: UnitEditor = load("res://editor/editors/unit_editor/UnitEditor.tscn").instantiate()
+	add_child_autofree(editor)
+	var item: UnitPanelItem = editor.production_item.get_parent().get_node("Production cost (self)")
+	var cost: SpinBox = item.get_content()
+	assert_eq(cost.min_value, 1.0)
+	assert_eq(cost.value, 1.0)
+	assert_eq(cost.step, 1.0)
+	assert_false(item.get_label().has_node("UnusedFeatureWarning"))
+
+	var resource := UnitResource.new()
+	resource.set_attribute("production_cost", 4.0)
+	item.load_from_unit_resource(resource)
+	assert_eq(cost.value, 4.0)
+	await wait_process_frames(1)
+	item.save_to_unit_resource(resource)
+	assert_eq(resource.get_attribute_value("production_cost"), 4.0)
+
+	resource.attributes.erase("production_cost")
+	item.load_from_unit_resource(resource)
+	assert_eq(cost.value, 1.0)
+
+	resource.set_attribute("production_cost", 0.0)
+	item.load_from_unit_resource(resource)
+	assert_eq(cost.value, 1.0)
+	await wait_process_frames(1)
+	cost.get_line_edit().text = "0"
+	item.save_to_unit_resource(resource)
+	assert_eq(resource.get_attribute_value("production_cost"), 1.0)
+
+
 func test_unit_editor_refreshes_and_saves_eligible_production_ids() -> void:
 	var editor: UnitEditor = load("res://editor/editors/unit_editor/UnitEditor.tscn").instantiate()
 	add_child_autofree(editor)
@@ -455,7 +486,7 @@ func test_unit_editor_refreshes_and_saves_eligible_production_ids() -> void:
 
 
 func test_warning_keys() -> void:
-	assert_eq(EditorTooltips.WARNINGS, {"unit": ["movement_type", "capturable", "morale", "victory_points", "perception", "actions", "attack_range", "production_cost"], "map": ["tile.hiding", "tactical_map"], "painter": ["crop_image"], "tactical_library": ["tactical_map"], "game_painter": ["settings"]})
+	assert_eq(EditorTooltips.WARNINGS, {"unit": ["movement_type", "capturable", "morale", "victory_points", "perception", "actions", "attack_range"], "map": ["tile.hiding", "tactical_map"], "painter": ["crop_image"], "tactical_library": ["tactical_map"], "game_painter": ["settings"]})
 
 
 func test_save_tooltips_follow_map_mode() -> void:

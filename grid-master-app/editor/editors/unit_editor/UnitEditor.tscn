@@ -179,6 +179,9 @@ text = "Production cost (self)"
 [node name="SpinBox" type="SpinBox" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Production/Production cost (self)"]
 layout_mode = 2
 size_flags_horizontal = 3
+min_value = 1.0
+step = 1.0
+value = 1.0
 
 [node name="Production unit" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Production" instance=ExtResource("3_ad1yx")]
 layout_mode = 2

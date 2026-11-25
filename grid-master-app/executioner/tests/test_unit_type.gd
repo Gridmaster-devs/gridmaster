@@ -39,6 +39,15 @@ func test_decimal_combat_attributes_from_unit_resource():
 	assert_almost_eq(unit.accuracy, 75.3, 0.0001)
 	assert_almost_eq(unit.dodge, 42.7, 0.0001)
 
+func test_zero_production_cost_loads_as_one() -> void:
+	unit_resource.set_attribute("production_cost", 0)
+	var unit_type := UnitType.initFromUnitResource(unit_resource)
+	assert_eq(unit_type.production_cost, 1)
+
+func test_positive_production_cost_is_preserved() -> void:
+	var unit_type := UnitType.initFromUnitResource(unit_resource)
+	assert_eq(unit_type.production_cost, 100)
+
 # Test legacy unit resource without 'id' or production attributes
 func test_init_from_legacy_unit_resource():
 	var legacy_res = UnitResource.new()
@@ -53,6 +62,7 @@ func test_init_from_legacy_unit_resource():
 	assert_eq(unit_type.unit_name, "Legacy Cat")
 	assert_false(unit_type.is_production_unit)
 	assert_false(unit_type.is_producible_unit)
+	assert_eq(unit_type.production_cost, 1)
 
 func test_producible_units_only_resolve_enabled_targets():
 	var producer := UnitType.initFromUnitResource(unit_resource)
