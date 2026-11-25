@@ -65,8 +65,8 @@ func load_resource(resource : Resource):
 ## Called by the editor main when loading in a game definition
 
 
-func set_units(units_p : Array[UnitResource]):
-	tree_panel.set_units(units_p)
+func set_units(units_p : Array[UnitResource]) -> bool:
+	return tree_panel.set_units(units_p)
 		
 		
 

@@ -547,6 +547,42 @@ func test_deleting_unit_removes_production_references_but_preserves_unresolved_i
 	assert_eq(second.get_attribute_value("producible_units"), [99])
 
 
+func test_duplicate_unit_import_preserves_production_references() -> void:
+	var editor: UnitEditor = load("res://editor/editors/unit_editor/UnitEditor.tscn").instantiate()
+	add_child_autofree(editor)
+	var producer := UnitResource.new()
+	var target := UnitResource.new()
+	var duplicate := UnitResource.new()
+	producer.set_attribute("id", 700)
+	target.set_attribute("id", 701)
+	target.set_attribute("is_producible_unit", true)
+	duplicate.set_attribute("id", 701)
+	producer.set_attribute("producible_units", [701])
+	editor.set_units([producer, target])
+	editor.load_resource(duplicate)
+	assert_eq(editor.tree_panel.get_units().size(), 2)
+	assert_eq(producer.get_attribute_value("producible_units"), [701])
+	for child in editor.tree_panel.get_children():
+		if child is AcceptDialog:
+			child.free()
+	assert_false(editor.set_units([target, duplicate]))
+	assert_eq(editor.tree_panel.get_units(), [producer, target])
+	assert_eq(producer.get_attribute_value("producible_units"), [701])
+
+
+func test_new_unit_avoids_existing_and_unresolved_ids() -> void:
+	var editor: UnitEditor = load("res://editor/editors/unit_editor/UnitEditor.tscn").instantiate()
+	add_child_autofree(editor)
+	var producer := UnitResource.new()
+	var next_id: int = UnitResource._next_id
+	producer.set_attribute("id", next_id)
+	producer.set_attribute("producible_units", [next_id + 1])
+	editor.set_units([producer])
+	editor.tree_panel.add_unit()
+	assert_eq(editor.tree_panel.get_units()[1].id, next_id + 2)
+	assert_eq(producer.get_attribute_value("producible_units"), [next_id + 1])
+
+
 func test_warning_keys() -> void:
 	assert_eq(EditorTooltips.WARNINGS, {"unit": ["movement_type", "capturable", "morale", "victory_points", "perception", "actions", "attack_range"], "map": ["tile.hiding", "tactical_map"], "painter": ["crop_image"], "tactical_library": ["tactical_map"], "game_painter": ["settings"]})
 

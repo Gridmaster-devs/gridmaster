@@ -334,8 +334,9 @@ func load_from_file() -> void:
 	ftm.upload_data("*.tres", true)
 
 func load_from_resource(resource : GameDefinitionResource):
+	if not editor_main.set_units(resource.load_units()):
+		return
 	set_game_name(resource.game_name)
-	editor_main.set_units(resource.load_units())
 	editor_main.setMap(resource.loadMap())
 	_unit_painter.reload_layer(resource.load_unit_layer(), _unit_layer_id)
 	_game_rules.import(resource.load_rules())

@@ -15,8 +15,8 @@ func get_units() -> Array[UnitResource]:
 
 # tells the unit editor to replace the units with the ones from the array
 # TODO: Use a unit pack when those are implemented
-func set_units(units_p : Array[UnitResource]):
-	unit_editor.set_units(units_p)
+func set_units(units_p : Array[UnitResource]) -> bool:
+	return unit_editor.set_units(units_p)
 
 
 func getMap() -> MapResource:

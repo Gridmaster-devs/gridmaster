@@ -50,7 +50,15 @@ func reset_units():
 
 # adds a new unit to the tree and to the unit array
 func add_unit():
+	var used_ids: Array = []
+	for unit in unit_resources:
+		used_ids.append(unit.id)
+		var saved_ids: Variant = unit.get_attribute_value("producible_units")
+		if saved_ids is Array:
+			used_ids.append_array(saved_ids)
 	var new_unit_resource = UnitResource.new()
+	while new_unit_resource.id in used_ids:
+		new_unit_resource = UnitResource.new()
 	unit_resources.append(new_unit_resource)
 	
 	
@@ -60,7 +68,11 @@ func add_unit():
 
 
 # only called when a unit is loaded from a file
-func add_unit_from_resource(unit_resource : UnitResource):
+func add_unit_from_resource(unit_resource : UnitResource) -> bool:
+	for existing in unit_resources:
+		if existing.id == unit_resource.id:
+			_show_duplicate_id_error(unit_resource.id)
+			return false
 	var item : TreeItem = tree.create_item(null, units)
 	
 	var unit_name = unit_resource.get_attribute_value("name")
@@ -76,6 +88,7 @@ func add_unit_from_resource(unit_resource : UnitResource):
 	units += 1
 	
 	units_changed.emit()
+	return true
 
 
 # removes a unit from the tree and the array
@@ -120,10 +133,27 @@ func get_units() -> Array[UnitResource]:
 	return unit_resources
 	
 
-func set_units(units_p : Array[UnitResource]):
+func set_units(units_p : Array[UnitResource]) -> bool:
+	var ids: Array[int] = []
+	for unit in units_p:
+		if unit.id in ids:
+			_show_duplicate_id_error(unit.id)
+			return false
+		ids.append(unit.id)
 	reset_units()
 	for unit in units_p:
 		add_unit_from_resource(unit)
+	return true
+
+
+func _show_duplicate_id_error(id: int) -> void:
+	var dialog := AcceptDialog.new()
+	dialog.title = "Duplicate unit ID"
+	dialog.dialog_text = "Cannot import units: ID %d already exists. Change the duplicate ID in the source file and try again." % id
+	dialog.confirmed.connect(dialog.queue_free)
+	dialog.canceled.connect(dialog.queue_free)
+	add_child(dialog)
+	dialog.popup_centered()
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
