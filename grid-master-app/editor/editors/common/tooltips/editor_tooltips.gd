@@ -111,7 +111,7 @@ const TEXT := {
 }
 
 const WARNINGS := {
- "unit": ["movement_type", "capturable", "victory_points", "perception", "is_producible_unit", "actions", "attack_range", "production_cost", "producible_units_add"],
+ "unit": ["movement_type", "capturable", "morale", "victory_points", "perception", "actions", "attack_range"],
  "map": ["tile.hiding", "tactical_map"],
  "painter": ["crop_image"],
  "tactical_library": ["tactical_map"],

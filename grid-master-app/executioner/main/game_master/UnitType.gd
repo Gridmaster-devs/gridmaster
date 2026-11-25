@@ -106,11 +106,10 @@ static func initFromUnitResource(unit_resource : UnitResource, fallback_id: int 
 	var is_prod = unit_resource.get_attribute_value("is_production_unit")
 	unit_type.is_production_unit = bool(is_prod) if is_prod != null else false
 
-	var is_producible = unit_resource.get_attribute_value("is_producible_unit")
-	unit_type.is_producible_unit = bool(is_producible) if is_producible != null else false
+	unit_type.is_producible_unit = unit_resource.get_attribute_value("is_producible_unit") == true
 
-	var prod_cost = unit_resource.get_attribute_value("production_cost")
-	unit_type.production_cost = int(prod_cost) if prod_cost != null else 1
+	var prod_cost: Variant = unit_resource.get_attribute_value("production_cost")
+	unit_type.production_cost = maxi(1, int(prod_cost)) if prod_cost != null else 1
 
 	var producible_units_from_resource = unit_resource.get_attribute_value("producible_units")
 	if producible_units_from_resource != null and producible_units_from_resource is Array:
@@ -135,11 +134,13 @@ static func initFromUnitResource(unit_resource : UnitResource, fallback_id: int 
 	return unit_type
 
 func populate_producible_units(unit_types_dict: Dictionary[int, UnitType]) -> void:
+	producible_units.clear()
 	for unit_id in producible_units_ids:
-		if unit_types_dict.has(unit_id):
-			producible_units.append(unit_types_dict[unit_id])
-		else:
-			print("UnitType with ID %d not found in unit_types_dict!" % unit_id)
+		var target: UnitType = unit_types_dict.get(unit_id) if unit_id is int else null
+		if target == null:
+			print("UnitType with ID %s not found in unit_types_dict!" % str(unit_id))
+		elif target.is_producible_unit:
+			producible_units.append(target)
 
 static func debugType() -> UnitType:
 	var type = UnitType.new()

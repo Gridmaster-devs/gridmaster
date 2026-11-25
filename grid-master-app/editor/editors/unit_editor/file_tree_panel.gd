@@ -9,7 +9,6 @@ extends PanelContainer
 signal units_changed
 
 var unit_resources : Array[UnitResource] = []
-var unit_ids: Array[int]
 var units : int = 0
 
 var unit_editor : UnitEditor
@@ -24,7 +23,6 @@ var state = unit_resources
 func add_to_tree(unit: UnitResource):
 	var item : TreeItem = tree.create_item(null, units)
 	item.set_text(0, "Unnamed unit")
-	unit_ids.append(unit.id)
 	units += 1
 	
 func remove_selected_from_tree():
@@ -32,7 +30,6 @@ func remove_selected_from_tree():
 	var index = null
 	if (selected != null):
 		index = selected.get_index()
-		unit_ids.remove_at(index)
 		tree_root.remove_child(selected)
 		units -= 1
 	return index
@@ -53,7 +50,8 @@ func reset_units():
 
 # adds a new unit to the tree and to the unit array
 func add_unit():
-	var new_unit_resource = UnitResource.new()
+	unit_editor.save_to_resource.emit(unit_editor.unit_resource)
+	var new_unit_resource = _new_unit_with_unused_id(_reserved_ids(unit_resources))
 	unit_resources.append(new_unit_resource)
 	
 	
@@ -63,7 +61,17 @@ func add_unit():
 
 
 # only called when a unit is loaded from a file
-func add_unit_from_resource(unit_resource : UnitResource):
+func add_unit_from_resource(unit_resource : UnitResource) -> bool:
+	if unit_resource.get_attribute_value("id") == null:
+		unit_editor.save_to_resource.emit(unit_editor.unit_resource)
+		var all_units: Array[UnitResource] = unit_resources.duplicate()
+		all_units.append(unit_resource)
+		unit_resource.set_attribute("id", _new_unit_with_unused_id(_reserved_ids(all_units)).id)
+	else:
+		for existing in unit_resources:
+			if existing.id == unit_resource.id:
+				_show_duplicate_id_error(unit_resource.id)
+				return false
 	var item : TreeItem = tree.create_item(null, units)
 	
 	var unit_name = unit_resource.get_attribute_value("name")
@@ -79,13 +87,19 @@ func add_unit_from_resource(unit_resource : UnitResource):
 	units += 1
 	
 	units_changed.emit()
+	return true
 
 
 # removes a unit from the tree and the array
 func remove_unit():
 	var index = remove_selected_from_tree()
 	if index != null:
+		var deleted_id: int = unit_resources[index].id
 		unit_resources.remove_at(index) # this does not check for out of bounds
+		for unit in unit_resources:
+			var saved_ids: Variant = unit.get_attribute_value("producible_units")
+			if saved_ids is Array and deleted_id in saved_ids:
+				unit.set_attribute("producible_units", saved_ids.filter(func(id: Variant) -> bool: return id != deleted_id))
 		unit_editor.unit_resource_removed()
 		units_changed.emit()
 
@@ -118,10 +132,53 @@ func get_units() -> Array[UnitResource]:
 	return unit_resources
 	
 
-func set_units(units_p : Array[UnitResource]):
+func set_units(units_p : Array[UnitResource]) -> bool:
+	var ids: Array[int] = []
+	for unit in units_p:
+		if unit.get_attribute_value("id") == null:
+			continue
+		if unit.id in ids:
+			_show_duplicate_id_error(unit.id)
+			return false
+		ids.append(unit.id)
+	var reserved_ids := _reserved_ids(units_p)
+	for unit in units_p:
+		if unit.get_attribute_value("id") == null:
+			var id := _new_unit_with_unused_id(reserved_ids).id
+			unit.set_attribute("id", id)
+			reserved_ids.append(id)
 	reset_units()
 	for unit in units_p:
 		add_unit_from_resource(unit)
+	return true
+
+
+func _reserved_ids(resources: Array[UnitResource]) -> Array:
+	var ids: Array = []
+	for unit in resources:
+		if unit.get_attribute_value("id") != null:
+			ids.append(unit.id)
+		var saved_ids: Variant = unit.get_attribute_value("producible_units")
+		if saved_ids is Array:
+			ids.append_array(saved_ids)
+	return ids
+
+
+func _new_unit_with_unused_id(reserved_ids: Array) -> UnitResource:
+	var unit := UnitResource.new()
+	while unit.id in reserved_ids:
+		unit = UnitResource.new()
+	return unit
+
+
+func _show_duplicate_id_error(id: int) -> void:
+	var dialog := AcceptDialog.new()
+	dialog.title = "Duplicate unit ID"
+	dialog.dialog_text = "Cannot import units: ID %d already exists. Change the duplicate ID in the source file and try again." % id
+	dialog.confirmed.connect(dialog.queue_free)
+	dialog.canceled.connect(dialog.queue_free)
+	add_child(dialog)
+	dialog.popup_centered()
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

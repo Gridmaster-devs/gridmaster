@@ -151,9 +151,14 @@ func set_graphics_flags(flags : int):
 # -----
 
 
-## Gives a random number between 0 and PERCENT RANGE (inclusive)
-func rand_range_val() -> int:
-	return randi_range(0, arg_vars.get(ArgVarType.PERCENT_RANGE))
+## Tests a probability expressed in units of PERCENT_RANGE.
+func probability_succeeds(chance: float) -> bool:
+	var percent_range: float = arg_vars.get(ArgVarType.PERCENT_RANGE)
+	if chance <= 0.0:
+		return false
+	if chance >= percent_range:
+		return true
+	return randf() * percent_range < chance
 
 
 ## Default fight function
@@ -225,11 +230,11 @@ func _gen_default_damage_func() -> void:
 ## the hit is confirmed
 func _gen_default_hit_func() -> void:
 	var hit_func = func(unit1 : Unit, unit2 : Unit) -> bool:
-		if (rand_range_val() > unit1.accuracy):
+		if not probability_succeeds(unit1.accuracy):
 			# Unit 1 missed
 			return false
 		
-		if (rand_range_val() <= unit2.dodge):
+		if probability_succeeds(unit2.dodge):
 			# Unit 2 dodged
 			return false
 		

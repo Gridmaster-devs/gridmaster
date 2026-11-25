@@ -179,6 +179,9 @@ text = "Production cost (self)"
 [node name="SpinBox" type="SpinBox" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Production/Production cost (self)"]
 layout_mode = 2
 size_flags_horizontal = 3
+min_value = 1.0
+step = 1.0
+value = 1.0
 
 [node name="Production unit" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Production" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
@@ -196,6 +199,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="Producible units" parent="HBoxContainer/VBoxContainer/HBoxContainer/AttributesPanel/TopVBox/ScrollContainer/ContentsVBox/Production" node_paths=PackedStringArray("options_list_provider") instance=ExtResource("8_8onv2")]
+visible = false
 layout_mode = 2
 options_list_provider = NodePath("../../../../../../../../UnitTreePanel")
 label_text = "Producible units"
@@ -329,17 +333,18 @@ size_flags_horizontal = 3
 [node name="Accuracy" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "accuracy"
-text = "Accuracy"
+text = "Accuracy (%)"
 type = 3
 
 [node name="Label" type="Label" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Accuracy"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Accuracy"
+text = "Accuracy (%)"
 
 [node name="SpinBox" type="SpinBox" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive/Accuracy"]
 layout_mode = 2
 size_flags_horizontal = 3
+step = 0.1
 
 [node name="Attack range" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Offensive" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
@@ -384,17 +389,18 @@ size_flags_horizontal = 3
 [node name="Evasion" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Defensive" instance=ExtResource("3_ad1yx")]
 layout_mode = 2
 attribute_name = "evasion"
-text = "Evasion"
+text = "Evasion (%)"
 type = 3
 
 [node name="Label" type="Label" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Defensive/Evasion"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Evasion"
+text = "Evasion (%)"
 
 [node name="SpinBox" type="SpinBox" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox/Defensive/Evasion"]
 layout_mode = 2
 size_flags_horizontal = 3
+step = 0.1
 
 [node name="Utility" type="VBoxContainer" parent="HBoxContainer/StatsPanel/TopVBox/ScrollContainer/ContentsVBox" index="2"]
 layout_mode = 2

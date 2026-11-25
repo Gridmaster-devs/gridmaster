@@ -7,32 +7,34 @@ signal production_selected
 @onready var _button: Button = $VBoxContainer/Button
 
 var _unit: Unit
-var _producible_unit: UnitType
-var _unit_options: Array[UnitType]
 var _game_data_manager: GameDataManager
 
 # Setups the optionbutton and the produce
-func setup(unitID: int, game_data_manager: GameDataManager):
+
+
+func setup(unit_id: int, game_data_manager: GameDataManager) -> void:
 	_selector.clear()
-	_unit = game_data_manager.get_unit_by_id(unitID)
-	_unit_options = _unit.type.producible_units
+	_unit = game_data_manager.get_unit_by_id(unit_id)
 	_game_data_manager = game_data_manager
 	
-	for u in _unit_options:
+	for u in _unit.type.producible_units:
 		_selector.add_item(u.unit_name)
 	
 	_button.text = "Produce"
+	_button.disabled = not _unit.type.is_production_unit or _unit.type.producible_units.is_empty()
+
 
 func _on_pressed() -> void:
-	var selected = _selector.get_item_text(_selector.selected)
+	if _unit == null or not _unit.type.is_production_unit or _unit.current_action != null:
+		return
+	var selected: int = _selector.selected
+	if selected < 0 or selected >= _unit.type.producible_units.size():
+		return
+	var target: UnitType = _unit.type.producible_units[selected]
+	_unit.current_action = ProductionAction.new(_unit.get_player_id(), _unit, _game_data_manager, target)
+	production_selected.emit()
 	
-	for u in _unit_options:
-		if u.unit_name == selected:
-			_producible_unit = u
-	
-	if _unit.current_action == null:
-		_unit.current_action = ProductionAction.new(_unit.get_player_id(), _unit, _game_data_manager, _producible_unit)
-		production_selected.emit()
-	
+
+
 func _ready() -> void:
 	_button.pressed.connect(_on_pressed)

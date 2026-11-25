@@ -234,6 +234,7 @@ func test_warning_button_freed_before_deferred_refresh() -> void:
 	# GUT's error tracking also catches invalid deferred calls.
 	assert_false(is_instance_valid(button))
 
+
 func test_registry_and_warning_set() -> void:
 	var count := 0
 	var warnings := 0
@@ -247,34 +248,37 @@ func test_registry_and_warning_set() -> void:
 			if EditorTooltips.has_warning(context, key):
 				warnings += 1
 	assert_eq(count, 91)
-	assert_eq(warnings, 14)
+	assert_eq(warnings, 12)
 	assert_eq(EditorTooltips.WARNING_TEXT, "This feature is not fully implemented yet.")
 	assert_eq(EditorTooltips.get_tooltip("unit", "health"), "How much damage the unit can take before being destroyed.")
+	assert_eq(EditorTooltips.get_tooltip("unit", "morale"), "The unit's starting morale.")
 	assert_eq(EditorTooltips.get_tooltip("game", "player_key_unit"), "The unit type this player must keep alive to avoid elimination. Leave blank to count any surviving unit.")
 	assert_eq(EditorTooltips.get_tooltip("unit", "missing"), "")
 	assert_eq(EditorTooltips.get_tooltip("map", "name"), "")
 	assert_false(EditorTooltips.has_warning("unit", "health"))
-	assert_false(EditorTooltips.has_warning("unit", "morale"))
+	assert_true(EditorTooltips.has_warning("unit", "morale"))
 	assert_false(EditorTooltips.has_warning("map", "save_map"))
+
 
 func test_label_warning_is_separate_and_idempotent() -> void:
 	var row := HBoxContainer.new()
 	var label := Label.new()
 	var input := LineEdit.new()
-	label.text = "Producible"
+	label.text = "Morale"
 	input.text = "preserved"
 	row.add_child(label)
 	row.add_child(input)
 	add_child_autofree(row)
-	TooltipHelper.apply(label, "unit", "is_producible_unit")
-	TooltipHelper.apply(label, "unit", "is_producible_unit")
-	assert_eq(label.tooltip_text, EditorTooltips.get_tooltip("unit", "is_producible_unit"))
+	TooltipHelper.apply(label, "unit", "morale")
+	TooltipHelper.apply(label, "unit", "morale")
+	assert_eq(label.tooltip_text, EditorTooltips.get_tooltip("unit", "morale"))
 	assert_ne(label.mouse_filter, Control.MOUSE_FILTER_IGNORE)
 	assert_eq(input.tooltip_text, "")
 	assert_eq(input.text, "preserved")
 	assert_eq(label.get_child_count(), 1)
 	assert_eq(label.get_child(0).tooltip_text, EditorTooltips.WARNING_TEXT)
 	assert_eq(row.get_child(1), input)
+
 
 func test_game_name_and_unit_placement_keep_original_layout() -> void:
 	var editor = load("res://editor/editors/game_editor/GameEditor.tscn").instantiate()
@@ -294,6 +298,7 @@ func test_game_name_and_unit_placement_keep_original_layout() -> void:
 	assert_eq(canvas.tooltip_text, EditorTooltips.get_tooltip("game", "unit_placement"))
 	assert_eq(canvas.mouse_filter, canvas_filter)
 
+
 func test_actions_header_has_one_warning() -> void:
 	var panel = load("res://editor/editors/unit_editor/ActionPanel.tscn").instantiate()
 	add_child_autofree(panel)
@@ -305,6 +310,7 @@ func test_actions_header_has_one_warning() -> void:
 	var text_width = label.get_theme_font("font").get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, label.get_theme_font_size("font_size")).x
 	var text_left = label.get_theme_stylebox("normal").get_content_margin(SIDE_LEFT)
 	assert_almost_eq(label.get_child(0).position.x, text_left + text_width + 4, 0.01)
+
 
 func test_action_name_keeps_original_layout() -> void:
 	var panel = load("res://editor/editors/unit_editor/Action panels/ActionPanelItem.tscn").instantiate()
@@ -319,6 +325,7 @@ func test_action_name_keeps_original_layout() -> void:
 	TooltipHelper.apply(panel.action_name_line, "unit", "action_name", false)
 	assert_eq(panel.get_children(), children)
 	assert_eq(panel.action_name_line.tooltip_text, EditorTooltips.get_tooltip("unit", "action_name"))
+
 
 func test_action_fields_keep_original_rows_without_warnings() -> void:
 	var panel = load("res://editor/editors/unit_editor/Action panels/ConsumeProducePanel.tscn").instantiate()
@@ -337,6 +344,7 @@ func test_action_fields_keep_original_rows_without_warnings() -> void:
 		assert_eq(row.get_child(2), row.get_node("ResourceName"))
 		assert_eq(row.get_child_count(), 3)
 
+
 func test_unit_image_keeps_original_layout() -> void:
 	var panel = load("res://editor/editors/unit_editor/UnitInfoPanel.tscn").instantiate()
 	var column = panel.get_node("TopVBox/PanelContainer/ContentsVBox/HBoxContainer/VBoxContainer")
@@ -348,6 +356,7 @@ func test_unit_image_keeps_original_layout() -> void:
 	assert_eq(image.tooltip_text, EditorTooltips.get_tooltip("unit", "texture"))
 	assert_eq(image.mouse_filter, image_filter)
 	assert_eq(panel.name_line.placeholder_text, "Unit name")
+
 
 func test_generated_team_and_player_rows_use_context() -> void:
 	var team = load("res://editor/editors/game_editor/team_ui.tscn").instantiate()
@@ -363,6 +372,7 @@ func test_generated_team_and_player_rows_use_context() -> void:
 	assert_eq(player_label.tooltip_text, EditorTooltips.get_tooltip("game", "player_team"))
 	assert_false(player_label.has_node("UnusedFeatureWarning"))
 
+
 func test_generated_terrain_hiding_field() -> void:
 	var popup = load("res://editor/editors/map_editor_refactor/popup_windows/new_tile_popup.tscn").instantiate()
 	add_child_autofree(popup)
@@ -376,14 +386,238 @@ func test_generated_terrain_hiding_field() -> void:
 	assert_false(movement.has_node("UnusedFeatureWarning"))
 	assert_eq(popup.get_ui_element("hiding").tooltip_text, "")
 
+
 func test_editor_scenes_instantiate() -> void:
 	for path in ["res://editor/editors/unit_editor/UnitEditor.tscn", "res://editor/editors/game_editor/GameEditor.tscn", "res://editor/editors/map_editor_refactor/map_editor.tscn"]:
 		var editor = load(path).instantiate()
 		add_child_autofree(editor)
 		assert_not_null(editor)
 
+
+func test_unit_editor_production_cost_spin_box() -> void:
+	var editor: UnitEditor = load("res://editor/editors/unit_editor/UnitEditor.tscn").instantiate()
+	add_child_autofree(editor)
+	var item: UnitPanelItem = editor.production_item.get_parent().get_node("Production cost (self)")
+	var cost: SpinBox = item.get_content()
+	assert_eq(cost.min_value, 1.0)
+	assert_eq(cost.value, 1.0)
+	assert_eq(cost.step, 1.0)
+	assert_false(item.get_label().has_node("UnusedFeatureWarning"))
+
+	var resource := UnitResource.new()
+	resource.set_attribute("production_cost", 4.0)
+	item.load_from_unit_resource(resource)
+	assert_eq(cost.value, 4.0)
+	await wait_process_frames(1)
+	item.save_to_unit_resource(resource)
+	assert_eq(resource.get_attribute_value("production_cost"), 4.0)
+
+	resource.attributes.erase("production_cost")
+	item.load_from_unit_resource(resource)
+	assert_eq(cost.value, 1.0)
+
+	resource.set_attribute("production_cost", 0.0)
+	item.load_from_unit_resource(resource)
+	assert_eq(cost.value, 1.0)
+	await wait_process_frames(1)
+	cost.get_line_edit().text = "0"
+	item.save_to_unit_resource(resource)
+	assert_eq(resource.get_attribute_value("production_cost"), 1.0)
+
+
+func test_unit_editor_preserves_ineligible_production_ids() -> void:
+	var editor: UnitEditor = load("res://editor/editors/unit_editor/UnitEditor.tscn").instantiate()
+	add_child_autofree(editor)
+	var producer := UnitResource.new()
+	var target := UnitResource.new()
+	producer.set_attribute("id", 40)
+	producer.set_attribute("is_production_unit", true)
+	producer.set_attribute("producible_units", [41])
+	target.set_attribute("id", 41)
+	target.set_attribute("name", "Tank")
+	target.set_attribute("is_producible_unit", true)
+	editor.set_units([producer, target])
+	var root: TreeItem = editor.tree_panel.tree_root
+	var options: PanelItemEditableList = editor.production_options
+	var checkbox: CheckBox = editor.producible_item.get_content()
+	var production_checkbox: CheckBox = editor.production_item.get_content()
+	var unrelated_control := HBoxContainer.new()
+	options.add_child(unrelated_control)
+	assert_false(editor.producible_item.get_label().has_node("UnusedFeatureWarning"))
+	assert_false(options.add_button.has_node("UnusedFeatureWarning"))
+	assert_eq(options.add_button.tooltip_text, EditorTooltips.get_tooltip("unit", "producible_units_add"))
+	root.get_child(0).select(0)
+	assert_true(options.visible)
+	assert_eq(options._chosen_rows[41].get_child(0).text, "Tank")
+	options.add_chosen(41)
+	assert_eq(options.chosen_list, [41])
+	production_checkbox.button_pressed = false
+	assert_false(options.visible)
+	production_checkbox.button_pressed = true
+	assert_true(options.visible)
+	root.get_child(1).select(0)
+	checkbox.button_pressed = false
+	assert_false(target.get_attribute_value("is_producible_unit"))
+	assert_eq(options.drop_down.get_item_index(41), -1)
+	assert_eq(producer.get_attribute_value("producible_units"), [41])
+	root.get_child(0).select(0)
+	assert_eq(options._chosen_rows[41].get_child(0).text, "Tank (not producible)")
+	assert_eq(unrelated_control.get_parent(), options)
+	editor.get_units()
+	var path := "user://production_reference_test.tres"
+	assert_eq(ResourceSaver.save(producer, path), OK)
+	var reloaded: UnitResource = ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_IGNORE)
+	assert_eq(reloaded.get_attribute_value("producible_units"), [41])
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	root.get_child(1).select(0)
+	editor.info_panel.name_line.text = "Renamed"
+	editor.info_panel.name_line.text_changed.emit("Renamed")
+	assert_eq(producer.get_attribute_value("producible_units"), [41])
+	checkbox.button_pressed = true
+	assert_ne(options.drop_down.get_item_index(41), -1)
+	root.get_child(0).select(0)
+	assert_eq(options._chosen_rows[41].get_child(0).text, "Renamed")
+	root.get_child(1).select(0)
+	checkbox.button_pressed = false
+	root.get_child(0).select(0)
+	var remove_button: PanelItemEditableListButton = options._chosen_rows[41].get_child(1)
+	remove_button._pressed()
+	editor.get_units()
+	assert_eq(producer.get_attribute_value("producible_units"), [])
+
+
+func test_missing_production_reference_is_visible_removable_and_resolves_on_import() -> void:
+	var editor: UnitEditor = load("res://editor/editors/unit_editor/UnitEditor.tscn").instantiate()
+	add_child_autofree(editor)
+	var producer := UnitResource.new()
+	producer.set_attribute("id", 60)
+	producer.set_attribute("is_production_unit", true)
+	producer.set_attribute("producible_units", [61, 62])
+	editor.set_units([producer])
+	editor.tree_panel.tree_root.get_child(0).select(0)
+	var options: PanelItemEditableList = editor.production_options
+	var missing_row: HBoxContainer = options._chosen_rows[61]
+	assert_eq(missing_row.get_child(0).text, "Missing unit (ID: 61)")
+	var remove_button: PanelItemEditableListButton = missing_row.get_child(1)
+	remove_button._pressed()
+	editor.get_units()
+	assert_eq(producer.get_attribute_value("producible_units"), [62])
+	var target := UnitResource.new()
+	target.set_attribute("id", 62)
+	target.set_attribute("name", "Tank")
+	target.set_attribute("is_producible_unit", false)
+	editor.load_resource(target)
+	assert_eq(options._chosen_rows[62].get_child(0).text, "Tank (not producible)")
+	target.set_attribute("is_producible_unit", true)
+	editor.tree_panel.units_changed.emit()
+	assert_eq(options._chosen_rows[62].get_child(0).text, "Tank")
+	editor.get_units()
+	assert_eq(producer.get_attribute_value("producible_units"), [62])
+
+
+func test_deleting_unit_removes_production_references_but_preserves_unresolved_ids() -> void:
+	var editor: UnitEditor = load("res://editor/editors/unit_editor/UnitEditor.tscn").instantiate()
+	add_child_autofree(editor)
+	var first := UnitResource.new()
+	var second := UnitResource.new()
+	var target := UnitResource.new()
+	first.set_attribute("id", 50)
+	second.set_attribute("id", 51)
+	target.set_attribute("id", 52)
+	target.set_attribute("is_producible_unit", true)
+	first.set_attribute("producible_units", [52, 99, 52])
+	second.set_attribute("producible_units", [99, 52])
+	editor.set_units([first, second, target])
+	editor.tree_panel.tree_root.get_child(2).select(0)
+	editor.tree_panel.remove_unit()
+	assert_eq(first.get_attribute_value("producible_units"), [99])
+	assert_eq(second.get_attribute_value("producible_units"), [99])
+	editor.load_resource(target)
+	editor.get_units()
+	assert_eq(first.get_attribute_value("producible_units"), [99])
+	assert_eq(second.get_attribute_value("producible_units"), [99])
+
+
+func test_duplicate_unit_import_preserves_production_references() -> void:
+	var editor: UnitEditor = load("res://editor/editors/unit_editor/UnitEditor.tscn").instantiate()
+	add_child_autofree(editor)
+	var producer := UnitResource.new()
+	var target := UnitResource.new()
+	var duplicate := UnitResource.new()
+	producer.set_attribute("id", 700)
+	target.set_attribute("id", 701)
+	target.set_attribute("is_producible_unit", true)
+	duplicate.set_attribute("id", 701)
+	producer.set_attribute("producible_units", [701])
+	editor.set_units([producer, target])
+	editor.load_resource(duplicate)
+	assert_eq(editor.tree_panel.get_units().size(), 2)
+	assert_eq(producer.get_attribute_value("producible_units"), [701])
+	for child in editor.tree_panel.get_children():
+		if child is AcceptDialog:
+			child.free()
+	assert_false(editor.set_units([target, duplicate]))
+	assert_eq(editor.tree_panel.get_units(), [producer, target])
+	assert_eq(producer.get_attribute_value("producible_units"), [701])
+
+
+func test_new_unit_avoids_existing_and_unresolved_ids() -> void:
+	var editor: UnitEditor = load("res://editor/editors/unit_editor/UnitEditor.tscn").instantiate()
+	add_child_autofree(editor)
+	var producer := UnitResource.new()
+	var next_id: int = UnitResource._next_id
+	producer.set_attribute("id", next_id)
+	producer.set_attribute("producible_units", [next_id + 1])
+	editor.set_units([producer])
+	editor.tree_panel.add_unit()
+	assert_eq(editor.tree_panel.get_units()[1].id, next_id + 2)
+	assert_eq(producer.get_attribute_value("producible_units"), [next_id + 1])
+
+
+func test_legacy_unit_imports_reserve_ids_and_references() -> void:
+	var editor: UnitEditor = load("res://editor/editors/unit_editor/UnitEditor.tscn").instantiate()
+	add_child_autofree(editor)
+	var legacy_a := UnitResource.new()
+	var legacy_b := UnitResource.new()
+	var modern := UnitResource.new()
+	legacy_a.attributes.erase("id")
+	legacy_b.attributes.erase("id")
+	var next_id := UnitResource._next_id
+	modern.set_attribute("id", next_id)
+	legacy_b.set_attribute("producible_units", [next_id + 1])
+	assert_true(editor.set_units([legacy_a, legacy_b, modern]))
+	assert_eq(modern.id, next_id)
+	assert_eq(legacy_a.id, next_id + 2)
+	assert_eq(legacy_b.id, next_id + 3)
+	assert_eq(legacy_b.get_attribute_value("producible_units"), [next_id + 1])
+	var individual := UnitResource.new()
+	individual.attributes.erase("id")
+	var next_individual_id := UnitResource._next_id
+	modern.set_attribute("producible_units", [next_individual_id])
+	assert_true(editor.tree_panel.add_unit_from_resource(individual))
+	assert_eq(individual.id, next_individual_id + 1)
+
+
+func test_cats_and_dogs_legacy_units_import() -> void:
+	var editor: UnitEditor = load("res://editor/editors/unit_editor/UnitEditor.tscn").instantiate()
+	add_child_autofree(editor)
+	var game: GameDefinitionResource = ResourceLoader.load("res://game_cats_dogs.tres", "", ResourceLoader.CACHE_MODE_IGNORE)
+	var imported := game.load_units()
+	assert_gt(imported.size(), 1)
+	var missing_count := 0
+	for unit in imported:
+		if unit.get_attribute_value("id") == null:
+			missing_count += 1
+	assert_gt(missing_count, 1)
+	assert_true(editor.set_units(imported))
+	var ids: Array[int] = []
+	for unit in imported:
+		assert_false(unit.id in ids)
+		ids.append(unit.id)
+
+
 func test_warning_keys() -> void:
-	assert_eq(EditorTooltips.WARNINGS, {"unit": ["movement_type", "capturable", "victory_points", "perception", "is_producible_unit", "actions", "attack_range", "production_cost", "producible_units_add"], "map": ["tile.hiding", "tactical_map"], "painter": ["crop_image"], "tactical_library": ["tactical_map"], "game_painter": ["settings"]})
+	assert_eq(EditorTooltips.WARNINGS, {"unit": ["movement_type", "capturable", "morale", "victory_points", "perception", "actions", "attack_range"], "map": ["tile.hiding", "tactical_map"], "painter": ["crop_image"], "tactical_library": ["tactical_map"], "game_painter": ["settings"]})
 
 
 func test_save_tooltips_follow_map_mode() -> void:
@@ -444,6 +678,7 @@ func test_library_tooltips_use_item_kind() -> void:
 			assert_true(item.get_node("Label").has_node("UnusedFeatureWarning"))
 			assert_eq(item.get_button().tooltip_text, EditorTooltips.get_tooltip(context, "tactical_map_thumbnail"))
 			assert_false(item.get_button().has_node("UnusedFeatureWarning"))
+
 
 func test_unit_description_has_no_added_label_or_tooltip() -> void:
 	var panel = load("res://editor/editors/unit_editor/UnitInfoPanel.tscn").instantiate()
