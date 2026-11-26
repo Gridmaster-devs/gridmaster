@@ -6,6 +6,9 @@
 class_name ConsumeProduce
 extends Action
 
+## Shown in the resource dropdowns when nothing is consumed / produced
+const NO_RESOURCE : String = "None"
+
 @export var consumed_resource : String
 @export var consumed_amount : int
 @export var produced_resource : String

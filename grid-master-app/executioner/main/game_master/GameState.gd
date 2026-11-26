@@ -10,7 +10,10 @@ var _units : Dictionary[int, Unit] = {} ## All the units in the game, NOTE: also
 var _unit_id_count : int = 0
 
 ## What turn it is
-var _turn_number : int = 0 
+var _turn_number : int = 0
+
+## How much of each global resource each player has (player ID -> resource name -> amount)
+var _player_resources : Dictionary[int, Dictionary] = {}
 
 
 ## Adds a unit to the game.
@@ -71,7 +74,8 @@ func deep_copy() -> GameState:
 		new_units[new_unit.unit_id] = new_unit
 	
 	var new_state = GameState.new(new_units, self._turn_number, self._unit_id_count)
-	
+	new_state._player_resources = self._player_resources.duplicate(true)
+
 	return new_state
 
 
@@ -94,6 +98,15 @@ func getNewUnitId() -> int:
 
 func get_unit_by_id(id : int) -> Unit:
 	return _units.get(id)
+
+## Returns how much of a resource the player has. Players start with none of every resource.
+func get_resource_amount(player_id : int, resource_name : String) -> int:
+	return _player_resources.get(player_id, {}).get(resource_name, 0)
+
+func set_resource_amount(player_id : int, resource_name : String, amount : int) -> void:
+	if not _player_resources.has(player_id):
+		_player_resources[player_id] = {}
+	_player_resources[player_id][resource_name] = amount
 
 ## Returns the unit in the specified position or null if the tile does not contain a unit at all
 func get_unit_by_position_nullable(pos: Vector2i) -> Unit:

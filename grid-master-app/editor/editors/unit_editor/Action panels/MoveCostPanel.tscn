@@ -1,0 +1,55 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Theme" uid="uid://yxekjv7f7m0g" path="res://themes/editor-theme.tres" id="1_theme"]
+[ext_resource type="Script" path="res://editor/editors/unit_editor/Action panels/move_cost_panel.gd" id="2_script"]
+
+[node name="MoveCostPanel" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource("1_theme")
+script = ExtResource("2_script")
+
+[node name="Cost" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Cost"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+text = "Moving costs"
+
+[node name="ResourceAmount" type="SpinBox" parent="Cost"]
+layout_mode = 2
+max_value = 9999.0
+size_flags_horizontal = 3
+
+[node name="ResourceName" type="OptionButton" parent="Cost"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+
+[node name="Mode" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Mode"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+text = "Cost is"
+
+[node name="ModeOption" type="OptionButton" parent="Mode"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 3.0
+
+[node name="NoneWarning" type="Label" parent="."]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.75, 0.2, 1)
+text = "No resource is selected, so moving this unit is free."
+autowrap_mode = 3

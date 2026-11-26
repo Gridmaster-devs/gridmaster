@@ -72,7 +72,13 @@ func add_unit_from_resource(unit_resource : UnitResource):
 		item.set_text(0, "Unnamed unit")
 	else:
 		item.set_text(0, unit_name)
-		
+
+	# units from files can have the same ID as a unit that is already in the editor
+	# (or no ID at all), so they're given a new one to keep the IDs unique
+	if (unit_resource.get_attribute_value("id") == null or _has_unit_with_id(unit_resource.id)):
+		unit_resource.assign_new_id()
+	UnitResource.reserve_id(unit_resource.id)
+
 	unit_resources.append(unit_resource)
 	
 	#tree_id_to_unit_resource_id[units] = unit_resource.id
@@ -116,6 +122,13 @@ func link_unit_editor(ue : UnitEditor):
 
 func get_units() -> Array[UnitResource]:
 	return unit_resources
+
+
+func _has_unit_with_id(id_p : int) -> bool:
+	for unit in unit_resources:
+		if (unit.id == id_p):
+			return true
+	return false
 	
 
 func set_units(units_p : Array[UnitResource]):

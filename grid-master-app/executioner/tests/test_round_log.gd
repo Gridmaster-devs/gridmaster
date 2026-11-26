@@ -1,7 +1,7 @@
 extends GutTest
 
 const GAME_MASTER_SCENE = preload("res://executioner/main/game_master/GameMaster.tscn")
-const GAME = preload("res://Production test.tres")
+const GAME = preload("res://test_games/Production test.tres")
 
 # Capture the outgoing RPC without a server so the client remains waiting.
 class WaitingMultiplayer extends MultiplayerAPIExtension:
@@ -79,7 +79,7 @@ func _state_update(completed_turns: int) -> Dictionary:
 func _start_multiplayer(completed_turns: int) -> void:
 	Global.game_type = Global.GameType.MULTIPLAYER
 	# Exercise the real file-received -> state-received sequence, including GUI replacement.
-	game_master._on_game_file_received(FileAccess.get_file_as_bytes("res://Production test.tres"), 1)
+	game_master._on_game_file_received(FileAccess.get_file_as_bytes("res://test_games/Production test.tres"), 1)
 	game_master._on_game_state_received(_state_update(completed_turns))
 
 

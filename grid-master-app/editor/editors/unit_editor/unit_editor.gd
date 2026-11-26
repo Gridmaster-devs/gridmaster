@@ -57,6 +57,15 @@ func set_units(units_p : Array[UnitResource]):
 	tree_panel.set_units(units_p)
 		
 		
+## Replaces the resources that can be selected in the consume / produce actions.
+##
+## Called by the editor main when the game's resources change.
+## The array is updated in place because the action panels hold a reference to it.
+func set_resources(resources_p : Array[String]):
+	resources.clear()
+	resources.append_array(resources_p)
+
+
 func get_units() -> Array[UnitResource]:
 	if (unit_resource != null):
 		save_to_resource.emit(unit_resource)
@@ -81,6 +90,13 @@ func new_unit_resource(unit_resource_p : UnitResource):
 func link_editor_main(editor_main_p : EditorMain):
 	editor_main = editor_main_p
 
+# rebuilds the current unit's actions when the editor is shown, so that
+# the resource dropdowns list the resources defined in the game editor
+func _on_visibility_changed():
+	if (visible and unit_resource != null):
+		action_panel.save_to_resource(unit_resource)
+		action_panel.load_from_resource(unit_resource)
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	
@@ -90,7 +106,8 @@ func _ready() -> void:
 	info_panel.get_load_button().button_up.connect(load_from_file)
 	
 	ftm.resource_uploaded.connect(load_resource)
-	
+	visibility_changed.connect(_on_visibility_changed)
+
 	update_resources.emit(resources)
 	
 	action_panel.link_unit_editor(self)

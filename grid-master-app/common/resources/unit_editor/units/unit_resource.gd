@@ -28,6 +28,19 @@ func _init():
 	set_attribute("id", _next_id)
 	_next_id += 1
 
+
+## Gives the unit a new ID that no other unit has
+func assign_new_id():
+	set_attribute("id", _next_id)
+	_next_id += 1
+
+
+## Makes sure the given ID isn't given to new units.
+##
+## Called for units loaded from files, as their IDs were given in an earlier session
+static func reserve_id(id_p : int):
+	_next_id = max(_next_id, id_p + 1)
+
 ## takes an attribute of a certain name and puts its value in the dictionary
 func set_attribute(name_p : String, value_p):
 	#TODO: Probably need to check for null values

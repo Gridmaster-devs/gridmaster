@@ -21,11 +21,14 @@ func load_from_action(action : Action):
 		
 	var cp = action as ConsumeProduce
 	
+	# resources that the game doesn't define (e.g. in units from older versions) default to none
 	if (cp.consumed_resource != null):
-		HelperFuncs.select_with_text(consumes_name, cp.consumed_resource)
-		
+		if !HelperFuncs.select_with_text(consumes_name, cp.consumed_resource):
+			HelperFuncs.select_with_text(consumes_name, ConsumeProduce.NO_RESOURCE)
+
 	if (cp.produced_resource != null):
-		HelperFuncs.select_with_text(produces_name, cp.produced_resource)
+		if !HelperFuncs.select_with_text(produces_name, cp.produced_resource):
+			HelperFuncs.select_with_text(produces_name, ConsumeProduce.NO_RESOURCE)
 		
 	if (cp.consumed_amount != null):
 		consumes_amount.value = cp.consumed_amount
@@ -73,6 +76,8 @@ func _ready() -> void:
 # just adds the resources to the dropdown menus
 func initiate(editor_resources : Array[String]) -> void:
 	resources = editor_resources
+	consumes_name.add_item(ConsumeProduce.NO_RESOURCE, -1)
+	produces_name.add_item(ConsumeProduce.NO_RESOURCE, -1)
 	for item in editor_resources:
 		consumes_name.add_item(item, -1)
 		produces_name.add_item(item, -1)

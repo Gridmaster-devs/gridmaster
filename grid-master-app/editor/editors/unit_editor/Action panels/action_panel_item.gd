@@ -29,14 +29,22 @@ func update_panel_type(selected : int):
 	match action_type:
 		Action.Type.CONSUMEPRODUCE:
 			create_consumeproduce_panel()
-			
-	
+		Action.Type.MOVECOST:
+			create_move_cost_panel()
+
+
 func create_consumeproduce_panel():
 	var scene : ConsumeProducePanel = preload("res://editor/editors/unit_editor/Action panels/ConsumeProducePanel.tscn").instantiate()
 	child_panel_parent.add_child(scene)
 	scene.initiate(resources)
 	child_panel = scene
-	
+
+func create_move_cost_panel():
+	var scene : MoveCostPanel = preload("res://editor/editors/unit_editor/Action panels/MoveCostPanel.tscn").instantiate()
+	child_panel_parent.add_child(scene)
+	scene.initiate(resources)
+	child_panel = scene
+
 func self_destruct():
 	queue_free()
 	
@@ -58,7 +66,12 @@ func load_from_action(action : Action):
 			update_panel_type(Action.Type.CONSUMEPRODUCE as int)
 			panel_type_box.select(Action.Type.CONSUMEPRODUCE as int)
 			child_panel.load_from_action(action)
-			
+
+		if action is MoveCost:
+			update_panel_type(Action.Type.MOVECOST as int)
+			panel_type_box.select(Action.Type.MOVECOST as int)
+			child_panel.load_from_action(action)
+
 		if action is NoneAction:
 			update_panel_type(Action.Type.NONE as int)
 			panel_type_box.select(Action.Type.NONE as int)
